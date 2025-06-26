@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en-AU" id="colour-target" class="dark-mode">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <!-- Website information -->
+  <title>Vocabug-pro Docs</title>
+  <meta name="description" content="A tool to generate words.">
+  <meta name="keywords" content="conlangs">
+  <meta name="author" content="Neonnaut">
+  <!-- Scripts and stylings -->
+  <link href="style.css" rel="stylesheet" type="text/css" media="all">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="script/theme-picker.js"></script>
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="img/voc_apple-touch.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/voc_favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/voc_favicon-32x32.png">
+</head>
+<body>
+  <nav id="myNav">
+    <ol class="breadcrumbs">
+      <li>
+        <a href="/"><img alt="neocities favicon" src="./img/neonnaut.png"></a>
+      </li>
+      <li style="float: right;">
+        <button id="main_menu"><i class="fa fa-bars"></i> Menu</button>
+      </li>
+    </ol>
+  </nav>
+
+  <div id="content">
+    <section id="top">
+      <div>
+        <img src="img/vocabug_logo.png" alt="Logo of letter V with bug antennae" width="100" height="100" style="float: left;">
+
+        <h1 style="margin-bottom: 10px;">Vocabug-pro<br>documentation</h1>
+        <b>Version 0.0.0</b>
+      </div>
+      <br>
+
+      <h2>Contents</h2>
+      <ol class="nice-list">
+        <li><a href="#vocAbout">About Vocabug</a></li>
+        <li><a href="#vocInterface">Interface</a>
+        <ol class="nice-list">
+          <li><a href="#vocOptions">Options</a></li>
+          <li><a href="#vocSaveLoad">File save / load</a></li> 
+        </ol>
+        </li>
+        <li><a href="#vocComments">Using comments</a></li>
+        <li><a href="#vocGraphemes">About graphemes</a>
+        <ol class="nice-list">
+          <li><a href="#vocNullGrapheme">Null grapheme</a></li>
+          
+
+          <li><a href="#vocEscapingCharacters">Escaping characters</a>
+          <ol class="nice-list">
+            <li><a href="#vocEscapeWord">Word creation character escape</a></li>
+            <li><a href="#vocEscapeTransform">Transform character escape</a></li>
+          </ol>
+          </li>
+
+          <li><a href="#vocHTMLEntities">HTML Entities</a></li>
+          
+          
+        </ol>
+        </li>
+
+
+        <li><a href="#vocCategories">Categories</a>
+        <ol class="nice-list">
+          <li><a href="#vocLongFormCategory">Long form category name</a></li>
+          <li><a href="#vocCategoryDropOff">Category-drop-off directive</a></li>
+          <li><a href="#vocCategoryinCategory">Categories inside categories and category-sets</a></li>
+        </ol>
+        </li>
+
+        <li><a href="#vocCategoryWeights">Assigning weights</a></li>
+        <li><a href="#vocBuildingWords">Building words</a>
+        <ol class="nice-list">
+          <li><a href="#vocWords">Words</a>
+          <ol class="nice-list">
+            <li><a href="#vocWordDropOff">Word-drop-off directive</a></li>
+          </ol>
+          </li>
+        
+          <li><a href="#vocSegments">Segments</a></li>
+          <li><a href="#vocPickOne">Pick-one-set</a></li>
+          <li><a href="#vocOptional">Optional-set</a>
+          <ol class="nice-list">
+            <li><a href="#vocOptionalWeight">Optional weight</a></li>
+          </ol>
+          </li>
+          <li><a href="#vocInterSet">Inter-set</a>
+          <ol class="nice-list">
+            <li><a href="#vocInterSetWeight">Inter-set weight</a></li>
+          </ol>
+          </li>
+        </ol>
+        </li>
+        <li><a href="#vocAlphabetisationAndGraphs">Alphabetisation and graphs</a>
+        <ol class="nice-list">
+          <li><a href="#vocAlphabetisation">Alphabetisation</a></li>
+          <li>
+            <a href="#vocGraphs">Defining graphemes</a>
+            <ol class="nice-list">
+              <li><a href="#vocAlternativeGraphs">Alternative graphemes</a></li>
+            </ol>
+            <li><a href="#vocInvisibility">Invisibility</a></li>
+          </ol>
+        </li>
+
+        <li><a href="#nascTransform">Transform</a></li>
+        <li><a href="#nascTheChange">The change</a>
+        <ol class="nice-list">
+          <li><a href="#nascConcurrentSet">Concurrent-set</a></li>
+          <li><a href="#nascMergingSet">Merging-set</a></li>
+          <li><a href="#nascOptionalSet">Optional-set</a></li>
+          <li><a href="#nascReject">Reject</a></li>
+        </ol>
+        </li>
+
+        <li><a href="#nascTheCondition">The condition</a>
+        <ol class="nice-list">
+          <li><a href="#nascMultipleCondition">Multiple conditions in one rule</a></li>
+          <li><a href="#nascOptionalConcurrent">Optional and concurrent set</a></li>
+          <li><a href="#nascWordBoundary">Word boundary</a></li>
+          <li><a href="#nascSyllableBoundary">Syllable boundary</a></li>
+          <li><a href="#nascWordBasedCondition">Word-based conditions</a></li>
+        </ol>
+        </li>
+
+        <li><a href="#nascTheException">The exception</a></li>
+
+        <li><a href="#nascUsingCategories">Using categories</a></li>
+        <li><a href="#nascFeature">The features directive</a>
+          <ol class="nice-list">
+            <li><a href="#nascFeatureField">Feature-field</a></li>
+          </ol></li>
+
+        <li><a href="#nascWildcardAndPositioning">Wildcard, repetition and positioning</a>
+        <ol class="nice-list">
+          <li><a href="#nascWildcard">Wildcard</a></li>
+          <li><a href="#nascDittoMark">Ditto-mark</a></li>
+          <li><a href="#nascPlusMark">Plus-mark</a></li>
+          <li><a href="#nascAnythingsMark">Anythings-mark</a></li>
+          
+          <li><a href="#nascQuantifier">Quantifier</a></li>
+
+          <li><a href="#nascBlocker">Blocker</a></li>
+
+          <li><a href="#nascPositioner">Positioner</a></li>
+        </ol>
+        </li>
+
+        <li><a href="#nascInsertionAndDeletion">Insertion and deletion</a></li>
+        <li><a href="#nascAdvancedRules">Advanced rules</a>
+          <ol class="nice-list">
+            <li><a href="#nascMetathesis">Metathesis</a></li>
+        </ol>
+        </li>
+
+        <li><a href="#nascLogicBlock">Logic blocks</a>
+        <ol class="nice-list">
+          <li><a href="#nascIfThenElse">If block</a></li>
+          <li><a href="#nascChance">Chance block</a></li>
+          <li><a href="#nascRuleMacro">Rule macro</a></li>
+        </ol>
+        </li>
+        <li><a href="#nascClusterfield">Cluster-field</a></li>
+        <li><a href="#nascEngine">Engine</a></li>
+      </ol>
+
+      <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
+      <p>This is the complete documentation for <a href="./vocabug-pro.html">Vocabug-pro, version 0.0.0</a></p>
+      <p>Vocabug randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.</p>
+
+      <h2 id="vocInterface"><a class="head-num">2</a>Interface</h2>
+      <ul class="paragraphian">
+        <li>The textbox at the top of the program is the <code class="example">definition-build editor</code>. A definition-build defines the graphemes, frequencies, word-shapes and transforms that generate the final words. There will already be a default definition-build in the definition-build editor, or the previous definition-build that generated words</li>
+        <li>Use the <code class="example">Generate</code> button to see Vocabug produce words</li>
+        <li>Use the <code class="example">Copy</code> button to copy the words to the clipboard</li>
+        <li>Use the <code class="example">Clear</code> button to clear the definition-build editor and the generated words</li>
+      </ul>
+
+      <h3 id="vocOptions"><a class="head-num">2.1</a>Options</h3>
+      <ul class="paragraphian">
+        <li>Use the <code class="example">Number of words</code> textbox to choose the number of words to generate. The default number is 100</li>
+        <li><code class="example">Word-list mode</code> will produce a list of words</li>
+        <li><code class="example">Paragraph mode</code> will produce words that look vaguely like sentences by injecting punctuation into the word list and capitalising the first word of each sentence</li>
+        <li><code class="example">Debug mode</code> will show, line by line, each step in creating each word</li>
+        <li><code class="example">Editor wrap lines</code> will make the definition-build editor jump to the next line if the line escapes the width of the definition-build editor</li>
+        <li><code class="example">Show keyboard</code> will reveal a 'keyboard' below the editor</li>
+        <li><code class="example">Remove duplicates</code> will make sure all words generated are unique</li>
+        <li><code class="example">Force words</code> will force the generator to try and generate the complete number of words requested within 30 seconds, despite the number of rejections / duplicates removed</li>
+        <li><code class="example">Sort words</code> and <code class="example">Capitalise words</code> should be self explanatory</li>
+        <li>The <code class="example">Word divider</code> textbox sets the delimiter, or in other words, what the content will be between each word in the output. It is a space "<code class="example"> </code>" by default. Use <code class="example">\n</code> to get one word for each line</li>
+      </ul>
+
+      <h3 id="vocSaveLoad"><a class="head-num">2.2</a>File save / load</h3>
+      <ul class="paragraphian">
+        <li>Use the <code class="example">Save</code> button to download the definition-build as a file called 'vocabug.txt', or whatever you named your file in the <code class="example">File name:</code> field. The file is always a ".txt" type</li>
+        <li>Use the <code class="example">Load</code> button to load a file from your system into the definition-build editor</li>
+        <li>Use the buttons in the <code class="example">Examples</code> dropdown to load a number of example definition-builds into the definition-build editor</li>
+      </ul>
+      
+      <h2 id="vocComments"><a class="head-num">3</a>Using comments</h2>
+      <p>If a line contains a semicolon <code class="example">;</code> everything after it on that line is ignored and not interpreted as Vocabug syntax -- unless <code class="example">;</code> is <a href="#vocWordCreationEscape">escaped</a>. You can use this to leave notes about what something does or why you made certain decisions.</p>
+
+      <h2 id="vocAboutGraphemes"><a class="head-num">4</a>About graphemes</h2>
+      <p>Graphemes are indivisible meaningful characters that make a generated word in Vocabug. Phonemes can be thought of as graphemes. If we use English words <code class="example">sky</code> and <code class="example">shy</code> as examples to illustrate this, <code class="example">sky</code> is made up by the graphemes <code class="example">s</code> + <code class="example">k</code> + <code class="example">y</code>, while <code class="example">shy</code> is made up by <code class="example">sh</code> + <code class="example">y</code>.</p>
+
+      <h3 id="vocNullGrapheme"><a class="head-num">4.1</a>Null grapheme</h3>
+      <p>If a word is built using the syntax character <code class="example">^</code>, it will disappear in the generated word. In other words <code class="example">^</code> is a null grapheme. If you want to use <code class="example">^</code> as a grapheme, you will need to <a href="#vocWordCreationEscape">escape it</a>. To use other syntax characters as graphemes, they must be escaped too.</p>
+
+      <h3 id="vocEscapingCharacters"><a class="head-num">4.2</a>Escaping characters</h3>
+      <p>A character after the syntax character <code class="example">\</code> ignores any meaning it might have had in the generator, including backslashes themselves. This way, anything including capital letters that have already been defined as categories, brackets, even spaces can be generated or targeted in transforms</p>
+
+      <h4 id="vocEscapeWord"><a class="head-num">4.2.1</a>Word creation character escape</h4>
+      <p>These are the characters you must escape if you want to use them in  in <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> and the <a href="#vocWords">words</a> directive:</p>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Characters</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><code class="example">;</code></td>
+            <td><a href="#vocComments">Comment</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">{&</code>, <code class="example">}</code></td>
+            <td><a href="#vocHTMLEntities">HTML Entities</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">C</code>, <code class="example">D</code>, <code class="example">Ḱ</code>, ...</td>
+            <td>Any one-length character can refer to a <a href="#vocCategories">category</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">{</code>, <code class="example">}</code></td>
+            <td>References a <a href="#vocLongFormCategory">long form category name</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">,</code></td>
+            <td>Separates choices</td>
+          </tr>
+          <tr>
+            <td><code class="example"> </code></td>
+            <td>Space, separates choices. An alternative to commas</td>
+          </tr>
+          <tr>
+            <td><code class="example">$</code></td>
+            <td>Defines a <a href="#vocSegments">segment</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">:</code></td>
+            <td>Gives weight to a grapheme, <a href="#vocSegments">segments</a>, set, or word-shape</td>
+          </tr>
+          <tr>
+            <td><code class="example">?</code></td>
+            <td>Gives probability of an <a href="#vocOptional">optional-set</a> being chosen</td>
+          </tr>
+          <tr>
+            <td><code class="example">@</code></td>
+            <td>Gives <a href="#vocInterSetWeight">weight of an inter-set</a> being chosen over others</td>
+          </tr>
+          <tr>
+            <td><code class="example">[</code>, <code class="example">]</code></td>
+            <td><a href="#vocPickOne">Pick-one-set</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">(</code>, <code class="example">)</code></td>
+            <td><a href="#vocOptional">Optional-set</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">&lt;</code>, <code class="example">&gt;</code></td>
+            <td><a href="#vocInterSet">Inter-set</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">\</code></td>
+            <td>Escapes a character after it</td>
+          </tr>
+        </tbody>
+      </table>
+      
+
+      <h4 id="vocEscapeTransform"><a class="head-num">4.2.2</a>Transform character escape</h4>
+      <p>These are the characters you must escape if you want to use them in the <a href="#nascTransform">transform</a> block.</p>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Characters</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><code class="example">;</code></td>
+            <td><a href="#vocComments">Comment</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">&gt;</code>, <code class="example">-&gt;</code>, <code class="example">=&gt;</code>, <code class="example">⇒</code>, <code class="example">→</code></td>
+            <td>Indicates <a href="#nascTheChange">change</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">,</code></td>
+            <td>Separates choices</td>
+          </tr>
+          <tr>
+            <td><code class="example">[</code>, <code class="example">]</code></td>
+            <td><a href="#nascConcurrentSet">Concurrent-set</a> or <a href="#nascMergingSet">merging-set</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">(</code>, <code class="example">)</code></td>
+            <td><a href="#nascOptionalSet">Optional-set</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">^REJECT</code></td>
+            <td><a href="#nascReject">Rejects</a> a word</td>
+          </tr>
+          <tr>
+            <td><code class="example">/</code></td>
+            <td><a href="#nascTheCondition">The condition</a> follows this character</td>
+          </tr>
+          <tr>
+            <td><code class="example">_</code></td>
+            <td>The underscore <code class="example">_</code> is a reference to the target</td>
+          </tr>
+          <tr>
+            <td><code class="example">#</code></td>
+            <td><a href="#nascWordBoundary">Word boundary</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">$</code></td>
+            <td><a href="#nascSyllableBoundary">Syllable boundary</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">!</code></td>
+            <td><a href="#nascTheException">The exception</a> follows this character</td>
+          </tr>
+          <tr>
+            <td><code class="example">{</code>, <code class="example">}</code></td>
+            <td><a href="#nascUsingCategories">Category</a> or <a href="#nascFeature">feature-matrix</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">*</code></td>
+            <td><a href="#nascWildcard">Wildcard</a>, matches exactly 1 of any character</td>
+          </tr>
+          <tr>
+            <td><code class="example">"</code></td>
+            <td><a href="#nascDittoMark">Ditto-mark</a>, matches exactly 1 of the previous character</td>
+          </tr>
+          <tr>
+            <td><code class="example">+</code></td>
+            <td><a href="#nascPlusMark">Plus-mark</a>, matches 1 or more of the previous character</td>
+          </tr>
+          <tr>
+            <td><code class="example">~</code>, <code class="example">…</code></td>
+            <td><a href="#nascAnythingsMark">Anythings-mark</a>, matches 1 or more of any character. It is non-greedy</td>
+          </tr>
+          <tr>
+            <td><code class="example">=[</code>, <code class="example">]</code></td>
+            <td><a href="#nascQuantifier">Quantifier</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">&lt;[</code>, <code class="example">]</code></td>
+            <td><a href="#nascBlocker">Blocker</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">@[</code>, <code class="example">]</code></td>
+            <td><a href="#nascPositioner">Positioner</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">^</code></td>
+            <td><a href="#nascInsertionAndDeletion">Insertion</a> when in <code class="example">TARGET</code>, <a href="#nascInsertionAndDeletion">deletion</a> when in <code class="example">RESULT</code></td>
+          </tr>
+          <tr>
+            <td><code class="example">|</code></td>
+            <td>Indicates <a href="#nascMetathesis">metathesis</a>, and the reordered contents</td>
+          </tr>
+          <tr>
+            <td><code class="example">1</code>, <code class="example">2</code>, ... <code class="example">9</code></td>
+            <td>In a <a href="#nascMetathesis">metathesis</a> rule, in <code class="example">RESULT</code>, these represent the changing graphemes</td>
+          </tr>
+          <tr>
+            <td><code class="example">\</code></td>
+            <td>Escapes a character after it</td>
+          </tr>
+        </tbody>
+        </table>
+
+      <h3 id="vocHTMLEntities"><a class="head-num">4.3</a>HTML entities</h3>
+      <p>Enclosing it in curly brackets <code class="example">{</code> and <code class="example">}</code>, the name, or hex-code of a HTML entity will be decoded at the very end of the definition build. For example <code class="example">{&amp;Agrave}</code> will give <code class="example">&Agrave;</code>, and <code class="example">{&amp;#x2603}</code> will give <code class="example">{&#x2603;}</code></p>
+      <p>If using the name of a HTML entity, you must preface it with <code class="example">&</code>. When using the hex-code of a HTML entity, you must preface it with <code class="example">&amp;#</code>. You cannot end the name or hex-code of the entity with a semicolon.</p>
+
+
+      <h2 id="vocCategories"><a class="head-num">5</a>Categories</h2>
+      <p>A category is a set of <a href="#vocGraphemes">graphemes</a> with a name. The name is usually a singular-length character, but can be <a href="#vocLongFormCategory">long-form</a>. For example:</p>
+      <pre class="example">C = t, n, k, m, ch, l, ꞌ, s, r, d, h, w, b, y, p, g
+F = n, l, ꞌ, t, k, r, p
+V = a, i, e, u, o</pre>
+      <p>This creates three groups of graphemes. <code class="example">C</code> is the group of all consonants, <code class="example">V</code> is the group of all vowels, and <code class="example">F</code> is the group of some of the consonants that will be used syllable finally.</p>
+        
+      <p>These graphemes are separated by commas, however an alternative is to use spaces: <code class="example">C = t n k m ch l ꞌ s r d h w b y p g</code>. You may not use both commas and spaces as separators on the same line, i.e: <code class="example">A = a b, c</code>.</p>
+
+      <p>By default, the graphemes' frequencies decrease as they go to the right, according to the Gusein-Zade distribution. In the above example, when Vocabug needs to choose a <code class="example">V</code>, it will choose <code class="example">a</code> the most at 43%, <code class="example">i</code> the second-most at 26%, <code class="example">e</code> the third-most at 17%, <code class="example">u</code> the fourth-most at 10%, and <code class="example">o</code> the fifth most at 4%.</p>
+      
+      <h3 id="vocLongFormCategory"><a class="head-num">5.1</a>Long-form category names</h3>
+      <p>You can also give categories long names, but you will need to enclose them in curly brackets <code class="example">{</code> and <code class="example">}</code> when using them:</p>
+      <pre class="example">consonant = t, n, k, m, ch, l, ꞌ, s, r, d, h, w, b, y, p, g
+vowel = a, i, e, u, o
+words: {consonant}{vowel}</pre>
+
+      <h3 id="vocCategoryDropOff"><a class="head-num">5.2</a>Category-drop-off</h3>
+      <p>This option modifies the default grapheme frequencies of categories. For example: <code class="example">category-drop-off: flat</code>. There are three options:</p>
+      <ul class="paragraphian">
+        <li><code class="example">zipfian</code> has the fastest drop-off, graphemes frequencies will decrease fast as they go to the right, according to the Zipf distribution</li>
+        <li><code class="example">gusein-zade</code> approximates a natural frequency distribution of graphemes. As already stated, this is the default</li>
+        <li><code class="example">flat</code> will make all graphemes have an equal chance of being chosen</li>
+      </ul>
+      
+      <h3 id="vocCategoryinCategory"><a class="head-num">5.3</a>Categories inside categories and set-categories</h3>
+      <p>You can use categories inside categories, as long as the referenced category has previously been defined. For example:</p>
+      <pre class="example">class-drop-off: flat<br>L = aa, ii, ee, oo
+V = a, i, e, o, L</pre>
+      <p>In the example above, <code class="example">V</code> has a 20% chance of being a long vowel.</p>
+      <p>You can also enclose a set of graphemes in square brackets <code class="example">[</code> and <code class="example">]</code>. This is called a 'set-category'. This set will be treated as if it were a reference to a category in terms of frequency. For example, we could write the same example as this:</p>
+      <pre class="example">class-drop-off: flat<br>V = a, i, e, o, [aa, ii, ee, oo]</pre>
+      <p>Assigning weights to categories in categories and set-categories is possible.</p>
+      <p>Categories inside categories and set-categories CANNOT be a part of any sequence. for example <code class="example">C = Xz</code> or <code class="example">C = x[c, d]</code> or <code class="example">C = [a, b][c, d]</code> will not give the results you might want. To get sequence-like behaviour like that, you will need to use <a href="#vocSegments">segments</a>.</p>
+
+      <h2 id="vocCategoryWeights"><a class="head-num">6</a>Assigning weights</h2>
+      <p>If you want to set your own frequency for graphemes in a <a href="#vocCategories">category</a> or category-set, items in a <a href="#vocPickOne">pick-one-set</a>, <a href="#vocOptional">optional-set</a>, or <a href="#vocInterSet">inter-set</a>, or <a href="#vocWords">word-shapes</a> in the <code class="example">words:</code> directive, you can use a colon <code class="example">:</code> to specify the weight for each item, like so:</p>
+      <pre class="example">V = a:5, e:4, i:3, o:2, u:1
+$S = [V:8 x:2]
+words: $S:2 y</pre>
+      <p><code class="example">V</code> has approximately the following probabilities: a: 33%, e: 27%, i: 20%, o: 13%, u: 7%. The <a href="#vocPickOne">pick-one-set</a> in the <code class="example">$S</code> segment has an 80% chance of producing a V category over the x grapheme. And the first word-shape in the <code class="example">words:</code> directive has twice the chance of being chosen over the next word-shape.</p>
+      <p>As you might have seen in the example above, in a sequence that has an option that has a weight, it overwrites any drop off frequencies. Also important to note is that any other option that you had not given a weight, is given a default weight of 1.</p>
+
+      <h2 id="vocBuildingWords"><a class="head-num">7</a>Building words</h2>
+
+      <h3 id="vocWords"><a class="head-num">7.1</a>Words</h3>
+      <p>The <code class="example">words:</code> directive defines a set of 'word-shapes' that Vocabug will choose from to create words. A word-shape can consist of individual graphemes, <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> or a mixture of both.</p>
+      <p>By default, words are selected using the Zipf distribution. The first word-shape will be chosen the most often, then the second word-shape the second most often and so on. Below is a very simple example that will generate words with one to three CV syllables:</p>
+      <pre class="example">C = t, n, k, m, l, s, r, d, h, w, b, j, p, g
+V = a, i, o, e, u
+words: CV, CVCV, CVCVCV</pre>
+
+      <h4 id="vocWordDropOff"><a class="head-num">7.1.1</a>Word-drop-off</h4>
+      <p>This directive modifies how often the words' frequencies decrease as they go to the right, unless they have weights. The options are <code class="example">zipfian</code>, <code class="example">gusein-zade</code>, and <code class="example">flat</code>. The default is <code class="example">zipfian</code>.</p>
+      <p>It is better to not use this directive or give word-shapes weights -- it is an uphill battle. For example, if you chose to remove duplicates in the above example, it is already removing one syllable words the most often. And if you have paragraph mode turned on, you would want simple syllables to occur very often. So it is best to simply rearrange the word-shapes in the words directive to get good-looking results. Nevertheless, maybe you want to use a flat distribution because you are only generating CVCV syllables of different types, or generating something that doesn't play by the rules.</p>
+
+      <h3 id="vocSegments"><a class="head-num">7.2</a>Segments</h3>
+      <p>Segments are a system that provides an abbreviation of parts of a <a href="#vocWords">word-shape</a>. Typically you would use it to define the shape of a syllable. Segments are defined similarly to categories, but with several important differences:</p>
+      <ul class="paragraphian">
+        <li>Every segment's name starts with <code class="example">$</code>. <code class="example">S = s</code> is a <a href="#vocCategories">category</a>; <code class="example">$S = s</code> is a segment.</li>
+        <li>Segments are not sets like categories are. <code class="example">$M = a, b, c</code> will not work. You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">$M = [a, b, c]</code></li>
+        <li>Segments have an effect on the logic behind <a href="#vocInterSet">Inter-sets</a>. In this sense, segments are not just abbreviation.</li>
+      </ul>
+      <p>For example you could write the last example like so:</p>
+      <pre class="example">$S = CV
+words: $S $S$S $S$S$S</pre>
+
+      <h3 id="vocPickOne"><a class="head-num">7.3</a>Pick-one set</h3>
+      <p>A pick-one-set is a group of graphemes and categories separated by spaces or commas, enclosed in square brackets <code class="example">[</code> and <code class="example">]</code>. Vocabug will pick an option from that pick-one just like it would from a segment. For example:</p>
+      <pre class="example">V = a, u
+words: t[V, x]</pre>
+      <p>This will produce either <code class="example">ta</code>, <code class="example">tu</code> or <code class="example">tx</code>.</p>
+      <p>Pick-one-sets can be nested inside each other.</p>
+      <p>Anything inside the pick-one can be assigned a weight, and a pick-one itself can be assigned a weight as well if it is nested inside another set:</p>
+      <pre class="example">words: [a:1, b:2, [c, d]:2]</pre>
+
+      <h3 id="vocOptional"><a class="head-num">7.4</a>Optional-set</h3>
+      <p>Using round brackets, <code class="example">(</code> and <code class="example">)</code>, optional-set works the same way as <a href="#vocPickOne">pick-one-set</a>, the only difference is that what's inside them can either appear in the word or not. The probability of each of these variants is 10% by default.</p>
+      <pre class="example">words: ta(n, t, l)</pre>
+      <p>In the above example, there is a 10% chance of getting one of <code class="example">tan</code>, <code class="example">tat</code> or <code class="example">tal</code>, but a 90% chance of <code class="example">ta</code>.</p>
+
+      <h4 id="vocOptionalWeight"><a class="head-num">7.4.1</a>Optional weight</h4> 
+      <p>This default probability can be modified in two ways. The first is by attaching a percentage-based weight following a <code class="example">?</code> inside the optional-set:</p>
+      <pre class="example">$S = ta(n, t, l ?30)
+words: $S</pre>
+      <p>Now there is a 30% chance of getting one of <code class="example">tan</code>, <code class="example">tat</code> or <code class="example">tal</code>.</p>
+    
+      <p>The other way to change this probability is through the <code class="example">optional-rate:</code> directive. This directive specifies how often an optional-set is selected. This number is a percentage and as previously stated the default is 10%. For example:</p>
+      <pre class="example">optional-rate: 20</pre>
+      <p>You can write this number with a percentage sign on the end if you want to.</p>
+
+      <h3 id="vocInterSet"><a class="head-num">7.5</a>Inter-set</h3>
+      <p>An inter-set, using less and greater than signs <code class="example">&lt;</code> and <code class="example">></code>, works the same as <a href="#vocPickOne">pick-one-set</a>. The difference is, only one inter-set will be chosen for that segment or word-shape.</p>
+      <p>Inter-set is a feature designed to help generate words with stress or pitch accent systems. Here is an example where it is used for a stress system:</p>
+      <pre class="example">C = t
+V = a
+$X = (&lt;'&gt;CV)&lt;'&gt;CV
+words: $X</pre>
+      <p>This produces any of the following words: <code class="example">'ta</code>, <code class="example">ta'ta</code>, <code class="example">'tata</code>, never any words with a double <code class="example">'</code>. Notice here that <code class="example">ta</code> is not possible -- An inter-set set is only chosen after dealing with any sets any Inter-pick-one sets are nested in.</p>
+      <p>There are a few restrictions and peculiarities to it. Most notably, Inter-set may not be nested inside each other. Let's look at another example:</p>
+      <pre class="example">class-drop-off: flat
+words: &lt;a, b&gt;&lt;x&gt;</pre>
+      <p>The above example is rather silly, as there is nothing between each Inter-set, defeating its whole purpose. However it is useful as an example here in showing that it is equivalent to the example below, which uses pick-ones instead.</p>
+      <pre class="example">class-drop-off: flat
+words: [[a, b],[x]]</pre>
+      <p>In both of the above examples, there is a 25% chance of producing <code class="example">a</code>, a 25% chance of <code class="example">b</code>, and a 50% chance of producing <code class="example">x</code>.</p>
+      <p>See the "Romance-like" example for a language that uses inter-set for its stress system, or the "BTX" example for a language that uses it for a complex pitch accent system.</p>
+      
+      <h4 id="vocInterSetWeight"><a class="head-num">7.5.1</a>Inter-set weight</h4> 
+      <p>Inter-set weights begin with an <code class="example">@</code> inside the set. The number of the weight behaves like semicolon weights rather than percentage-based weights. Let's look at a scenario break it down:</p>
+      <pre class="example">class-drop-off: flat
+$Y = &lt;a:2, b:1 @3&gt;&lt;c&gt;
+words: &lt;$Y @8&gt;-&lt;d @2&gt;</pre>
+      <p>In the segment <code class="example">$Y</code>, <code class="example">a</code> and <code class="example">b</code> have a three times greater chance of being chosen over <code class="example">c</code>, while <code class="example">a</code> has a weight that makes it twice as probable than <code class="example">b</code>. In the <code class="example">words:</code> directive, there is one word-shape, and that word-shape has an 80% chance of being the segment <code class="example">Y</code> followed by <code class="example">-</code>, and a 20% chance of the word being <code class="example">-d</code>.</p>
+
+      <h2 id="vocAlphabetisationAndGraphs"><a class="head-num">8</a>Alphabetisation and graphemes</h2>
+      <p>The <code class="example">alphabet:</code>, <code class="example">graphs:</code>, <code class="example">alphabet-graphs:</code> and <code class="example">invisible:</code> directives can be an important element to your definition-build. Let's go over its uses.</p>
+
+      <h3 id="vocAlphabetisation"><a class="head-num">8.1</a>Alphabetisation</h3>
+      <p>The alphabet directive gives Vocabug a custom alphabetisation order for words, when the sort words checkbox is selected.</p>
+      <pre class="example">alphabet: a, b, c, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
+      <p>This would order generated words like so: <code class="example">cat chat cumin frog tray t'a</code></p>
+
+      <h3 id="vocGraphs"><a class="head-num">8.2</a>Defining graphs</h3>
+      <p>The <code class="example">graphs:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nascTransform">transforms</a>.</p>
+      <pre class="example">graphs: a, b, c, ch, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
+      <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
+      <p><i>"But my list of graphemes is the same as my list of alphabeticalising letters, I don't want to list them twice"</i>, you might exclaim. Well, you can create an alphabetisation order and list your graphemes in one line using the <code class="example">alphabet-and-graphs:</code> directive.</p>
+      
+      <h4 id="vocAlternativeGraphs"><a class="head-num">8.2.1</a>Alternative graphemes</h4>
+      <p>The <code class="example">graphs:</code> directive can tell Vocabug which character + combining diacritic sequences are to be treated as alternatives of a base grapheme. Let's name these alternatives the 'children' and the base grapheme the 'parent'. You can do this by enclosing the 'children' in <code class="example">&lt;[</code> and <code class="example">]</code> as a set, directly after their 'parent'.</p>
+      <p>Important: The left-most precomposed character of a 'child' must be the same as its 'parent'.</p>
+      <p>This should be useful for tonal languages that mark tone with diacritics on vowels. In these tonal languages, we no longer need to list every variation of a vowel + diacritic to capture a vowel:</p>
+      <pre class="example">  graphs: a, &lt;[á, à, ā, ǎ], h, i, &lt;[í, ì, ī, ǐ], k, l, m, n, o, &lt;[ó, ò, ō, ǒ], t<br>  a -> o<br>; mápǎ ==> mópǒ</pre>
+      <p>However we can still capture a vowel with a tone mark, such as <code class="example">ǎ</code>:</p>
+      <pre class="example">  ǎ -> o<br>; mápǎ ==> mápo</pre>
+
+      <h3 id="vocInvisibility"><a class="head-num">8.3</a>Invisibility</h3>
+      <p>Sometimes you will want characters, such as syllable dividers, to be invisible to alphabetisation. You can do this by listing these characters in the invisible-alphabet: directive.</p>
+      <pre class="example">invisible-alphabet: ., ˈ<br></pre>
+      <p>This would order generated words <code class="example">ˈpa.ta ˈca.ta za.ˈta ca.ˈa</code> as   <code class="example">ca.ˈa, ˈca.ta, ˈpa.ta, za.ˈta</code></p>
+
+      <h2 id="nascTransform"><a class="head-num">9</a>Transform</h2>
+      <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of the transform block, which implements the <a href="./nasc.html">NASC program</a>.</p>
+      <p>All transforms must be used inside this block. To terminate a block you use an <code class="example">END</code> line. However, all unterminated blocks are automatically terminated at the end of the definition-build:</p>
+      <pre class="example">BEGIN transform:<br>; Your rules go here<br>END</pre>
+      <p>A NASC rule can be summarised in four fields: <code class="example">CHANGE / CONDITION ! EXCEPTION</code>. The characters <code class="example">/</code> and <code class="example">!</code> that precede each field (except for the <code class="example">CHANGE</code>) are necessary for signalling each field. For example, including a <code class="example">!</code> will signal that this rule contains an exception, and all text following it until the next field marker will be interpreted as such.</p>
+
+      <p>Every rule begins on a new line and must contain a <code class="example">CHANGE</code>. The <code class="example">CONDITION</code> or <code class="example">EXCEPTION</code> fields are optional.</p>
+      <p>If you want to capture graphemes that are normally syntax characters in transforms, you will need to <a href="#nascTransformEscape">escape them</a>.</p>
+
+      <p>When this document uses examples to explain transformations, the last comment shows an example word transforming. For example <code class="example">; amda ==> ampa</code> means the rule will transform the word <code class="example">amda</code> into <code class="example">ampa</code></p>
+
+      <h2 id="nascTheChange"><a class="head-num">10</a>The change</h2>
+      <p>The format of the change can be expressed as <code class="example">TARGET -> RESULT</code>.</p>
+      <ul class="paragraphian">
+        <li><code class="example">TARGET</code> specifies which part of the word is being changed</li>
+        <li>Then followed by a space and the <code class="example">></code> character. <code class="example">></code> can be swapped with either <code class="example">-></code>, <code class="example">=></code>, <code class="example">⇒</code> or <code class="example">→</code> if you prefer</li>
+        <li><code class="example">RESULT</code> is what <code class="example">TARGET</code> is changing into, or in other words, replacing</li>
+      </ul>
+      <p>Let's look at a simple unconditional rule:</p>
+      <pre class="example">; Replace every /o/ with /x/<br>  o -> x<br>; bodido ==> bxdidx</pre>
+      <p>In this rule, we see every instance of <code class="example">o</code> become <code class="example">x</code>.</p>
+
+      <h3 id="nascConcurrentSet"><a class="head-num">10.1</a>Concurrent set</h3>
+      <p>A concurrent set in a change is achieved by listing multiple graphemes in <code class="example">TARGET</code> separated by commas in square brackets, and listing the same amount of resultant graphemes in <code class="example">RESULT</code> separated by commas in square brackets. Changes in a concurrent change execute at the same time:</p>
+      <pre class="example">; Switch /o/ and /e/ around<br>  [o, a] -> [a, o]<br>; boda ==> bado</pre>
+      <p>Notice that the above example is different to the example below:</p>
+      <pre class="example">  o -> a<br>  a -> o<br>; boda ==> bodo</pre>
+      <p>where each change is on its own line. We can see <code class="example">o</code> merge with <code class="example">a</code>, then <code class="example">a</code> becomes <code class="example">o</code>.</p>
+
+      <p>In the above example, square brackets were used, but because the entire rule was a concurrent set, the square brackets are optional:</p>
+      <pre class="example">; Switch /o/ and /e/ around<br>  o, a -> a, o<br>; boda ==> bado</pre>
+      
+      <h3 id="nascMergingSet"><a class="head-num">10.2</a>Merging set</h3>
+      <p>A merging change is accomplished by placing graphemes enclosed in square brackets in <code class="example">TARGET</code>, with a corresponding singular grapheme in <code class="example">RESULT</code> that the graphemes in the set will merge into:</p>
+      <pre class="example">; Three graphemes becoming two graphemes<br>  [ʃ, z], dz -> s, d<br>; zeʃadzas ==> sesadas</pre>
+
+      <h3 id="nascOptionalSet"><a class="head-num">10.3</a>Optional-set</h3>
+      <p>Items in an optional-set can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
+      <pre class="example">; Merge /x/ and /xw/ into /k/<br>  x(w) -> k<br>; xwaxaħa ==> kakaħa</pre>
+      <p>Optional-set can also attach to a concurrent or merging change:</p>
+      <pre class="example">; Merge /x/, /xw/, /ħ/ and /ħw/ into /k/<br>  [x, ħ](w) -> k<br>; xwaxaħa ==> kakaka</pre>
+      <p>Looking at the above example, Let's say you wanted to preserve this optional /w/ following /k/ or /ħ/. We can do this by writing this /w/ in <code class="example">RESULT</code>, enclosed by round brackets:</p>
+      <pre class="example">; Like the previous rule, but preserve labialisation<br>  {x, ħ}(w) -> k(w)<br>; xwaxaħa ==> kwahaka</pre>
+      <p>The optional-set can also be a merging change, or concurrent change too:</p>
+      <pre class="example">; Like the previous rule, but preserve palatalisation and labialisation <br>  [x ħ](w, j) -> k(w, j)<br>; xwaxjaxa ==> kwakjaka</pre>
+
+      <h3 id="nascReject"><a class="head-num">10.4</a>Reject</h3>
+      <p>To remove, or in other words, reject a word, you use the <code class="example">^REJECT</code> keyword in <code class="example">RESULT</code>:</p>
+      <pre class="example">a, bi -> ^REJECT</pre>
+      <p>In the above example, any word that contains <code class="example">a</code> or <code class="example">bi</code> will be rejected.</p>
+
+      <h2 id="nascTheCondition"><a class="head-num">11</a>The condition</h2>
+      <p>Conditions follow <a href="#nascTheChange">the change</a> and are placed after a forward slash. The condition may also be called the environment.</p>
+      <p>The format of a condition is <code class="example">/ BEFORE_AFTER</code></p>
+      <ul class="paragraphian">
+        <li><code class="example">BEFORE</code> is anything in the word before the target</li>
+        <li>The underscore <code class="example">_</code> is a reference to the target in a condition</li>
+        <li><code class="example">AFTER</code> is anything in the word after the target</li>
+      </ul>
+      <p>For example:</p>
+      <pre class="example">; Change /o/ into /x/ only when it is between /p/s<br>  o -> x / p_p<br>; opoptot ==> opxptot</pre>
+
+      <h3 id="nascMultipleCondition"><a class="head-num">11.1</a>Multiple conditions in one rule</h3>
+      <p>Multiple conditions for a single rule can be made by separating each condition with additional forward slashes. The change will happen if it meets either, or both of the conditions:</p>
+      <pre class="example">; Change /o/ into /x/ only when it is between /p/s or /t/s<br>  o -> x / p_p / t_t<br>; opoptot ==> opxptxt</pre>
+
+      <h3 id="nascOptionalConcurrent"><a class="head-num">11.2</a>Optional and concurrent sets</h3>
+      <p><a href="#nascOptionalSet">Optional</a> and <a href="#nascConcurrentSet">concurrent</a> sets can be used in conditions:</p>
+      <pre class="example">  a -> e / k(w)_[p, s]<br>; kwop-po-kos-po ==> kwxp-po-kxs-ko</pre>
+      
+      <h3 id="nascWordBoundary"><a class="head-num">11.3</a>Word boundary</h3>
+      <p><code class="example">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="example">TARGET</code>, or the end of the word if it is in <code class="example">RESULT</code></p>
+      <pre class="example">  o -> x / p_p#<br>; opoppop ==> opoppxp</pre>
+
+      <h3 id="nascSyllableBoundary"><a class="head-num">11.4</a>Syllable boundary</h3>
+      <p><code class="example">$</code> matches to syllable boundaries. A syllable boundary is either the beginning or end of the word, or any of the symbols defined in the <code class="example">syllable-boundary:</code> directive.</p>
+      <p>For example:</p>
+      <pre class="example">  syllable-boundary: .<br>  t$t -> d$d<br>; at.ta ==> ad.da</pre>
+
+      <h3 id="nascWordBasedCondition"><a class="head-num">11.5</a>Word-based condition</h3>
+      <p>If we wanted to execute a transformation only on a list of words, we simply write those words as a list in a condition without any underscores:</p>
+      <pre class="example">sw -> s / _o / swore, sworn</pre>
+      <p>In the above example, the transformation will only execute if the word is <code class="example">swore</code> or <code class="example">sworn</code></p>
+
+      <h2 id="nascTheException"><a class="head-num">12</a>The exception</h2>
+      <p>Exceptions are placed following a <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- they will make sure the content in the exception does not execute a change:</p>
+      <pre class="example">sw -> s / _o ! swore, sworn</pre>
+      <p>In the above example, the transformation will not execute if the word is <code class="example">swore</code> or <code class="example">sworn</code></p>
+
+      <h2 id="nascUsingCategories"><a class="head-num">13</a>Using categories</h2>
+      <p>You can reference categories in transforms by enclosing a category in curly brackets <code class="example">{</code> and <code class="example">}</code>. The category will behave in the same way as a concurrent or merging set:</p>
+      <pre class="example">  B = x, y, z<br>  transform:<br>  {B} -> ^<br>; xapay ==> apa</pre>
+
+      <h2 id="nascFeature"><a class="head-num">14</a>The features directive</h2>
+      <p>Let's say you had the grapheme, or rather, <i>phon</i>eme /<code class="example">i</code>/ and wanted to capture it by its distinctive vowel features, <code class="example">+high</code> and <code class="example">+front</code>, and turn it into a phoneme marked with <code class="example">+high</code> and <code class="example">+back</code> features, perhaps /<code class="example">ɯ</code>/. The <code class="example">features:</code> directive block lets you do this:</p>
+
+      <ul class="paragraphian">
+        <li>Features are defined inside the features block. The features block begins with <code class="example">BEGIN features</code> and terminates with <code class="example">END</code></li>
+        <li>A feature prepended with a plus sign <code class="example">+</code> is a 'pro-feature'. For example <code class="example">+voice</code>. In the features block, we can define a set of graphemes that are marked by this feature by using this pro-feature. For example: <code class="example">+voice = b, d, g, v, z</code></li>
+        <li>A feature prepended with a minus sign <code class="example">-</code> is an 'anti-feature'. For example <code class="example">-voice</code>. In the features block, we can define a set of graphemes that are marked by a lack of this feature by using this anti-feature. For example: <code class="example">-voice = p, t, k, f, s</code></li>
+        <li><i>Where does this leave graphemes that are not marked by either the pro-feature or the anti-feature of a feature?</i>, you might ask. Such graphemes are <b>unmarked</b> by that feature.</li>
+        <li>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' using curly brackets <code class="example">{</code> and <code class="example">}</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">{+high, +back}</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">{+high, +back, -round}</code> would capture <code class="example">ɯ</code> only.</li>
+      </ul>
+
+      <p>The very simple example below is written to change all voiceless graphemes that have a voiced counterpart into their voiced counterparts:</p>
+      <pre class="example">BEGIN features:
+  -voice = p, t, k, f, s
+  +voice = b, d, g, v, z
+END
+
+  {-voice} -> {+voice}
+; tamefa ==> dameva</pre>
+      <p>In this rule, in <code class="example">RESULT</code>, <code class="example">{+voice}</code> has a symmetrical one-to-one change of graphemes from the graphemes in <code class="example">{-voice}</code> in <code class="example">TARGET</code>, leading to a concurrent change. Let's quickly imagine a scenario where the only <code class="example">{+voice}</code> grapheme was <code class="example">b</code>. The result will be a merging of all <code class="example">-voice</code> graphemes into <code class="example">b</code>: <code class="example">tamepfa ==> bamebba</code>. Similarly, in a different scenario where the only <code class="example">-voice</code> grapheme was <code class="example">p</code>, <code class="example">p</code> would become the first grapheme in <code class="example">{+voice}</code>, which happens to be <code class="example">b</code>: <code class="example">tamepfa ==> tamebfa</code></p>
+
+      <p><b>Para-feature</b></p>
+      <ul class="paragraphian">
+        <li>A feature defined without a prepended plus or minus sign is a 'para-feature'. A para-feature is a pro-feature without a listed anti-feature counterpart. Instead, the graphemes marked as the anti-feature are the graphemes in the <code class="example">graphs:</code> directive that are not not marked by the para-feature. <br><br>Notice: If there is no <code class="example">graphs:</code> directive in the definition-build, there will be zero anti-feature phonemes. If you define an anti-feature as the counterpart of a para-feature, your anti-feature will be ignored.</li>
+      </ul>
+      <pre class="example">graphs: a, b, h, i, k, n, o, t<br><br>BEGIN features:
+  vowel = a, i, o<br>END</pre>
+      <p>In the above example, the matrix <code class="example">{-vowel}</code> captures the graphemes <code class="example">b, h, k, n, t</code></p>
+
+      <p><b>Combining features</b></p>
+      <p>We can 'combine' features. Or to be more accurate, a feature's graphemes can mirror the graphemes of other features by defining a feature with features in it. The combined features must be a pro-feature or anti-feature:</p>
+      <pre class="example">BEGIN features:
+  labial = p, b, m
+  alveolar = t, d, s, l, n
+  palatal = j
+  velar = k, g
+  glottal = h
+  consonant = +labial, +alveolar, +palatal, +velar, +glottal
+END</pre>
+
+      <h3 id="nascFeatureField"><a class="head-num">14.1</a>Feature-field</h3>
+      <p>Feature-fields allow graphemes to be easily marked by multiple features at the same time.</p>
+
+      <ul class="paragraphian">
+        <li>The feature-field begins with a <code class="example">%</code> followed by a para-feature. Think of this para-feature as the parent feature of the other features in that feature-cluster. The graphemes marked by this para-feature are listed in the first row. The graphemes marked by the anti-feature counterpart are the graphemes in the <code class="example">graphs:</code> directive that are not not marked by the para-feature.</li>
+        <li>The graphemes being marked by the features are listed on the first row</li>
+        <li>The features are listed in the first column</li>
+        <li>A <code class="example">+</code> means to mark the grapheme by that feature's pro-feature</li>
+        <li>A <code class="example">-</code> means to mark the grapheme by that feature's anti-feature</li>
+        <li>A <code class="example">.</code> means to leave the grapheme unmarked by that feature</li>
+      </ul>
+
+      <p>Here is an example of comprehensive features of consonants and vowels:</p>
+      <pre class="example">graphs: a, e, i, o, p, b, t, d, k, g, s, h, l, j, m, n
+BEGIN features:
+  %consonant m n p b t d k g s h l j
+  voice      + + - + - + - + - - + +
+  plosive    - - + + + + + + - - - -
+  nasal      + + - - - - - - - - - -
+  fricative  - - - - - - - - + + - -
+  approx     - - - - - - - - - - + +
+  labial     + - + + - - - - + + - -
+  alveolar   - + - - + + - - - - + -
+  palatal    - - - - - - - - - - - +
+  velar      - - - - - - + + - - - -
+  glottal    - - - - - - - - - + - -
+
+  %vowel a e i o
+  high   - - + -
+  mid    - + - +
+  low    + - - -
+  front  - + + -
+  back   + - - +
+  round  - - - +
+END</pre>
+      <p>Here are some matrices of these features and which graphemes they would capture:</p>
+      <ul class="paragraphian">
+        <li><code class="example">{+plosive}</code> captures the graphemes <code class="example">b, d, g, p, t, k</code></li>
+        <li><code class="example">{+voiced, +plosive}</code> captures the graphemes <code class="example">b, d, g</code></li>
+        <li><code class="example">{+voiced, +labial, +plosive}</code> captures the grapheme <code class="example">b</code></li>
+
+        <li><code class="example">{+vowel}</code> captures the graphemes <code class="example">a, e, i, o</code></li>
+
+        <li><code class="example">{-vowel}</code> captures the graphemes <code class="example">p, b, t, d, k, g, f, v, s, z, h, l, r, j</code></li>
+      </ul>
+
+      <p>Notice a problem that could occur with the above example? The above example has no overlapping features between consonants and vowels, which is fine. But the example below describes a language that has overlapping features between vowels and consonants, namely, syllabic consonants that carry tone. The solution here is to list all phonemes in just one feature-field:</p>
+      <pre class="example">BEGIN features:
+  %phoneme   m n p b t d k g s h l j n̩ ń̩ ǹ̩ a á à e é è i í ὶ o ó ὸ
+  syllabic   - - - - - - - - - - - - + + + + + + + + + + + + + + +
+  vowel      - - - - - - - - - - - - - - - + + + + + + + + + + + +
+  high       . . . . . . . . . . . . . . . - - - - - - + + + - - - 
+  mid        . . . . . . . . . . . . . . . - - - + + + - - - + + +
+  low        . . . . . . . . . . . . . . . + + + - - - - - - - - -
+  front      . . . . . . . . . . . . . . . - - - + + + + + + - - - 
+  back       . . . . . . . . . . . . . . . + + + - - - - - - + + +
+  round      . . . . . . . . . . . . . . . - - - - - - - - - + + +
+  low_tone   . . . . . . . . . . . . . . - - - + - - + - - + - - +
+  mid_tone   . . . . . . . . . . . . + - - + - - + - - + - - + - -
+  high_tone  . . . . . . . . . . . . . . + - + - - + - - + - - + -
+  consonant  + + + + + + + + + + + + + + + - - - - - - - - - - - -
+  voice      + + - + - + - + - - + + + + + + + + + + + + + + + + +
+  plosive    - - + + + + + + - - - - - - . . . . . . . . . . . . .
+  nasal      + + - - - - - - - - - - + + . . . . . . . . . . . . .
+  fricative  - - - - - - - - + + - - - - . . . . . . . . . . . . .
+  approx     - - - - - - - - - - + + - - . . . . . . . . . . . . .
+  labial     + - + + - - - - + + - - + - . . . . . . . . . . . . .
+  alveolar   - + - - + + - - - - + - - + . . . . . . . . . . . . .
+  palatal    - - - - - - - - - - - + - - . . . . . . . . . . . . .
+  velar      - - - - - - + + - - - - - - . . . . . . . . . . . . .
+  glottal    - - - - - - - - - + - - - - . . . . . . . . . . . . .
+END
+</pre>
+
+      <h2 id="nascWildcardAndPositioning"><a class="head-num">15</a>Wildcard, repetition and positioning</h2>
+      <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
+
+      <h3 id="nascWildcard"><a class="head-num">15.1</a>Wildcard</h3>
+      <p>Wildcard using an astrisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
+      <pre class="example">  a -> e / _*<br>; apappap ==> apappep</pre>
+
+      <p>Wildcard can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
+
+      <h3 id="nascDittoMark"><a class="head-num">15.2</a>Ditto-mark</h3>
+      <p>Ditto-mark using double-quote <code class="example">"</code>, will duplicate once the grapheme, or grapheme from a set, category, or feature, to the left of it. In other words, you can capture an item only when it is geminated using the ditto-mark:</p>
+      <pre class="example">  a" -> o<br>; aaata => oata</pre>
+
+      <p>Ditto-mark can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(")</code>, thereby allowing it to match zero copies as well.</p>
+
+      <h3 id="nascPlusMark"><a class="head-num">15.3</a>Plus-mark</h3>
+      <p>Plus-mark, using <code class="example">+</code>, will match as many (but not zero) times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it.</p>
+      <pre class="example">  a+ -> o<br>; raraaaaa ==> raro</pre>
+
+      <pre class="example">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
+
+      <p>Plus-mark can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(+)</code>, thereby allowing it to match zero copies as well.</p>
+
+      <p>You may want to match zero, once, or as many times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it, known occasionally as a <a href="https://en.wikipedia.org/wiki/Kleene_star">Kleene-star</a>. To do this, you need to enclose the grapheme, set, category, or feature and the plus-mark in an <a href="#vocOptional">optional-set</a>, and the plus-mark by itself inside another optional-set:</p>
+      <pre class="example">; /i/ followed by either 0, 1, or more /a/ becomes /e/<br>  i(a(+)) -> e<br>; ririaaaaa ==> rere</pre>
+
+      <h3 id="nascAnythingsMark"><a class="head-num">15.4</a>Anythings-mark</h3>
+      <p>The anythings-mark uses tilde <code class="example">~</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
+      <pre class="example">  b~t -> x<br>; babãitto => xto</pre>
+      <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="example">t</code> and beyond like <code class="example">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
+      
+      <p>The example below uses an optional anythings-mark in the condition:</p>
+      <pre class="example">; Simulate spreading of nasality to vowels<br>  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ](…)_ <br>; babãittati => babãĩttãtĩ</pre>
+
+      <h3 id="nascQuantifier"><a class="head-num">15.5</a>Quantifier</h3>
+      <p>The quantifier matches as many times its digit(s), enclosed in <code class="example">=[</code> and <code class="example">]</code>, to the things to the left.</p>
+      <pre class="example">  Change /o/ into /x/ only when preceded by three /r/s<br>  o -> x / r=[3]_
+; ororrro ==> ororrrx</pre>
+      <p>The digits in the quantifier can also be a list:</p>
+      <pre class="example">  Change a sequence of 2 or 4 /o/s into /x/<br>  o -> x / r=[2, 4]_
+; toootoooo ==> txotx</pre>
+      <p>The numbers in the quantifier can also be a range of numbers. To do this, put a <code class="example">:</code> between the lowest and highest range. (The ranges must be in the order of lowest to highest):</p>
+      <pre class="example">  Change a sequence of 2 to 4 /o/s into /x/<br>  o -> x / r=[2:4]_
+; toootoooo ==> txtx</pre>
+
+      <br>
+      <b>Using the <code class="example">+</code> symbol</b>
+
+      <p>If you use a <code class="example">+</code> in a list between two lower and higher numbers, it will represent all the numbers between the two digits:</p>
+      <pre class="example">  Change a sequence of 2 to 10 /o/s into /x/<br>  o -> x / r=[2, +, 10]_
+; toootoooo ==> txtx</pre>
+
+      <p>At the beginning of the list, <code class="example">+</code> represents all the possible numbers lower than the number to the right, not including zero.</p>
+      <pre class="example">  Change a sequence of 1 to 10 /o/s into /x/<br>  o -> x / r=[+, 10]_
+; toootoooo ==> txtx</pre>
+
+      <p>And finally at the end of the list, <code class="example">+</code> represents all possible numbers larger than the number to the the left</p>
+        <pre class="example">  Change a sequence of 4 to as many as possible /o/s into /x/<br>  o -> x / r=[4, +]_
+; toootooooo ==> toootx</pre>
+
+      <p>Here is a useful lookup table on getting quantities of ditto-marks or wildcards:</p>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Wildcard</th>
+            <th>Ditto-mark</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+              <td>Exactly 1 of</td>
+              <td><code class="example">*</code></td>
+              <td><code class="example">"</code></td>
+          </tr>
+          <tr>
+              <td>0 or 1 of</td>
+              <td><code class="example">(*)</code></td>
+              <td><code class="example">(")</code></td>
+          </tr>
+          <tr>
+              <td>1 or more of</td>
+              <td><code class="example">~</code></td>
+              <td><code class="example">+</code></td>
+          </tr>
+          <tr>
+            <td>0, 1, or more of</td>
+            <td><code class="example">(~)</code></td>
+            <td><code class="example">(+)</code></td>
+          </tr>
+          <tr>
+              <td>Specific number(s) of</td>
+              <td><code class="example">*=[N]</code></td>
+              <td><code class="example">"=[N]</code></td>
+          </tr>
+          <tr>
+              <td>Number range(s) of</td>
+              <td><code class="example">*=[N:N]</code></td>
+              <td><code class="example">"=[N:N]</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="nascBlocker"><a class="head-num">15.6</a>Blocker</h3>
+      <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="example">&lt;[</code> and <code class="example">]</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
+      <pre class="example">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ](~)&lt;[k, g]_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
+
+      <h3 id="nascPositioner"><a class="head-num">15.7</a>Positioner</h3>
+      <p>Positioners, enclosed in <code class="example">@[</code> and <code class="example">]</code>, allows a grapheme to the left of it to be captured only when it is the Nth in the word:</p>
+      <pre class="example">; Change the second /o/ in a word to /x/ after the second /s/<br>  o@[2] -> x / s@[2]_
+; sososo ==> sosxso</pre>
+      <p>If we want to match the last occurence of a grapheme in a word, use <code class="example">-1</code>. For the second last occurence of a grapheme in a word, use <code class="example">-2</code>, and so forth:</p>
+      <pre class="example">; Change the last /o/ in a word to /x/<br>  o@[-1] -> x
+; sososo ==> sososx</pre>
+      <p>The numbers in the positioner can also be a list of numbers:</p>
+      <pre class="example">; Change the first and third /o/ in a word to /x/<br>  o@[1, 3] -> x
+; sososo ==> sxsosx</pre>
+      <p>The number in the positioner can also be a range. To do this, put a <code class="example">:</code> between the lowest and highest range:</p>
+      <pre class="example">; Change the first to third /o/ in a word to /x/<br>  o@[1:3] -> x
+; sososoo ==> sxsxsxo</pre>
+
+      <h2 id="nascInsertionAndDeletion"><a class="head-num">16</a>Insertion and deletion</h2>
+      <p>Insertion requires a condition to be present, and for a caron <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
+      <pre class="example">; insert /a/ in between /b/ and /t/
+  ^ -> a / b_t
+; bt ==> bat</pre>
+      <p>Deletion happens when <code class="example">^</code> is present in <code class="example">RESULT</code></p>
+      <pre class="example">; delete every /b/
+  b -> ^
+; bubda ==> uda</pre>
+
+      <h2 id="nascAdvancedRules"><a class="head-num">17</a>Advanced rules</h2>
+
+      <h3 id="nascMetathesis"><a class="head-num">17.1</a>Metathesis</h3>
+      <p>Metathesis in NASC refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.</p>
+      <p>To make a rule a metathesis rule, use these symbols:</p>
+      <ul class="paragraphian">
+        <li>The pipe <code class="example">|</code> marks the content (if any) between the targets we want to reorder. You must use the same amount of <code class="example">|</code>s in <code class="example">TARGET</code> as in <code class="example">RESULT</code></li>
+        <li>Numbers in <code class="example">RESULT</code> refer to the targets. Reordering these numbers reorders the targets. It is possible to have up to nine</li>
+        <li>Underscores <code class="example">_</code> in a condition or exception, are references to the targets. Unlike a normal rule, we can have multiple</li>
+      </ul>
+
+      <p><b>Local metathesis</b></p>
+      <p>A typical type of metathesis is local two-place metathesis:</p>
+      <pre class="example">; An intervocalic stop + nasal sequence becomes nasal + stop<br>  [stop]|[nasal] -> 2|1 / V__V <br>; watna ==> wanta</pre>
+
+      <p><b>Long-distance metathesis</b></p>
+      <p>The example below approximates metathesis that occured in Spanish:</p>
+      <pre class="example">r|l -> 2|1 / _(…)[plosive]_<br>; parabla ==> palabra</pre>
+
+      <p><b>One-place metathesis</b></p>
+      <p>To simulate one-place metathesis, move <code class="example">|</code>s.</p>
+      <p>The example below is metathesis where words beginning with <code class="example">stop</code> + <code class="example">vowel</code> will try and move an <code class="example">r</code> in a <code class="example">stop</code> + <code class="example">r</code> cluster to form a word initial <code class="example">stop</code> + <code class="example">r</code> cluster:</p>
+      <pre class="example">{stop}|r -> 12| / #_{vowel}…{stop}_ <br>; kabatros ==> krabatos</pre>
+
+      <p><b>Metathesis madness</b></p>
+      <p>Three or more items, to a maximum of 9, switching places, are possible, with shuffling of any <code class="example">|</code>:</p>
+      <pre class="example">  x|y|z -> ||321<br>; xaayooz ==> aaoozyx</pre>
+
+      <h2 id="nascLogicBlock"><a class="head-num">18</a>Logic blocks</h2>
+      <p>Logic blocks are a way of executing transformations depending on a trigger event that we are listening for.</p>
+
+      <h3 id="nascIfThenElse"><a class="head-num">18.1</a>If block</h3>
+      <p>Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.</p>
+      <p>It should feel familiar to anyone who knows a bit about programming languages</p>
+      <ul class="paragraphian">
+        <li><code class="example">BEGIN if:</code> starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.</li>
+        <li><code class="example">then:</code> is where you put transforms that will execute if the transformations in <code class="example">if:</code> did apply</li>
+        <li><code class="example">else:</code> is is where you put transforms that will execute if the transformations in <code class="example">if:</code> did not meet a <code class="example">CONDITION</code> or were blocked by an <code class="example">EXCEPTION</code></li>
+        <li><code class="example">END</code> is the end of the block</li>
+      </ul>
+
+      <p>For example:</p>
+      <pre class="example">BEGIN if:<br>  ; Deletion of schwa before r
+  ə -> ^ / _r
+then:<br>  ; Then do metathesis of r and l
+  r|l -> 2|1 / _|[plosive]_
+else:<br>  ; Schwa becomes e if the first rule did not apply
+  ə -> e
+END</pre>
+      <p>Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.</p>
+
+      <h3 id="nascChance"><a class="head-num">18.2</a>Chance block</h3>
+      <p>The chance block is a way to apply transformations depending on percentage-based chance:</p>
+      <pre class="example">BEGIN chance 15:<br>  a -> e<br>END</pre>
+      <p>In the above example we have a 15% chance of words with an <code class="example">a</code> in them such as <code class="example">pa</code> becoming <code class="example">pe</code></p>
+
+      <h3 id="nascRuleMacro"><a class="head-num">18.3</a>Rule macro</h3>
+      <p>Rule macro saves rules to be used later in the definition-build as many times as needed. The rules inside the <code class="example">define-rule-macro:</code> block do not run until invoked using <code class="example">do-rule-macro:</code>:</p>
+      <pre class="example">BEGIN def-rule-macro resyllabify:<br>  i -> j / _[a,e,o,u]<br>  u -> w / _[a,e,i,o]<br>END<br>
+  do-rule-macro: resyllabify<br>  ʔ -> ^<br>  do-rule-macro: resyllabify
+; iaruʔitua ==> jaruʔitwa ==> jaruitwa  ==> jarwitwa</pre>
+      <p>In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.</p>
+
+      <h2 id="nascClusterfield"><a class="head-num">19</a>Cluster-field</h2>
+      <p>Cluster-fields are a way to target and change sequences of graphemes. They are laid out like tables, and start with <code class="example">%</code>. For example:</p>
+      <pre class="example">% a  i  u
+a +  +  o
+i -  +  uu
+u -  -  +</pre>
+      <p>The first grapheme is the row, and the second grapheme is the column. In this example, <code class="example">au</code> becomes <i>o</i> and <code class="example">iu</code> becomes <i>uu</i>. <code class="example">+</code> means to leave the combination as-is, and <code class="example">-</code> means to reject the word. This table would permit <code class="example">ai</code> but reject <code class="example">ia</code>.</p>
+      <p>Cluster-fields can also use <code class="example">^</code> in them to remove a sequence.</p>
+      <p>As with filters, these are parsed in the order presented. The cluster-field ends at a blank line or the end of the definition-build.</p>
+
+      <h2 id="nascEngine"><a class="head-num">20</a>Engine</h2>
+      <p>The engine statement provides useful functions that you can call at any point in the definition-build. You can also call a list of these functions in one line e.g: <code class="example">engine: compose, capitalise</code></p>
+
+      <ul class="paragraphian">
+        <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, <code class="example">n</code> \u006E + <code class="example">◌̃ </code> \u0303. The typescript function is called Normalize("NFD")</li>
+        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1. The typescript function is called Normalize("NFC")</li>
+        <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
+        <li><code class="example">de-capitalise</code> will convert the first character of a word to lowercase</li>
+        <li><code class="example">to-upper-case</code> will convert all characters of a word to uppercase</li>
+        <li><code class="example">to-lower-case</code> will convert all characters of a word to lowercase</li>
+        <li><code class="example">xsampa_to_ipa</code> will convert graphemes of a word written in X-SAMPA into IPA</li>
+        <li><code class="example">ipa_to_xsampa</code> will convert graphemes of a word written in IPA into X-SAMPA</li>
+      </ul>
+
+
+    </section>
+
+  </div>
+
+  <footer>
+    <ol class="breadcrumbs">
+      <li>
+        <a href="#myNav">Return to top</a>
+      </li>
+    </ol>
+  </footer>
+  
+</body>
+</html>
