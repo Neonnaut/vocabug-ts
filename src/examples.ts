@@ -31,6 +31,8 @@ END`;
 ;     r ɻ j w
 ;     l   ʎ
 
+Z = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp lŋ rŋ ɻŋ nt ɻʈ ṅṫ lṫ ṅʔ ṫʔ lṅ
+X = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc lṅṫ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
 ; Initials:
 I = k, p, m, w, x, c, ŋ, j, t, ɲ, n, ʎ, ṫ
 J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, ṫ ; For disyllabic words
@@ -52,10 +54,10 @@ $X = JV(F)
 
 words: $T$S$S$S $T$S$S$S$S $T$S$S $X$S $T$S$S$S$S$S $T$S$S$S$S$S$S
 
-graphs: a eR i iR o oR u uR p ṫ t c k ʔ m ṅ n ɲ ŋ r ɻ j w l ʎ
+graphmes: a eR i iR o oR u uR p ṫ t c k ʔ m ṅ n ɲ ŋ r ɻ j w l ʎ
 alphabet: a e h i j k l m n o p r r t u w y ꞌ
 
-BEGIN sound-change:
+BEGIN transform:
 
 x -> ^ ; Get vowel initial words
 
@@ -83,15 +85,15 @@ kp  ṫʔ  tp      ṅʔ
 
 ɻk  ɻp  ɻʈ  ɻc  
 ɻŋ  ɻm  ɻɳ      
-ɻŋk ɻmp ɻɳʈ ɻɲc
+
 
 lk  lp      lc  lṫ
 lŋ  lm          lṅ
-lŋk lmp     lɲc lṅṫ
+
 
 rk  rp      rc
 rŋ  rm         
-rŋk rmp     rɲc
+
 
 
 %   p    ṫ    t    c    k    m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
@@ -165,46 +167,42 @@ r, ɻ, ṅ, ṫ, ʔ, ŋ -> rr, r, nh, th, ꞌ, ng
 ; <X> gives me onsetless morae.    <R> gives me long vowels
 ; <N> is the syllable final nasal. <Q> gives me geminate consonants
 
-C = k, t, s, r, n, X, h, m, d, g, z, b, w, p
-I = k, X, t, s, n, m, h, d, g, r, z, b, w, p
+C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
+I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
 V = a, i, u, o, e, [oR, aR, iR, eR, uR, ya, yu, yo, [yaR, yuR, yoR]]
 F = N, Q
 
-$S = CVF? ; Gives type C(y)V(R)(N,Q).
-$A = IVF? ; First syllable of slightly different consonant distribution.
+$S = CV(F) ; Gives type C(y)V(R)(N,Q).
+$A = IV(F) ; First syllable of slightly different consonant distribution.
 
 # Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
 # The final two syllables are least likely to be light + heavy.
 
 words: $S $A$S$S $A$S$S$S $A$S$S$S$S $A$S
 
-graphs: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
-alphabet: a b c d e f g h i j k l m n o p r s t u w y z
+graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 BEGIN transform:
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
-%  i   u   e   o   ya   yu   yo
-s  ši  +   +   +   ša   šu   šo
-z  ji  +   +   +   ja   ju   jo 
-t  či  cu  +   +   ča   ču   čo
-d  ji  zu  +   +   ja   ju   jo
-h  hi  fu  +   +   +    +    +
-w  Xi  wa  Xe  Xo  ya   yu   yo
+%  i   u   e   o   ya   yu  yo
+s  shi +   +   +   sha  shu sho
+z  ji  +   +   +   ja   ju  jo 
+t  chi tsu +   +   cha  chu cho
+d  ji  zu  +   +   ja   ju  jo
+h  hi  fu  +   +   +    +   +
+w  i   wa  e   o   ya   yu  yo
 
-N -> n' / _X ; <N> + <onsetless syllable> is <n'>.
+Na Ne Ni No Nu -> n'a n'e n'i n'o n'u
 
 ; <N> assimilation, and <Q> gemination.
-% č    š    c   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
-Q Qtč  Qšš  Qtc j  Qkk g  Qss z  Qtt d  n  Qpp b  Qpp m  r  l  Qpp Qpp
-N nč   nš   nc  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
+% ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
+Q Qtch Qshsh Qtts j  Qkk g  Qss z  Qtt d  n  Qpp b  Qpp m  r  l  Qpp Qpp
+N nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
 
-filter: RQ>!; Q>!; N>n; ; <R> + <Q> is illegal.
-
-filter: c>ts; č>ch; š>sh; ; This was to stop <chu> becoming <cfu>.
+RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
 
 ; Vowel sequences:
-filter: X > ! ; Get onsetless morae
 %  a   i   u   e  o
 a  a   ai  oo  ae ai
 i  ya  i   yuu ie io
@@ -212,13 +210,10 @@ u  wa  ui  u   ai ai
 e  ee  ei  yoo e  yo
 o  oo  oi  ou  oe o
 
-filter: aR>aa; eR>ee; iR>ii; oR>oo; uR>uu ; Get long vowels
-
-; Overlong vowels become long vowels.
-filter: aa+>aa; ee+>ee; ii+>ii; oo+>oo; uu+>uu;
+aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
-filter: ^aa$>a; ^ee$>e; ^ii$>i; ^oo$>o; ^uu$>u;
+#aa# #ee# #ii# #oo# #uu# -> aa ee ii oo uu
 `;
 
 } else if (example == "romance") {

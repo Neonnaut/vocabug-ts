@@ -80,6 +80,9 @@ export const xcodeLightStyle: CreateThemeOptions['styles'] = [
   // Comment / GREEN / #
   { tag: t.comment, color: "#277022" },
 
+  // Escape char / Greenblue
+  { tag: t.escape, color: "#6ee79d"}, 
+
   { tag: t.variableName, color: "#000000" },
 
   // Directive / BLUE / words: categories: with: letters: random-rate:
@@ -124,7 +127,10 @@ export const defaultSettingsXcodeDark: CreateThemeOptions['settings'] = {
 
 export const xcodeDarkStyle: CreateThemeOptions['styles'] = [
   // Comment / GREEN / #
-  { tag: t.comment, color: "#bee79d"},
+  { tag: t.comment, color: "#bee79d"}, 
+
+  // Escape char / Greenblue
+  { tag: t.escape, color: "#6ee79d"}, 
 
   { tag: t.variableName, color: "#eeeeee" },
 

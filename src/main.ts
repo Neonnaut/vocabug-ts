@@ -11,7 +11,7 @@ function create_file_editor() {
     let content = ''; let theme = 'dark'; let filename = '';
     if (localStorage.hasOwnProperty('vocabug-pro')) {
         try {
-            const gotLocalStorage = JSON.parse(localStorage.getItem('vocabug-lite') || '[]') as [string, string];
+            const gotLocalStorage = JSON.parse(localStorage.getItem('vocabug-pro') || '[]') as [string, string];
             content = gotLocalStorage[0]; filename = gotLocalStorage[1];
         } catch {
             localStorage.removeItem("vocabug-pro");
@@ -113,7 +113,7 @@ $(window).on('load', function () {
         outputMessage.innerHTML = output_message_html;
 
         // Store file contents in local storage to be retrieved on page refresh
-        localStorage.setItem('vocabug-lite', JSON.stringify([e.data.file, filename]));
+        localStorage.setItem('vocabug-pro', JSON.stringify([e.data.file, filename]));
 
         if (generateWordsButton) {
             generateWordsButton.disabled = false;
@@ -281,19 +281,14 @@ $(window).on('load', function () {
     document.querySelectorAll(".ipa-button").forEach((button) => {
         button.addEventListener("mousedown", (e) => {
             e.preventDefault();
-
-            const activeElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement;
-            if (activeElement && (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA")) {
-                const start = activeElement.selectionStart ?? 0;
-                const end = activeElement.selectionEnd ?? 0;
-                const beforeText = activeElement.value.substring(0, start);
-                const afterText = activeElement.value.substring(end);
-                const charToInsert = (button as HTMLElement).getAttribute("value") || "";
-
-                activeElement.value = beforeText + charToInsert + afterText;
-                activeElement.selectionStart = activeElement.selectionEnd = start + charToInsert.length;
-                activeElement.focus();
-            }
+            editor.dispatch({
+                changes: {
+                    from: editor.state.selection.main.head,
+                    insert: button.getAttribute("value")
+                },
+                selection: { anchor: editor.state.selection.main.head + 1 },
+                scrollIntoView: true,
+            })
         });
     });
 });

@@ -35,6 +35,23 @@ abcdefg ; And this is a comment following junk.
   ; Tab should indent by 2 spaces
   ; Enter after tab should repeat the indent on the next line
 
+; TRANSFORM:
+BEGIN transform
+
+  ; Simple replacement:
+    o -> x ; bodido ==> bxdidx
+
+  ; Concurrent set:
+  ; Switch [o] and [e] around
+    o a -> a o ; boda ==> bado
+
+  ; CLUSTERFIELD
+    % k k R F
+    a á à ǎ â 
+    ā ā́ ā̀ ā̌ ā̂
+
+END transform
+
 category-distribution: gusein-zade zipfian flat
 wordshape-distribution: zipfian gusein-zade flat
 optionals-weight: 10 ; How often optionals are selected
@@ -55,6 +72,9 @@ graphemes: ch sch ; For transforms
 
   ; syntax characters
   C = ^
+
+; BUILDING WORDS
+words: $S:5, $SsC:5 $S, $S$S, [foo:4, ^, bar]:5 \[ 
 
 ; SEGMENTS
   $S = CVCVCV
@@ -82,26 +102,6 @@ graphemes: ch sch ; For transforms
   ; Inter-pick-ones
   $C = CV{D:4}CV{E:5}
   ; ==> pe'ta, peta'
-
-; BUILDING WORDS
-  words: $S:5, $SsC:5 $S, $S$S, [foo, bar]
-
-; TRANSFORM:
-BEGIN transform
-
-  ; Simple replacement:
-    o -> x ; bodido ==> bxdidx
-
-  ; Concurrent set:
-  ; Switch [o] and [e] around
-    o a -> a o ; boda ==> bado
-
-  ; CLUSTERFIELD
-    % k k R F
-    a á à ǎ â 
-    ā ā́ ā̀ ā̌ ā̂
-
-END transform
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
   

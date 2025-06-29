@@ -102,9 +102,9 @@ class Text_Builder {
         } else if ((this.num_of_duds >= this.upper_gen_limit) && (!this.force_word_limit)) {
             this.terminated = true;
             if (this.remove_duplicates) {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms, or turn on force-word-limit')
+                this.logger.warn('Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms, or turn on \`force word limit\`')
             } else {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more word-shapes, remove some reject transforms, or turn on force-word-limit')
+                this.logger.warn('Could not generate the requested amount of words. Try adding more word-shapes, remove some reject transforms, or turn on \`force word limit\`')
             }
         }
     }

@@ -82,7 +82,7 @@ function tokenize(input: string): string[] {
     const sorted = [...words].sort(customCompare);
     const unknownGraphemes:string[] = Array.from(unknownSet);
     if (unknownGraphemes.length != 0) {
-        logger.warn(`Words remain unsorted because words had the unknown graphemess: "${unknownGraphemes.join(', ')}"; missing from alphabet`)
+        logger.warn(`Words remain unsorted because words had the unknown graphemes: "${unknownGraphemes.join(', ')}"; missing from \`alphabet\``)
         return words;
     }
     

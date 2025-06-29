@@ -2,7 +2,7 @@ import Word from './word.js';
 import Logger from './logger.js';
 import Escape_Mapper from './escape_mapper.js';
 
-import { weightedRandomPick, resolve_wordshape_sets } from './utilities'
+import { weightedRandomPick, resolve_wordshape_sets, valid_words_brackets } from './utilities'
 
 class Word_Builder {
     public logger: Logger;
@@ -38,8 +38,6 @@ class Word_Builder {
             throw new Error('A word was undefined')
         }
 
-
-
         // baby word looks like `CVCVF!`
         const baby_word:string = resolve_wordshape_sets(skeleton_word, this.wordshape_distribution, this.optionals_weight);
 
@@ -48,7 +46,7 @@ class Word_Builder {
         for (let i = 0; i < baby_word.length; i++) { // going through each char of baby
             let new_char:string = baby_word[i];
             if (!new_char){
-                throw new Error("This should not have happened")
+                throw new Error("Undefined char of word")
             }
             for (const [category_key, category_field] of this.categories) { //going through C = [[a, b, c], [1, 2, 3]]
                 if (category_key == new_char) {

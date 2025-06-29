@@ -17,13 +17,12 @@ class Transformer {
         this.transforms = transforms;
     }
 
-    // Updated spelling here
-    graphemosis(input: string, graphemes: string[]): string[] {
+    graphemosis(input: string): string[] {
         const tokens: string[] = [];
         let i = 0;
         while (i < input.length) {
             let matched = false;
-            for (const g of graphemes.sort((a, b) => b.length - a.length)) {
+            for (const g of this.graphemes.sort((a, b) => b.length - a.length)) {
                 if (input.startsWith(g, i)) {
                     tokens.push(g);
                     i += g.length;
@@ -120,7 +119,7 @@ class Transformer {
         // Apply all replacements non-destructively
         replacements.sort((a, b) => a.index - b.index);
         const blocked = new Set<number>();
-        const resultTokens: string[] = [];
+        let resultTokens: string[] = [];
 
         let i = 0;
         while (i < tokens.length) {
@@ -142,6 +141,7 @@ class Transformer {
                 i++;
             }
         }
+        resultTokens = this.graphemosis(resultTokens.join(''))
 
         if (applied) {
             word.record_transformation(`${transform.target.join(", ")} → ${transform.result.join(", ")}`, resultTokens.join("·"));
@@ -156,7 +156,7 @@ class Transformer {
             return word; // No transforms 
         }
 
-        let tokens = this.graphemosis(word.get_last_form(), this.graphemes);
+        let tokens = this.graphemosis(word.get_last_form());
         word.record_transformation("graphemosis", `${tokens.join("·")}`);
 
         for (const t of this.transforms) {

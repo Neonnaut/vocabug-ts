@@ -13,7 +13,7 @@ const makePercentage = (input: string): number | null => {
 };
 
 function validateCatSegName(str: string): [boolean, boolean] {
-    const regex = /^[A-Z]$|^\$[A-Z]$/;
+    const regex = /^[A-Z\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD]$|^\$[A-Z\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD]$/u;
     const hasDollarSign = str.includes("$");
 
     return [regex.test(str), hasDollarSign];
@@ -43,12 +43,11 @@ function getCatSeg(input: string): [string, string, boolean, boolean, boolean] {
 }
 
 function GetTransform(input: string): [string[], string[], boolean] {
-  const divider = "→";
     if (input === "") {
         return [[], [], false]; // Handle invalid inputs
     }
 
-    const divided = input.split(divider);
+    const divided = input.split(/->|>|→/); 
     if (divided.length !== 2) {
         return [[], [], false]; // Ensure division results in exactly two parts
     }
@@ -104,7 +103,7 @@ function valid_category_brackets(str: string): boolean {
   return stack.length === 0; // Stack should be empty if balanced
 }
 
-function extract_Value_and_Weight(
+function extract_value_and_weight(
     input_list: string[],
     default_distribution: string
 ): [string[], number[]] {
@@ -138,6 +137,84 @@ function extract_Value_and_Weight(
     return [my_values, my_weights];
 }
 
+function extract_complex_value_and_weight(
+    input_list: string[],
+    default_distribution: string
+): [string[], number[]] {
+    const my_values: string[] = [];
+    const my_weights: number[] = [];
+
+    const combine_adjacent_chunks = (str: string): string[] => {
+        const chunks: string[] = [];
+        let buffer = '';
+        let bracketDepth = 0;
+        let parenDepth = 0;
+
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            buffer += char;
+
+            if (char === '[') bracketDepth++;
+            if (char === ']') bracketDepth--;
+            if (char === '(') parenDepth++;
+            if (char === ')') parenDepth--;
+
+            const nextChar = str[i + 1];
+            const atEnd = i === str.length - 1;
+
+            if ((char === ',' && bracketDepth === 0 && parenDepth === 0) || atEnd) {
+                if (char !== ',' && atEnd) {
+                    // Final character is part of buffer
+                } else {
+                    buffer = buffer.slice(0, -1); // remove comma
+                }
+                if (buffer.trim()) chunks.push(buffer.trim());
+                buffer = '';
+            }
+        }
+
+        return chunks;
+    };
+
+    const all_parts = input_list.flatMap(combine_adjacent_chunks);
+
+    const all_default_weights = all_parts.every(part =>
+        !/^(?:\[.*\]|[^:]+):[\d.]+$/.test(part)
+    );
+
+    if (all_default_weights) {
+        my_values.push(...all_parts.map(p => p.trim()));
+        my_weights.push(
+            ...(default_distribution === "gusein-zade"
+                ? guseinzade_distribution(my_values.length)
+                : default_distribution === "zipfian"
+                ? zipfian_distribution(my_values.length)
+                : flat_distribution(my_values.length))
+        );
+        return [my_values, my_weights];
+    }
+
+    for (const part of all_parts) {
+        const trimmed = part.trim();
+        const match = trimmed.match(/^(.*):([\d.]+)$/);
+
+        if (match && !/\[.*:.*\]$/.test(match[1])) {
+            my_values.push(match[1]);
+            my_weights.push(parseFloat(match[2]));
+        } else if (/^\[.*\]:[\d.]+$/.test(trimmed)) {
+            const i = trimmed.lastIndexOf(":");
+            my_values.push(trimmed.slice(0, i));
+            my_weights.push(parseFloat(trimmed.slice(i + 1)));
+        } else {
+            my_values.push(trimmed);
+            my_weights.push(1);
+        }
+    }
+
+    return [my_values, my_weights];
+}
+
+
 function weightedRandomPick(items:string[], weights:number[]): string {
     const totalWeight = weights.reduce((acc, w) => acc + w, 0);
     let randomValue = Math.random() * totalWeight;
@@ -155,36 +232,41 @@ function weightedRandomPick(items:string[], weights:number[]): string {
 function guseinzade_distribution(no_of_items: number): number[] {
     const jitter = (val: number, percent: number = 7): number =>
         val * (1 + (percent * (Math.random() - 0.5)) / 100);
-
     const weights: number[] = [];
-
     for (let i = 0; i < no_of_items; ++i) {
         weights.push(jitter(Math.log(no_of_items + 1) - Math.log(i + 1)));
     }
-
     return weights;
 }
 
 function zipfian_distribution(no_of_items: number): number[] {
     const jitter = (val: number, percent: number = 2): number =>
         val * (1 + (percent * (Math.random() - 0.5)) / 100);
-
     const weights: number[] = [];
-
     for (let i = 0; i < no_of_items; ++i) {
         weights.push(jitter(10 / Math.pow(i + 1, 0.9)));
     }
-
     return weights;
+}
+function shallow_distribution(no_of_items: number): number[] {
+    const weights: number[] = [];
+
+    for (let i = 0; i < no_of_items; ++i) {
+        const rank = i + 1;
+        // Interpolated exponent: smooth but doesn't get too flat
+        const t = i / (no_of_items - 1); // from 0 to 1
+        const exponent = 0.5 - t * 0.07; // interpolates 0.5 → 0.13
+        weights.push(1 / Math.pow(rank, exponent));
+    }
+    const total = weights.reduce((sum, w) => sum + w, 0);
+    return weights.map(w => w / total);
 }
 
 function flat_distribution(no_of_items: number): number[] {
     const weights: number[] = [];
-
     for (let i = 0; i < no_of_items; ++i) {
         weights.push(1);
     }
-
     return weights;
 }
 
@@ -195,23 +277,10 @@ function resolve_nested_categories(
 ): { graphemes:string[], weights:number[]} {
   type Entry = { key: string; weight: number };
 
-  function guseinzade_distribution(n: number): number[] {
-    const total = (n * (n + 1)) / 2;
-    return Array.from({ length: n }, (_, i) => (n - i) / total);
-  }
-
-  function zipfian_distribution(n: number): number[] {
-    const sum = Array.from({ length: n }, (_, i) => 1 / (i + 1)).reduce((a, b) => a + b, 0);
-    return Array.from({ length: n }, (_, i) => 1 / (i + 1) / sum);
-  }
-
-  function flat_distribution(n: number): number[] {
-    return Array.from({ length: n }, () => 1 / n);
-  }
-
   function get_distribution(n: number): number[] {
     if (default_distribution === "gusein-zade") return guseinzade_distribution(n);
     if (default_distribution === "zipfian") return zipfian_distribution(n);
+    if (default_distribution === "shallow") return shallow_distribution(n);
     return flat_distribution(n);
   }
 
@@ -329,10 +398,6 @@ function resolve_wordshape_sets(
     let items: string[] = [];
     let outputs: [string[], number[]];
 
-    if (!valid_words_brackets(input_list)) {
-        throw new Error('A word-shape had missmatched brackets');
-    }
-
     // Resolve optional sets in round brackets based on weight
     while ((matches = input_list.match(roundPattern)) !== null) {
         const group = matches[matches.length - 1];
@@ -342,7 +407,7 @@ function resolve_wordshape_sets(
         const include = Math.random() * 100 < optionals_weight;
 
         if (include && candidates.length > 0) {
-            outputs = extract_Value_and_Weight(candidates, distribution);
+            outputs = extract_value_and_weight(candidates, distribution);
             const selected = weightedRandomPick(outputs[0], outputs[1]);
             input_list = input_list.replace(group, selected);
         } else {
@@ -358,7 +423,7 @@ function resolve_wordshape_sets(
         if (items.length === 0) {
             items = ['^'];
         } else {
-            outputs = extract_Value_and_Weight(items, distribution);
+            outputs = extract_value_and_weight(items, distribution);
             const picked = weightedRandomPick(outputs[0], outputs[1]);
             items = [picked];
         }
@@ -367,7 +432,7 @@ function resolve_wordshape_sets(
     }
 
     items = input_list.split(/[,\s]+/).filter(Boolean);
-    outputs = extract_Value_and_Weight(items, distribution);
+    outputs = extract_value_and_weight(items, distribution);
     const finalPick = weightedRandomPick(outputs[0], outputs[1]);
     return finalPick;
 }
@@ -377,11 +442,15 @@ function parse_distribution(value:string):string {
     return "gusein-zade";
   } else if (value.toLowerCase().startsWith("z")) {
     return "zipfian";
+  } else if (value.toLowerCase().startsWith("s")) {
+    return "shallow";
   }
   return "flat";
 }
 
+
+
 export {
-  get_last, capitalise, makePercentage, extract_Value_and_Weight, weightedRandomPick,
+  get_last, capitalise, makePercentage, extract_value_and_weight, weightedRandomPick,
   resolve_nested_categories, resolve_wordshape_sets, parse_distribution,
-  valid_category_brackets, valid_words_brackets, getCatSeg, GetTransform };
+  valid_category_brackets, valid_words_brackets, getCatSeg, GetTransform, extract_complex_value_and_weight };

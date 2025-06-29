@@ -1,7 +1,7 @@
 import type Escape_Mapper from './escape_mapper';
 import Logger from './logger';
 
-import { getCatSeg, GetTransform, makePercentage, extract_Value_and_Weight, resolve_nested_categories,
+import { getCatSeg, GetTransform, makePercentage, extract_complex_value_and_weight, resolve_nested_categories,
     valid_words_brackets, valid_category_brackets, parse_distribution
  } from './utilities'
 
@@ -124,13 +124,18 @@ class Resolver {
                     continue;
                 }
                 
+                if (line.startsWith("% ")) { // Parse clusters
+                    this.parse_cluster(file_array);
+                    continue;
+                }
+                
                 let [target, result, valid] = GetTransform(line_value);
 
                 if ( !valid ) {
-                    this.logger.warn(`Malformed transform, (transforms must look like 'old → new')`);
+                    this.logger.warn(`Malformed transform at line ${this.file_line_num + 1} -- expected \`old → new\` or a clusterfield`);
                     continue;
                 } else if ( target.length != result.length ){
-                    this.logger.warn(`Malformed transform had a missmatch of concurrent-set targets to concurrent-set results at line ${this.file_line_num + 1}`);
+                    this.logger.warn(`Malformed transform at line ${this.file_line_num + 1} -- expected an equal amount of concurrent-set targets to concurrent-set results`);
                     continue;
                 }
 
@@ -148,11 +153,11 @@ class Resolver {
                 this.wordshape_distribution = parse_distribution(line_value);
 
             } else if (line.startsWith("optionals-weight:")) {
-                line_value = line.substring(17).trim();
+                line_value = line.substring(17).replace(/%/g, "").trim();
 
                 let optionals_weight = makePercentage(line_value);
                 if (optionals_weight == null) {
-                    this.logger.warn(`Invalid optionals-weight, (it should be a number between 1 and 100)`);
+                    this.logger.warn(`Invalid optionals-weight at ${this.file_line_num + 1} -- expected a number between 1 and 100`);
                     continue;
                 }
                 this.optionals_weight = optionals_weight;
@@ -162,7 +167,7 @@ class Resolver {
 
                 let alphabet = line_value.split(/[,\s]+/).filter(Boolean);
                 if (alphabet.length == 0){
-                    this.logger.warn(`An alphabet set was introduced but alphabet was empty`);
+                    this.logger.warn(`\`alphabet\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.alphabet = alphabet;
 
@@ -179,7 +184,7 @@ class Resolver {
 
                 let graphemes = line_value.split(/[,\s]+/).filter(Boolean);
                 if (graphemes.length == 0){
-                    this.logger.warn(`A graphemes set was intoduced but graphemes was empty`);
+                    this.logger.warn(`\`graphemes\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.graphemes = graphemes;
 
@@ -220,7 +225,7 @@ class Resolver {
         let insideBrackets = 0;
 
         if (this.wordshape_string.length == 0){
-            throw new Error("No word-shapes to choose from");
+            throw new Error(`No word-shapes to choose from -- expected \`words: wordshape1 wordshape2 ...\``);
         }
 
         if (!valid_words_brackets(this.wordshape_string)) {
@@ -250,7 +255,7 @@ class Resolver {
             result.push(buffer);
         }
 
-        let [resultStr, resultNum] = extract_Value_and_Weight(result, this.wordshape_distribution);
+        let [resultStr, resultNum] = extract_complex_value_and_weight(result, this.wordshape_distribution);
         for (let i = 0; i < resultStr.length; i++) {
             this.wordshapes.items.push(resultStr[i]);
             this.wordshapes.weights.push(resultNum[i]); ///
@@ -307,7 +312,7 @@ class Resolver {
                 for (const key of mappingKeys) {
                     if (str.startsWith(key, i)) {
                         if (history.includes(key)) {
-                            this.logger.warn(`A cycle was detected in mapping for "${key}"`);
+                            this.logger.warn(`A cycle was detected when mapping "${key}"`);
                             result += '🔃';
                         } else {
                             let resolved = resolveMapping(mappings.get(key) || '', [...history, key]);
@@ -326,6 +331,48 @@ class Resolver {
         };
 
         return resolveMapping(input);
+    }
+
+    private parse_cluster(file_array:string[]) {
+        let line = file_array[this.file_line_num];
+        line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+        if (line === '') { return; } // Blank line. End clusterfield... early !!
+        let top_row = line.split(/[,\s]+/).filter(Boolean);
+        top_row.shift();
+        const row_length = top_row.length;
+        this.file_line_num ++;
+
+        let concurrent_target: string[] = [];
+        let concurrent_result: string[] = [];
+
+        for (; this.file_line_num < file_array.length; ++this.file_line_num) {
+            let line = file_array[this.file_line_num];
+            line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+            if (line === '') { break} // Blank line. End clusterfield !!
+
+            let row = line.split(/[,\s]+/).filter(Boolean);
+            let column = row[0];
+            row.shift();
+
+            if (row.length > row_length) {
+                throw new Error(`Clusterfield row too long at line number ${this.file_line_num + 1}`);
+            } else if (row.length < row_length) {
+                throw new Error(`Clusterfield row too short at line number ${this.file_line_num + 1}`);
+            }
+
+            for (let i = 0; i < row_length; ++i) {
+                if (row[i] === '+') {
+                    continue;
+                } else if (row[i] === '-') {
+                    concurrent_target.push(column + top_row[i]!);
+                    concurrent_result.push('^REJECT')
+                } else {
+                    concurrent_target.push(column + top_row[i]!);
+                    concurrent_result.push(row[i]!);
+                }
+            }
+        }
+        this.add_transform(concurrent_target, concurrent_result);
     }
 
 
@@ -348,7 +395,7 @@ class Resolver {
 
         let wordshapes = [];
         for (let i = 0; i < this.wordshapes.items.length; i++) {
-            wordshapes.push(`${this.wordshapes.items[i]}:${this.wordshapes.weights[i]}`);
+            wordshapes.push(`\`${this.wordshapes.items[i]}\`:${this.wordshapes.weights[i]}`);
         }
 
         let transforms = [];

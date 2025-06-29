@@ -90,3 +90,5 @@ function gen_words(
 }
 
 export default gen_words;
+
+// module.exports = gen_words;
