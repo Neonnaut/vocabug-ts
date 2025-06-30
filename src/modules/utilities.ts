@@ -159,7 +159,6 @@ function extract_complex_value_and_weight(
             if (char === '(') parenDepth++;
             if (char === ')') parenDepth--;
 
-            const nextChar = str[i + 1];
             const atEnd = i === str.length - 1;
 
             if ((char === ',' && bracketDepth === 0 && parenDepth === 0) || atEnd) {

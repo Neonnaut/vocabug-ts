@@ -172,9 +172,9 @@ class Resolver {
                 this.alphabet = alphabet;
 
             } else if (line.startsWith("words:")) {
-                line_value = line.substring(6).trim();
                 line_value = this.escape_mapper.escapeBackslashPairs(line_value);
-
+                line_value = line.substring(6).trim();
+                
                 if (line_value != "") {
                     this.wordshape_string = line_value;
                 }

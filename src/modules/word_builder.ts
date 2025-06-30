@@ -2,7 +2,7 @@ import Word from './word.js';
 import Logger from './logger.js';
 import Escape_Mapper from './escape_mapper.js';
 
-import { weightedRandomPick, resolve_wordshape_sets, valid_words_brackets } from './utilities'
+import { weightedRandomPick, resolve_wordshape_sets } from './utilities'
 
 class Word_Builder {
     public logger: Logger;
