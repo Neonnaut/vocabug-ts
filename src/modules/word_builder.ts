@@ -57,10 +57,13 @@ class Word_Builder {
             adult_word += new_char
         }
 
+        adult_word = adult_word.replace(/\^/g, ""); // Remove caret from word
         if (this.escape_mapper.counter != 0) {
             skeleton_word = this.escape_mapper.restoreEscapedChars(skeleton_word);
             adult_word = this.escape_mapper.restoreEscapedChars(adult_word);
         }
+        
+
         return new Word(skeleton_word, adult_word);
     }
 }

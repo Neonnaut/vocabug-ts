@@ -281,6 +281,23 @@ q +  q
 
 `;
 
+} else if (example == "tonal") {
+  choice = `; # Tonal Yoruba
+
+; Initial-cluster: pl pr tr cl cr bl br dr gl gr
+a e ẹ i o ọ u ą ḛ o̰
+ç ş ŋ
+
+; b	 t    k
+;    d    g
+; mb nd   ŋg
+;    c  ç
+; f  s  ş      h
+; m  l  j ŋ  w
+     r
+
+`;
+
 } else if (example == "wordgen") {
   choice = `; This is a comment.
 abcdefg ; And this is a comment following junk.

@@ -102,19 +102,24 @@ class Text_Builder {
         } else if ((this.num_of_duds >= this.upper_gen_limit) && (!this.force_word_limit)) {
             this.terminated = true;
             if (this.remove_duplicates) {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms, or turn on \`force word limit\`')
+                this.logger.warn('Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms')
             } else {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more word-shapes, remove some reject transforms, or turn on \`force word limit\`')
+                this.logger.warn('Could not generate the requested amount of words. Try adding more word-shapes, remove some reject transforms')
             }
         }
     }
 
     make_text() {
         // Send some good info about the generation results
+        let ms:any = Date.now() - this.build_start;
+        const display = ms >= 1000 ? `${(ms / 1000).toFixed(ms % 1000 === 0 ? 0 : 1)} s` : `${ms} ms`;
         if (this.words.length == 1) {
-            this.logger.info(`1 word generated in ${Date.now() - this.build_start} ms`);
+            this.logger.info(`1 word generated in ${display}`);
         } else if (this.words.length > 1) {
-            this.logger.info(`${this.words.length} words generated in ${Date.now() - this.build_start} ms`);
+
+            this.logger.info(`${this.words.length} words generated in ${display}`);
+        } else if (this.words.length == 0) {
+            this.logger.warn(`No words generated in ${display}`);
         }
         if (this.num_of_duplicates == 1) {
             this.logger.info(`1 duplicate word removed`);

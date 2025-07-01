@@ -20439,7 +20439,7 @@ var cm6 = (function (exports) {
       // Comment / GREEN / #
       { tag: tags.comment, color: "#277022" },
       // Escape char / Greenblue
-      { tag: tags.escape, color: "#6ee79d" },
+      { tag: tags.escape, color: "#000000", backgroundColor: "#e8d9cc" },
       { tag: tags.variableName, color: "#000000" },
       // Directive / BLUE / words: categories: with: letters: random-rate:
       { tag: [tags.meta, tags.name], color: "#ad5005" },
@@ -20474,7 +20474,7 @@ var cm6 = (function (exports) {
       // Comment / GREEN / #
       { tag: tags.comment, color: "#bee79d" },
       // Escape char / Greenblue
-      { tag: tags.escape, color: "#6ee79d" },
+      { tag: tags.escape, color: "#f0f0f0", backgroundColor: "#584747" },
       { tag: tags.variableName, color: "#eeeeee" },
       // Directive / BLUE / words: categories: with: letters: random-rate: name:
       { tag: [tags.meta, tags.name], color: "#ff7a7a" },
@@ -20509,6 +20509,9 @@ var cm6 = (function (exports) {
    ***********************/
 
   const vocabugTransformRules = [
+      { token: "escape",
+        regex: /\\./
+      },
       { token: "operator", // > and ;
         regex: />|->|→|\^REJECT/
       },
@@ -20518,6 +20521,9 @@ var cm6 = (function (exports) {
   ];
 
   const vocabugClusterRules = [
+      { token: "escape",
+        regex: /\\./
+      },
       { token: "operator", // > and ;
         regex: /\+|\-/
       },
@@ -20528,7 +20534,7 @@ var cm6 = (function (exports) {
 
   const vocabugDistroRules = [
       { token: "meta",
-        regex: /\s+(zipfian|flat|gusein-zade)(?!\S)/
+        regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/
       }
   ];
 
@@ -20543,7 +20549,7 @@ var cm6 = (function (exports) {
         regex: /\\./
       },
       { token: "regexp",  
-          regex: /\(|\)|\[|\]|\{|\}/
+          regex: /\(|\)|\[|\]|\{|\}|\^/
       },
       { token: "operator",
         regex: /=|,/
@@ -20558,7 +20564,7 @@ var cm6 = (function (exports) {
         regex: /\\./
       },
       { token: "regexp",  
-          regex: /\[|\]/
+          regex: /\[|\]|\^/
       },
       { token: "operator",
         regex: /,|=/

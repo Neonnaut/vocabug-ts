@@ -82,8 +82,8 @@ function tokenize(input: string): string[] {
     const sorted = [...words].sort(customCompare);
     const unknownGraphemes:string[] = Array.from(unknownSet);
     if (unknownGraphemes.length != 0) {
-        logger.warn(`Words remain unsorted because words had the unknown graphemes: "${unknownGraphemes.join(', ')}"; missing from \`alphabet\``)
-        return words;
+        logger.warn(`The custom order stated in \`alphabet\` was ignored because words had the unknown initial graphemes: "${unknownGraphemes.join(', ')}"; missing from \`alphabet\``)
+        return words.sort((Intl.Collator().compare));
     }
     
     return sorted

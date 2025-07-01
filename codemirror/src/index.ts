@@ -81,7 +81,7 @@ export const xcodeLightStyle: CreateThemeOptions['styles'] = [
   { tag: t.comment, color: "#277022" },
 
   // Escape char / Greenblue
-  { tag: t.escape, color: "#6ee79d"}, 
+  { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
 
   { tag: t.variableName, color: "#000000" },
 
@@ -130,7 +130,7 @@ export const xcodeDarkStyle: CreateThemeOptions['styles'] = [
   { tag: t.comment, color: "#bee79d"}, 
 
   // Escape char / Greenblue
-  { tag: t.escape, color: "#6ee79d"}, 
+  { tag: t.escape, color: "#f0f0f0", backgroundColor:"#584747" }, 
 
   { tag: t.variableName, color: "#eeeeee" },
 

@@ -103,6 +103,31 @@ function valid_category_brackets(str: string): boolean {
   return stack.length === 0; // Stack should be empty if balanced
 }
 
+function valid_weights(str: string): boolean {
+  // Rule 1: Colon must be followed by a digit
+  const colonWithoutDigit = /:(?!\d)/g;  // Returns false if follows rule
+
+  // Rule 2: Colon must not appear at the start
+  const colonAtStart = /^:/; // Returns false if follows rule
+
+  // Rule 3: Colon must not be preceded by space or comma
+  const colonAfterSpaceOrComma = /[ ,]:/g; // Returns false if follows rule
+
+  // Rule 4: Colon-digit pair must be followed by space, comma, or end of string
+  const colonDigitBadSuffix = /:\d+(?!\d)(?![ ,]|$)/g; // Returns false if follows rule
+
+  // If any are true return false
+  if (
+    colonWithoutDigit.test(str) ||
+    colonAtStart.test(str) ||
+    colonAfterSpaceOrComma.test(str) ||
+    colonDigitBadSuffix.test(str)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 function extract_value_and_weight(
     input_list: string[],
     default_distribution: string
@@ -257,8 +282,7 @@ function shallow_distribution(no_of_items: number): number[] {
         const exponent = 0.5 - t * 0.07; // interpolates 0.5 → 0.13
         weights.push(1 / Math.pow(rank, exponent));
     }
-    const total = weights.reduce((sum, w) => sum + w, 0);
-    return weights.map(w => w / total);
+    return weights
 }
 
 function flat_distribution(no_of_items: number): number[] {
@@ -452,4 +476,5 @@ function parse_distribution(value:string):string {
 export {
   get_last, capitalise, makePercentage, extract_value_and_weight, weightedRandomPick,
   resolve_nested_categories, resolve_wordshape_sets, parse_distribution,
-  valid_category_brackets, valid_words_brackets, getCatSeg, GetTransform, extract_complex_value_and_weight };
+  valid_category_brackets, valid_words_brackets, valid_weights,
+  getCatSeg, GetTransform, extract_complex_value_and_weight };

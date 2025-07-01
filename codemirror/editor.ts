@@ -22,6 +22,9 @@ const lineWrapConfig = new Compartment();
  ***********************/
 
 const vocabugTransformRules = [
+    { token: "escape",
+      regex: /\\./
+    },
     { token: "operator", // > and ;
       regex: />|->|→|\^REJECT/
     },
@@ -31,6 +34,9 @@ const vocabugTransformRules = [
 ];
 
 const vocabugClusterRules = [
+    { token: "escape",
+      regex: /\\./
+    },
     { token: "operator", // > and ;
       regex: /\+|\-/
     },
@@ -41,7 +47,7 @@ const vocabugClusterRules = [
 
 const vocabugDistroRules = [
     { token: "meta",
-      regex: /\s+(zipfian|flat|gusein-zade)(?!\S)/
+      regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/
     }
 ];
 
@@ -56,7 +62,7 @@ const vocabugWordRules = [
       regex: /\\./
     },
     { token: "regexp",  
-        regex: /\(|\)|\[|\]|\{|\}/
+        regex: /\(|\)|\[|\]|\{|\}|\^/
     },
     { token: "operator",
       regex: /=|,/
@@ -71,7 +77,7 @@ const vocabugCategoryRules = [
       regex: /\\./
     },
     { token: "regexp",  
-        regex: /\[|\]/
+        regex: /\[|\]|\^/
     },
     { token: "operator",
       regex: /,|=/
