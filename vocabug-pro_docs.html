@@ -218,10 +218,10 @@
       <p>If a word is built using the syntax character <code class="example">^</code>, it will disappear in the generated word. In other words <code class="example">^</code> is a null grapheme. If you want to use <code class="example">^</code> as a grapheme, you will need to <a href="#vocWordCreationEscape">escape it</a>. To use other syntax characters as graphemes, they must be escaped too.</p>
 
       <h3 id="vocEscapingCharacters"><a class="head-num">4.2</a>Escaping characters</h3>
-      <p>A character after the syntax character <code class="example">\</code> ignores any meaning it might have had in the generator, including backslashes themselves. This way, anything including capital letters that have already been defined as categories, brackets, even spaces can be generated or targeted in transforms</p>
+      <p>A single-length character following the syntax character <code class="example">\</code> ignores any meaning it might have had in the generator, including backslashes themselves. This way, anything including capital letters that have already been defined as categories, brackets, even spaces can be graphemes.</p>
 
       <h4 id="vocEscapeWord"><a class="head-num">4.2.1</a>Word creation character escape</h4>
-      <p>These are the characters you must escape if you want to use them in  in <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> and the <a href="#vocWords">words</a> directive:</p>
+      <p>These are the characters you must escape if you want to use them in <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> and the <a href="#vocWords">words</a> directive:</p>
       <table class="styled-table">
         <thead>
           <tr>
@@ -292,7 +292,7 @@
       
 
       <h4 id="vocEscapeTransform"><a class="head-num">4.2.2</a>Transform character escape</h4>
-      <p>These are the characters you must escape if you want to use them in the <a href="#nascTransform">transform</a> block.</p>
+      <p>These are the characters you must escape if you want to use them in the <a href="#nascTransform">transform</a> block:</p>
       <table class="styled-table">
         <thead>
           <tr>
@@ -401,97 +401,11 @@
       <p>Enclosing it in curly brackets <code class="example">{</code> and <code class="example">}</code>, the name, or hex-code of a HTML entity will be decoded at the very end of the definition build. For example <code class="example">{&amp;Agrave}</code> will give <code class="example">&Agrave;</code>, and <code class="example">{&amp;#x2603}</code> will give <code class="example">{&#x2603;}</code></p>
       <p>If using the name of a HTML entity, you must preface it with <code class="example">&</code>. When using the hex-code of a HTML entity, you must preface it with <code class="example">&amp;#</code>. You cannot end the name or hex-code of the entity with a semicolon.</p>
 
-
-      <h2 id="vocCategories"><a class="head-num">5</a>Categories</h2>
-      <p>A category is a set of <a href="#vocGraphemes">graphemes</a> with a name. The name is usually a singular-length character, but can be <a href="#vocLongFormCategory">long-form</a>. For example:</p>
-      <pre class="example">C = t, n, k, m, ch, l, ꞌ, s, r, d, h, w, b, y, p, g
-F = n, l, ꞌ, t, k, r, p
-V = a, i, e, u, o</pre>
-      <p>This creates three groups of graphemes. <code class="example">C</code> is the group of all consonants, <code class="example">V</code> is the group of all vowels, and <code class="example">F</code> is the group of some of the consonants that will be used syllable finally.</p>
-        
-      <p>These graphemes are separated by commas, however an alternative is to use spaces: <code class="example">C = t n k m ch l ꞌ s r d h w b y p g</code>. You may not use both commas and spaces as separators on the same line, i.e: <code class="example">A = a b, c</code>.</p>
-
-      <p>By default, the graphemes' frequencies decrease as they go to the right, according to the Gusein-Zade distribution. In the above example, when Vocabug needs to choose a <code class="example">V</code>, it will choose <code class="example">a</code> the most at 43%, <code class="example">i</code> the second-most at 26%, <code class="example">e</code> the third-most at 17%, <code class="example">u</code> the fourth-most at 10%, and <code class="example">o</code> the fifth most at 4%.</p>
-      
-      <h3 id="vocLongFormCategory"><a class="head-num">5.1</a>Long-form category names</h3>
-      <p>You can also give categories long names, but you will need to enclose them in curly brackets <code class="example">{</code> and <code class="example">}</code> when using them:</p>
-      <pre class="example">consonant = t, n, k, m, ch, l, ꞌ, s, r, d, h, w, b, y, p, g
-vowel = a, i, e, u, o
-words: {consonant}{vowel}</pre>
-
-      <h3 id="vocCategoryDropOff"><a class="head-num">5.2</a>Category-drop-off</h3>
-      <p>This option modifies the default grapheme frequencies of categories. For example: <code class="example">category-drop-off: flat</code>. There are three options:</p>
-      <ul class="paragraphian">
-        <li><code class="example">zipfian</code> has the fastest drop-off, graphemes frequencies will decrease fast as they go to the right, according to the Zipf distribution</li>
-        <li><code class="example">gusein-zade</code> approximates a natural frequency distribution of graphemes. As already stated, this is the default</li>
-        <li><code class="example">flat</code> will make all graphemes have an equal chance of being chosen</li>
-      </ul>
-      
-      <h3 id="vocCategoryinCategory"><a class="head-num">5.3</a>Categories inside categories and set-categories</h3>
-      <p>You can use categories inside categories, as long as the referenced category has previously been defined. For example:</p>
-      <pre class="example">class-drop-off: flat<br>L = aa, ii, ee, oo
-V = a, i, e, o, L</pre>
-      <p>In the example above, <code class="example">V</code> has a 20% chance of being a long vowel.</p>
-      <p>You can also enclose a set of graphemes in square brackets <code class="example">[</code> and <code class="example">]</code>. This is called a 'set-category'. This set will be treated as if it were a reference to a category in terms of frequency. For example, we could write the same example as this:</p>
-      <pre class="example">class-drop-off: flat<br>V = a, i, e, o, [aa, ii, ee, oo]</pre>
-      <p>Assigning weights to categories in categories and set-categories is possible.</p>
-      <p>Categories inside categories and set-categories CANNOT be a part of any sequence. for example <code class="example">C = Xz</code> or <code class="example">C = x[c, d]</code> or <code class="example">C = [a, b][c, d]</code> will not give the results you might want. To get sequence-like behaviour like that, you will need to use <a href="#vocSegments">segments</a>.</p>
-
-      <h2 id="vocCategoryWeights"><a class="head-num">6</a>Assigning weights</h2>
-      <p>If you want to set your own frequency for graphemes in a <a href="#vocCategories">category</a> or category-set, items in a <a href="#vocPickOne">pick-one-set</a>, <a href="#vocOptional">optional-set</a>, or <a href="#vocInterSet">inter-set</a>, or <a href="#vocWords">word-shapes</a> in the <code class="example">words:</code> directive, you can use a colon <code class="example">:</code> to specify the weight for each item, like so:</p>
-      <pre class="example">V = a:5, e:4, i:3, o:2, u:1
-$S = [V:8 x:2]
-words: $S:2 y</pre>
-      <p><code class="example">V</code> has approximately the following probabilities: a: 33%, e: 27%, i: 20%, o: 13%, u: 7%. The <a href="#vocPickOne">pick-one-set</a> in the <code class="example">$S</code> segment has an 80% chance of producing a V category over the x grapheme. And the first word-shape in the <code class="example">words:</code> directive has twice the chance of being chosen over the next word-shape.</p>
-      <p>As you might have seen in the example above, in a sequence that has an option that has a weight, it overwrites any drop off frequencies. Also important to note is that any other option that you had not given a weight, is given a default weight of 1.</p>
-
-      <h2 id="vocBuildingWords"><a class="head-num">7</a>Building words</h2>
-
-      <h3 id="vocWords"><a class="head-num">7.1</a>Words</h3>
-      <p>The <code class="example">words:</code> directive defines a set of 'word-shapes' that Vocabug will choose from to create words. A word-shape can consist of individual graphemes, <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> or a mixture of both.</p>
-      <p>By default, words are selected using the Zipf distribution. The first word-shape will be chosen the most often, then the second word-shape the second most often and so on. Below is a very simple example that will generate words with one to three CV syllables:</p>
-      <pre class="example">C = t, n, k, m, l, s, r, d, h, w, b, j, p, g
-V = a, i, o, e, u
-words: CV, CVCV, CVCVCV</pre>
-
-      <h4 id="vocWordDropOff"><a class="head-num">7.1.1</a>Word-drop-off</h4>
-      <p>This directive modifies how often the words' frequencies decrease as they go to the right, unless they have weights. The options are <code class="example">zipfian</code>, <code class="example">gusein-zade</code>, and <code class="example">flat</code>. The default is <code class="example">zipfian</code>.</p>
-      <p>It is better to not use this directive or give word-shapes weights -- it is an uphill battle. For example, if you chose to remove duplicates in the above example, it is already removing one syllable words the most often. And if you have paragraph mode turned on, you would want simple syllables to occur very often. So it is best to simply rearrange the word-shapes in the words directive to get good-looking results. Nevertheless, maybe you want to use a flat distribution because you are only generating CVCV syllables of different types, or generating something that doesn't play by the rules.</p>
-
-      <h3 id="vocSegments"><a class="head-num">7.2</a>Segments</h3>
-      <p>Segments are a system that provides an abbreviation of parts of a <a href="#vocWords">word-shape</a>. Typically you would use it to define the shape of a syllable. Segments are defined similarly to categories, but with several important differences:</p>
-      <ul class="paragraphian">
-        <li>Every segment's name starts with <code class="example">$</code>. <code class="example">S = s</code> is a <a href="#vocCategories">category</a>; <code class="example">$S = s</code> is a segment.</li>
-        <li>Segments are not sets like categories are. <code class="example">$M = a, b, c</code> will not work. You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">$M = [a, b, c]</code></li>
-        <li>Segments have an effect on the logic behind <a href="#vocInterSet">Inter-sets</a>. In this sense, segments are not just abbreviation.</li>
-      </ul>
-      <p>For example you could write the last example like so:</p>
-      <pre class="example">$S = CV
-words: $S $S$S $S$S$S</pre>
-
-      <h3 id="vocPickOne"><a class="head-num">7.3</a>Pick-one set</h3>
-      <p>A pick-one-set is a group of graphemes and categories separated by spaces or commas, enclosed in square brackets <code class="example">[</code> and <code class="example">]</code>. Vocabug will pick an option from that pick-one just like it would from a segment. For example:</p>
-      <pre class="example">V = a, u
-words: t[V, x]</pre>
-      <p>This will produce either <code class="example">ta</code>, <code class="example">tu</code> or <code class="example">tx</code>.</p>
-      <p>Pick-one-sets can be nested inside each other.</p>
-      <p>Anything inside the pick-one can be assigned a weight, and a pick-one itself can be assigned a weight as well if it is nested inside another set:</p>
-      <pre class="example">words: [a:1, b:2, [c, d]:2]</pre>
-
-      <h3 id="vocOptional"><a class="head-num">7.4</a>Optional-set</h3>
-      <p>Using round brackets, <code class="example">(</code> and <code class="example">)</code>, optional-set works the same way as <a href="#vocPickOne">pick-one-set</a>, the only difference is that what's inside them can either appear in the word or not. The probability of each of these variants is 10% by default.</p>
-      <pre class="example">words: ta(n, t, l)</pre>
-      <p>In the above example, there is a 10% chance of getting one of <code class="example">tan</code>, <code class="example">tat</code> or <code class="example">tal</code>, but a 90% chance of <code class="example">ta</code>.</p>
-
       <h4 id="vocOptionalWeight"><a class="head-num">7.4.1</a>Optional weight</h4> 
       <p>This default probability can be modified in two ways. The first is by attaching a percentage-based weight following a <code class="example">?</code> inside the optional-set:</p>
       <pre class="example">$S = ta(n, t, l ?30)
 words: $S</pre>
       <p>Now there is a 30% chance of getting one of <code class="example">tan</code>, <code class="example">tat</code> or <code class="example">tal</code>.</p>
-    
-      <p>The other way to change this probability is through the <code class="example">optional-rate:</code> directive. This directive specifies how often an optional-set is selected. This number is a percentage and as previously stated the default is 10%. For example:</p>
-      <pre class="example">optional-rate: 20</pre>
-      <p>You can write this number with a percentage sign on the end if you want to.</p>
 
       <h3 id="vocInterSet"><a class="head-num">7.5</a>Inter-set</h3>
       <p>An inter-set, using less and greater than signs <code class="example">&lt;</code> and <code class="example">></code>, works the same as <a href="#vocPickOne">pick-one-set</a>. The difference is, only one inter-set will be chosen for that segment or word-shape.</p>
@@ -516,20 +430,6 @@ words: [[a, b],[x]]</pre>
 $Y = &lt;a:2, b:1 @3&gt;&lt;c&gt;
 words: &lt;$Y @8&gt;-&lt;d @2&gt;</pre>
       <p>In the segment <code class="example">$Y</code>, <code class="example">a</code> and <code class="example">b</code> have a three times greater chance of being chosen over <code class="example">c</code>, while <code class="example">a</code> has a weight that makes it twice as probable than <code class="example">b</code>. In the <code class="example">words:</code> directive, there is one word-shape, and that word-shape has an 80% chance of being the segment <code class="example">Y</code> followed by <code class="example">-</code>, and a 20% chance of the word being <code class="example">-d</code>.</p>
-
-      <h2 id="vocAlphabetisationAndGraphs"><a class="head-num">8</a>Alphabetisation and graphemes</h2>
-      <p>The <code class="example">alphabet:</code>, <code class="example">graphs:</code>, <code class="example">alphabet-graphs:</code> and <code class="example">invisible:</code> directives can be an important element to your definition-build. Let's go over its uses.</p>
-
-      <h3 id="vocAlphabetisation"><a class="head-num">8.1</a>Alphabetisation</h3>
-      <p>The alphabet directive gives Vocabug a custom alphabetisation order for words, when the sort words checkbox is selected.</p>
-      <pre class="example">alphabet: a, b, c, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
-      <p>This would order generated words like so: <code class="example">cat chat cumin frog tray t'a</code></p>
-
-      <h3 id="vocGraphs"><a class="head-num">8.2</a>Defining graphs</h3>
-      <p>The <code class="example">graphs:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nascTransform">transforms</a>.</p>
-      <pre class="example">graphs: a, b, c, ch, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
-      <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
-      <p><i>"But my list of graphemes is the same as my list of alphabeticalising letters, I don't want to list them twice"</i>, you might exclaim. Well, you can create an alphabetisation order and list your graphemes in one line using the <code class="example">alphabet-and-graphs:</code> directive.</p>
       
       <h4 id="vocAlternativeGraphs"><a class="head-num">8.2.1</a>Alternative graphemes</h4>
       <p>The <code class="example">graphs:</code> directive can tell Vocabug which character + combining diacritic sequences are to be treated as alternatives of a base grapheme. Let's name these alternatives the 'children' and the base grapheme the 'parent'. You can do this by enclosing the 'children' in <code class="example">&lt;[</code> and <code class="example">]</code> as a set, directly after their 'parent'.</p>
@@ -544,6 +444,93 @@ words: &lt;$Y @8&gt;-&lt;d @2&gt;</pre>
       <pre class="example">invisible-alphabet: ., ˈ<br></pre>
       <p>This would order generated words <code class="example">ˈpa.ta ˈca.ta za.ˈta ca.ˈa</code> as   <code class="example">ca.ˈa, ˈca.ta, ˈpa.ta, za.ˈta</code></p>
 
+      <h2 id="vocCategories"><a class="head-num">6</a>Categories</h2>
+      <p>A category is a set of <a href="#vocGraphemes">graphemes</a> with a key. The key is a singular-length capital letter. For example:</p>
+      <pre class="example">C = t, n, k, m, ch, l, ꞌ, s, r, d, h, w, b, y, p, g
+F = n, l, ꞌ, t, k, r, p
+V = a, i, e, u, o</pre>
+      <p>This creates three groups of graphemes. <code class="example">C</code> is the group of all consonants, <code class="example">V</code> is the group of all vowels, and <code class="example">F</code> is the group of some of the consonants that will be used syllable finally.</p>
+        
+      <p>These graphemes are separated by commas, however an alternative is to use spaces: <code class="example">C = t n k m ch l ꞌ s r d h w b y p g</code>.</p>
+
+      <p>By default, the graphemes' frequencies decrease as they go to the right, according to the Gusein-Zade distribution. In the above example, when Vocabug needs to choose a <code class="example">V</code>, it will choose <code class="example">a</code> the most at 43%, <code class="example">i</code> the second-most at 26%, <code class="example">e</code> the third-most at 17%, <code class="example">u</code> the fourth-most at 10%, and <code class="example">o</code> the fifth most at 4%.</p>
+      
+        <p>Á Ć É Ǵ Í Ḱ Ĺ Ḿ Ń Ó Ṕ Ŕ Ś Ú Ẃ Ý Ź Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω</p>
+
+      <h3 id="vocCategoryinCategory"><a class="head-num">6.1</a>Categories inside categories and set-categories</h3>
+      <p>You can use categories inside categories, as long as the referenced category has previously been defined. For example:</p>
+      <pre class="example">default-category-distribution: flat<br>L = aa, ii, ee, oo
+V = a, i, e, o, L</pre>
+      <p>In the example above, <code class="example">V</code> has a 20% chance of being a long vowel.</p>
+      <p>You can also enclose a set of graphemes in square brackets <code class="example">[</code> and <code class="example">]</code>. This is called a 'set-category'. This set will be treated as if it were a reference to a category in terms of frequency. For example, we could write the same example as this:</p>
+      <pre class="example">default-category-distribution: flat<br>V = a, i, e, o, [aa, ii, ee, oo]</pre>
+      <p>Assigning weights to categories in categories and set-categories is possible.</p>
+      <p>Categories inside categories and set-categories CANNOT be a part of any sequence. for example <code class="example">C = Xz</code> or <code class="example">C = x[c, d]</code> or <code class="example">C = [a, b][c, d]</code> will not give the results you might want. To get sequence-like behaviour like that, you will need to use <a href="#vocSegments">segments</a>.</p>
+
+      <h2 id="vocBuildingWords"><a class="head-num">7</a>Building words</h2>
+
+      <h3 id="vocWords"><a class="head-num">7.1</a>Words</h3>
+      <p>The <code class="example">words:</code> directive defines a set of 'word-shapes' that Vocabug will choose from to create words. A word-shape can consist of individual graphemes, <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> or a mixture of both.</p>
+      <p>By default, words are selected using the Zipf distribution. The first word-shape will be chosen the most often, then the second word-shape the second most often and so on. Below is a very simple example that will generate words with one to three CV syllables:</p>
+      <pre class="example">C = t, n, k, m, l, s, r, d, h, w, b, j, p, g
+V = a, i, o, e, u
+words: CV, CVCV, CVCVCV</pre>
+
+      <h3 id="vocSegments"><a class="head-num">7.2</a>Segments</h3>
+      <p>Segments are a system that provides an abbreviation of parts of a <a href="#vocWords">word-shape</a>. Typically you would use it to define the shape of a syllable. Segments are defined similarly to categories, but with several important differences:</p>
+      <ul class="paragraphian">
+        <li>Every segment's key starts with <code class="example">$</code>. <code class="example">S = s</code> is a <a href="#vocCategories">category</a>; <code class="example">$S = s</code> is a segment.</li>
+        <li>Segments are not sets like categories are. <code class="example">$M = a, b, c</code> will not work as you might expect (because as already stated, segments are abbreviation for word-shapes). You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">$M = [a, b, c]</code></li>
+      </ul>
+      <p>For example you could write the last example like so:</p>
+      <pre class="example">$S = CV
+words: $S $S$S $S$S$S</pre>
+      <p>You can put segments inside segments.</p>
+
+      <h3 id="vocPickOne"><a class="head-num">7.3</a>Pick-one set</h3>
+      <p>A pick-one-set is a group of graphemes and categories separated by spaces or commas, enclosed in square brackets <code class="example">[</code> and <code class="example">]</code>. Vocabug will pick an option from that pick-one just like it would from a segment. For example:</p>
+      <pre class="example">V = a, u
+words: t[V, x]</pre>
+      <p>This will produce either <code class="example">ta</code>, <code class="example">tu</code> or <code class="example">tx</code>.</p>
+      <p>Pick-one-sets can be nested inside each other.</p>
+      <p>Anything inside the pick-one can be assigned a weight, and a pick-one itself can be assigned a weight as well if it is nested inside another set:</p>
+      <pre class="example">words: [a:1, b:2, [c, d]:2]</pre>
+
+      <h3 id="vocOptional"><a class="head-num">7.4</a>Optional-set</h3>
+      <p>Using round brackets, <code class="example">(</code> and <code class="example">)</code>, optional-set works the same way as <a href="#vocPickOne">pick-one-set</a>, the only difference is that what's inside them can either appear in the word or not. The probability of each of these variants is 10% by default.</p>
+      <pre class="example">words: ta(n, t, l)</pre>
+      <p>In the above example, there is a 10% chance of getting one of <code class="example">tan</code>, <code class="example">tat</code> or <code class="example">tal</code>, but a 90% chance of <code class="example">ta</code>.</p>
+
+      <h4 id="vocOptionalsWeight"><a class="head-num">7.4.1</a>Optionals weight</h4>
+      <p>By default, an optional-set has a 10% chance of being included in the word. You can change this probability.</p>
+
+            <h2 id="vocDistributions"><a class="head-num">4</a>Default distributions</h2>
+      <p><b>The ordering of items matters</b> in <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> and <a href="#vocWords">word-shapes</a>. The first item will be chosen the most often, the second grapheme the second most often, and so on.</p>
+
+      <p>You can change these default distributions (another name for this might be "default drop-off", but I digress). For categories, the default is <code class="example">gusein-zade</code>, and for the separate setting for word-shapes, the default is <code class="example">zipfian</code>. The distribution will be applied to each item in a set, and then recursively to any set that set is nested in (treating the nested set as an item), then applied at the surface level.</p>
+
+      <ul class="paragraphian">
+        <li>A <code class="example">zipfian</code> distribution approximates natural language frequency for words, where the highest-ranked item receives the greatest weight, and subsequent ones decay steeply until flattening out.</li>
+        <li>A <code class="example">gusein-zade</code> distribution offers a gentler slope that is natural across phonemes in a language, following a logarithmic decay that still prioritizes top-ranked items but spreads weight more evenly</li>
+        <li><code class="example">Shallow</code> distribution, the red-headed step-child of the distributions. It doesn't occur in natural linguistics, but offers us something between Flat and Gusein-Zade. It is Zipfian in nature, a 'long-tailed Zipfian distribution'</li>
+        <li>A <code class="example">flat</code> distribution treats all items equally. This is not to say the items will be evenly chosen -- items are still being randomly chosen on a generation, they just have the same weight</li>
+      </ul>
+
+      <img src="img/distribution.png" alt="Distribution graph" style="width: 100%;">
+
+      <h2 id="vocCategoryWeights"><a class="head-num">5</a>Assigning weights</h2>
+      <p>If you want to set your own frequency for graphemes in a <a href="#vocCategories">category</a> or category-set, items in a <a href="#vocPickOne">pick-one-set</a>, or <a href="#vocOptional">optional-set</a>, or <a href="#vocWords">word-shapes</a> in the <code class="example">words:</code> directive, you can use a colon <code class="example">:</code> to specify the weight for each item, like so:</p>
+      <pre class="example">V = a:5, e:4, i:3, o:2, u:1
+$S = [V:8 x:2]
+words: $S:2 y</pre>
+      <p><code class="example">V</code> has approximately the following probabilities: a: 33%, e: 27%, i: 20%, o: 13%, u: 7%. The <a href="#vocPickOne">pick-one-set</a> in the <code class="example">$S</code> segment has an 80% chance of producing a V category over the x grapheme. And the first word-shape in the <code class="example">words:</code> directive has twice the chance of being chosen over the next word-shape.</p>
+      <p>As you might have noticed in the example above, in a sequence that has at least one weighted option, it overwrites any default distributions. Also important to note is that any other option that you had not given a weight (inside that set, or on the surface level), is given a weight of 1.</p>
+
+      <h2 id="vocAlphabetisation"><a class="head-num">8</a>Alphabetisation</h2>
+      <p>The alphabet directive gives Vocabug a custom alphabetisation order for words, when the sort words checkbox is selected.</p>
+      <pre class="example">alphabet: a, b, c, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
+      <p>This would order generated words like so: <code class="example">cat chat cumin frog tray t'a yanny</code></p>
+
       <h2 id="nascTransform"><a class="head-num">9</a>Transform</h2>
       <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of the transform block, which implements the <a href="./nasc.html">NASC program</a>.</p>
       <p>All transforms must be used inside this block. To terminate a block you use an <code class="example">END</code> line. However, all unterminated blocks are automatically terminated at the end of the definition-build:</p>
@@ -554,6 +541,13 @@ words: &lt;$Y @8&gt;-&lt;d @2&gt;</pre>
       <p>If you want to capture graphemes that are normally syntax characters in transforms, you will need to <a href="#nascTransformEscape">escape them</a>.</p>
 
       <p>When this document uses examples to explain transformations, the last comment shows an example word transforming. For example <code class="example">; amda ==> ampa</code> means the rule will transform the word <code class="example">amda</code> into <code class="example">ampa</code></p>
+
+      <h3 id="vocGraphs"><a class="head-num">9.1</a>Defining graphemes</h3>
+      <p>The <code class="example">graphemes:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nascTransform">transformations</a>.</p>
+      <pre class="example">graphemes: a, b, c, ch, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
+      <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
+
+
 
       <h2 id="nascTheChange"><a class="head-num">10</a>The change</h2>
       <p>The format of the change can be expressed as <code class="example">TARGET -> RESULT</code>.</p>

@@ -169,7 +169,7 @@ r, ɻ, ṅ, ṫ, ʔ, ŋ -> rr, r, nh, th, ꞌ, ng
 
 C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
 I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
-V = a, i, u, o, e, [oR, aR, iR, eR, uR, ya, yu, yo, [yaR, yuR, yoR]]
+V = a, i, u, o, e, [oR, aR, iR, eR, uR, yu, yo, ya, [yoR, yuR, yaR]]
 F = N, Q
 
 $S = CV(F) ; Gives type C(y)V(R)(N,Q).
@@ -230,13 +230,25 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 ; Word-internal coda: n r l s m
 ; Word-final coda: n r l s d z
 
-# rare: ywi, yoi, yaw, od#, yja, yje, yjo, yju
+; rare: ywi, yoi, yaw, od#, yja, yje, yjo, yju
 
-C = t s k d n p l m r b q g h č f z
+C = t s ^ k d n p l m r b q g h č f z
 V = a i o u e
 F = n r l s m
-$S = C?VF?
-words: $S$S
+T = '
+$S = CV(F)
+
+$X = C{T:6}V(F) ; third last: 6%
+$Y = C{^:85}V(F) ; 2nd last 85% 
+$Z = C{T:9}V(F) ; last: 9%
+words: $Y$Z $X$Y$Z $S$X$Y$Z
+
+  
+
+BEGIN transform:
+
+%  a  e  i  o  u
+'  á é í ó ú
 
 ; Enlace y Hiato
 ; [a,e,i,o,u]+ -> [a,e,i,o,u]
@@ -257,7 +269,7 @@ y  +  +  y  +  +  y  +
 s  +  +  +  +  +  +  s
 r  +  +  +  +  +  y  +  
 
-# q -> c / _(w)[a,o,u]
+; q -> c / _(w)[a,o,u]
 
 %  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  y  z  
 m  +  nk nq ng nč nd nf h  nl m  +  +  r  +  nt y  nz 
@@ -275,30 +287,33 @@ g ň  +
 y ʎ  +
 q +  q
 
-; Taco-taco, burrito-burrito
-; k q  č  h  ň ʎ  j  w
-; c qu ch j  ñ ll i  u
+Taco-taco, burrito-burrito
+k q  č  h  ň ʎ  j  w > c qu ch j  ñ ll i  u
 
 `;
 
-} else if (example == "tonal") {
+} else if (example == "yoruba") {
   choice = `; # Tonal Yoruba
 
-; Initial-cluster: pl pr tr cl cr bl br dr gl gr
-a e ẹ i o ọ u ą ḛ o̰
-ç ş ŋ
+; a e ẹ i o ọ u ṵ o̰ ḛ ḭ 
 
-; b	 t    k
-;    d    g
-; mb nd   ŋg
+; b	 t     k  kp
+;    d     g  gb
+; mb nd    ŋg ŋgb
 ;    c  ç
-; f  s  ş      h
-; m  l  j ŋ  w
-     r
+; f  s  ş         h
+; m  l  j  ŋ  w
+;    r
+
+; Ol' dead consonant trick:
+  l -> n / N_N
+  p -> f / V_V
+  ɓ	ɗ -> p l
+
 
 `;
 
-} else if (example == "wordgen") {
+} else if (example == "tests") {
   choice = `; This is a comment.
 abcdefg ; And this is a comment following junk.
 
@@ -374,11 +389,9 @@ BEGIN transform
     a á à ǎ â 
     ā ā́ ā̀ ā̌ ā̂
 
-END transform
-`;
-  } else if (example == "transform") {
-        choice = `; GRAPHS
-  graphs: ts pf
+    graphemes: ts pf
+; ~~~~~~~~~~~~
+
   t -> ʡ
   atsota ==> atsoʡa
 
@@ -547,6 +560,7 @@ END transform
   ; Tonogenesis:
 
   ; Sandhi: impossible
+
 `;
     }
 

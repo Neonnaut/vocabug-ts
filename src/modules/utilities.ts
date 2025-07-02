@@ -12,8 +12,9 @@ const makePercentage = (input: string): number | null => {
   return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
 };
 
+// Á Ć É Ǵ Í Ḱ Ĺ Ḿ Ń Ó Ṕ Ŕ Ś Ú Ẃ Ý Ź Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
 function validateCatSegName(str: string): [boolean, boolean] {
-    const regex = /^[A-Z\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD]$|^\$[A-Z\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD]$/u;
+    const regex = /^[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]$/u;
     const hasDollarSign = str.includes("$");
 
     return [regex.test(str), hasDollarSign];
@@ -113,8 +114,8 @@ function valid_weights(str: string): boolean {
   // Rule 3: Colon must not be preceded by space or comma
   const colonAfterSpaceOrComma = /[ ,]:/g; // Returns false if follows rule
 
-  // Rule 4: Colon-digit pair must be followed by space, comma, or end of string
-  const colonDigitBadSuffix = /:\d+(?!\d)(?![ ,]|$)/g; // Returns false if follows rule
+  // Rule 4: Colon-digit pair must be followed by space, comma, curlybracket, or end of string
+  const colonDigitBadSuffix = /:\d+(?!\d)(?![ ,}]|$)/g; // Returns false if follows rule
 
   // If any are true return false
   if (

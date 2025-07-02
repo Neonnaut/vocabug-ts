@@ -4,6 +4,7 @@ import Transformer from './transformer.ts';
 import Text_Builder from './text_builder.ts';
 import Logger from './logger.ts';
 import Escape_Mapper from './escape_mapper.ts'; 
+import InterBuilder from './inter_builder.ts';
 
 function gen_words(
     file: string,
@@ -34,16 +35,21 @@ function gen_words(
             word_divider
         );
 
+        const inter_builder = new InterBuilder(logger);
+
+
+
         resolver.parse_file(file);
         resolver.expand_categories();
         resolver.expand_segments();
         resolver.expand_wordshape_segments();
-        resolver.set_wordshapes();
+        resolver.set_wordshapes(inter_builder);
         resolver.create_record();
 
         const wordBuilder = new Word_Builder(
             logger,
             escape_mapper,
+            inter_builder,
             resolver.categories,
             resolver.wordshapes,
             resolver.wordshape_distribution,
@@ -69,7 +75,8 @@ function gen_words(
             resolver.sort_words,
             resolver.capitalise_words,
             resolver.word_divider,
-            resolver.alphabet
+            resolver.alphabet,
+            resolver.invisible
         );
 
         // Yo! this is where we generate da words !!

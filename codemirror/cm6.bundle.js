@@ -20596,7 +20596,7 @@ var cm6 = (function (exports) {
               } else if (state.mode != 'transform') {
                   state.mode = 'none';
               }
-              return "comment";
+              if (state.blanko) {state.blanko = false;}            return "comment";
           }
           if (stream.sol()) {
               // No more clusterblock we reached line with blankspaces
@@ -20631,7 +20631,7 @@ var cm6 = (function (exports) {
                       return "meta";
                   }
                   // Graphemes, Alphabet
-                  if (stream.match(/(graphemes|alphabet)(?=:)/)) {
+                  if (stream.match(/(graphemes|alphabet|invisible|alphabet-and-graphs)(?=:)/)) {
                       state.mode = 'listLine';
                       state.doIndent = true;
                       return "meta";
@@ -20656,7 +20656,7 @@ var cm6 = (function (exports) {
 
                   // Macro
                   // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
-                  let match = stream.match(/(\$[A-Z\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9\u0041-\u005A\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD])(?=\s*=)/u);
+                  let match = stream.match(/(\$[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?=\s*=)/u);
                   if (match) {
                       state.classMacList.push(match[1]);
                       state.mode = 'segmentLine';
@@ -20664,7 +20664,7 @@ var cm6 = (function (exports) {
                   }
 
                   // Class
-                  match = stream.match(/([A-Z\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9\u0041-\u005A\u00C1\u00C9\u00CD\u00D3\u00DA\u00DD])(?=\s*=)/u);
+                  match = stream.match(/([A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?=\s*=)/u);
                   if (match) {
                       state.classList.push(match[1]);
                       state.classMacList.push(match[1]);

@@ -18,6 +18,7 @@ class Text_Builder {
     public capitalise_words: boolean;
     public word_divider: string;
     public alphabet: string[];
+    public invisible: string[];
 
     public terminated: boolean;
     public words: string[];
@@ -39,7 +40,8 @@ class Text_Builder {
         sort_words: boolean,
         capitalise_words: boolean,
         word_divider: string,
-        alphabet: string[]
+        alphabet: string[],
+        invisible: string[]
     ) {
         this.logger = logger;
         this.build_start = build_start;
@@ -54,6 +56,7 @@ class Text_Builder {
         this.capitalise_words = capitalise_words;
         this.word_divider = word_divider;
         this.alphabet = alphabet;
+        this.invisible = invisible;
 
         this.terminated = false;
         this.words = []
@@ -133,7 +136,7 @@ class Text_Builder {
         }
 
         if (this.sort_words){
-            this.words = collator( this.logger, this.words, this.alphabet );
+            this.words = collator( this.logger, this.words, this.alphabet, this.invisible );
         }
         if (this.capitalise_words){
             for (let i = 0; i < this.words.length; i++) {

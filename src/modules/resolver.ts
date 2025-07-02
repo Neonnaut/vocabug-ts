@@ -1,5 +1,6 @@
 import type Escape_Mapper from './escape_mapper';
 import Logger from './logger';
+import InterBuilder from './inter_builder';
 
 import { getCatSeg, GetTransform, makePercentage, extract_complex_value_and_weight, resolve_nested_categories,
     valid_words_brackets, valid_category_brackets, valid_weights, parse_distribution
@@ -31,6 +32,7 @@ class Resolver {
     public transforms: { target:string[], result:string[]}[];
     public graphemes: string[];
     public alphabet: string[];
+    public invisible: string[];
 
     private file_line_num = 0;
 
@@ -96,6 +98,7 @@ class Resolver {
         this.segments = new Map;
         this.wordshape_distribution = "flat";
         this.alphabet = [];
+        this.invisible = [];
         this.wordshape_string = ""
         this.wordshapes = { items: [], weights: [] };
         this.graphemes = [];
@@ -178,6 +181,29 @@ class Resolver {
                 }
                 this.alphabet = alphabet;
 
+            } else if (line.startsWith("invisible:")) {
+                line_value = line.substring(10).trim();
+                line_value = this.escape_mapper.restorePreserveEscapedChars(line_value);
+
+                let invisible = line_value.split(/[,\s]+/).filter(Boolean);
+
+                if (invisible.length == 0){
+                    this.logger.warn(`\`invisible\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                }
+                this.invisible = invisible;
+
+            } else if (line.startsWith("alphabet-and-graphs:")) {
+                line_value = line.substring(20).trim();
+                line_value = this.escape_mapper.restorePreserveEscapedChars(line_value);
+
+                let a_g = line_value.split(/[,\s]+/).filter(Boolean);
+
+                if (a_g.length == 0){
+                    this.logger.warn(`\`alphabet-and-graphs\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                }
+                this.graphemes = a_g;
+                this.alphabet = a_g;
+
             } else if (line.startsWith("graphemes:")) {
                 line_value = line.substring(10).trim();
                 line_value = this.escape_mapper.escapeBackslashPairs(line_value);
@@ -224,7 +250,7 @@ class Resolver {
         this.segments.set(name, field);
     }
 
-    set_wordshapes() {
+    set_wordshapes(inter_builder: InterBuilder) {
         let result = [];
         let buffer = "";
         let insideBrackets = 0;
@@ -232,6 +258,8 @@ class Resolver {
         if (this.wordshape_string.length == 0){
             throw new Error(`No word-shapes to choose from -- expected \`words: wordshape1 wordshape2 ...\``);
         }
+
+        this.wordshape_string = inter_builder.processString(this.wordshape_string);
 
         if (!valid_words_brackets(this.wordshape_string)) {
             throw new Error("A word-shape had missmatched brackets");
@@ -437,7 +465,8 @@ class Resolver {
 
             `\nTransforms {\n` + transforms.join('\n') + `\n}` +
             `\nGraphemes:              ` + this.graphemes.join(', ') +
-            `\nAlphabet:               ` + this.alphabet.join(', ');
+            `\nAlphabet:               ` + this.alphabet.join(', ') +
+            `\nInvisible:             ` + this.invisible.join(', ');
         info = this.escape_mapper.restorePreserveEscapedChars(info);
 
         this.logger.silent_info(info);

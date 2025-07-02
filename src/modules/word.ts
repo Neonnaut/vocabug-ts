@@ -25,7 +25,7 @@ class Word {
         let output: string | undefined = '';
         if (Word.debug) {
             for (let i = 0; i < this.forms.length; i++) {
-                output += `<${this.transformations[i]}>: '${this.forms[i]}'\n`;
+                output += `{${this.transformations[i]}}: {${this.forms[i]}}\n`;
             }
             return output;
         }
