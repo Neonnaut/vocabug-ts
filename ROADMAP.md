@@ -4,8 +4,6 @@ Thoughts....
 
 - Promises `words: C?UV`
 
-- Word-class addition
-
 - I should finish all wordgen things, then move on to Nasc, then go back here to improve transforms
 
 - Null symbol as alternative to caret?

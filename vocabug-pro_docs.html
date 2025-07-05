@@ -458,6 +458,11 @@ V = a, i, e, o, L</pre>
 V = a, i, o, e, u
 words: CV, CVCV, CVCVCV</pre>
 
+        <p>Word-shapes may alternatively be declared in the <code class="example">BEGIN words:</code> block. Allowing word-shapes to be declared over multiple lines, and allowing the use of comments:</p>
+      <pre class="example">BEGIN words: wordshape1<br>  wordshape2, wordshape3
+; This is a comment<br>  wordshape4<br>END</pre>
+        <p>You must use the <code class="example">END</code> keyword on a new line to end of the block.</p>
+
       <h3 id="vocSegments"><a class="head-num">7.2</a>Segments</h3>
       <p>Segments are a system that provides an abbreviation of parts of a <a href="#vocWords">word-shape</a>. Typically you would use it to define the shape of a syllable. Segments are defined similarly to categories, but with several important differences:</p>
       <ul class="paragraphian">
@@ -491,7 +496,7 @@ words: t[V, x]</pre>
       <p>Supra-set is a feature designed to help generate words with stress systems, pitch accent systems, or other word-based suprasegmentals. Here is an example where it is used for a stress system:</p>
       <pre class="example">C = t<br>V = a<br>X = '<br>words: ({X}CV){X}CV</pre>
       <p>This produces any of the following words: <code class="example">'ta</code>, <code class="example">ta'ta</code>, <code class="example">'tata</code>, never any words with more than one <code class="example">'</code>. Notice here that <code class="example">ta</code> is not possible -- A supra-set item is only chosen after dealing with any sets that the supra-set items are nested in.</p>
-      <p>See the "Romance-like" example for a language that uses inter-set for its stress system, or the "BTX" example for a language that uses it for a complex pitch accent system.</p>
+      <p>See the "Romance-like" example for a language that uses supra-set for its stress system.</p>
       
       <h4 id="vocInterSetWeight"><a class="head-num">7.5.1</a>Supra-set weight</h4> 
       <p>You can set the weights of supra-set items like so:</p>
@@ -861,7 +866,7 @@ END
 ; sososoo ==> sxsxsxo</pre>
 
       <h2 id="nascInsertionAndDeletion"><a class="head-num">16</a>Insertion and deletion</h2>
-      <p>Insertion requires a condition to be present, and for a caron <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
+      <p>Insertion requires a condition to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
       <pre class="example">; insert /a/ in between /b/ and /t/
   ^ -> a / b_t
 ; bt ==> bat</pre>

@@ -154,8 +154,6 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
 #aa# #ee# #ii# #oo# #uu# -> aa ee ii oo uu
-
-
 `;
 
 } else if (example == "romance") {
@@ -178,17 +176,18 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 optionals-weight: 30 %
 
-C = [t:9,tr] s ^ [k:9,kr,kl] d n p l m r b q g h [č:12 f z]
+C = [t:9,tr] s ^ [k:9,kr,kl] [d:9,dr] n [p:9,pr,pl] l m r [b:9,br,bl] q g h [č:12 f z]
 V = a i o u e
 F = n r l s m d
 X = n r l s d
 T = '
 $S = CV(F)
-$Y = CV({^:70},{^:85}F) ; 2nd last 85% 
+$X = CV({T:1},{^:3}F) ; 2nd last 85% 
+$Y = CV({^:80},{^:95}F) ; 2nd last 85% 
 $Z = CV({T:3},{T:9}X) ; last: 9%
 
 BEGIN words:
-  $Y$Z $S$Y$Z $S$S$Y$Z
+  $Y$Z $X$Y$Z $S$X$Y$Z
 END
 
   
@@ -244,6 +243,7 @@ q +  q
 
 ; Taco-taco, burrito-burrito
 k q č h ň ʎ j w > c qu ch j ñ ll i u
+
 `;
 
 } else if (example == "tonal") {
