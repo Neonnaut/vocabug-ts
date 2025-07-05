@@ -35,6 +35,9 @@ html {
   --button-text: #fff;
   --select-border: #eaeeff;
 
+  --input-box-border: #919191;
+  --input-box-border-focus: #feffe0;
+
   --disabled-button-bg: #3e3e3e;
   --disabled-button-text: #a2a2a2;
 
@@ -92,6 +95,9 @@ html {
   --button-text: #000;
   --select-border: #4c4c80;
 
+  --input-box-border: #6f6f6f;
+  --input-box-border-focus: #000000;
+
   --disabled-button-bg: #eee;
   --disabled-button-text: #6c6c6c;
 
@@ -148,6 +154,9 @@ html {
   --button-bg: #eaeeff;
   --button-text: #073642;
   --select-border: #4c4c80;
+
+  --input-box-border: #ababab;
+  --input-box-border-focus: #ffffff;
 
   --disabled-button-bg: #dadada;
   --disabled-button-text: #6c6c6c;
@@ -260,6 +269,10 @@ h3 {font-size: 2.3rem;}
 h4 {font-size: 1.9rem;}
 h5 {font-size: 1.7rem;}
 h6 {font-size: 1.5rem;}
+
+.monospace {
+  font-family: monospace;
+}
 
 p {
   color: var(--text);
@@ -445,24 +458,42 @@ input[type='checkbox'], input[type='radio'], input[type='range'], progress {
   accent-color: var(--active-bg);
   cursor: pointer;
 }
+
 input[type='checkbox']:disabled, input[type='radio']:disabled, input[type='range']:disabled {
   cursor: default;
 }
-input[type='range'] {
-  margin-top: 5px;
-}
-input {
-  padding: 5px;
-}
+
 select option:hover {
   background: var(--hover-bg);
   color: var(--hover-text);
 }
-textarea {
-  box-sizing: border-box;
-  width: 100%;
+select {
+  padding: 6px;
+  color: var(--textbox-text);
+  background: var(--textbox-bg);
+  border-radius: 3px;
+  font-size: inherit;
+
+  -webkit-appearance: none;
+  background-image: url(./img/apple-touch-icon.png);
+  line-height: 16px; /*ios*/
+  cursor: pointer;
 }
-textarea, input, .fake-textbox {
+
+select:disabled {
+  background: var(--disabled-button-bg);
+  cursor: default;
+  border: var(--disabled-button-text) 1px solid;
+}
+
+input[type='color'],
+input[type='number'], input[type='date'], input[type='month'], input[type='week'],
+input[type='datetime-local'], input[type='text'], input[type='password'],
+input[type='url'], input[type='email'], input[type='tel'], input[type='search'],
+textarea, .fake-textbox, select {
+  border: 1px solid var(--input-box-border);
+  outline: none;
+
   background: var(--textbox-bg);
   color: var(--textbox-text);
   white-space: pre;
@@ -470,12 +501,22 @@ textarea, input, .fake-textbox {
   font-size: 16px;
   padding: 5px;
 }
+input[type='color']:focus,
+input[type='number']:focus, input[type='date']:focus, input[type='month']:focus, input[type='week']:focus,
+input[type='datetime-local']:focus, input[type='text']:focus, input[type='password']:focus,
+input[type='url']:focus, input[type='email']:focus, input[type='tel']:focus, input[type='search']:focus,
+textarea:focus, .fake-textbox:focus, select:focus {
+  border: 1px solid var(--input-box-border-focus);
+}
+
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+}
 .fake-textbox {
   -moz-appearance: textfield-multiline;
   -webkit-appearance: textarea;
-  border: transparent solid 1px;
   resize: both;
-  box-shadow: inset 0px 1px 2px var(--light-grey-border);
   padding: 6px;
   font-family: monospace;
   font-size: 1.2em;
@@ -484,11 +525,7 @@ textarea, input, .fake-textbox {
 .fake-textbox:hover {
   cursor: auto;
 }
-.fake-textbox:focus {
-  outline: none;
-  border: none;
-  border: var(--light-grey-border) solid 1px;
-}
+
 .dropdown {
   display: inline-block;
   position: relative;
@@ -924,45 +961,12 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 .flex {
     display: flex
 }
-
 .grid {
     display: grid
 }
 
-.hidden {
-    display: none
-}
-
-.h-6 {
-    height: 1.5rem
-}
-
-.h-\[calc\(100vh-7rem\)\] {
-    height: calc(100vh - 7rem)
-}
-
-.w-6 {
-    width: 1.5rem
-}
-
 .w-full {
     width: 100%
-}
-
-.max-w-screen-xl {
-    max-width: 1280px
-}
-
-.shrink-0 {
-    flex-shrink: 0
-}
-
-.flex-grow {
-    flex-grow: 1
-}
-
-.cursor-pointer {
-    cursor: pointer
 }
 
 .grid-cols-2 {
@@ -995,32 +999,4 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 
 .gap-2 {
     gap: .5rem
-}
-
-select {
-  padding: 6px;
-  color: var(--textbox-text);
-  background: var(--textbox-bg);
-  border: var(--select-border) 1px solid;
-  border-radius: 3px;
-  font-size: inherit;
-
-  -webkit-appearance: none;
-  line-height: 16px; /*ios*/
-  cursor: pointer;
-}
-
-select::after {
-    content: '\0025BC';
-    color: white;
-}
-
-select:disabled {
-  background: var(--disabled-button-bg);
-  cursor: default;
-  border: var(--disabled-button-text) 1px solid;
-}
-
-.monospace {
-  font-family: monospace;
 }

@@ -1,4 +1,4 @@
-import Word from './word.js';
+import Word from './word';
 import Logger from './logger';
 
 class Transformer {

@@ -12,13 +12,36 @@ const makePercentage = (input: string): number | null => {
   return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
 };
 
-// Á Ć É Ǵ Í Ḱ Ĺ Ḿ Ń Ó Ṕ Ŕ Ś Ú Ẃ Ý Ź Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
 function validateCatSegName(str: string): [boolean, boolean] {
-    const regex = /^[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]$/u;
+    const regex = /^[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]$|^\$[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]$/u;
     const hasDollarSign = str.includes("$");
 
     return [regex.test(str), hasDollarSign];
 }
+
+function validateSegment(str: string): boolean {
+  let insideSquare = false;
+  let insideParen = false;
+
+  // We don't want random space or comma inside segment
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+
+    if (char === "[") insideSquare = true;
+    else if (char === "]") insideSquare = false;
+
+    else if (char === "(") insideParen = true;
+    else if (char === ")") insideParen = false;
+
+    if ((char === "," || char === " ") && !insideSquare && !insideParen) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 
 function getCatSeg(input: string): [string, string, boolean, boolean, boolean] {
     const divider = "=";
@@ -105,8 +128,9 @@ function valid_category_brackets(str: string): boolean {
 }
 
 function valid_weights(str: string): boolean {
-  // Rule 1: Colon must be followed by a digit
-  const colonWithoutDigit = /:(?!\d)/g;  // Returns false if follows rule
+
+  // Rule 1: Colon must be followed by a number (integer or decimal)
+  const colonWithoutNumber = /:(?!\d+(\.\d+)?)/g;
 
   // Rule 2: Colon must not appear at the start
   const colonAtStart = /^:/; // Returns false if follows rule
@@ -114,15 +138,16 @@ function valid_weights(str: string): boolean {
   // Rule 3: Colon must not be preceded by space or comma
   const colonAfterSpaceOrComma = /[ ,]:/g; // Returns false if follows rule
 
-  // Rule 4: Colon-digit pair must be followed by space, comma, curlybracket, or end of string
-  const colonDigitBadSuffix = /:\d+(?!\d)(?![ ,}]|$)/g; // Returns false if follows rule
+  // Rule 4: Colon-number (int or decimal) pair
+  // must be followed by space, comma, }, ], ), or end of string
+  const colonNumberBadSuffix = /:(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,}\]\)\n]|$)/g;
 
   // If any are true return false
   if (
-    colonWithoutDigit.test(str) ||
+    colonWithoutNumber.test(str) ||
     colonAtStart.test(str) ||
     colonAfterSpaceOrComma.test(str) ||
-    colonDigitBadSuffix.test(str)
+    colonNumberBadSuffix.test(str)
   ) {
     return false;
   }
@@ -478,4 +503,4 @@ export {
   get_last, capitalise, makePercentage, extract_value_and_weight, weightedRandomPick,
   resolve_nested_categories, resolve_wordshape_sets, parse_distribution,
   valid_category_brackets, valid_words_brackets, valid_weights,
-  getCatSeg, GetTransform, extract_complex_value_and_weight };
+  getCatSeg, GetTransform, extract_complex_value_and_weight, validateSegment };

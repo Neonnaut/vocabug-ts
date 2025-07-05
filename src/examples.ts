@@ -2,18 +2,16 @@ function get_example(example:string):string {
     var choice = '';
 
 if (example == "basic") {
-  choice = `C = [t:9, tr] n [k:13, kr] m r s [p:12, pr] h w j
-V = a i e o u L
+  choice = `C = [t:9, tr] n [k:13, kr] m r s [p:12, pr] ch h w y
 L = ee oo aa ii uu
+V = a i e o u L
 F = n r s
-
 $S = CV(F)
-$I = (C)V(F)
-words: $I$S, [$S, $I], $I$S$S, $I$S$S$S
-
+words: (V)$S, $S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
+graphemes: ee, oo, aa, ii, uu, ch
 BEGIN transform:
-  ji tu → ci cu
-  nn nm np sh ss → nj m mp s s
+nn, nm, np, sh, ss → ny, m, mp, s, s
+#aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
 END`;
 
 } else if (example == "australian") {
@@ -30,36 +28,6 @@ END`;
 ; m ṅ n   ɲ ŋ
 ;     r ɻ j w
 ;     l   ʎ
-
-Z = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp lŋ rŋ ɻŋ nt ɻʈ ṅṫ lṫ ṅʔ ṫʔ lṅ
-X = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc lṅṫ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
-; Initials:
-I = k, p, m, w, x, c, ŋ, j, t, ɲ, n, ʎ, ṫ
-J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, ṫ ; For disyllabic words
-; Medials
-C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, ṫ, w, j, ṅ, ʎ, ʔ
-; Finals
-F = @n, @l, @r, @ɻ, @x, @ɲ, @lq, @rq, @ɻq
-
-; VOWELS: <a aa i ii u uu ee oo>; and diphthong <ai>
-; things happen to <ee> and <oo> later on.
-V = a:45, i:39, u:37, oR:2, eR:2, aR:2, iR:2, uR:2, ai:1
-
-; Syllable shapes: (C)V(F), CVFNCV. (C is optional ONLY word initially).
-; <l r ɻ ṅ> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
-; Disylabic words DON'T begin with a vowel. NO monosyllabic words
-$S = CV(F)
-$T = IV(F)
-$X = JV(F)
-
-words: $T$S$S$S $T$S$S$S$S $T$S$S $X$S $T$S$S$S$S$S $T$S$S$S$S$S$S
-
-graphmes: a eR i iR o oR u uR p ṫ t c k ʔ m ṅ n ɲ ŋ r ɻ j w l ʎ
-alphabet: a e h i j k l m n o p r r t u w y ꞌ
-
-BEGIN transform:
-
-x -> ^ ; Get vowel initial words
 
 ; The following consonant clusters are permissible:
 
@@ -80,38 +48,33 @@ x -> ^ ; Get vowel initial words
 ; <r> + [peripheral non-palatal nasal]
 ; <r> + [peripheral nasal] + [homorganic stop]
 
-kp  ṫʔ  tp      ṅʔ 
-ŋk  mp  nt  ɲc  ṅṫ
+; Initials:
+I = k, p, m, w, ^, c, ŋ, j, t, ɲ, n, ʎ, ṫ
+J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, ṫ ; For disyllabic words
+; Medials
+C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, ṫ, w, j, [ṅ:3, ʎ:3, ʔ]
+; Clusters
+X = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp
+Y = lŋ rŋ ɻŋ nt ɻʈ ṅṫ lṫ ṅʔ ṫʔ lṅ
+Z = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc lṅṫ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
+F = n l r ɻ 
+; VOWELS: <a aa i ii u uu ee oo>; and diphthong <ai>
+V = a, i, u, [oR, eR, aR, iR, uR, ai]
+W = a, i, u
 
-ɻk  ɻp  ɻʈ  ɻc  
-ɻŋ  ɻm  ɻɳ      
+; Syllable shapes: (C)V(F), CVFNCV. (C is optional ONLY word initially).
+; <l r ɻ ṅ> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
+; Disylabic words DON'T begin with a vowel. NO monosyllabic words
+$I = IV
+$S = [C:12,@X:2,@Y,@Z]V
+$J = JV
+$Z = CW(F)
 
+words: $I$S$Z $I$S$S$Z $I$S$S$S$Z $J$Z $I$S$S$S$S$Z
 
-lk  lp      lc  lṫ
-lŋ  lm          lṅ
+graphemes: a aR e eR i iR o oR u uR p ṫ t c k ʔ m ṅ n ɲ ŋ r ɻ j w l ʎ
 
-
-rk  rp      rc
-rŋ  rm         
-
-
-
-%   p    ṫ    t    c    k    m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
-@n  @mp  @ṅṫ  @nt  @ɲc  @ŋk  m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
-@ɲ  p    ṫ    t    c    k    m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
-@l  @lp  @lṫ  t    @lc  @lk  @lm @lṅ @lŋ n   ɲ ʔ y w ʎ r ɻ l
-@r  @rp  ṫ    t    @rc  @rk  @rm ṅ   @rŋ n   ɲ ʔ y w ʎ r ɻ l
-@ɻ  @ɻp  @ɻṫ  @ɻt  @ɻc  @ɻk  @ɻm @ɻṅ @ɻŋ @ɻn ɲ ʔ y w ʎ r ɻ l
-@x  p    @ṫʔ  @tp  @c   @kp  m   @ṅʔ ŋ   n   ɲ ʔ y w ʎ r ɻ l
-@lq @lmp @lṅṫ t    @lɲc @lŋk m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
-@rq @rmp ṫ    t    @rɲc @rŋk m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
-@ɻq @ɻmp @ɻṅṫ @ɻnt @ɻɲc @ɻŋk m   ṅ   ŋ   n   ɲ ʔ y w ʎ r ɻ l
-
-k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, ṫ, w, j, ṅ, ʎ, ʔ
-
-; <ee> and <oo> cannot be word initial or final.
-eR, oR -> i, u / #_, _#
-
+BEGIN transform:
 ; Long vowels become short before a consonant cluster or <ʔ>
 %  @  ʔ
 oR o@ oʔ
@@ -120,45 +83,19 @@ iR i@ iʔ
 aR a@ aʔ
 
 ; Restrict the occurance of <ai>
-%  ʔ  c  ŋ  ɲ  j  w  ʎ  r  ɻ  @
-ai aʔ ac aŋ aɲ aj aw aʎ ar aɻ a@
 
-; Long vowels become short at the beginning of a word
-aR iR uR -> a i u
-
-; An interesting sound change
-i -> e / #{+palatal}a{+consonant -palatal}_
-a -> i / {+palatal}[vowel -long]{+consonant -palatal}_
+aiʔ aic aiŋ aiɲ aij aiw aiʎ aiɻ ai@ -> aʔ ac aŋ aɲ aj aw aʎ aɻ a@
 
 ; <ji>, <ʎi> and <wu> become <je>, <ʎe> and <wo>
-ji ʎi wu jiR ʎiR wuR -> i i u e e u / #_
-ji ʎi wu jiR ʎiR wuR -> je ʎe wo jeR ʎeR woR
-je wo ʎe -> ju ŋu ʎa / _#
-e o eR oR -> i u i u / _#
+ji ʎi wu jiR ʎiR wuR -> ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT
 
 ; Remove leftover markup
-@x q @ -> ^
+@ -> ^
 
 ; Romaniser:
 oR eR iR uR aR -> oo ee ii uu aa
 r, ɻ, ṅ, ṫ, ʔ, ŋ -> rr, r, nh, th, ꞌ, ng
-ɲ ʎ j c -> ny ly y j`;
-
-} else if (example == "btx") {
-  choice = `; A language based on Tuvan and Blackfoot, hence 'BTX'.
-; Tu-foot shows complex consonant clusters,
-; two types of vowel harmony, pitch accent.
-
-    p, pː, tː, k, kː, ʔ,
-    ts, tts, ks, kks,
-    s, sː, x,
-    m, mː, n, nː,
-    w, j,
-
-    a, ɯ, o, u,
-    e, i, ø, y
-
-`;
+ɲ ʎ j c ʈ ɳ -> ny ly y j t n`;
 
     } else if (example == "japanese") {
         choice = `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
@@ -175,14 +112,17 @@ F = N, Q
 $S = CV(F) ; Gives type C(y)V(R)(N,Q).
 $A = IV(F) ; First syllable of slightly different consonant distribution.
 
-# Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
-# The final two syllables are least likely to be light + heavy.
+; # Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
+; # The final two syllables are least likely to be light + heavy.
 
 words: $S $A$S$S $A$S$S$S $A$S$S$S$S $A$S
 
 graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 BEGIN transform:
+
+aaa eee iii ooo uuu -> a e i o u
+aa ee ii oo uu -> a e i o u
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
 %  i   u   e   o   ya   yu  yo
@@ -191,7 +131,7 @@ z  ji  +   +   +   ja   ju  jo
 t  chi tsu +   +   cha  chu cho
 d  ji  zu  +   +   ja   ju  jo
 h  hi  fu  +   +   +    +   +
-w  i   wa  e   o   ya   yu  yo
+w  i   +   e   o   ya   yu  yo
 
 Na Ne Ni No Nu -> n'a n'e n'i n'o n'u
 
@@ -206,7 +146,7 @@ RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
 %  a   i   u   e  o
 a  a   ai  oo  ae ai
 i  ya  i   yuu ie io
-u  wa  ui  u   ai ai
+u  a   ui  u   ai ai
 e  ee  ei  yoo e  yo
 o  oo  oi  ou  oe o
 
@@ -214,10 +154,14 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
 #aa# #ee# #ii# #oo# #uu# -> aa ee ii oo uu
+
+
 `;
 
 } else if (example == "romance") {
   choice = `; # Spanish-like
+
+; # Spanish-like
 
 ; Initial-cluster: pl pr tr cl cr bl br dr gl gr
 ; All-consonant: t s k q d n b m p l r g h č f z
@@ -232,23 +176,33 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 ; rare: ywi, yoi, yaw, od#, yja, yje, yjo, yju
 
-C = t s ^ k d n p l m r b q g h č f z
+optionals-weight: 30 %
+
+C = [t:9,tr] s ^ [k:9,kr,kl] d n p l m r b q g h [č:12 f z]
 V = a i o u e
-F = n r l s m
+F = n r l s m d
+X = n r l s d
 T = '
 $S = CV(F)
+$Y = CV({^:70},{^:85}F) ; 2nd last 85% 
+$Z = CV({T:3},{T:9}X) ; last: 9%
 
-$X = C{T:6}V(F) ; third last: 6%
-$Y = C{^:85}V(F) ; 2nd last 85% 
-$Z = C{T:9}V(F) ; last: 9%
-words: $Y$Z $X$Y$Z $S$X$Y$Z
+BEGIN words:
+  $Y$Z $S$Y$Z $S$S$Y$Z
+END
 
   
 
 BEGIN transform:
 
-%  a  e  i  o  u
-'  á é í ó ú
+ud# -> od
+
+%  '
+a  á    
+e  é
+i  í
+o  ó
+u  ú
 
 ; Enlace y Hiato
 ; [a,e,i,o,u]+ -> [a,e,i,o,u]
@@ -269,13 +223,14 @@ y  +  +  y  +  +  y  +
 s  +  +  +  +  +  +  s
 r  +  +  +  +  +  y  +  
 
-; q -> c / _(w)[a,o,u]
+qwa qwo qwu qa qo qu -> cwa cwo cwu ca co cu
 
 %  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  y  z  
 m  +  nk nq ng nč nd nf h  nl m  +  +  r  +  nt y  nz 
 n  mb +  +  +  +  +  +  h  +  ň  ň  +  +  +  +  ň  +  
 r  +  +  +  +  +  +  +  +  +  +  +  +  rr +  +  y  +  
-l  +  +  +  +  +  +  +  +  ʎ  +  ʎ  +  +  +  +  y  +  
+l  +  +  +  +  +  +  +  +  ʎ  +  ʎ  +  +  +  +  y  +
+d  +  +  +  +  +  d  +  h  l  +  n  +  r  +  t  +  +
 s  +  +  +  +  +  +  +  +  +  +  +  +  +  s  +  +  +  
 j  +  +  +  ň  +  +  +  +  ʎ  +  ň  +  +  +  +  ʎ  +  
 w  +  +  +  +  +  +  +  +  +  +  +  +  +  +  +  y  +
@@ -287,30 +242,45 @@ g ň  +
 y ʎ  +
 q +  q
 
-Taco-taco, burrito-burrito
-k q  č  h  ň ʎ  j  w > c qu ch j  ñ ll i  u
-
+; Taco-taco, burrito-burrito
+k q č h ň ʎ j w > c qu ch j ñ ll i u
 `;
 
-} else if (example == "yoruba") {
-  choice = `; # Tonal Yoruba
+} else if (example == "tonal") {
+  choice = `; # Tonal Yoruba-like
+I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
+C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
+V = a i e o u
+W = a i ẹ ọ u
+T = ^:1.5 \` '
 
-; a e ẹ i o ọ u ṵ o̰ ḛ ḭ 
+$S = CVT
+$Z = CWT
 
-; b	 t     k  kp
-;    d     g  gb
-; mb nd    ŋg ŋgb
-;    c  ç
-; f  s  ş         h
-; m  l  j  ŋ  w
-;    r
+$I = IVT
+$J = IWT
 
-; Ol' dead consonant trick:
-  l -> n / N_N
-  p -> f / V_V
-  ɓ	ɗ -> p l
+words: $I$S $I$S$S $I$S$S$S $J$Z $J$Z$Z $J$Z$Z$Z
 
+graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
+BEGIN transform:
+a' e' ẹ' i' o' ọ' u' -> á é ẹ́ í ó ọ́ ú
+a\` e\` ẹ\` i\` o\` ọ\` u\` -> à è ẹ̀ ì ò ọ̀ ù
+END`;
 
+} else if (example == "btx") {
+  choice = `; A language based on Tuvan and Blackfoot, hence 'BTX'.
+; Tu-foot shows complex consonant clusters,
+; two types of vowel harmony, pitch accent.
+
+    p, pː, tː, k, kː, ʔ,
+    ts, tts, ks, kks,
+    s, sː, x,
+    m, mː, n, nː,
+    w, j,
+
+    a, ɯ, o, u,
+    e, i, ø, y
 `;
 
 } else if (example == "tests") {
@@ -328,6 +298,8 @@ wordshape-distribution: zipfian gusein-zade flat
 optionals-weight: 10 ; How often optionals are selected
 alphabet: a b c d e f ; A custom sort order if Sort words is turned on
 graphemes: ch sch ; For transforms
+alphabet-and-graphemes: a b ch ; Does both
+invisible: . |
 
 ; CATEGORIES
   C = p, t, k
@@ -375,7 +347,7 @@ graphemes: ch sch ; For transforms
   words: $S:5, $SsC:5 $S, $S$S, [foo, bar]
 
 ; TRANSFORM:
-BEGIN transform
+BEGIN transform:
 
   ; Simple replacement:
     o -> x ; bodido ==> bxdidx
@@ -386,20 +358,10 @@ BEGIN transform
 
   ; CLUSTERFIELD
     % k k R F
-    a á à ǎ â 
-    ā ā́ ā̀ ā̌ ā̂
+    a á + ^ â 
+    ā - ā̀ ā̌ ā̂
 
-    graphemes: ts pf
 ; ~~~~~~~~~~~~
-
-  t -> ʡ
-  atsota ==> atsoʡa
-
-    ; A custom sort order for generated words if Sort words is turned on
-  graphs: a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z
-  graphs: a <[á à ǎ â] b d e <[é è ě ê] g h i <[í ì ǐ î] j k l m n o <[ó ò ǒ ô] p r s t u <[ú ù ǔ û] w
-  alphabet: a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z
-  invisible: . 
   
 ; REPLACEMENT
   ; Simple replacement:
@@ -411,7 +373,7 @@ BEGIN transform
 
   ; Merging set:
   ; Three phonemes becoming two phonemes
-    ʃ:z dz -> s, d ; zeʃadzas ==> sesadas
+    [ʃ,z] dz -> s, d ; zeʃadzas ==> sesadas
 
   ; Optional set:
   ; Merge [xw] and [x] into [h]
@@ -561,6 +523,7 @@ BEGIN transform
 
   ; Sandhi: impossible
 
+END
 `;
     }
 

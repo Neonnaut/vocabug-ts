@@ -106,7 +106,7 @@ const vocabugLang = StreamLanguage.define({
         if (stream.match(/\s*;.*$/)) {
             if (state.mode == 'clusterBlock'){
                 state.mode = 'transform';
-            } else if (state.mode != 'transform') {
+            } else if (state.mode != 'transform' && state.mode != 'wordsBlock') {
                 state.mode = 'none';
             }
             if (state.blanko) {state.blanko = false};
@@ -118,7 +118,7 @@ const vocabugLang = StreamLanguage.define({
                 state.blanko = true;
             }
 
-            if (stream.string.trim() && state.mode != 'clusterBlock' && state.mode != 'transform') {
+            if (stream.string.trim() && state.mode != 'clusterBlock' && state.mode != 'transform' && state.mode != 'wordsBlock') {
                 state.mode = 'none';
             }
 
@@ -145,7 +145,7 @@ const vocabugLang = StreamLanguage.define({
                     return "meta";
                 }
                 // Graphemes, Alphabet
-                if (stream.match(/(graphemes|alphabet|invisible|alphabet-and-graphs)(?=:)/)) {
+                if (stream.match(/(graphemes|alphabet|invisible|alphabet-and-graphemes)(?=:)/)) {
                     state.mode = 'listLine';
                     state.doIndent = true;
                     return "meta";
@@ -158,6 +158,12 @@ const vocabugLang = StreamLanguage.define({
                 // Words
                 if (stream.match(/(words)(?=:)/)) {
                     state.mode = 'wordLine';
+                    state.doIndent = true;
+                    return "meta";
+                }
+                // Begin Words
+                if (stream.match(/(BEGIN words)(?=:)/)) {
+                    state.mode = 'wordsBlock';
                     state.doIndent = true;
                     return "meta";
                 }
@@ -187,6 +193,26 @@ const vocabugLang = StreamLanguage.define({
                 }
             }
         }
+
+        if (state.mode == 'wordsBlock') {
+            //End
+            if (stream.match(/END/)) {
+                state.mode = 'none';
+                return "meta";
+            }
+
+            for (let rule of vocabugWordRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+            for (let classo of state.classMacList) {
+                if (stream.match(classo)) {
+                    return "className";
+                }
+            }
+        }
+
         if (state.mode == 'transform') {
             // End Transform
             if (stream.match(/END/)) {
@@ -263,7 +289,7 @@ const vocabugLang = StreamLanguage.define({
         if (state.mode == 'clusterBlock') {
             // End Transform
             if (stream.match(/END/)) {
-                state.mode = 'none';
+                state.mode = 'transform';
                 return "meta";
             }
 

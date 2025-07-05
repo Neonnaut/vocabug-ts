@@ -1,9 +1,9 @@
 import type Escape_Mapper from './escape_mapper';
 import Logger from './logger';
-import InterBuilder from './inter_builder';
+import SupraBuilder from './supra_builder';
 
 import { getCatSeg, GetTransform, makePercentage, extract_complex_value_and_weight, resolve_nested_categories,
-    valid_words_brackets, valid_category_brackets, valid_weights, parse_distribution
+    valid_words_brackets, valid_category_brackets, valid_weights, parse_distribution, validateSegment
  } from './utilities'
 
 class Resolver {
@@ -192,14 +192,14 @@ class Resolver {
                 }
                 this.invisible = invisible;
 
-            } else if (line.startsWith("alphabet-and-graphs:")) {
-                line_value = line.substring(20).trim();
+            } else if (line.startsWith("alphabet-and-graphemes:")) {
+                line_value = line.substring(23).trim();
                 line_value = this.escape_mapper.restorePreserveEscapedChars(line_value);
 
                 let a_g = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (a_g.length == 0){
-                    this.logger.warn(`\`alphabet-and-graphs\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`\`alphabet-and-graphemes\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.graphemes = a_g;
                 this.alphabet = a_g;
@@ -222,6 +222,9 @@ class Resolver {
                     this.wordshape_string = line_value;
                 }
 
+            } else if (line.startsWith("BEGIN words:")) {
+                this.parse_words_block(file_array);
+
             } else { // It's a category or segment
                 line_value = line;
                 line_value = this.escape_mapper.escapeBackslashPairs(line_value);
@@ -234,6 +237,7 @@ class Resolver {
                 }
                 if (hasDollarSign) {
                     // SEGMENTS !!!
+                    if (!validateSegment(field)) { throw new Error(`A segment at line ${this.file_line_num + 1} had separators outside any sets -- expected separators for segments to appear only in sets`)}
                     this.add_segment(myName, field);
                 } else {
                     // CATEGORIES !!!
@@ -250,7 +254,7 @@ class Resolver {
         this.segments.set(name, field);
     }
 
-    set_wordshapes(inter_builder: InterBuilder) {
+    set_wordshapes(supra_builder: SupraBuilder) {
         let result = [];
         let buffer = "";
         let insideBrackets = 0;
@@ -259,7 +263,7 @@ class Resolver {
             throw new Error(`No word-shapes to choose from -- expected \`words: wordshape1 wordshape2 ...\``);
         }
 
-        this.wordshape_string = inter_builder.processString(this.wordshape_string);
+        this.wordshape_string = supra_builder.processString(this.wordshape_string);
 
         if (!valid_words_brackets(this.wordshape_string)) {
             throw new Error("A word-shape had missmatched brackets");
@@ -370,6 +374,25 @@ class Resolver {
         };
 
         return resolveMapping(input);
+    }
+
+    private parse_words_block(file_array:string[]) {
+        let line = file_array[this.file_line_num];
+        let line_value = line.substring(14).trim();
+        line_value = line_value.replace(/;.*/u, '').trim(); // Remove comment!!
+        if (line_value === 'END') {return}
+
+        this.wordshape_string += line_value;
+        this.file_line_num ++;
+
+        for (; this.file_line_num < file_array.length; ++this.file_line_num) {
+            line_value = file_array[this.file_line_num];
+            line_value = line_value.replace(/;.*/u, '').trim(); // Remove comment!!
+            if (line_value === 'END') { break} // END !!
+            line_value = line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ") ? line_value : line_value + " ";
+
+            this.wordshape_string += line_value;   
+        }
     }
 
     private parse_cluster(file_array:string[]) {

@@ -1,34 +1,37 @@
-import Word from './word.js';
-import Logger from './logger.js';
-import Escape_Mapper from './escape_mapper.js';
-import InterBuilder from './inter_builder.js';
+import Word from './word';
+import Logger from './logger';
+import Escape_Mapper from './escape_mapper';
+import SupraBuilder from './supra_builder';
 import { weightedRandomPick, resolve_wordshape_sets } from './utilities'
 
 class Word_Builder {
     public logger: Logger;
     public escape_mapper: Escape_Mapper;
-    public inter_builder: InterBuilder;
+    public supra_builder: SupraBuilder;
     public categories: Map< string, {graphemes:string[], weights:number[]} >;
     public wordshapes: {items:string[], weights:number[]};
     public wordshape_distribution: string;
+    private category_distribution: string;
     public optionals_weight: number;
 
     constructor(
         logger: Logger,
         escape_mapper: Escape_Mapper,
-        inter_builder: InterBuilder,
+        supra_builder: SupraBuilder,
         categories: Map< string, {graphemes:string[], weights:number[]} >,
         wordshapes: {items:string[], weights:number[]},
         wordshape_distribution: string,
+        category_distribution: string,
         optionals_weight: number,
         debug: boolean,
     ) {
         this.logger = logger;
         this.escape_mapper = escape_mapper;
-        this.inter_builder = inter_builder
+        this.supra_builder = supra_builder
         this.categories = categories;
         this.wordshapes = wordshapes;
         this.wordshape_distribution = wordshape_distribution;
+        this.category_distribution = category_distribution;
         this.optionals_weight = optionals_weight;
 
         Word.debug = debug;
@@ -42,13 +45,13 @@ class Word_Builder {
         }
 
         // baby word looks like `CVCVF!`
-        const stage_two:string = resolve_wordshape_sets(stage_one, this.wordshape_distribution, this.optionals_weight);
+        const stage_two:string = resolve_wordshape_sets(stage_one, this.category_distribution, this.optionals_weight);
 
-        const [ids, weights] = this.inter_builder.extractLettersAndWeights(stage_two);
+        const [ids, weights] = this.supra_builder.extractLettersAndWeights(stage_two);
         const chosen_id = weightedRandomPick(ids, weights);
 
         // Resolved Inters
-        const stage_three = this.inter_builder.replaceLetterAndClean(stage_two, Number(chosen_id));
+        const stage_three = this.supra_builder.replaceLetterAndClean(stage_two, Number(chosen_id));
 
         // adult word looks like `tacan!`. ready to be transformed and added to text
         let stage_four:string = "";

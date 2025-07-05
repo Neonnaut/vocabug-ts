@@ -1,8 +1,8 @@
-import Word from './word.js';
-import Logger from './logger.js';
-import collator from './collator.js';
-import { capitalise } from './utilities.js';
-import type Escape_Mapper from './escape_mapper.js';
+import Word from './word';
+import Logger from './logger';
+import collator from './collator';
+import { capitalise } from './utilities';
+import type Escape_Mapper from './escape_mapper';
 
 class Text_Builder {
     public logger: Logger;
@@ -112,29 +112,46 @@ class Text_Builder {
         }
     }
 
-    make_text() {
+    create_record() {
         // Send some good info about the generation results
         let ms:any = Date.now() - this.build_start;
         const display = ms >= 1000 ? `${(ms / 1000).toFixed(ms % 1000 === 0 ? 0 : 1)} s` : `${ms} ms`;
+        let text:string = '';
+        
         if (this.words.length == 1) {
-            this.logger.info(`1 word generated in ${display}`);
+            text+= `1 word generated in ${display}`;
         } else if (this.words.length > 1) {
-
-            this.logger.info(`${this.words.length} words generated in ${display}`);
+            text+= `${this.words.length} words generated in ${display}`;
         } else if (this.words.length == 0) {
-            this.logger.warn(`No words generated in ${display}`);
-        }
-        if (this.num_of_duplicates == 1) {
-            this.logger.info(`1 duplicate word removed`);
-        } else if (this.num_of_duplicates > 1) {
-            this.logger.info(`${this.num_of_duplicates} duplicate words removed`);
-        }
-        if (this.num_of_rejects == 1) {
-            this.logger.info(`1 word was rejected`)
-        } else if (this.num_of_rejects > 1) {
-            this.logger.info(`${this.num_of_rejects} words were rejected`)
+            text+= `Zero words generated in ${display}`;
         }
 
+        if (this.num_of_duplicates == 1) {
+            text+= ` -- with 1 duplicate word removed`;
+            if (this.num_of_rejects == 1) {
+                text+= `, and 1 word rejected`;
+            } else if (this.num_of_rejects > 1) {
+                text+= `, and ${this.num_of_rejects} words rejected`;
+            }
+        } else if (this.num_of_duplicates > 1) {
+            text+= ` -- with ${this.num_of_duplicates} duplicate words removed`;
+            if (this.num_of_rejects == 1) {
+                text+= `, and 1 word rejected`;
+            } else if (this.num_of_rejects > 1) {
+                text+= `, and ${this.num_of_rejects} words rejected`;
+            }
+        } else {
+            if (this.num_of_rejects == 1) {
+                text+= ` -- with 1 word rejected`;
+            } else if (this.num_of_rejects > 1) {
+                text+= ` -- with ${this.num_of_rejects} words rejected`;
+            }
+        }
+
+        this.logger.info(text);
+    }
+
+    make_text() {
         if (this.sort_words){
             this.words = collator( this.logger, this.words, this.alphabet, this.invisible );
         }
@@ -146,6 +163,7 @@ class Text_Builder {
         if (this.paragrapha){
             return this.paragraphify(this.words);
         }
+        this.create_record();
         return this.words.join(this.word_divider);
     }
 

@@ -2,9 +2,9 @@ import Resolver from './resolver.ts';
 import Word_Builder from './word_builder.ts';
 import Transformer from './transformer.ts';
 import Text_Builder from './text_builder.ts';
-import Logger from './logger.ts';
-import Escape_Mapper from './escape_mapper.ts'; 
-import InterBuilder from './inter_builder.ts';
+import Logger from './logger';
+import Escape_Mapper from './escape_mapper'; 
+import SupraBuilder from './supra_builder';
 
 function gen_words(
     file: string,
@@ -35,7 +35,7 @@ function gen_words(
             word_divider
         );
 
-        const inter_builder = new InterBuilder(logger);
+        const supra_builder = new SupraBuilder(logger);
 
 
 
@@ -43,16 +43,17 @@ function gen_words(
         resolver.expand_categories();
         resolver.expand_segments();
         resolver.expand_wordshape_segments();
-        resolver.set_wordshapes(inter_builder);
+        resolver.set_wordshapes(supra_builder);
         resolver.create_record();
 
         const wordBuilder = new Word_Builder(
             logger,
             escape_mapper,
-            inter_builder,
+            supra_builder,
             resolver.categories,
             resolver.wordshapes,
             resolver.wordshape_distribution,
+            resolver.category_distribution,
             resolver.optionals_weight,
             resolver.debug
         );

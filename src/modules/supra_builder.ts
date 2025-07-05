@@ -1,6 +1,6 @@
 import Logger from './logger';
 
-export class InterBuilder {
+export class SupraBuilder {
     private logger: Logger;
     private weights: Record<number, number>;
     private letters: Record<number, string>;
@@ -86,4 +86,4 @@ public replaceLetterAndClean(input: string, targetID: number): string {
     }
 }
 
-export default InterBuilder;
+export default SupraBuilder;
