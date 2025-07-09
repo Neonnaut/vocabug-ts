@@ -59,6 +59,7 @@ $(window).on('load', function () {
     // Generate button
     document.getElementById("generate-words")?.addEventListener("click", function () {
         const generateButton = this as HTMLButtonElement;
+        const outputMessage = document.getElementById('voc-output-message') as HTMLDivElement;
         generateButton.disabled = true;
 
         try {
@@ -72,9 +73,15 @@ $(window).on('load', function () {
                 force_words: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
                 word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
             });
+            w.onerror = function (e: ErrorEvent) {
+                generateButton.disabled = false;
+                outputMessage.innerHTML = `<p class='error-message'>${e.message}</p>`;
+            };
+
         } catch (e) {
             generateButton.disabled = false;
-            alert(e);
+            const error_message = e instanceof Error ? e.message : String(e);
+            outputMessage.innerHTML = `<p class='error-message'>${error_message}</p>`;
         }
     });
 

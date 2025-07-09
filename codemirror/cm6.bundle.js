@@ -20555,7 +20555,7 @@ var cm6 = (function (exports) {
         regex: /=|,/
       },
       { token: "strong", // Weights
-        regex: /((:|\?)\d+(\.\d+)?)/
+        regex: /((\*|\?)\d+(\.\d+)?)/
       }
   ];
 
@@ -20570,7 +20570,7 @@ var cm6 = (function (exports) {
         regex: /,|=/
       },
       { token: "strong", // Weights
-        regex: /((:|\?)\d+(\.\d+)?)/
+        regex: /((\*|\?)\d+(\.\d+)?)/
       }
   ];
 

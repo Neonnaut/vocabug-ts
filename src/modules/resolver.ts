@@ -3,7 +3,8 @@ import Logger from './logger';
 import SupraBuilder from './supra_builder';
 
 import { getCatSeg, GetTransform, makePercentage, extract_complex_value_and_weight, resolve_nested_categories,
-    valid_words_brackets, valid_category_brackets, valid_weights, parse_distribution, validateSegment
+    valid_words_brackets, valid_category_brackets, valid_weights, parse_distribution, validateSegment,
+    valid_category_weights
  } from './utilities'
 
 class Resolver {
@@ -29,7 +30,7 @@ class Resolver {
     private wordshape_string: string;
     public wordshapes: { items:string[], weights:number[]};
     
-    public transforms: { target:string[], result:string[]}[];
+    public transforms: { target:string[], result:string[], line_num:string}[];
     public graphemes: string[];
     public alphabet: string[];
     public invisible: string[];
@@ -62,8 +63,8 @@ class Resolver {
             this.logger.warn('Number of words was rounded to the nearest whole number');
             num_of_words = Math.ceil(num_of_words);
         }
-        if ((num_of_words > 1_000_000) || (num_of_words < 1)) {
-            this.logger.warn('Number of words was not between 1 and 1,000,000. Genearating 100 words instead');
+        if ((num_of_words > 100_000) || (num_of_words < 1)) {
+            this.logger.warn('Number of words was not between 1 and 100,000. Genearating 100 words instead');
             num_of_words = 100;
         }
         this.num_of_words = num_of_words;
@@ -91,12 +92,12 @@ class Resolver {
             this.word_divider = '\n';
         }
         
-        this.category_distribution = "flat";
+        this.category_distribution = "gusein-zade";
         this.category_strings = new Map;
         this.categories = new Map;
         this.optionals_weight = 10;
         this.segments = new Map;
-        this.wordshape_distribution = "flat";
+        this.wordshape_distribution = "zipfian";
         this.alphabet = [];
         this.invisible = [];
         this.wordshape_string = ""
@@ -143,7 +144,7 @@ class Resolver {
                     continue;
                 }
 
-                this.add_transform(target, result);
+                this.add_transform(target, result, `:${this.file_line_num + 1}`);
                 continue;
             }
 
@@ -153,12 +154,12 @@ class Resolver {
             } else if (line.startsWith("category-distribution:")) {
                 line_value = line.substring(22).trim().toLowerCase();
 
-                this.category_distribution = parse_distribution(line_value);
+                this.category_distribution = line_value;
 
             } else if (line.startsWith("wordshape-distribution:")) {
                 line_value = line.substring(23).trim().toLowerCase();
 
-                this.wordshape_distribution = parse_distribution(line_value);
+                this.wordshape_distribution = line_value;
 
             } else if (line.startsWith("optionals-weight:")) {
                 line_value = line.substring(17).replace(/%/g, "").trim();
@@ -245,6 +246,8 @@ class Resolver {
                 }
             }
         }
+        this.wordshape_distribution = parse_distribution(this.wordshape_distribution);
+        this.category_distribution = parse_distribution(this.category_distribution);
     }
     
     add_category(name:string, field:string) {
@@ -269,7 +272,7 @@ class Resolver {
             throw new Error("A word-shape had missmatched brackets");
         }
         if (!valid_weights(this.wordshape_string)) {
-            throw new Error("A word-shape had invalid weights -- expected weights to follow an item and look like `:NUMBER` followed by either `,` or ` `");
+            throw new Error("A word-shape had invalid weights -- expected weights to follow an item and look like `*NUMBER` followed by either `,` a bracket, or ` `");
         }
 
         for (let i = 0; i < this.wordshape_string.length; i++) {
@@ -302,8 +305,8 @@ class Resolver {
         } 
     }
 
-    add_transform(target:string[], result:string[]) {
-        this.transforms.push( { target:target, result:result } );
+    add_transform(target:string[], result:string[], line_num:string) {
+        this.transforms.push( { target:target, result:result, line_num:line_num} );
     }
 
     expand_categories() {
@@ -311,8 +314,8 @@ class Resolver {
             if (!valid_category_brackets(value)) {
                 throw new Error("A category had missmatched brackets");
             }
-            if (!valid_weights(value)) {
-                throw new Error("A category had invalid weights -- expected weights to follow an item and look like `:NUMBER` followed by either `,` or ` `");
+            if (!valid_category_weights(value)) {
+                throw new Error("A category had invalid weights -- expected weights to follow an item and look like `*NUMBER` followed by either `,`, a bracket, or ` `");
             }
             this.category_strings.set( key, this.recursiveExpansion(value, this.category_strings, true) );
         }
@@ -378,9 +381,10 @@ class Resolver {
 
     private parse_words_block(file_array:string[]) {
         let line = file_array[this.file_line_num];
-        let line_value = line.substring(14).trim();
+        let line_value = line.substring(12).trim();
         line_value = line_value.replace(/;.*/u, '').trim(); // Remove comment!!
         if (line_value === 'END') {return}
+        line_value = line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ") ? line_value : line_value + " ";
 
         this.wordshape_string += line_value;
         this.file_line_num ++;
@@ -434,7 +438,7 @@ class Resolver {
                 }
             }
         }
-        this.add_transform(concurrent_target, concurrent_result);
+        this.add_transform(concurrent_target, concurrent_result, `:${this.file_line_num}`);
     }
 
 

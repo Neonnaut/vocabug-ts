@@ -68,7 +68,7 @@ const vocabugWordRules = [
       regex: /=|,/
     },
     { token: "strong", // Weights
-      regex: /((:|\?)\d+(\.\d+)?)/
+      regex: /((\*|\?)\d+(\.\d+)?)/
     }
 ];
 
@@ -83,7 +83,7 @@ const vocabugCategoryRules = [
       regex: /,|=/
     },
     { token: "strong", // Weights
-      regex: /((:|\?)\d+(\.\d+)?)/
+      regex: /((\*|\?)\d+(\.\d+)?)/
     }
 ];
 

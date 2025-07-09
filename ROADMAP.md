@@ -16,7 +16,3 @@ If so, this would mean [ > @, would not work on a word \[ada
 - Troubleshooting
 
 TRANSFORMS
-
-I can prob use `&` as seperator again... perhaps it could replace ditto mark!!
-
-Anythings-mark should be ampersand.

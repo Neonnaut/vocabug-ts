@@ -15,12 +15,12 @@ export class SupraBuilder {
 
     public processString(input: string): string {
         const tokenRegex = /\{([^}]*)\}/g;
-        const validContentRegex = /^(\^|[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?::(\d+))?$/;
+        const validContentRegex = /^(\^|[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?:\*(\d+(?:\.\d+)?))?$/;
 
         return input.replace(tokenRegex, (fullMatch, content) => {
             const match = validContentRegex.exec(content);
             if (!match) {
-                throw new Error(`Invalid inter-picker: ${fullMatch} -- expected all inter-pickers to look like \`{A}\` or \`{A:2}\``);
+                throw new Error(`Invalid supra-set item: ${fullMatch} -- expected all supra-set items to look like \`{A}\`, \`{^}\` or \`{A*2}\``);
             }
 
             const letter = match[1];

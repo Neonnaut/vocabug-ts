@@ -2,7 +2,7 @@ function get_example(example:string):string {
     var choice = '';
 
 if (example == "basic") {
-  choice = `C = [t:9, tr] n [k:13, kr] m r s [p:12, pr] ch h w y
+  choice = `C = [t*9, tr] n [k*13, kr] m r s [p*12, pr] ch h w y
 L = ee oo aa ii uu
 V = a i e o u L
 F = n r s
@@ -12,6 +12,163 @@ graphemes: ee, oo, aa, ii, uu, ch
 BEGIN transform:
 nn, nm, np, sh, ss → ny, m, mp, s, s
 #aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
+yi -> ^REJECT
+END`;
+
+} else if (example == "tonal") {
+  choice = `; # Tonal Yoruba-like
+I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
+C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
+V = a i e o u
+W = a i ẹ ọ u
+T = ^*1.1 \` '
+
+$A = ITV
+$B = CTV
+$C = CTV(n)
+
+$X = ITW
+$Y = CTW
+$Z = CTW(n)
+
+BEGIN words:
+$A$C $A$B$C $A$B$B$C
+$X$Z $X$Y$Z $X$Y$Y$Z
+$A $Z
+END
+
+graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
+
+BEGIN transform:
+% a e ẹ i o ọ u
+' á é ẹ́ í ó ọ́ ú
+\` à è ẹ̀ ì ò ọ̀ ù
+
+ci -> çi
+END`;
+
+} else if (example == "romance") {
+  choice = `; # Spanish-like
+
+; # Spanish-like
+
+; Initial-cluster: pl pr tr cl cr bl br dr gl gr
+; All-consonant: t s k q d n b m p l r g h č f z
+
+; Vowels: a e i o u
+; Diphthongs: aj aw ej ew oj ja je jo ju wa we wi
+; Hiato: ea eo oa
+; Triphthong = jaj jej joj jaw jew jow waj wej waw
+
+; Word-internal coda: n r l s m
+; Word-final coda: n r l s d z
+
+; rare: ywi, yoi, yaw, od#, yja, yje, yjo, yju
+
+optionals-weight: 30 %
+
+C = [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
+V = a i o u e
+F = n r l s m
+X = n r l s
+T = '
+$S = CV(F)
+$X = CV({T*1},{^*3}F) ; 2nd last 85% 
+$Y = CV({^*80},{^*95}F) ; 2nd last 85% 
+$Z = CV({T*3},{T*9}X) ; last: 9%
+
+BEGIN words:
+  $Y$Z $X$Y$Z $S$X$Y$Z
+END
+
+BEGIN transform:
+
+a' e' i' o' u' -> á é í ó ú
+áa aá ée eé íi ií óo oó úu uú -> á á é é í í ó ó ú ú
+
+; Enlace y Hiato
+; [a,e,i,o,u]+ -> [a,e,i,o,u]
+%   a  e  i  o  u
+a   a  aj aj o  aw
+e   ea e  ej eo ew
+i   ja je i  jo ju
+o   oa e  oj o  u
+u   wa we wi wo u
+
+qwa qwo qwu qa qo qu -> kwa kwo kwu ka ko ku
+
+nj gj gn gl qw -> ň ň ň ʎ q
+
+jg jn jj jl ww -> ň ň j ʎ w
+
+%  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  z  
+m  +  nk nq ng nč nd nf h  nl m  ň  +  r  +  nt nz 
+n  mb +  +  +  +  +  +  h  l  ň  ň  mp +  +  +  +  
+r  +  +  +  +  +  +  +  h  l  +  +  +  +  +  +  z  
+l  +  +  +  +  +  +  +  h  ʎ  +  ʎ  +  r  +  +  z
+s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z  
+
+; Taco-taco, burrito-burrito
+k q č h ň ʎ j w > c qu ch j ñ ll i u
+
+END`;
+
+} else if (example == "japanese") {
+        choice = `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
+; and link.springer.com/content/pdf/10.3758/BF03195600.pdf
+
+; <R> gives me long vowels
+; <N> is the syllable final nasal. <Q> gives me geminate consonants
+
+I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
+C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
+V = a, i, u, o, e, [oR, aR, iR, eR, uR, yu, yo, ya, [yoR, yuR, yaR]]
+F = N, Q
+
+$A = IV(F) ; First syllable of slightly different consonant distribution.
+$S = CV(F) ; Gives type C(y)V(R)(N,Q).
+
+; # Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
+; # The final two syllables are least likely to be light + heavy.
+
+words: $A$S$S $A$S$S$S $A $A$S$S$S$S $A$S
+
+graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
+
+BEGIN transform:
+
+; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
+%  i   u   e   o   ya   yu   yo
+s  shi +   +   +   sha  shu  sho
+z  ji  +   +   +   ja   ju   jo 
+t  chi tsu +   +   cha  chu  cho
+d  ji  zu  +   +   ja   ju   jo
+h  +   fu  +   +   +    +    +
+w  i   yu  yo  yo  ya   yu   yo
+N  n'a n'u n'e n'o n'ya n'yu n'yo
+
+; <N> assimilation, and <Q> gemination.
+% ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
+Q Qtch Qshsh Qtts j  Qkk g  Qss z  Qtt d  n  Qpp b  Qpp m  r  l  Qpp Qpp
+N nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
+
+RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
+
+; Vowel sequences:
+%  a   i   u   e  o
+a  a   +   oR  +  ai
+i  ya  i   yuR +  yo
+u  a   +   u   ai ai
+e  eR  +   yoR e  yo
+o  oR  +   +   +  o
+R  R   R   R   R  R
+
+shy jy chy -> sh j ch
+
+aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
+
+; Collapse aa ee ii oo uu words into short vowels.
+#aa# #ee# #ii# #oo# #uu# -> a e i o u
 END`;
 
 } else if (example == "australian") {
@@ -49,14 +206,14 @@ END`;
 ; <r> + [peripheral nasal] + [homorganic stop]
 
 ; Initials:
-I = k, p, m, w, ^, c, ŋ, j, t, ɲ, n, ʎ, ṫ
-J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, ṫ ; For disyllabic words
+I = k, p, m, w, ^, c, ŋ, j, t, ɲ, n, ʎ, t̪
+J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, t̪ ; For disyllabic words
 ; Medials
-C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, ṫ, w, j, [ṅ:3, ʎ:3, ʔ]
+C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, t̪, w, j, [n̪*5, ʎ*5, ʔ]
 ; Clusters
 X = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp
-Y = lŋ rŋ ɻŋ nt ɻʈ ṅṫ lṫ ṅʔ ṫʔ lṅ
-Z = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc lṅṫ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
+Y = lŋ rŋ ɻŋ nt ɻʈ n̪t̪ lt̪ ln̪ n̪ʔ t̪ʔ
+Z = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc ln̪t̪ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
 F = n l r ɻ 
 ; VOWELS: <a aa i ii u uu ee oo>; and diphthong <ai>
 V = a, i, u, [oR, eR, aR, iR, uR, ai]
@@ -66,206 +223,29 @@ W = a, i, u
 ; <l r ɻ ṅ> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
 ; Disylabic words DON'T begin with a vowel. NO monosyllabic words
 $I = IV
-$S = [C:12,@X:2,@Y,@Z]V
+$S = [C*12,@X*2,@Y,@Z]V
 $J = JV
 $Z = CW(F)
 
 words: $I$S$Z $I$S$S$Z $I$S$S$S$Z $J$Z $I$S$S$S$S$Z
 
-graphemes: a aR e eR i iR o oR u uR p ṫ t c k ʔ m ṅ n ɲ ŋ r ɻ j w l ʎ
+graphemes: a aR e eR i iR o oR u uR p t̪ t c k ʔ m n̪ n ɲ ŋ r ɻ j w l ʎ
 
 BEGIN transform:
-; Long vowels become short before a consonant cluster or <ʔ>
-%  @  ʔ
-oR o@ oʔ
-eR e@ eʔ
-iR i@ iʔ
-aR a@ aʔ
-
 ; Restrict the occurance of <ai>
+%  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  @
+ai aʔ ac aŋ aɲ aj aw aʎ aɻ a@
 
-aiʔ aic aiŋ aiɲ aij aiw aiʎ aiɻ ai@ -> aʔ ac aŋ aɲ aj aw aʎ aɻ a@
+; Long vowels become short before a consonant cluster or <ʔ>
+R@ Rʔ @ -> ^ ʔ ^
 
 ; <ji>, <ʎi> and <wu> become <je>, <ʎe> and <wo>
 ji ʎi wu jiR ʎiR wuR -> ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT
 
-; Remove leftover markup
-@ -> ^
-
 ; Romaniser:
 oR eR iR uR aR -> oo ee ii uu aa
-r, ɻ, ṅ, ṫ, ʔ, ŋ -> rr, r, nh, th, ꞌ, ng
-ɲ ʎ j c ʈ ɳ -> ny ly y j t n`;
-
-    } else if (example == "japanese") {
-        choice = `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
-; and link.springer.com/content/pdf/10.3758/BF03195600.pdf
-
-; <X> gives me onsetless morae.    <R> gives me long vowels
-; <N> is the syllable final nasal. <Q> gives me geminate consonants
-
-C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
-I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
-V = a, i, u, o, e, [oR, aR, iR, eR, uR, yu, yo, ya, [yoR, yuR, yaR]]
-F = N, Q
-
-$S = CV(F) ; Gives type C(y)V(R)(N,Q).
-$A = IV(F) ; First syllable of slightly different consonant distribution.
-
-; # Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
-; # The final two syllables are least likely to be light + heavy.
-
-words: $S $A$S$S $A$S$S$S $A$S$S$S$S $A$S
-
-graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
-
-BEGIN transform:
-
-aaa eee iii ooo uuu -> a e i o u
-aa ee ii oo uu -> a e i o u
-
-; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
-%  i   u   e   o   ya   yu  yo
-s  shi +   +   +   sha  shu sho
-z  ji  +   +   +   ja   ju  jo 
-t  chi tsu +   +   cha  chu cho
-d  ji  zu  +   +   ja   ju  jo
-h  hi  fu  +   +   +    +   +
-w  i   +   e   o   ya   yu  yo
-
-Na Ne Ni No Nu -> n'a n'e n'i n'o n'u
-
-; <N> assimilation, and <Q> gemination.
-% ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
-Q Qtch Qshsh Qtts j  Qkk g  Qss z  Qtt d  n  Qpp b  Qpp m  r  l  Qpp Qpp
-N nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
-
-RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
-
-; Vowel sequences:
-%  a   i   u   e  o
-a  a   ai  oo  ae ai
-i  ya  i   yuu ie io
-u  a   ui  u   ai ai
-e  ee  ei  yoo e  yo
-o  oo  oi  ou  oe o
-
-aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
-
-; Collapse aa ee ii oo uu words into short vowels.
-#aa# #ee# #ii# #oo# #uu# -> aa ee ii oo uu
-`;
-
-} else if (example == "romance") {
-  choice = `; # Spanish-like
-
-; # Spanish-like
-
-; Initial-cluster: pl pr tr cl cr bl br dr gl gr
-; All-consonant: t s k q d n b m p l r g h č f z
-
-; Vowels: a e i o u
-; Diphthongs: aj aw ej ew oj ja je jo ju wa we wi
-; Hiato: ea eo oa
-; Triphthong = jaj jej joj jaw jew jow waj wej waw
-
-; Word-internal coda: n r l s m
-; Word-final coda: n r l s d z
-
-; rare: ywi, yoi, yaw, od#, yja, yje, yjo, yju
-
-optionals-weight: 30 %
-
-C = [t:9,tr] s ^ [k:9,kr,kl] [d:9,dr] n [p:9,pr,pl] l m r [b:9,br,bl] q g h [č:12 f z]
-V = a i o u e
-F = n r l s m d
-X = n r l s d
-T = '
-$S = CV(F)
-$X = CV({T:1},{^:3}F) ; 2nd last 85% 
-$Y = CV({^:80},{^:95}F) ; 2nd last 85% 
-$Z = CV({T:3},{T:9}X) ; last: 9%
-
-BEGIN words:
-  $Y$Z $X$Y$Z $S$X$Y$Z
-END
-
-  
-
-BEGIN transform:
-
-ud# -> od
-
-%  '
-a  á    
-e  é
-i  í
-o  ó
-u  ú
-
-; Enlace y Hiato
-; [a,e,i,o,u]+ -> [a,e,i,o,u]
-%   a  e  i  o  u
-a   a  aj aj o  aw
-e   ea e  ej eo ew
-i   ja je i  jo ju
-o   oa e  oj o  u
-u   wa we wi wo u
-
-%  m  n  j  l  g  y  s 
-m  m  ň  +  +  +  +  +
-n  ň  ň  ň  +  +  ň  +
-j  +  ň  j  ʎ  ʎ  ʎ  +
-l  +  ʎ  ʎ  ʎ  +  ʎ  +
-g  +  +  ʎ  +  +  +  +
-y  +  +  y  +  +  y  +
-s  +  +  +  +  +  +  s
-r  +  +  +  +  +  y  +  
-
-qwa qwo qwu qa qo qu -> cwa cwo cwu ca co cu
-
-%  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  y  z  
-m  +  nk nq ng nč nd nf h  nl m  +  +  r  +  nt y  nz 
-n  mb +  +  +  +  +  +  h  +  ň  ň  +  +  +  +  ň  +  
-r  +  +  +  +  +  +  +  +  +  +  +  +  rr +  +  y  +  
-l  +  +  +  +  +  +  +  +  ʎ  +  ʎ  +  +  +  +  y  +
-d  +  +  +  +  +  d  +  h  l  +  n  +  r  +  t  +  +
-s  +  +  +  +  +  +  +  +  +  +  +  +  +  s  +  +  +  
-j  +  +  +  ň  +  +  +  +  ʎ  +  ň  +  +  +  +  ʎ  +  
-w  +  +  +  +  +  +  +  +  +  +  +  +  +  +  +  y  +
-
-% j  w
-n ň  +
-l ʎ  +
-g ň  +
-y ʎ  +
-q +  q
-
-; Taco-taco, burrito-burrito
-k q č h ň ʎ j w > c qu ch j ñ ll i u
-
-`;
-
-} else if (example == "tonal") {
-  choice = `; # Tonal Yoruba-like
-I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
-C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
-V = a i e o u
-W = a i ẹ ọ u
-T = ^:1.5 \` '
-
-$S = CVT
-$Z = CWT
-
-$I = IVT
-$J = IWT
-
-words: $I$S $I$S$S $I$S$S$S $J$Z $J$Z$Z $J$Z$Z$Z
-
-graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
-BEGIN transform:
-a' e' ẹ' i' o' ọ' u' -> á é ẹ́ í ó ọ́ ú
-a\` e\` ẹ\` i\` o\` ọ\` u\` -> à è ẹ̀ ì ò ọ̀ ù
+r ɻ n̪ t̪ ʔ ɳ -> rr r nh th ꞌ n
+ɲ ʎ j c ʈ ŋ -> ny ly y j t ng
 END`;
 
 } else if (example == "btx") {
@@ -311,7 +291,7 @@ invisible: . |
   C = \\^, \\[, \\]
 
   ; Weights
-  C = p:7, t:6, k:4
+  C = p*7, t*6, k*4
 
   ; syntax characters
   C = ^
@@ -326,7 +306,7 @@ invisible: . |
   $C = \\^, \\[, \\]
 
   ; Weights
-  $C = p:7, t:6, k:4
+  $C = p*7, t*6, k*4
 
   ; Syntax characters
   $C = ^
@@ -340,11 +320,11 @@ invisible: . |
   ; ==> p, pt, pk, ps
 
   ; Inter-pick-ones
-  $C = CV{D:4}CV{E:5}
+  $C = CV{D*4}CV{E*5}
   ; ==> pe'ta, peta'
 
 ; BUILDING WORDS
-  words: $S:5, $SsC:5 $S, $S$S, [foo, bar]
+  words* $S*5, $SsC*5 $S, $S$S, [foo, bar]
 
 ; TRANSFORM:
 BEGIN transform:
@@ -517,7 +497,7 @@ BEGIN transform:
   ; nasals agree in place with following sound
 
   ; Palatalization:
-    k:t s > tʃ ʃ / _i
+    k*t s > tʃ ʃ / _i
 
   ; Tonogenesis:
 
