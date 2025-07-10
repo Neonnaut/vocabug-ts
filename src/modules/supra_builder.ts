@@ -1,13 +1,9 @@
-import Logger from './logger';
-
 export class SupraBuilder {
-    private logger: Logger;
     private weights: Record<number, number>;
     private letters: Record<number, string>;
     private idCounter: number;
 
-    constructor(logger: Logger) {
-        this.logger = logger;
+    constructor() {
         this.weights = {};
         this.letters = {};
         this.idCounter = 1;
@@ -20,7 +16,7 @@ export class SupraBuilder {
         return input.replace(tokenRegex, (fullMatch, content) => {
             const match = validContentRegex.exec(content);
             if (!match) {
-                throw new Error(`Invalid supra-set item: ${fullMatch} -- expected all supra-set items to look like \`{A}\`, \`{^}\` or \`{A*2}\``);
+                throw new Error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like \`{A}\`, \`{^}\` or \`{A*2}\``);
             }
 
             const letter = match[1];
@@ -34,7 +30,7 @@ export class SupraBuilder {
         });
     }
 
-        public extractLettersAndWeights(input: string): [string[], number[]] {
+    public extractLettersAndWeights(input: string): [string[], number[]] {
         const idRegex = /\{(\d+)\}/g;
         const ids: string[] = [];
         const weights: number[] = [];
@@ -44,8 +40,7 @@ export class SupraBuilder {
             const id = Number(match[1]);
 
             if (!(id in this.letters) || !(id in this.weights)) {
-                this.logger.error(`ID ${id} not found in state.`);
-                throw new Error(`Missing data for ID ${id}`);
+                throw new Error(`Missing data for ID '${id}'`);
             }
 
             ids.push(id.toString());
@@ -55,27 +50,21 @@ export class SupraBuilder {
         return [ ids, weights ];
     }
 
-public replaceLetterAndClean(input: string, targetID: number): string {
-    const idRegex = /\{(\d+)\}/g;
+    public replaceLetterAndClean(input: string, targetID: number): string {
+        const idRegex = /\{(\d+)\}/g;
 
-    return input.replace(idRegex, (_match, idStr) => {
-        const id = Number(idStr);
+        return input.replace(idRegex, (_match, idStr) => {
+            const id = Number(idStr);
 
-        // Safety check
-        if (!(id in this.letters)) {
-            this.logger.warn(`Unknown ID ${id} found in input.`);
-            return '';
-        }
+            // Safety check
+            if (!(id in this.letters)) {
+                throw new Error(`Unknown ID '${id}' found in input.`);
+            }
 
-        // Keep only the target letter
-        return id === targetID ? `${this.letters[id]}` : '';
-    });
-}
-
-
-
-
-
+            // Keep only the target letter
+            return id === targetID ? `${this.letters[id]}` : '';
+        });
+    }
 
     public getWeights(): Record<number, number> {
         return this.weights;

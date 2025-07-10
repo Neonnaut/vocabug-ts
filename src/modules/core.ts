@@ -7,77 +7,44 @@ import Escape_Mapper from './escape_mapper';
 import SupraBuilder from './supra_builder';
 
 function gen_words(
-    file: string,
-    num_of_words: string,
-    mode: string = 'word-list',
-    sort_words: boolean = true,
-    capitalise_words: boolean = false,
-    remove_duplicates: boolean = true,
-    force_word_limit: boolean = false,
-    word_divider: string = " "
+    file: string, num_of_words: string,
+    mode: string = 'word-list', remove_duplicates: boolean = true, force_word_limit: boolean = false,
+    sort_words: boolean = true, capitalise_words: boolean = false, word_divider: string = " "
 ): { text:string, errors:string[], warnings:string[], infos:string[] } {
     const build_start = Date.now();
     const logger = new Logger();
-    let text = '';
+    let text:string = ''
 
     try {
-        const escape_mapper = new Escape_Mapper(); // Initialize Escape_Mapper to ensure it's ready for use
+        const escape_mapper = new Escape_Mapper();
+        const supra_builder = new SupraBuilder();
 
-        const resolver = new Resolver(
-            logger,
-            escape_mapper,
-            num_of_words,
-            mode,
-            sort_words,
-            capitalise_words,
-            remove_duplicates,
-            force_word_limit,
-            word_divider
+        const r = new Resolver(
+            logger, escape_mapper, supra_builder,
+            num_of_words, mode, sort_words, capitalise_words,
+            remove_duplicates, force_word_limit, word_divider
         );
 
-        const supra_builder = new SupraBuilder(logger);
-
-
-
-        resolver.parse_file(file);
-        resolver.expand_categories();
-        resolver.expand_segments();
-        resolver.expand_wordshape_segments();
-        resolver.set_wordshapes(supra_builder);
-        resolver.create_record();
+        r.parse_file(file);
+        r.expand_categories();
+        r.expand_segments();
+        r.expand_wordshape_segments();
+        r.set_wordshapes();
+        r.create_record();
 
         const wordBuilder = new Word_Builder(
-            logger,
-            escape_mapper,
-            supra_builder,
-            resolver.categories,
-            resolver.wordshapes,
-            resolver.wordshape_distribution,
-            resolver.category_distribution,
-            resolver.optionals_weight,
-            resolver.debug
+            logger, escape_mapper, r.supra_builder, r.categories, r.wordshapes,
+            r.category_distribution, r.optionals_weight, r.debug
         );
 
         const transformer = new Transformer(
-            logger,
-            resolver.graphemes,
-            resolver.transforms
+            logger, r.graphemes, r.transforms
         );
 
         const textBuilder = new Text_Builder(
-            logger,
-            build_start,
-            escape_mapper,
-            resolver.num_of_words,
-            resolver.debug,
-            resolver.paragrapha,
-            resolver.remove_duplicates,
-            resolver.force_word_limit,
-            resolver.sort_words,
-            resolver.capitalise_words,
-            resolver.word_divider,
-            resolver.alphabet,
-            resolver.invisible
+            logger, build_start, escape_mapper, r.num_of_words, r.debug, r.paragrapha,
+            r.remove_duplicates, r.force_word_limit, r.sort_words,
+            r.capitalise_words, r.word_divider, r.alphabet, r.invisible
         );
 
         // Yo! this is where we generate da words !!
@@ -87,7 +54,6 @@ function gen_words(
             word = transformer.do_transforms(word);
             textBuilder.add_word(word);
         }
-
         text = textBuilder.make_text();
         
     } catch (e: unknown) {
@@ -98,5 +64,3 @@ function gen_words(
 }
 
 export default gen_words;
-
-// module.exports = gen_words;

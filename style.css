@@ -15,9 +15,9 @@ html {
   --select-bg: #a3154e;
   --select-text: #fff;
 
-  --error-text: #ff0000;
-  --warning-text: #ea9433;
-  --info-text: #21ff51;
+  --error-text: #ff7a7a;
+  --warning-text: #ffc078;
+  --info-text: #7fff9b;
   --hover-text: #fff;
   --hover-bg: #00A4BD;
 
@@ -77,9 +77,9 @@ html {
   --select-bg: #a3154e;
   --select-text: #fff;
 
-  --error-text: #a90000;
-  --warning-text: #a1651f;
-  --info-text: #00771a;
+  --error-text: #8b0000;
+  --warning-text: #864700;
+  --info-text: #005d14;
   --hover-text: #fff;
   --hover-bg: #00A4BD;
 
@@ -137,9 +137,9 @@ html {
   --select-bg: #a75613;
   --select-text: #fff;
 
-  --error-text: #bd0000;
-  --warning-text: #9f5f17;
-  --info-text: #00771a;
+  --error-text: #8b0000;
+  --warning-text: #864700;
+  --info-text: #005d14;
   --hover-text: #000;
   --hover-bg: #ffdd00;
 
@@ -999,4 +999,10 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 
 .gap-2 {
     gap: .5rem
+}
+
+.flex-box {
+    padding: 4px 5px;
+    resize: none;
+    overflow: hidden;
 }

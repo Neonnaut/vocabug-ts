@@ -4,11 +4,13 @@ onmessage = function (event) {
     const vocabug = gen_words(
         event.data.file,
         event.data.num_of_words,
+
         event.data.mode,
+        event.data.remove_duplicates,
+        event.data.force_word_limit,
+
         event.data.sort_words,
         event.data.capitalise_words,
-        event.data.remove_duplicates,
-        event.data.force_words,
         event.data.word_divider
     );
 

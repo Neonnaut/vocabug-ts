@@ -2,10 +2,10 @@ import Word from './word';
 import Logger from './logger';
 
 class Transformer {
-    public logger: Logger;
+    private logger: Logger;
    
-    public graphemes: string[];
-    public transforms: { target:string[], result:string[], line_num:string }[];
+    private graphemes: string[];
+    private transforms: { target:string[], result:string[], line_num:string }[];
 
     constructor(
         logger: Logger,
@@ -66,6 +66,7 @@ applyTransform(
     const { target, result } = transform;
 
     if (target.length !== result.length) {
+        // We've already done this in resolover, but, you know...
         throw new Error("Mismatched target/result concurrent set lengths in a transform");
     }
 

@@ -1,6 +1,9 @@
 // vite.config.ts
 import { defineConfig } from 'vite';
 
+/// <reference types="vitest" />
+// Configure Vitest (https://vitest.dev/config/)
+
 export default defineConfig({
   build: {
     rollupOptions: {
@@ -14,5 +17,8 @@ export default defineConfig({
       }
 
     }
-  }
+  },
+    test: {
+    // ...
+  },
 });

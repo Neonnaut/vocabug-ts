@@ -5,14 +5,13 @@ import SupraBuilder from './supra_builder';
 import { weightedRandomPick, resolve_wordshape_sets } from './utilities'
 
 class Word_Builder {
-    public logger: Logger;
-    public escape_mapper: Escape_Mapper;
-    public supra_builder: SupraBuilder;
-    public categories: Map< string, {graphemes:string[], weights:number[]} >;
-    public wordshapes: {items:string[], weights:number[]};
-    public wordshape_distribution: string;
+    private logger: Logger;
+    private escape_mapper: Escape_Mapper;
+    private supra_builder: SupraBuilder;
+    private categories: Map< string, {graphemes:string[], weights:number[]} >;
+    private wordshapes: {items:string[], weights:number[]};
     private category_distribution: string;
-    public optionals_weight: number;
+    private optionals_weight: number;
 
     constructor(
         logger: Logger,
@@ -20,7 +19,6 @@ class Word_Builder {
         supra_builder: SupraBuilder,
         categories: Map< string, {graphemes:string[], weights:number[]} >,
         wordshapes: {items:string[], weights:number[]},
-        wordshape_distribution: string,
         category_distribution: string,
         optionals_weight: number,
         debug: boolean,
@@ -30,7 +28,7 @@ class Word_Builder {
         this.supra_builder = supra_builder
         this.categories = categories;
         this.wordshapes = wordshapes;
-        this.wordshape_distribution = wordshape_distribution;
+
         this.category_distribution = category_distribution;
         this.optionals_weight = optionals_weight;
 

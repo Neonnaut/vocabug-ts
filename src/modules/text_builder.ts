@@ -5,23 +5,23 @@ import { capitalise } from './utilities';
 import type Escape_Mapper from './escape_mapper';
 
 class Text_Builder {
-    public logger: Logger;
+    private logger: Logger;
     private build_start: number;
-    public escape_mapper: Escape_Mapper
+    private escape_mapper: Escape_Mapper
 
-    public num_of_words: number;
-    public debug: boolean;
-    public paragrapha: boolean;
-    public remove_duplicates: boolean;
-    public force_word_limit: boolean;
-    public sort_words: boolean;
-    public capitalise_words: boolean;
-    public word_divider: string;
-    public alphabet: string[];
-    public invisible: string[];
+    private num_of_words: number;
+    private debug: boolean;
+    private paragrapha: boolean;
+    private remove_duplicates: boolean;
+    private force_word_limit: boolean;
+    private sort_words: boolean;
+    private capitalise_words: boolean;
+    private word_divider: string;
+    private alphabet: string[];
+    private invisible: string[];
 
     public terminated: boolean;
-    public words: string[];
+    private words: string[];
 
     private num_of_duplicates: number;
     private num_of_rejects: number;
@@ -98,16 +98,16 @@ class Text_Builder {
         } else if ((this.force_word_limit) && (Date.now() - this.build_start >= 30000) ) {
             this.terminated = true;
             if (this.remove_duplicates) {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more unique word-shapes or remove some reject transforms')
+                this.logger.warn(`Could not generate the requested amount of words. Try adding more unique word-shapes or remove some reject transforms`)
             } else {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more word-shapes or remove some reject transforms')
+                this.logger.warn(`Could not generate the requested amount of words. Try adding more word-shapes or remove some reject transforms`)
             }
         } else if ((this.num_of_duds >= this.upper_gen_limit) && (!this.force_word_limit)) {
             this.terminated = true;
             if (this.remove_duplicates) {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms')
+                this.logger.warn(`Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms`)
             } else {
-                this.logger.warn('Could not generate the requested amount of words. Try adding more word-shapes, remove some reject transforms')
+                this.logger.warn(`Could not generate the requested amount of words. Try adding more word-shapes or remove some reject transforms`)
             }
         }
     }
@@ -116,39 +116,39 @@ class Text_Builder {
         // Send some good info about the generation results
         let ms:any = Date.now() - this.build_start;
         const display = ms >= 1000 ? `${(ms / 1000).toFixed(ms % 1000 === 0 ? 0 : 1)} s` : `${ms} ms`;
-        let text:string = '';
+        let record:string = '';
         
         if (this.words.length == 1) {
-            text+= `1 word generated in ${display}`;
+            record+= `1 word generated in ${display}`;
         } else if (this.words.length > 1) {
-            text+= `${this.words.length} words generated in ${display}`;
+            record+= `${this.words.length} words generated in ${display}`;
         } else if (this.words.length == 0) {
-            text+= `Zero words generated in ${display}`;
+            record+= `Zero words generated in ${display}`;
         }
 
         if (this.num_of_duplicates == 1) {
-            text+= ` -- with 1 duplicate word removed`;
+            record+= ` -- with 1 duplicate word removed`;
             if (this.num_of_rejects == 1) {
-                text+= `, and 1 word rejected`;
+                record+= `, and 1 word rejected`;
             } else if (this.num_of_rejects > 1) {
-                text+= `, and ${this.num_of_rejects} words rejected`;
+                record+= `, and ${this.num_of_rejects} words rejected`;
             }
         } else if (this.num_of_duplicates > 1) {
-            text+= ` -- with ${this.num_of_duplicates} duplicate words removed`;
+            record+= ` -- with ${this.num_of_duplicates} duplicate words removed`;
             if (this.num_of_rejects == 1) {
-                text+= `, and 1 word rejected`;
+                record+= `, and 1 word rejected`;
             } else if (this.num_of_rejects > 1) {
-                text+= `, and ${this.num_of_rejects} words rejected`;
+                record+= `, and ${this.num_of_rejects} words rejected`;
             }
         } else {
             if (this.num_of_rejects == 1) {
-                text+= ` -- with 1 word rejected`;
+                record+= ` -- with 1 word rejected`;
             } else if (this.num_of_rejects > 1) {
-                text+= ` -- with ${this.num_of_rejects} words rejected`;
+                record+= ` -- with ${this.num_of_rejects} words rejected`;
             }
         }
 
-        this.logger.info(text);
+        this.logger.info(record);
     }
 
     make_text() {

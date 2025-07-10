@@ -74,7 +74,7 @@ function collator(
 
   if (unknownSet.size > 0) {
     logger.warn(
-      `The custom order stated in \`alphabet\` was ignored because words had unknown graphemes: "${Array.from(unknownSet).join(", ")}"; missing from \`alphabet\``
+      `The custom order stated in 'alphabet' was ignored because words had unknown graphemes: '${Array.from(unknownSet).join(", ")}' missing from 'alphabet'`
     );
     return words.sort(Intl.Collator().compare);
   }

@@ -66,11 +66,13 @@ $(window).on('load', function () {
             w.postMessage({
                 file: editor.state.doc.toString(),
                 num_of_words: (document.getElementById('num-of-words') as HTMLInputElement)?.value || "",
+                
                 mode: (document.querySelector('input[name="mode-type"]:checked') as HTMLInputElement)?.value || "",
+                remove_duplicates: (document.getElementById('remove-duplicates') as HTMLInputElement)?.checked || false,
+                force_word_limit: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
+                
                 sort_words: (document.getElementById('sort-words') as HTMLInputElement)?.checked || false,
                 capitalise_words: (document.getElementById('capitalise-words') as HTMLInputElement)?.checked || false,
-                remove_duplicates: (document.getElementById('remove-duplicates') as HTMLInputElement)?.checked || false,
-                force_words: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
                 word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
             });
             w.onerror = function (e: ErrorEvent) {

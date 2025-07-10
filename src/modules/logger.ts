@@ -10,7 +10,7 @@ class Logger {
     }
 
     error(error: string): void {
-        this.errors.push(`${error}.`);
+        this.errors.push(`Error: ${error}.`);
         console.error(error);
     }
 

@@ -8,8 +8,9 @@ import { getCatSeg, GetTransform, makePercentage, extract_complex_value_and_weig
  } from './utilities'
 
 class Resolver {
-    public logger: Logger;
+    private logger: Logger;
     private escape_mapper: Escape_Mapper;
+    public supra_builder: SupraBuilder
 
     public num_of_words: number;
     public debug: boolean;
@@ -40,8 +41,9 @@ class Resolver {
     constructor(
         logger: Logger,
         escape_mapper: Escape_Mapper,
-        num_of_words_string: string,
+        supra_builder: SupraBuilder,
 
+        num_of_words_string: string,
         mode: string,
         sort_words: boolean,
         capitalise_words: boolean,
@@ -51,20 +53,21 @@ class Resolver {
     ) {
         this.logger = logger;
         this.escape_mapper = escape_mapper;
+        this.supra_builder = supra_builder;
 
         if (num_of_words_string == '') {
             num_of_words_string = '100';
         }
         let num_of_words: number = Number(num_of_words_string);
         if (isNaN(num_of_words)) {
-            this.logger.warn('Number of words was not a number. Genearating 100 words instead');
+            this.logger.warn(`Number of words '${num_of_words}' was not a number. Genearating 100 words instead`);
             num_of_words = 100;
         } else if (!Number.isInteger(num_of_words)) {
-            this.logger.warn('Number of words was rounded to the nearest whole number');
+            this.logger.warn(`Number of words '${num_of_words}' was rounded to the nearest whole number`);
             num_of_words = Math.ceil(num_of_words);
         }
         if ((num_of_words > 100_000) || (num_of_words < 1)) {
-            this.logger.warn('Number of words was not between 1 and 100,000. Genearating 100 words instead');
+            this.logger.warn(`Number of words '${num_of_words}' was not between 1 and 100,000. Genearating 100 words instead`);
             num_of_words = 100;
         }
         this.num_of_words = num_of_words;
@@ -137,10 +140,10 @@ class Resolver {
                 let [target, result, valid] = GetTransform(line_value);
 
                 if ( !valid ) {
-                    this.logger.warn(`Malformed transform at line ${this.file_line_num + 1} -- expected \`old → new\` or a clusterfield`);
+                    this.logger.warn(`Malformed transform '${line_value}' at line ${this.file_line_num + 1} -- expected 'old → new' or a clusterfield`);
                     continue;
                 } else if ( target.length != result.length ){
-                    this.logger.warn(`Malformed transform at line ${this.file_line_num + 1} -- expected an equal amount of concurrent-set targets to concurrent-set results`);
+                    this.logger.warn(`Malformed transform '${line_value}' at line ${this.file_line_num + 1} -- expected an equal amount of concurrent-set targets to concurrent-set results`);
                     continue;
                 }
 
@@ -166,7 +169,7 @@ class Resolver {
 
                 let optionals_weight = makePercentage(line_value);
                 if (optionals_weight == null) {
-                    this.logger.warn(`Invalid optionals-weight at ${this.file_line_num + 1} -- expected a number between 1 and 100`);
+                    this.logger.warn(`Invalid optionals-weight '${line_value}' at line ${this.file_line_num + 1} -- expected a number between 1 and 100`);
                     continue;
                 }
                 this.optionals_weight = optionals_weight;
@@ -178,7 +181,7 @@ class Resolver {
                 let alphabet = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (alphabet.length == 0){
-                    this.logger.warn(`\`alphabet\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'alphabet' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.alphabet = alphabet;
 
@@ -189,7 +192,7 @@ class Resolver {
                 let invisible = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (invisible.length == 0){
-                    this.logger.warn(`\`invisible\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'invisible' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.invisible = invisible;
 
@@ -200,7 +203,7 @@ class Resolver {
                 let a_g = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (a_g.length == 0){
-                    this.logger.warn(`\`alphabet-and-graphemes\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'alphabet-and-graphemes' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.graphemes = a_g;
                 this.alphabet = a_g;
@@ -211,7 +214,7 @@ class Resolver {
 
                 let graphemes = line_value.split(/[,\s]+/).filter(Boolean);
                 if (graphemes.length == 0){
-                    this.logger.warn(`\`graphemes\` was introduced but there were no graphemes listed at ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'graphemes' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
                 }
                 this.graphemes = graphemes;
 
@@ -238,7 +241,7 @@ class Resolver {
                 }
                 if (hasDollarSign) {
                     // SEGMENTS !!!
-                    if (!validateSegment(field)) { throw new Error(`A segment at line ${this.file_line_num + 1} had separators outside any sets -- expected separators for segments to appear only in sets`)}
+                    if (!validateSegment(field)) { throw new Error(`The segment '${myName}' at line ${this.file_line_num + 1} had separator(s) outside sets -- expected separators for segments to appear only in sets`)}
                     this.add_segment(myName, field);
                 } else {
                     // CATEGORIES !!!
@@ -254,10 +257,13 @@ class Resolver {
         this.category_strings.set(name, field);
     }
     add_segment(name:string, field:string) {
+        if (!valid_words_brackets(field)) {
+            throw new Error(`The segment '${name}' had missmatched brackets`);
+        }
         this.segments.set(name, field);
     }
 
-    set_wordshapes(supra_builder: SupraBuilder) {
+    set_wordshapes() {
         let result = [];
         let buffer = "";
         let insideBrackets = 0;
@@ -266,13 +272,13 @@ class Resolver {
             throw new Error(`No word-shapes to choose from -- expected \`words: wordshape1 wordshape2 ...\``);
         }
 
-        this.wordshape_string = supra_builder.processString(this.wordshape_string);
+        this.wordshape_string = this.supra_builder.processString(this.wordshape_string);
 
         if (!valid_words_brackets(this.wordshape_string)) {
-            throw new Error("A word-shape had missmatched brackets");
+            throw new Error("Word-shapes had missmatched brackets");
         }
         if (!valid_weights(this.wordshape_string)) {
-            throw new Error("A word-shape had invalid weights -- expected weights to follow an item and look like `*NUMBER` followed by either `,` a bracket, or ` `");
+            throw new Error("Word-shapes had invalid weights -- expected weights to follow an item and look like `*NUMBER` followed by either `,` a bracket, or ` `");
         }
 
         for (let i = 0; i < this.wordshape_string.length; i++) {
@@ -312,10 +318,10 @@ class Resolver {
     expand_categories() {
         for (const [key, value] of this.category_strings) {
             if (!valid_category_brackets(value)) {
-                throw new Error("A category had missmatched brackets");
+                throw new Error(`Category '${key}' had missmatched brackets`);
             }
             if (!valid_category_weights(value)) {
-                throw new Error("A category had invalid weights -- expected weights to follow an item and look like `*NUMBER` followed by either `,`, a bracket, or ` `");
+                throw new Error(`Category '${key}' had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',', a bracket, or ' '`);
             }
             this.category_strings.set( key, this.recursiveExpansion(value, this.category_strings, true) );
         }
@@ -358,7 +364,7 @@ class Resolver {
                 for (const key of mappingKeys) {
                     if (str.startsWith(key, i)) {
                         if (history.includes(key)) {
-                            this.logger.warn(`A cycle was detected when mapping "${key}"`);
+                            this.logger.warn(`A cycle was detected when mapping '${key}'`);
                             result += '🔃';
                         } else {
                             let resolved = resolveMapping(mappings.get(key) || '', [...history, key]);
@@ -421,9 +427,9 @@ class Resolver {
             row.shift();
 
             if (row.length > row_length) {
-                throw new Error(`Clusterfield row too long at line number ${this.file_line_num + 1}`);
+                throw new Error(`Clusterfield row '${line}' too long at line ${this.file_line_num + 1}`);
             } else if (row.length < row_length) {
-                throw new Error(`Clusterfield row too short at line number ${this.file_line_num + 1}`);
+                throw new Error(`Clusterfield row '${line}' too short at line ${this.file_line_num + 1}`);
             }
 
             for (let i = 0; i < row_length; ++i) {

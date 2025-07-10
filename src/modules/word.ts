@@ -3,10 +3,10 @@ import { get_last } from './utilities'
 class Word {
     static debug: boolean = false;
 
-    transformations: string[];
-    forms: string[];
-    rejected: boolean;
-    line_nums: string[];
+    private transformations: string[];
+    private forms: string[];
+    public rejected: boolean;
+    private line_nums: string[];
 
     constructor(skeleton: string, adult: string) {
         this.transformations = [skeleton];
