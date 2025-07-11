@@ -1,4 +1,4 @@
-import gen_words from './modules/core';
+import gen_words from '../src/modules/core';
 
 onmessage = function (event) {
     const vocabug = gen_words(

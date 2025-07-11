@@ -1,24 +1,25 @@
 // vite.config.ts
-import { defineConfig } from 'vite';
-
 /// <reference types="vitest" />
 // Configure Vitest (https://vitest.dev/config/)
 
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          examples: ['./src/examples.ts'] // 👈 Keep this file separate
-        },
-        entryFileNames: '[name].js',
-        chunkFileNames: 'script/vocabug-lite/[name].js',
-        assetFileNames: 'script/vocabug-lite/[name].[ext]'
-      }
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
 
-    }
-  },
+export default defineConfig({
     test: {
-    // ...
+    globals: true,
+    environment: 'node'
   },
+  build: {
+    lib: {
+      entry: resolve(__dirname, 'src/api_entrypoint'),
+      name: 'vocabug',
+      formats: ['es', 'cjs'],
+      fileName: format => `vocabug.${format}.js`
+    },
+    rollupOptions: {
+      external: [], // Add external dependencies to avoid bundling them
+    },
+    outDir: 'dist'
+  }
 });

@@ -1,7 +1,7 @@
 export class SupraBuilder {
     private weights: Record<number, number>;
     private letters: Record<number, string>;
-    private idCounter: number;
+    public idCounter: number;
 
     constructor() {
         this.weights = {};

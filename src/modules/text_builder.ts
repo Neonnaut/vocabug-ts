@@ -2,15 +2,12 @@ import Word from './word';
 import Logger from './logger';
 import collator from './collator';
 import { capitalise } from './utilities';
-import type Escape_Mapper from './escape_mapper';
 
 class Text_Builder {
     private logger: Logger;
     private build_start: number;
-    private escape_mapper: Escape_Mapper
 
     private num_of_words: number;
-    private debug: boolean;
     private paragrapha: boolean;
     private remove_duplicates: boolean;
     private force_word_limit: boolean;
@@ -30,10 +27,8 @@ class Text_Builder {
 
     constructor(
         logger: Logger, build_start: number,
-        escape_mapper: Escape_Mapper,
 
         num_of_words: number,
-        debug: boolean,
         paragrapha: boolean,
         remove_duplicates: boolean,
         force_word_limit: boolean,
@@ -45,10 +40,8 @@ class Text_Builder {
     ) {
         this.logger = logger;
         this.build_start = build_start;
-        this.escape_mapper = escape_mapper;
 
         this.num_of_words = num_of_words;
-        this.debug = debug;
         this.paragrapha = paragrapha;
         this.remove_duplicates = remove_duplicates;
         this.force_word_limit = force_word_limit;

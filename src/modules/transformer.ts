@@ -1,18 +1,13 @@
 import Word from './word';
-import Logger from './logger';
 
-class Transformer {
-    private logger: Logger;
-   
+class Transformer {   
     private graphemes: string[];
     private transforms: { target:string[], result:string[], line_num:string }[];
 
     constructor(
-        logger: Logger,
         graphemes: string[],
         transforms: { target:string[], result:string[], line_num:string }[]
     ) {
-        this.logger = logger;
         this.graphemes = graphemes;
         this.transforms = transforms;
     }

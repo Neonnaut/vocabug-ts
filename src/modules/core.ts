@@ -33,16 +33,16 @@ function gen_words(
         r.create_record();
 
         const wordBuilder = new Word_Builder(
-            logger, escape_mapper, r.supra_builder, r.categories, r.wordshapes,
+            escape_mapper, r.supra_builder, r.categories, r.wordshapes,
             r.category_distribution, r.optionals_weight, r.debug
         );
 
         const transformer = new Transformer(
-            logger, r.graphemes, r.transforms
+            r.graphemes, r.transforms
         );
 
         const textBuilder = new Text_Builder(
-            logger, build_start, escape_mapper, r.num_of_words, r.debug, r.paragrapha,
+            logger, build_start, r.num_of_words, r.paragrapha,
             r.remove_duplicates, r.force_word_limit, r.sort_words,
             r.capitalise_words, r.word_divider, r.alphabet, r.invisible
         );

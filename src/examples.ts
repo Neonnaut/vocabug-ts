@@ -156,10 +156,10 @@ RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
 
 ; Vowel sequences:
 %  a   i   u   e  o
-a  a   +   oR  +  ai
-i  ya  i   yuR +  yo
-u  a   +   u   ai ai
-e  eR  +   yoR e  yo
+a  ai  +   oR  +  +
+i  ya  ui  yuR +  yo
+u  uR  +   ui  ai ai
+e  eR  eR  yoR ai yo
 o  oR  +   +   +  o
 R  R   R   R   R  R
 
