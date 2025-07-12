@@ -1,6 +1,6 @@
 {
   "name": "vocabug",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Word generator program for conlangers",
   "author": "Neonnaut",
@@ -21,9 +21,8 @@
   ],
   "scripts": {
     "dev": "vite",
-  "build": "tsc && vite build",
-  "build:win": "tsc.cmd && vite.cmd",
-
+    "build": "tsc && vite build",
+    "build:win": "tsc.cmd && vite.cmd",
     "preview": "vite preview",
     "test": "vitest"
   },
