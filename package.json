@@ -1,6 +1,6 @@
 {
   "name": "vocabug",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "description": "Word generator program for conlangers",
   "author": "Neonnaut",
@@ -37,7 +37,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-    "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/vocabug.es.js",
       "require": "./dist/vocabug.cjs.js"
     }
