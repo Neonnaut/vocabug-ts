@@ -35,8 +35,8 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/my-lib.js",
-      "require": "./dist/my-lib.umd.cjs"
+      "import": "./dist/vocabug.es.js",
+      "require": "./dist/vocabug.cjs.js"
     }
   },
   "files": [
