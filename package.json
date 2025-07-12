@@ -1,9 +1,7 @@
 {
   "name": "vocabug",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
-
-
   "description": "Word generator program for conlangers",
   "author": "Neonnaut",
   "license": "MIT",
@@ -15,8 +13,12 @@
   "bugs": {
     "url": "https://github.com/Neonnaut/vocabug-ts/issues"
   },
-  "keywords": ["conlangs", "conlanging", "word generator", "vocabulary generator"],
-
+  "keywords": [
+    "conlangs",
+    "conlanging",
+    "word generator",
+    "vocabulary generator"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -29,7 +31,6 @@
     "vite": "^6.3.5",
     "vitest": "^3.2.4"
   },
-
   "main": "./dist/vocabug.cjs.js",
   "module": "./dist/vocabug.es.js",
   "types": "./dist/index.d.ts",
@@ -41,10 +42,7 @@
   },
   "files": [
     "dist",
-      "LICENSE",
-      "README"
+    "LICENSE",
+    "README"
   ]
 }
-
-
-
