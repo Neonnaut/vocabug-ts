@@ -10,13 +10,7 @@ describe('vocabug', () => {
 
       const def = gen_words({
         file: example,
-        num_of_words: "7",
-        mode: 'word-list',
-        remove_duplicates: true,
-        force_word_limit: false,
-        sort_words: true,
-        capitalise_words: false,
-        word_divider: " "
+        num_of_words: "6",
       });
       expect(typeof def.text).toBe('string');
       expect(def.text.length).toBeGreaterThan(0);
@@ -24,7 +18,6 @@ describe('vocabug', () => {
       expect(def.warnings.length).toBeLessThan(1);
       expect(def.infos.length).toBeGreaterThan(0);
       console.log(def.text);
-
     }
   });
 });

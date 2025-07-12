@@ -37,7 +37,7 @@ function create_file_editor() {
     );
 }
 
-$(window).on('load', function () {
+window.addEventListener("load", () => {
     const editor = create_file_editor();
 
     editor.dispatch({

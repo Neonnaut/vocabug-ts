@@ -1,6 +1,6 @@
 {
   "name": "vocabug",
-  "version": "0.1.3",
+  "version": "0.0.1",
   "type": "module",
   "description": "Word generator program for conlangers",
   "author": "Neonnaut",
@@ -14,10 +14,10 @@
     "url": "https://github.com/Neonnaut/vocabug-ts/issues"
   },
   "keywords": [
-    "conlangs",
     "conlanging",
-    "word generator",
-    "vocabulary generator"
+    "wordgen",
+    "vocabulary",
+    "vocabug"
   ],
   "scripts": {
     "dev": "vite",

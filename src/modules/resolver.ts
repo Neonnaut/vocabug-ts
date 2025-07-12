@@ -784,39 +784,39 @@ class Resolver {
 
         let wordshapes = [];
         for (let i = 0; i < this.wordshapes.items.length; i++) {
-            wordshapes.push(`\`${this.wordshapes.items[i]}\`:${this.wordshapes.weights[i]}`);
+            wordshapes.push(`⟨${this.wordshapes.items[i]}⟩:${this.wordshapes.weights[i]}`);
         }
 
         let transforms = [];
         for (let i = 0; i < this.transforms.length; i++) {
-            transforms.push(`  ${this.transforms[i].target.join(", ")} → ${this.transforms[i].result.join(", ")}`);
+            transforms.push(`  ⟨${this.transforms[i].target.join(", ")} → ${this.transforms[i].result.join(", ")}⟩`);
         }
 
         let info:string =
             `~ OPTIONS ~\n` +
-            `Num of words:      ` + this.num_of_words + 
-            `\nDebug:             ` + this.debug + 
-            `\nParagrapha:        ` + this.paragrapha +
+            `Num of words: ` + this.num_of_words + 
+            `\nDebug: ` + this.debug + 
+            `\nParagrapha: ` + this.paragrapha +
             `\nRemove duplicates: ` + this.remove_duplicates +
-            `\nForce word limit:  ` + this.force_word_limit +
-            `\nSort words:        ` + this.sort_words +
-            `\nCapitalise words:  ` + this.capitalise_words +
-            `\nWord divider:      "` + this.word_divider + `"` +
-            `\n\n~ FILE ~` +
+            `\nForce word limit: ` + this.force_word_limit +
+            `\nSort words: ` + this.sort_words +
+            `\nCapitalise words: ` + this.capitalise_words +
+            `\nWord divider: "` + this.word_divider + `"` +
 
-            `\nCategory-distribution:  ` + this.category_distribution +
+            `\n\n~ FILE ~` +
+            `\nCategory-distribution: ` + this.category_distribution +
             `\nCategories {\n` + categories.join('\n') + `\n}` +
 
             `\nSegments {\n` + segments.join('\n') + `\n}` +
-            `\nOptionals-weight:       ` + this.optionals_weight +
+            `\nOptionals-weight: ` + this.optionals_weight +
 
             `\nWordshape-distribution: ` + this.wordshape_distribution +
-            `\nWordshapes:             ` + wordshapes.join(', ') + `\n}` +
+            `\nWordshapes: ` + wordshapes.join(', ') + `\n}` +
 
             `\nTransforms {\n` + transforms.join('\n') + `\n}` +
-            `\nGraphemes:              ` + this.graphemes.join(', ') +
-            `\nAlphabet:               ` + this.alphabet.join(', ') +
-            `\nInvisible:             ` + this.invisible.join(', ');
+            `\nGraphemes: ` + this.graphemes.join(', ') +
+            `\nAlphabet: ` + this.alphabet.join(', ') +
+            `\nInvisible: ` + this.invisible.join(', ');
         info = this.escape_mapper.restorePreserveEscapedChars(info);
 
         this.logger.silent_info(info);

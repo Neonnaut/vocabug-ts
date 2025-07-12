@@ -3,13 +3,30 @@
 [![version][1]][2] [![license][3]][4] [![issue count][5]][6]
 [![git activity][7]][8]
 
+![Vocabug logo](./img/vocabug_logo.svg?raw=true "Vocabug")
+
 This is a word generator designed to be a successor to the Williams' [Lexifer][9] and to [Awkwords][10]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug-pro, is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
 
 Vocabug randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.
 
 ## Development
 
-To build use `npm run build`. For live testing use `npm run dev`. 
+To build use `npm run build`. For live testing use `npm run dev`.
+
+## API
+
+Install with `npm install vocabug`, and use it like:
+
+```ts
+import vocabug from 'vocabug';
+const def = vocabug.gen_words({
+    file: vocabug.examples['tonal']
+});
+
+console.log(def.warnings)
+console.log(def.errors);
+console.log(def.text);
+```
 
 ## Vocabug-pro online
 

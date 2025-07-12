@@ -16,9 +16,11 @@
   <!-- Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="img/voc_apple-touch.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="img/voc_favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="img/voc_favicon-32x32.png">
+  <link rel="icon" type="image/png" href="/img/voc-favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/img/voc-favicon.svg" />
+  <link rel="shortcut icon" href="/img/voc-favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/voc-apple-touch-icon.png" />
+  <link rel="manifest" href="/img/voc-site.webmanifest" />
 </head>
 <body>
   <nav id="myNav">
@@ -35,10 +37,10 @@
   <div id="content">
     <section id="top">
       <div>
-        <img src="img/vocabug_logo.png" alt="Logo of letter V with bug antennae" width="100" height="100" style="float: left;">
+        <img src="img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" width="100" height="100" style="float: left;">
 
         <h1 style="margin-bottom: 10px;">Vocabug-pro<br>documentation</h1>
-        <b>Version 0.0.0</b>
+        <b>Version 0.0.1</b>
       </div>
       <br>
 
@@ -176,8 +178,10 @@
       </ol>
 
       <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
-      <p>This is the complete documentation for <a href="./vocabug-pro.html">Vocabug-pro, version 0.0.0</a></p>
+      <p>This is the complete documentation for <a href="./vocabug-pro.html">Vocabug, version 0.0.1</a></p>
       <p>Vocabug randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.</p>
+
+      <p>This is a word generator designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find it's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. This is different to vocabug-lite.</p>
 
       <h2 id="vocInterface"><a class="head-num">2</a>Interface</h2>
       <ul class="paragraphian">
