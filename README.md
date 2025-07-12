@@ -23,9 +23,9 @@ Documentation lives at [neonnaut.neocities.org/vocabug-pro_docs][12]
 [2]: https://www.npmjs.com/package/vocabug "npm package"
 [3]: https://img.shields.io/npm/l/vocabug
 [4]: https://github.com/Neonnaut/vocabug-ts/blob/master/LICENSE "license text"
-[5]: https://img.shields.io/github/issues-raw/Neonnaut/vocabug-ts/
+[5]: https://img.shields.io/github/issues-raw/Neonnaut/vocabug-ts
 [6]: https://github.com/Neonnaut/vocabug-ts/issues "issues page"
-[7]: https://img.shields.io/github/commit-activity/m/Neonnaut/vocabug-ts/
+[7]: https://img.shields.io/github/commit-activity/m/Neonnaut/vocabug-ts
 [8]: https://github.com/Neonnaut/vocabug-ts/commits "commit log"
 
 [9]: https://github.com/bbrk24/lexifer-ts
