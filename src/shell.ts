@@ -1,6 +1,6 @@
 import MyWorker from './worker?worker';
 
-import { get_example } from './examples.ts';
+import { examples } from './examples.ts';
 
 const cm6 = (window as any).cm6; // This was global. Stops TS from complaining
 
@@ -15,10 +15,10 @@ function create_file_editor() {
             content = gotLocalStorage[0]; filename = gotLocalStorage[1];
         } catch {
             localStorage.removeItem("vocabug-pro");
-            content = get_example('basic');
+            content = examples.basic;
         }
     } else {
-        content = get_example('basic');
+        content = examples.basic;
     }
     if (localStorage.hasOwnProperty('colourScheme')) {
         if (localStorage.getItem('colourScheme') != 'dark-mode') {
@@ -257,8 +257,8 @@ $(window).on('load', function () {
     // Examples buttons
     document.querySelectorAll(".voc-example").forEach((button) => {
         button.addEventListener("click", () => {
-            const choice = (button as HTMLElement).getAttribute("value") || '?';
-            const text = get_example(choice);
+            const choice:string = (button as HTMLElement).getAttribute("value") || '?';
+            const text = examples[choice];
             const confirmed = window.confirm("Replace editor text with example?");
             
             if (confirmed) {

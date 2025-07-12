@@ -1,10 +1,8 @@
-# Vocabug-pro
+# Vocabug
 
-Version 0.0.1
+This is a word generator designed to be a successor to the Williams' [Lexifer][1] and to [Awkwords][2]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug-pro, is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
 
-This is a word generator designed to be a successor to the Williams' [Lexifer][1] and to [Awkwords][2]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. As the name implies, Vocabug-pro, is the 'pro' version of the partial Vocabug, Vocabug-lite.
-
-Vocabug-pro randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.
+Vocabug randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.
 
 ## Development
 

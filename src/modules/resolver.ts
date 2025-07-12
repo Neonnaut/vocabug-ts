@@ -301,7 +301,7 @@ class Resolver {
         let insideBrackets = 0;
 
         if (this.wordshape_string.length == 0){
-            throw new Error(`No word-shapes to choose from -- expected \`words: wordshape1 wordshape2 ...\``);
+            throw new Error(`No word-shapes to choose from -- expected 'words: wordshape1 wordshape2 ...'`);
         }
 
         this.wordshape_string = this.supra_builder.processString(this.wordshape_string);
@@ -310,7 +310,7 @@ class Resolver {
             throw new Error("Word-shapes had missmatched brackets");
         }
         if (!this.valid_words_weights(this.wordshape_string)) {
-            throw new Error("Word-shapes had invalid weights -- expected weights to follow an item and look like `*NUMBER` followed by either `,` a bracket, or ` `");
+            throw new Error("Word-shapes had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',' a bracket, or ' '");
         }
 
         for (let i = 0; i < this.wordshape_string.length; i++) {

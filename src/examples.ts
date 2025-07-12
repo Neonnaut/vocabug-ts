@@ -1,8 +1,6 @@
-function get_example(example:string):string {
-    var choice = '';
-
-if (example == "basic") {
-  choice = `C = [t*9, tr] n [k*13, kr] m r s [p*12, pr] ch h w y
+const examples: { [key: string]: string } = {
+  basic: 
+`C = [t*9, tr] n [k*13, kr] m r s [p*12, pr] ch h w y
 L = ee oo aa ii uu
 V = a i e o u L
 F = n r s
@@ -13,10 +11,10 @@ BEGIN transform:
 nn, nm, np, sh, ss → ny, m, mp, s, s
 #aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
 yi -> ^REJECT
-END`;
+END`,
 
-} else if (example == "tonal") {
-  choice = `; # Tonal Yoruba-like
+  tonal:
+`; # Tonal Yoruba-like
 I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
 C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
 V = a i e o u
@@ -45,10 +43,10 @@ BEGIN transform:
 \` à è ẹ̀ ì ò ọ̀ ù
 
 ci -> çi
-END`;
+END`,
 
-} else if (example == "romance") {
-  choice = `; # Spanish-like
+  romance:
+`; # Spanish-like
 
 ; # Spanish-like
 
@@ -111,10 +109,10 @@ s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z
 ; Taco-taco, burrito-burrito
 k q č h ň ʎ j w > c qu ch j ñ ll i u
 
-END`;
+END`,
 
-} else if (example == "japanese") {
-        choice = `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
+  japanese: 
+`; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
 ; and link.springer.com/content/pdf/10.3758/BF03195600.pdf
 
 ; <R> gives me long vowels
@@ -169,10 +167,10 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
 #aa# #ee# #ii# #oo# #uu# -> a e i o u
-END`;
+END`,
 
-} else if (example == "australian") {
-  choice = `; This does not represent a single Australian language, it does something
+  australian: 
+`; This does not represent a single Australian language, it does something
 ; Australian looking. The glottal stop and lack of retroflex stops make it
 ; not an 'average' Australian language word list, but not unusual.
 
@@ -246,10 +244,11 @@ ji ʎi wu jiR ʎiR wuR -> ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT
 oR eR iR uR aR -> oo ee ii uu aa
 r ɻ n̪ t̪ ʔ ɳ -> rr r nh th ꞌ n
 ɲ ʎ j c ʈ ŋ -> ny ly y j t ng
-END`;
+END`,
 
-} else if (example == "btx") {
-  choice = `; A language based on Tuvan and Blackfoot, hence 'BTX'.
+/*
+  btx:
+`; A language based on Tuvan and Blackfoot, hence 'BTX'.
 ; Tu-foot shows complex consonant clusters,
 ; two types of vowel harmony, pitch accent.
 
@@ -260,11 +259,10 @@ END`;
     w, j,
 
     a, ɯ, o, u,
-    e, i, ø, y
-`;
+    e, i, ø, y`,
 
-} else if (example == "tests") {
-  choice = `; This is a comment.
+  tests: 
+`; This is a comment.
 abcdefg ; And this is a comment following junk.
 
 () [] {} ; <- These should self close.
@@ -503,16 +501,8 @@ BEGIN transform:
 
   ; Sandhi: impossible
 
-END
-`;
-    }
+END`
+*/
+};
 
-    if (choice == '' || choice == null || choice == undefined) {
-        return '?';
-    } else {
-        return choice;
-    }
-
-}
-
-export { get_example };
+export { examples };
