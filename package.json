@@ -37,6 +37,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+    "types": "./dist/index.d.ts",
       "import": "./dist/vocabug.es.js",
       "require": "./dist/vocabug.cjs.js"
     }
