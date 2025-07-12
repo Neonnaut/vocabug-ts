@@ -1,18 +1,18 @@
 import gen_words from '../src/modules/core';
 
 onmessage = function (event) {
-    const vocabug = gen_words(
-        event.data.file,
-        event.data.num_of_words,
+    const vocabug = gen_words({
+        file: event.data.file,
+        num_of_words: event.data.num_of_words,
 
-        event.data.mode,
-        event.data.remove_duplicates,
-        event.data.force_word_limit,
+        mode: event.data.mode,
+        remove_duplicates: event.data.remove_duplicates,
+        force_word_limit: event.data.force_word_limit,
 
-        event.data.sort_words,
-        event.data.capitalise_words,
-        event.data.word_divider
-    );
+        sort_words: event.data.sort_words,
+        capitalise_words: event.data.capitalise_words,
+        word_divider: event.data.word_divider
+    });
 
     postMessage({
         words: vocabug.text,

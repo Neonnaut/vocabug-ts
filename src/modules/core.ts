@@ -1,16 +1,38 @@
-import Resolver from './resolver.ts';
-import Word_Builder from './word_builder.ts';
-import Transformer from './transformer.ts';
-import Text_Builder from './text_builder.ts';
+import Resolver from './resolver';
+import Word_Builder from './word_builder';
+import Transformer from './transformer';
+import Text_Builder from './text_builder';
 import Logger from './logger';
 import Escape_Mapper from './escape_mapper'; 
 import SupraBuilder from './supra_builder';
 
-function gen_words(
-    file: string, num_of_words: string,
-    mode: string = 'word-list', remove_duplicates: boolean = true, force_word_limit: boolean = false,
-    sort_words: boolean = true, capitalise_words: boolean = false, word_divider: string = " "
-): { text:string, errors:string[], warnings:string[], infos:string[] } {
+type GenWordsOptions = {
+  file: string;
+  num_of_words: any;
+  mode?: string;
+  remove_duplicates?: boolean;
+  force_word_limit?: boolean;
+  sort_words?: boolean;
+  capitalise_words?: boolean;
+  word_divider?: string;
+};
+
+function gen_words({
+    file,
+    num_of_words,
+    mode = 'word-list',
+    remove_duplicates = true,
+    force_word_limit = false,
+    sort_words = true,
+    capitalise_words = false,
+    word_divider = ' '
+}: GenWordsOptions): {
+    text: string;
+    errors: string[];
+    warnings: string[];
+    infos: string[];
+} {
+
     const build_start = Date.now();
     const logger = new Logger();
     let text:string = ''

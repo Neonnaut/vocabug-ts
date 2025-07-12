@@ -21,7 +21,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+  "build": "tsc && vite build",
+  "build:win": "tsc.cmd && vite.cmd",
+
     "preview": "vite preview",
     "test": "vitest"
   },
