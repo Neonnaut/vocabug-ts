@@ -18,9 +18,10 @@ onmessage = function (event) {
         words: vocabug.text,
         file: event.data.file,
         
-        error_message: vocabug.errors,
-        warning_message: vocabug.warnings,
-        info_message: vocabug.infos
+        error_messages: vocabug.errors,
+        warning_messages: vocabug.warnings,
+        info_messages: vocabug.infos,
+        diagnostic_messages: vocabug.diagnostics
     });
 }
 

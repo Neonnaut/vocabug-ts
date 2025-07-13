@@ -31,6 +31,7 @@ function gen_words({
     errors: string[];
     warnings: string[];
     infos: string[];
+    diagnostics: string[];
 } {
 
     const build_start = Date.now();
@@ -82,7 +83,8 @@ function gen_words({
         logger.error(typeof e === "string" ? e : e instanceof Error ? e.message : String(e));
     }
 
-    return { text:text, errors:logger.errors, warnings:logger.warnings, infos:logger.infos };
+    return { text:text, errors:logger.errors, warnings:logger.warnings,
+        infos:logger.infos, diagnostics:logger.diagnostics };
 }
 
 export default gen_words;

@@ -104,19 +104,27 @@ window.addEventListener("load", () => {
 
         let output_message_html = '';
 
-        if (e.data.warning_message.length != 0) {
-            for (const message of e.data.warning_message) {
+        if (e.data.warning_messages.length != 0) {
+            for (const message of e.data.warning_messages) {
                 output_message_html += `<p class='warning-message'>${message}</p>`;
+                console.warn(message);
             }
         }
-        if (e.data.error_message.length != 0) {
-            for (const message of e.data.error_message) {
+        if (e.data.error_messages.length != 0) {
+            for (const message of e.data.error_messages) {
                 output_message_html += `<p class='error-message'>${message}</p>`;
+                console.error(message);
             }
         }
-        if (e.data.info_message.length != 0) {
-            for (const message of e.data.info_message) {
+        if (e.data.info_messages.length != 0) {
+            for (const message of e.data.info_messages) {
                 output_message_html += `<p class='info-message'>${message}</p>`;
+                console.info(message);
+            }
+        }
+        if (e.data.diagnostic_messages.length != 0) {
+            for (const message of e.data.diagnostic_messages) {
+                console.debug(message);
             }
         }
         outputMessage.innerHTML = output_message_html;

@@ -1,11 +1,12 @@
 # Vocabug
 
 [![version][1]][2] [![license][3]][4] [![issue count][5]][6]
-[![git activity][7]][8]
+[![git activity][7]][8] [![Tests]][9]
+
 
 ![Vocabug logo](./img/vocabug_logo.svg?raw=true "Vocabug")
 
-This is a word generator designed to be a successor to the Williams' [Lexifer][9] and to [Awkwords][10]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug-pro, is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
+This is a word generator designed to be a successor to the Williams' [Lexifer][10] and to [Awkwords][11]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug-pro, is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
 
 Vocabug randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.
 
@@ -24,17 +25,18 @@ const def = vocabug.gen_words({
 });
 
 console.log(def.warnings)
+console.log(def.warnings)
 console.log(def.errors);
 console.log(def.text);
 ```
 
 ## Vocabug-pro online
 
-Vocabug lives at [neonnaut.neocities.org/vocabug-pro][11]
+Vocabug lives online at [neonnaut.neocities.org/vocabug-pro][12]
 
 ## Documentation
 
-Documentation lives at [neonnaut.neocities.org/vocabug-pro_docs][12]
+Documentation lives online at [neonnaut.neocities.org/vocabug-pro_docs][13]
 
 [1]: https://img.shields.io/npm/v/vocabug
 [2]: https://www.npmjs.com/package/vocabug "npm package"
@@ -45,7 +47,9 @@ Documentation lives at [neonnaut.neocities.org/vocabug-pro_docs][12]
 [7]: https://img.shields.io/github/commit-activity/m/Neonnaut/vocabug-ts
 [8]: https://github.com/Neonnaut/vocabug-ts/commits "commit log"
 
-[9]: https://github.com/bbrk24/lexifer-ts
-[10]: https://github.com/nai888/awkwords
-[11]: https://neonnaut.neocities.org/vocabug-pro "deployment"
-[12]: https://neonnaut.neocities.org/vocabug-pro_docs "docs"
+[9]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml/badge.svg
+
+[10]: https://github.com/bbrk24/lexifer-ts
+[11]: https://github.com/nai888/awkwords
+[12]: https://neonnaut.neocities.org/vocabug-pro "deployment"
+[13]: https://neonnaut.neocities.org/vocabug-pro_docs "docs"

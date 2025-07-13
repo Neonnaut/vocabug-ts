@@ -819,7 +819,7 @@ class Resolver {
             `\nInvisible: ` + this.invisible.join(', ');
         info = this.escape_mapper.restorePreserveEscapedChars(info);
 
-        this.logger.silent_info(info);
+        this.logger.diagnostic(info);
     }
 }
 

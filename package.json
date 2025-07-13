@@ -24,7 +24,7 @@
     "build": "tsc && vite build",
     "build:win": "tsc.cmd && vite.cmd",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^24.0.12",
