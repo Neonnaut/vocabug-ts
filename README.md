@@ -1,8 +1,7 @@
 # Vocabug
 
 [![version][1]][2] [![license][3]][4] [![issue count][5]][6]
-[![git activity][7]][8] [![Tests]][9]
-
+[![git activity][7]][8] [![Tests]][badge-link]
 
 ![Vocabug logo](./img/vocabug_logo.svg?raw=true "Vocabug")
 
@@ -47,7 +46,8 @@ Documentation lives online at [neonnaut.neocities.org/vocabug-pro_docs][13]
 [7]: https://img.shields.io/github/commit-activity/m/Neonnaut/vocabug-ts
 [8]: https://github.com/Neonnaut/vocabug-ts/commits "commit log"
 
-[9]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml/badge.svg
+[badge-link]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml
+[Tests]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml/badge.svg
 
 [10]: https://github.com/bbrk24/lexifer-ts
 [11]: https://github.com/nai888/awkwords
