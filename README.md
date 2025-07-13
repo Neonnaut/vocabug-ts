@@ -23,10 +23,11 @@ const def = vocabug.gen_words({
     file: vocabug.examples['tonal']
 });
 
-console.log(def.warnings)
-console.log(def.warnings)
-console.log(def.errors);
+console.log(def.warnings.join(", "));
+console.log(def.errors.join(", "));
+console.log(def.diagnostics.join(", "));
 console.log(def.text);
+console.log(def.infos.join(", "));
 ```
 
 ## Vocabug-pro online
