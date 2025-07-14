@@ -19,7 +19,7 @@ words: (V)$S, $S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
 ; Graphemes prevent transforms targeting only part of a grapheme.
 graphemes: ee, oo, aa, ii, uu, ch
 
-Vocabug uses 'transforms' to change words, or ouright reject them.
+; Vocabug uses 'transforms' to change words, or ouright reject them.
 BEGIN transform:
 nn, nm, np, sh, ss → ny, m, mp, s, s
 #aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u

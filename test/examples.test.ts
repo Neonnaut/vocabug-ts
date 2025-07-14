@@ -12,11 +12,13 @@ describe('vocabug', () => {
         file: example,
         num_of_words: "6",
       });
+      console.log(def);
       expect(typeof def.text).toBe('string');
       expect(def.text.length).toBeGreaterThan(0);
       expect(def.errors.length).toBeLessThan(1);
       expect(def.warnings.length).toBeLessThan(1);
       expect(def.infos.length).toBeGreaterThan(0);
+      expect(def.diagnostics.length).toBeGreaterThan(0);
       console.log(def.text);
     }
   });
