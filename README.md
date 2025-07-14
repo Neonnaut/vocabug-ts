@@ -5,7 +5,7 @@
 
 ![Vocabug logo](./img/vocabug_logo.svg?raw=true "Vocabug")
 
-This is a word generator designed to be a successor to the Williams' [Lexifer][10] and to [Awkwords][11]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug-pro, is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
+This is a word generator designed to be a successor to the Williams' [Lexifer][10] and to [Awkwords][11]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
 
 Vocabug randomly generates vocabulary from a given definition of graphemes, frequencies and word patterns. You can use it to make words for a constructed language, to get an original nickname or password, or just for fun.
 
@@ -30,13 +30,13 @@ console.log(def.text);
 console.log(def.infos.join(", "));
 ```
 
-## Vocabug-pro online
+## Vocabug online
 
-Vocabug lives online at [neonnaut.neocities.org/vocabug-pro][12]
+Vocabug lives online at [neonnaut.neocities.org/vocabug][12]
 
 ## Documentation
 
-Documentation lives online at [neonnaut.neocities.org/vocabug-pro_docs][13]
+Documentation lives online at [neonnaut.neocities.org/vocabug_docs][13]
 
 [1]: https://img.shields.io/npm/v/vocabug
 [2]: https://www.npmjs.com/package/vocabug "npm package"
@@ -52,5 +52,5 @@ Documentation lives online at [neonnaut.neocities.org/vocabug-pro_docs][13]
 
 [10]: https://github.com/bbrk24/lexifer-ts
 [11]: https://github.com/nai888/awkwords
-[12]: https://neonnaut.neocities.org/vocabug-pro "deployment"
-[13]: https://neonnaut.neocities.org/vocabug-pro_docs "docs"
+[12]: https://neonnaut.neocities.org/vocabug "deployment"
+[13]: https://neonnaut.neocities.org/vocabug_docs "docs"
