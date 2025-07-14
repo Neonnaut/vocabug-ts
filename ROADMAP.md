@@ -2,17 +2,13 @@ Thoughts....
 
 - HTML entities, good, keep them in `{}`
 
-- Promises `words: C?UV`
+- Promises `words: Cj->{u,o,a}UV`
 
-- I should finish all wordgen things, then move on to Nasc, then go back here to improve transforms
-
-- Null symbol as alternative to caret?
+- word classes
 
 - Do I keep graphemes escaped going past into the transforms?
 If so, this would mean [ > @, would not work on a word \[ada
 
-- In tests do find loops
-
-- Troubleshooting
+- Troubleshooting in the docs
 
 TRANSFORMS

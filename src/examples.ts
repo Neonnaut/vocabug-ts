@@ -1,12 +1,25 @@
 const examples: { [key: string]: string } = {
   basic: 
-`C = [t*9, tr] n [k*13, kr] m r s [p*12, pr] ch h w y
+`; These are 'categories', categories are groups of graphemes.
+C = [t*9, tr] n [k*13, kr] m r s [p*12, pr] ch h w y
 L = ee oo aa ii uu
 V = a i e o u L
 F = n r s
+; By default, graphemes furthest to the right are picked more 
+; often than graphemes to the left.
+
+; Segments provide abbreviation of parts of a word-shape.
+; Here we are using '$S' to define the main syllable.
 $S = CV(F)
+; Items enclosed in '(' and ')' only appear 10% of the time by default.
+
+; The first word-shape is picked the most often, the last, the least often.
 words: (V)$S, $S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
+
+; Graphemes prevent transforms targeting only part of a grapheme.
 graphemes: ee, oo, aa, ii, uu, ch
+
+Vocabug uses 'transforms' to change words, or ouright reject them.
 BEGIN transform:
 nn, nm, np, sh, ss → ny, m, mp, s, s
 #aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
@@ -14,17 +27,19 @@ yi -> ^REJECT
 END`,
 
   tonal:
-`; # Tonal Yoruba-like
+`; # A somewhat Yoruba-like tonal language
 I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
 C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
 V = a i e o u
 W = a i ẹ ọ u
-T = ^*1.1 \` '
+T = ^*3.7 \`*3 '*3.3 ; Gives mid-tone, low-tone, high-tone
 
+; + ATR harmony 
 $A = ITV
 $B = CTV
 $C = CTV(n)
 
+; - ATR harmony
 $X = ITW
 $Y = CTW
 $Z = CTW(n)
@@ -37,6 +52,7 @@ END
 
 graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
 
+; Mark vowels with a tone mark
 BEGIN transform:
 % a e ẹ i o ọ u
 ' á é ẹ́ í ó ọ́ ú
@@ -46,24 +62,19 @@ ci -> çi
 END`,
 
   romance:
-`; # Spanish-like
-
-; # Spanish-like
+`; This should produce... simplified Spanish-looking words
 
 ; Initial-cluster: pl pr tr cl cr bl br dr gl gr
 ; All-consonant: t s k q d n b m p l r g h č f z
-
 ; Vowels: a e i o u
-; Diphthongs: aj aw ej ew oj ja je jo ju wa we wi
+; Diphthongs: aj aw ej ew oj ja je jo ju wa we wi wo
 ; Hiato: ea eo oa
-; Triphthong = jaj jej joj jaw jew jow waj wej waw
-
 ; Word-internal coda: n r l s m
-; Word-final coda: n r l s d z
+; Word-final coda: n r l s
+; If stressing the penultimate syllable, don't show stress.
+; Stress can also appear on the last or third-from-last syllable
 
-; rare: ywi, yoi, yaw, od#, yja, yje, yjo, yju
-
-optionals-weight: 30 %
+optionals-weight: 15 %
 
 C = [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
 V = a i o u e
@@ -71,9 +82,9 @@ F = n r l s m
 X = n r l s
 T = '
 $S = CV(F)
-$X = CV({T*1},{^*3}F) ; 2nd last 85% 
-$Y = CV({^*80},{^*95}F) ; 2nd last 85% 
-$Z = CV({T*3},{T*9}X) ; last: 9%
+$X = CV({T*1},{T*3}F) ; 3rd last
+$Y = CV({^*80},{^*95}F) ; 2nd last
+$Z = CV({T*3},{T*9}X) ; last
 
 BEGIN words:
   $Y$Z $X$Y$Z $S$X$Y$Z
@@ -126,8 +137,8 @@ F = N, Q
 $A = IV(F) ; First syllable of slightly different consonant distribution.
 $S = CV(F) ; Gives type C(y)V(R)(N,Q).
 
-; # Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
-; # The final two syllables are least likely to be light + heavy.
+; Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
+; The final two syllables are least likely to be light + heavy...
 
 words: $A$S$S $A$S$S$S $A $A$S$S$S$S $A$S
 
@@ -174,34 +185,15 @@ END`,
 ; Australian looking. The glottal stop and lack of retroflex stops make it
 ; not an 'average' Australian language word list, but not unusual.
 
-; I use <ṫ ṅ> for [t̪ n̪], <R> for length and <@> for coda-matching.
-; <ṫ  c ʔ ṅ  ɲ  ŋ  r  ɻ ʎ  j> romanise as...
+; I use <R> for length and <@> for coda-matching.
+; <t̪  c ʔ n̪  ɲ  ŋ  r  ɻ ʎ  j> romanise as...
 ; <th j ꞌ nh ny ng rr r ly y> at the end.
 
 ; CONSONANTS:
-; p ṫ t   c k ʔ
-; m ṅ n   ɲ ŋ
+; p t̪ t   c k ʔ
+; m n̪ n   ɲ ŋ
 ;     r ɻ j w
 ;     l   ʎ
-
-; The following consonant clusters are permissible:
-
-; <k / t> + <p>
-; <ṫ / ṅ> + <ʔ>
-
-; [nasal] + [homorganic stop]
-
-; <ɻ> + [peripheral stop] / <ʈ>
-; <ɻ> + [non-palatal nasal] / <ɳ>
-; <ɻ> + [non-palatal nasal] / <ɳ> + [homorganic stop]
-
-; <l> + [non-apical stop]
-; <l> + [peripheral nasal]
-; <l> + [nonapical nasal] + [homorganic stop]
-
-; <r> + [peripheral stop]
-; <r> + [peripheral non-palatal nasal]
-; <r> + [peripheral nasal] + [homorganic stop]
 
 ; Initials:
 I = k, p, m, w, ^, c, ŋ, j, t, ɲ, n, ʎ, t̪
@@ -213,13 +205,13 @@ X = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp
 Y = lŋ rŋ ɻŋ nt ɻʈ n̪t̪ lt̪ ln̪ n̪ʔ t̪ʔ
 Z = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc ln̪t̪ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
 F = n l r ɻ 
-; VOWELS: <a aa i ii u uu ee oo>; and diphthong <ai>
+; VOWELS: <a aa i ii u uu ee oo> and diphthong <ai>
 V = a, i, u, [oR, eR, aR, iR, uR, ai]
 W = a, i, u
 
 ; Syllable shapes: (C)V(F), CVFNCV. (C is optional ONLY word initially).
-; <l r ɻ ṅ> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
-; Disylabic words DON'T begin with a vowel. NO monosyllabic words
+; <l r ɻ n̪> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
+; Disylabic words DON'T begin with a vowel. NO monosyllabic words.
 $I = IV
 $S = [C*12,@X*2,@Y,@Z]V
 $J = JV
@@ -230,14 +222,14 @@ words: $I$S$Z $I$S$S$Z $I$S$S$S$Z $J$Z $I$S$S$S$S$Z
 graphemes: a aR e eR i iR o oR u uR p t̪ t c k ʔ m n̪ n ɲ ŋ r ɻ j w l ʎ
 
 BEGIN transform:
-; Restrict the occurance of <ai>
+; Restrict the occurance of <ai>.
 %  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  @
 ai aʔ ac aŋ aɲ aj aw aʎ aɻ a@
 
-; Long vowels become short before a consonant cluster or <ʔ>
+; Long vowels become short before a consonant cluster or <ʔ>.
 R@ Rʔ @ -> ^ ʔ ^
 
-; <ji>, <ʎi> and <wu> become <je>, <ʎe> and <wo>
+; <ji>, <ʎi> and <wu> are rejected.
 ji ʎi wu jiR ʎiR wuR -> ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT
 
 ; Romaniser:

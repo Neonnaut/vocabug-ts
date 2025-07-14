@@ -64,6 +64,7 @@ class Word_Builder {
 
         // Stage five, remove caret from word
         let stage_five = stage_four.replace(/\^/g, ""); 
+        stage_five = stage_five.replace(/∅/g, ""); 
 
         if (this.escape_mapper.counter != 0) {
             stage_one = this.escape_mapper.restoreEscapedChars(stage_one);
@@ -122,7 +123,7 @@ class Word_Builder {
             // console.log(`🔧 Resolving nested set: [${items.join(", ")}]`);
 
             if (items.length === 0) {
-            items = ["^"];
+                items = ["^"];
             // console.log(`⚠️ Empty set, defaulting to '^'`);
             } else {
             const usesExplicitWeights = items.some(c => c.includes("*"));

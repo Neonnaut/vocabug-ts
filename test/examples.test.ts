@@ -1,4 +1,4 @@
-import gen_words from '../src/modules/core';
+import generate from '../src/modules/core';
 import { examples } from '../src/examples';
 
 import { describe, it, expect } from 'vitest';
@@ -8,7 +8,7 @@ describe('vocabug', () => {
 
     for (const [name, example] of Object.entries(examples)) {
 
-      const def = gen_words({
+      const def = generate({
         file: example,
         num_of_words: "6",
       });

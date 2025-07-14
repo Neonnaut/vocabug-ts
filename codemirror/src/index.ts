@@ -86,19 +86,21 @@ export const xcodeLightStyle: CreateThemeOptions['styles'] = [
   { tag: t.variableName, color: "#000000" },
 
   // Directive / BLUE / words: categories: with: letters: random-rate:
-  { tag: [t.meta, t.name], color: "#ad5005" },
+  { tag: [t.meta, t.name], color: "#a11c08ff" },
 
   // RegExp / BROWN / . + * ? ^ $ | \ ( ) [ ] { }
   // Operator / BROWN / = > : 
-  { tag: t.regexp, color: "#7a0099" },
+  { tag: t.regexp, color: "#990085ff" },
 
   { tag: t.operator, color: "#024bba", fontWeight: "bold"},
 
+  { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, // commas and stuff
+
   // Classes / RED /
-  { tag: t.className, color: "#726969" },
+  { tag: t.className, color: "#7f5700ff" },
 
   // Weights
-  { tag: t.strong, color: "#ad5005" }
+  { tag: t.strong, color: "#a11c08ff", fontWeight: "italic" }
 ];
 
 export function xcodeLightInit(options?: Partial<CreateThemeOptions>) {
@@ -132,7 +134,7 @@ export const xcodeDarkStyle: CreateThemeOptions['styles'] = [
   // Escape char / Greenblue
   { tag: t.escape, color: "#f0f0f0", backgroundColor:"#584747" }, 
 
-  { tag: t.variableName, color: "#eeeeee" },
+  { tag: t.variableName, color: "#eeeeeeff" },
 
   // Directive / BLUE / words: categories: with: letters: random-rate: name:
   { tag: [t.meta, t.name], color: "#ff7a7a" },
@@ -141,13 +143,15 @@ export const xcodeDarkStyle: CreateThemeOptions['styles'] = [
   // Operator / Brown / = > : 
   { tag: t.regexp, color: "#e687e4" },
   
-  { tag: t.operator, color: "#a6d3f7" , fontWeight: "bold" },
+  { tag: t.operator, color: "#44ebd0ff" , fontWeight: "bold" },
+
+  { tag: t.link, color: "#a6d3f7" , fontWeight: "bold" }, // commas and stuff
 
   // Classes / RED /
   { tag: t.className, color: "#ffcd90" },
 
   // Weights
-  { tag: t.strong, color: "#ff7a7a" }
+  { tag: t.strong, color: "#ff7a7a", fontStyle: "italic" }
 ];
 
 export const xcodeDarkInit = (options?: Partial<CreateThemeOptions>) => {

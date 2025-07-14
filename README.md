@@ -19,7 +19,7 @@ Install with `npm install vocabug`, and use it like:
 
 ```ts
 import vocabug from 'vocabug';
-const def = vocabug.gen_words({
+const def = vocabug.generate({
     file: vocabug.examples['tonal']
 });
 

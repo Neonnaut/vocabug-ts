@@ -17,7 +17,7 @@ type GenWordsOptions = {
   word_divider?: string;
 };
 
-function gen_words({
+function generate({
     file,
     num_of_words,
     mode = 'word-list',
@@ -87,4 +87,4 @@ function gen_words({
         infos:logger.infos, diagnostics:logger.diagnostics };
 }
 
-export default gen_words;
+export default generate;

@@ -1,7 +1,7 @@
-import gen_words from '../src/modules/core';
+import generate from '../src/modules/core';
 
 onmessage = function (event) {
-    const vocabug = gen_words({
+    const vocabug = generate({
         file: event.data.file,
         num_of_words: event.data.num_of_words,
 

@@ -25,11 +25,14 @@ const vocabugTransformRules = [
     { token: "escape",
       regex: /\\./
     },
+    { token: "link",
+      regex: />|->|→/
+    },
     { token: "operator", // > and ;
-      regex: />|->|→|\^REJECT/
+      regex: /\^REJECT|\^R|\^|∅/
     },
     { token: "regexp",  
-      regex: /\^|\#|,/
+      regex: /\#|,/
     }
 ];
 
@@ -37,11 +40,14 @@ const vocabugClusterRules = [
     { token: "escape",
       regex: /\\./
     },
+    { token: "link",
+      regex: /,/
+    },
     { token: "operator", // > and ;
-      regex: /\+|\-/
+      regex: /\+|\-|\^REJECT|\^R|\^|∅/
     },
     { token: "regexp",  
-      regex: /\^|\#|,/
+      regex: /\#/
     }
 ];
 
@@ -52,7 +58,7 @@ const vocabugDistroRules = [
 ];
 
 const vocabugListRules = [
-    { token: "regexp",  
+    { token: "link",  
       regex: /,/
     }
 ];
@@ -62,10 +68,13 @@ const vocabugWordRules = [
       regex: /\\./
     },
     { token: "regexp",  
-        regex: /\(|\)|\[|\]|\{|\}|\^/
+        regex: /\(|\)|\[|\]|\{|\}/
+    },
+    { token: "link",
+      regex: /,|=/
     },
     { token: "operator",
-      regex: /=|,/
+      regex: /\^|∅/
     },
     { token: "strong", // Weights
       regex: /((\*|\?)\d+(\.\d+)?)/
@@ -77,10 +86,13 @@ const vocabugCategoryRules = [
       regex: /\\./
     },
     { token: "regexp",  
-        regex: /\[|\]|\^/
+        regex: /\[|\]/
+    },
+    { token: "link",
+      regex: /,|=/
     },
     { token: "operator",
-      regex: /,|=/
+      regex: /\^|∅/
     },
     { token: "strong", // Weights
       regex: /((\*|\?)\d+(\.\d+)?)/
@@ -132,7 +144,7 @@ const vocabugLang = StreamLanguage.define({
         if (state.doIndent) {
             stream.match(/:/);
             state.doIndent = false;
-            return "operator";
+            return "link";
         }
 
         if (state.mode == 'none') {

@@ -69,10 +69,10 @@ applyTransform(
 
     for (let i = 0; i < target.length; i++) {
         let rawSearch = target[i];
-        const isDelete = result[i] === "^";
+        const isDelete = result[i] === "^" || result[i] === "∅";
         let replacement = isDelete ? "" : result[i];
 
-        if (replacement === "^REJECT") {
+        if (replacement === "^REJECT" || replacement === "^R") {
             for (let j = 0; j < tokens.length; j++) {
                 const subTokens = tokens.slice(j);
                 const span = spanToLength(subTokens, rawSearch.length);
@@ -174,28 +174,30 @@ applyTransform(
 
     const appliedSet = this.normalizeReplacements(tokens, replacements);
 
-  const matchedTargets: string[] = [];
-  const matchedResults: string[] = [];
+    const matchedTargets: string[] = [];
+    const matchedResults: string[] = [];
 
-for (let i = 0; i < transform.target.length; i++) {
-  const target = transform.target[i].replace(/\\/g, "");
-  const result = transform.result[i] === "^" ? "" : transform.result[i].replace(/\\/g, "");
-  const recorded = transform.result[i];
+    for (let i = 0; i < transform.target.length; i++) {
+        const target = transform.target[i].replace(/\\/g, "");
+        const result =
+        transform.result[i] === "^" || transform.result[i] === "∅"
+            ? ""
+            : transform.result[i].replace(/\\/g, "");
+        const recorded = transform.result[i];
 
-  if (appliedSet.has(`${target}→${result}`)) {
-    matchedTargets.push(transform.target[i]);
-    matchedResults.push(recorded);
-  }
-}
+        if (appliedSet.has(`${target}→${result}`)) {
+            matchedTargets.push(transform.target[i]);
+            matchedResults.push(recorded);
+        }
+    }
 
 
-  if (matchedTargets.length > 0) {
-    word.record_transformation(
-      `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}`, transform.line_num,
-      normalized.join(" ")
-    );
-  }
-
+    if (matchedTargets.length > 0) {
+        word.record_transformation(
+        `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}`, transform.line_num,
+        normalized.join(" ")
+        );
+    }
 
     return normalized;
 }
