@@ -1,4 +1,6 @@
-import vocabug from '../dist/vocabug.es.js';
+//import vocabug from '../dist/vocabug.es.js';
+
+import vocabug from '../src/index'
 
 
 import { describe, it, expect } from 'vitest';
