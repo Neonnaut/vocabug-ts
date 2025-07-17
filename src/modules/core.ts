@@ -8,7 +8,7 @@ import SupraBuilder from './supra_builder';
 
 type GenWordsOptions = {
   file: string;
-  num_of_words: any;
+  num_of_words?: any;
   mode?: string;
   remove_duplicates?: boolean;
   force_word_limit?: boolean;
@@ -19,7 +19,7 @@ type GenWordsOptions = {
 
 function generate({
     file,
-    num_of_words,
+    num_of_words = 100,
     mode = 'word-list',
     remove_duplicates = true,
     force_word_limit = false,

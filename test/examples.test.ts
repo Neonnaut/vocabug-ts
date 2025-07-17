@@ -8,18 +8,17 @@ describe('vocabug', () => {
 
     for (const [name, example] of Object.entries(examples)) {
 
-      const def = generate({
+      const run = generate({
         file: example,
         num_of_words: "6",
       });
-      console.log(def);
-      expect(typeof def.text).toBe('string');
-      expect(def.text.length).toBeGreaterThan(0);
-      expect(def.errors.length).toBeLessThan(1);
-      expect(def.warnings.length).toBeLessThan(1);
-      expect(def.infos.length).toBeGreaterThan(0);
-      expect(def.diagnostics.length).toBeGreaterThan(0);
-      console.log(def.text);
+      expect(typeof run.text).toBe('string');
+      expect(run.text.length).toBeGreaterThan(0);
+      expect(run.errors.length).toBeLessThan(1);
+      expect(run.warnings.length).toBeLessThan(1);
+      expect(run.infos.length).toBeGreaterThan(0);
+      expect(run.diagnostics.length).toBeGreaterThan(0);
+      console.log(`Example: ${name}; words: ${run.text}`);
     }
   });
 });

@@ -16,7 +16,7 @@ $S = CV(F)
 ; The first word-shape is picked the most often, the last, the least often.
 words: (V)$S, $S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
 
-; Graphemes prevent transforms targeting only part of a grapheme.
+; Graphemes directive prevents transforms targeting only part of a grapheme.
 graphemes: ee, oo, aa, ii, uu, ch
 
 ; Vocabug uses 'transforms' to change words, or ouright reject them.
@@ -25,7 +25,6 @@ nn, nm, np, sh, ss → ny, m, mp, s, s
 #aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
 yi -> ^REJECT
 END`,
-
   tonal:
 `; # A somewhat Yoruba-like tonal language
 I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
@@ -60,7 +59,6 @@ BEGIN transform:
 
 ci -> çi
 END`,
-
   romance:
 `; This should produce... simplified Spanish-looking words
 
@@ -121,7 +119,6 @@ s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z
 k q č h ň ʎ j w > c qu ch j ñ ll i u
 
 END`,
-
   japanese: 
 `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
 ; and link.springer.com/content/pdf/10.3758/BF03195600.pdf
@@ -179,7 +176,6 @@ aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 ; Collapse aa ee ii oo uu words into short vowels.
 #aa# #ee# #ii# #oo# #uu# -> a e i o u
 END`,
-
   australian: 
 `; This does not represent a single Australian language, it does something
 ; Australian looking. The glottal stop and lack of retroflex stops make it
@@ -212,7 +208,7 @@ W = a, i, u
 ; Syllable shapes: (C)V(F), CVFNCV. (C is optional ONLY word initially).
 ; <l r ɻ n̪> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
 ; Disylabic words DON'T begin with a vowel. NO monosyllabic words.
-$I = IV
+$I = IW
 $S = [C*12,@X*2,@Y,@Z]V
 $J = JV
 $Z = CW(F)

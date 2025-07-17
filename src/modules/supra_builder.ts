@@ -9,7 +9,7 @@ export class SupraBuilder {
         this.idCounter = 1;
     }
 
-    public processString(input: string): string {
+    processString(input: string): string {
         const tokenRegex = /\{([^}]*)\}/g;
         const validContentRegex = /^(\^|∅|[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?:\*(\d+(?:\.\d+)?))?$/;
 
@@ -30,7 +30,7 @@ export class SupraBuilder {
         });
     }
 
-    public extractLettersAndWeights(input: string): [string[], number[]] {
+    extractLettersAndWeights(input: string): [string[], number[]] {
         const idRegex = /\{(\d+)\}/g;
         const ids: string[] = [];
         const weights: number[] = [];
@@ -50,7 +50,7 @@ export class SupraBuilder {
         return [ ids, weights ];
     }
 
-    public replaceLetterAndClean(input: string, targetID: number): string {
+    replaceLetterAndClean(input: string, targetID: number): string {
         const idRegex = /\{(\d+)\}/g;
 
         return input.replace(idRegex, (_match, idStr) => {
@@ -66,11 +66,11 @@ export class SupraBuilder {
         });
     }
 
-    public getWeights(): Record<number, number> {
+    getWeights(): Record<number, number> {
         return this.weights;
     }
 
-    public getLetters(): Record<number, string> {
+    getLetters(): Record<number, string> {
         return this.letters;
     }
 }

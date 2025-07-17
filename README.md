@@ -1,7 +1,7 @@
 # Vocabug
 
-[![version][1]][2] [![license][3]][4] [![issue count][5]][6]
-[![git activity][7]][8] [![Tests]][badge-link]
+[![version][1]][2] [![license][3]][4] [![Tests]][badge-link]
+[![issue count][5]][6] [![git activity][7]][8]
 
 ![Vocabug logo](./img/vocabug_logo.svg?raw=true "Vocabug")
 
