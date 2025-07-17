@@ -1,16 +1,18 @@
-import generate from '../src/modules/core';
-import { examples } from '../src/examples';
+import vocabug from '../dist/vocabug.es.js';
+
 
 import { describe, it, expect } from 'vitest';
+
+console.log(vocabug)
 
 describe('vocabug', () => {
   it('returns generated words', () => {
 
-    for (const [name, example] of Object.entries(examples)) {
+    for (const [name, example] of Object.entries(vocabug.examples)) {
 
-      const run = generate({
+      const run = vocabug.generate({
         file: example,
-        num_of_words: "6",
+        num_of_words: 6
       });
       expect(typeof run.text).toBe('string');
       expect(run.text.length).toBeGreaterThan(0);

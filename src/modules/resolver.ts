@@ -41,7 +41,7 @@ class Resolver {
         escape_mapper: Escape_Mapper,
         supra_builder: SupraBuilder,
 
-        num_of_words_string: string,
+        num_of_words_string: number | string,
         mode: string,
         sort_words: boolean,
         capitalise_words: boolean,

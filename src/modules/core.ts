@@ -6,9 +6,9 @@ import Logger from './logger';
 import Escape_Mapper from './escape_mapper'; 
 import SupraBuilder from './supra_builder';
 
-type GenWordsOptions = {
+type generate_options = {
   file: string;
-  num_of_words?: any;
+  num_of_words?: number | string;
   mode?: string;
   remove_duplicates?: boolean;
   force_word_limit?: boolean;
@@ -26,7 +26,7 @@ function generate({
     sort_words = true,
     capitalise_words = false,
     word_divider = ' '
-}: GenWordsOptions): {
+}: generate_options): {
     text: string;
     errors: string[];
     warnings: string[];
