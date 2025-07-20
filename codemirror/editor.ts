@@ -22,82 +22,58 @@ const lineWrapConfig = new Compartment();
  ***********************/
 
 const vocabugTransformRules = [
-    { token: "escape",
-      regex: /\\./
-    },
-    { token: "link",
-      regex: />|->|→/
-    },
-    { token: "operator", // > and ;
-      regex: /\^REJECT|\^R|\^|∅/
-    },
-    { token: "regexp",  
-      regex: /\#|,/
-    }
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: />|->|→/ },
+  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "regexp",   regex: /#|,/ }
 ];
 
 const vocabugClusterRules = [
-    { token: "escape",
-      regex: /\\./
-    },
-    { token: "link",
-      regex: /,/
-    },
-    { token: "operator", // > and ;
-      regex: /\+|\-|\^REJECT|\^R|\^|∅/
-    },
-    { token: "regexp",  
-      regex: /\#/
-    }
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: /,/ },
+  { token: "operator", regex: /\+|\-|\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "regexp",   regex: /#/ }
 ];
 
 const vocabugDistroRules = [
-    { token: "meta",
-      regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/
-    }
+  { token: "meta",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
 ];
 
 const vocabugListRules = [
-    { token: "link",  
-      regex: /,/
-    }
+  { token: "link",     regex: /,/ }
 ];
 
 const vocabugWordRules = [
-    { token: "escape",
-      regex: /\\./
-    },
-    { token: "regexp",  
-        regex: /\(|\)|\[|\]|\{|\}/
-    },
-    { token: "link",
-      regex: /,|=/
-    },
-    { token: "operator",
-      regex: /\^|∅/
-    },
-    { token: "strong", // Weights
-      regex: /((\*|\?)\d+(\.\d+)?)/
-    }
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: /,|=/ },
+  { token: "operator", regex: /\^|∅/ },
+  { token: "regexp",   regex: /[()\[\]{}]/ },
+  { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
 ];
 
 const vocabugCategoryRules = [
-    { token: "escape",
-      regex: /\\./
-    },
-    { token: "regexp",  
-        regex: /\[|\]/
-    },
-    { token: "link",
-      regex: /,|=/
-    },
-    { token: "operator",
-      regex: /\^|∅/
-    },
-    { token: "strong", // Weights
-      regex: /((\*|\?)\d+(\.\d+)?)/
-    }
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: /,|=/ },
+  { token: "operator", regex: /\^|∅/ },
+  { token: "regexp",   regex: /\[|\]/ },
+  { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
 ];
+
+const cappa = "[A-Z" +
+    // Latin acute
+    "\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179" +
+  
+    // Diaeresis
+    "\u00C4\u00CB\u1E26\u00CF\u00D6\u00DC\u1E84\u1E8C\u0178" +
+
+    // Caron
+    "\u01CD\u010C\u010E\u011A\u01E6\u021E\u01CF\u01E8\u013D\u0147\u01D1\u0158\u0160\u0164\u01D3\u017D" +
+
+    // Grave
+    "\u00C0\u00C8\u00CC\u01F8\u00D2\u00D9\u1E80\u1EF2" +
+
+    // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
+    "\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]";
 
 const vocabugLang = StreamLanguage.define({
     name: "Vocabug",
@@ -186,9 +162,8 @@ const vocabugLang = StreamLanguage.define({
                     return "meta";
                 }
 
-                // Macro
-                // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
-                let match = stream.match(/(\$[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?=\s*=)/u);
+                const macroRegex = new RegExp(`(\\$${cappa})(?=\\s*=)`, "u");
+                let match = stream.match(macroRegex);
                 if (match) {
                     state.classMacList.push(match[1]);
                     state.mode = 'segmentLine';
@@ -196,7 +171,8 @@ const vocabugLang = StreamLanguage.define({
                 }
 
                 // Class
-                match = stream.match(/([A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?=\s*=)/u);
+                const ClassRegex = new RegExp(`(${cappa})(?=\\s*=)`, "u");
+                match = stream.match(ClassRegex);
                 if (match) {
                     state.classList.push(match[1]);
                     state.classMacList.push(match[1]);

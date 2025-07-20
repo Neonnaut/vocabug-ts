@@ -12,6 +12,8 @@ Thoughts....
 
 - Should be able to put `#` in categories with syntax highlighting
 
+- 's' weight for sentinel value, super-heavy
+
 - Do I keep graphemes escaped going past into the transforms?
 If so, this would mean [ > @, would not work on a word \[ada
 

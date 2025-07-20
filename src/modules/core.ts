@@ -33,14 +33,16 @@ function generate({
     infos: string[];
     diagnostics: string[];
 } {
-
-    const build_start = Date.now();
     const logger = new Logger();
     let text:string = ''
 
     try {
+        const build_start = Date.now();
+        //let y = "yab"
+        //y = y.join("cab")
+
         const escape_mapper = new Escape_Mapper();
-        const supra_builder = new SupraBuilder();
+        const supra_builder = new SupraBuilder(logger);
 
         const r = new Resolver(
             logger, escape_mapper, supra_builder,
@@ -55,12 +57,12 @@ function generate({
         r.set_wordshapes();
         r.create_record();
 
-        const wordBuilder = new Word_Builder(
+        const wordBuilder = new Word_Builder( logger,
             escape_mapper, r.supra_builder, r.categories, r.wordshapes,
             r.category_distribution, r.optionals_weight, r.debug
         );
 
-        const transformer = new Transformer(
+        const transformer = new Transformer( logger,
             r.graphemes, r.transforms
         );
 
@@ -80,7 +82,9 @@ function generate({
         text = textBuilder.make_text();
         
     } catch (e: unknown) {
-        logger.error(typeof e === "string" ? e : e instanceof Error ? e.message : String(e));
+        if (!(e instanceof logger.ValidationError)) {
+            logger.uncaught_error(e as Error);
+        }
     }
 
     return { text:text, errors:logger.errors, warnings:logger.warnings,

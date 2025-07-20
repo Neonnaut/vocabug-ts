@@ -46,5 +46,8 @@
     "dist",
     "LICENSE",
     "README"
-  ]
+  ],
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.1"
+  }
 }

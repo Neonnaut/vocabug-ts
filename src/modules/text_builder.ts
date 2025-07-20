@@ -98,7 +98,7 @@ class Text_Builder {
         } else if ((this.num_of_duds >= this.upper_gen_limit) && (!this.force_word_limit)) {
             this.terminated = true;
             if (this.remove_duplicates) {
-                this.logger.warn(`Could not generate the requested amount of words. Try adding more unique word-shapes, remove some reject transforms`)
+                this.logger.warn(`Could not generate the requested amount of words. Try adding more unique word-shapes or remove some reject transforms`)
             } else {
                 this.logger.warn(`Could not generate the requested amount of words. Try adding more word-shapes or remove some reject transforms`)
             }

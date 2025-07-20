@@ -14,19 +14,19 @@ $S = CV(F)
 ; Items enclosed in '(' and ')' only appear 10% of the time by default.
 
 ; The first word-shape is picked the most often, the last, the least often.
-words: (V)$S, $S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
+words: (V)$S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
 
-; Graphemes directive prevents transforms targeting only part of a grapheme.
+; 'graphemes' directive prevents transforms targeting only part of a grapheme.
 graphemes: ee, oo, aa, ii, uu, ch
 
-; Vocabug uses 'transforms' to change words, or ouright reject them.
+; Vocabug uses 'transforms' to change words, or outright reject them.
 BEGIN transform:
 nn, nm, np, sh, ss → ny, m, mp, s, s
 #aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
 yi -> ^REJECT
 END`,
   tonal:
-`; # A somewhat Yoruba-like tonal language
+`; A somewhat Yoruba-like tonal language
 I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
 C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
 V = a i e o u

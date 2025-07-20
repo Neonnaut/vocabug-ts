@@ -1,4 +1,16 @@
 
+const cappa = "[A-Z" +
+    // Latin acute
+    "\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179" +
+    // Diaeresis
+    "\u00C4\u00CB\u1E26\u00CF\u00D6\u00DC\u1E84\u1E8C\u0178" +
+    // Caron
+    "\u01CD\u010C\u010E\u011A\u01E6\u021E\u01CF\u01E8\u013D\u0147\u01D1\u0158\u0160\u0164\u01D3\u017D" +
+    // Grave
+    "\u00C0\u00C8\u00CC\u01F8\u00D2\u00D9\u1E80\u1EF2" +
+    // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
+    "\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]";
+
 // This thing fetches the last item of an array
 const get_last = <T = never>(arr: ArrayLike<T> | null | undefined) =>
   arr?.[arr.length - 1];
@@ -13,7 +25,9 @@ const makePercentage = (input: string): number | null => {
 };
 
 function validateCatSegName(str: string): [boolean, boolean] {
-    const regex = /^[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]$|^\$[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]$/u;
+
+    const regex = new RegExp(`^(${cappa}|\\$${cappa})$`, "u");
+
     const hasDollarSign = str.includes("$");
 
     return [regex.test(str), hasDollarSign];
@@ -79,6 +93,31 @@ function weightedRandomPick(items:string[], weights:number[]): string {
     return '';
 }
 
+function supraWeightedRandomPick(items: string[], weights: (number|'s')[]): string {
+    for (let i = 0; i < items.length; i++) {
+        if (weights[i] === "s") {
+            return items[i]; // override: pick first 's'
+        }
+    }
+
+    const totalWeight = weights.reduce<number>((sum, w) =>
+    typeof w === "number" && w > 0 ? sum + w : sum
+    , 0);
+
+    if (totalWeight === 0) return '';
+
+    let randomValue = Math.random() * totalWeight;
+
+    for (let i = 0; i < items.length; i++) {
+        const w = weights[i];
+        if (typeof w !== "number" || w <= 0) continue;
+        if (randomValue < w) return items[i];
+        randomValue -= w;
+    }
+
+    return '';
+}
+
 function guseinzade_distribution(no_of_items: number): number[] {
     const jitter = (val: number, percent: number = 7): number =>
         val * (1 + (percent * (Math.random() - 0.5)) / 100);
@@ -130,5 +169,6 @@ function get_distribution(n: number, default_distribution:string): number[] {
 
 export {
   get_last, capitalise, makePercentage, weightedRandomPick, get_distribution,
-  getCatSeg, GetTransform,
+  supraWeightedRandomPick,
+  getCatSeg, GetTransform, cappa
 };

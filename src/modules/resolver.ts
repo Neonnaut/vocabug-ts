@@ -28,8 +28,9 @@ class Resolver {
     public wordshape_distribution: string;
     private wordshape_string: string;
     public wordshapes: { items:string[], weights:number[]};
+    private wordshape_line_num: number;
     
-    public transforms: { target:string[], result:string[], line_num:string}[];
+    public transforms: { target:string[], result:string[], line_num:number}[];
     public graphemes: string[];
     public alphabet: string[];
     public invisible: string[];
@@ -103,6 +104,7 @@ class Resolver {
         this.invisible = [];
         this.wordshape_string = ""
         this.wordshapes = { items: [], weights: [] };
+        this.wordshape_line_num = 0;
         this.graphemes = [];
         this.transforms = [];
     }
@@ -138,14 +140,14 @@ class Resolver {
                 let [target, result, valid] = GetTransform(line_value);
 
                 if ( !valid ) {
-                    this.logger.warn(`Malformed transform '${line_value}' at line ${this.file_line_num + 1} -- expected 'old → new' or a clusterfield`);
+                    this.logger.warn(`Malformed transform '${line_value}' -- expected 'old → new' or a clusterfield`, this.file_line_num);
                     continue;
                 } else if ( target.length != result.length ){
-                    this.logger.warn(`Malformed transform '${line_value}' at line ${this.file_line_num + 1} -- expected an equal amount of concurrent-set targets to concurrent-set results`);
+                    this.logger.warn(`Malformed transform '${line_value}' -- expected an equal amount of concurrent-set targets to concurrent-set results`, this.file_line_num);
                     continue;
                 }
 
-                this.add_transform(target, result, `:${this.file_line_num + 1}`);
+                this.add_transform( target, result, this.file_line_num );
                 continue;
             }
 
@@ -167,7 +169,7 @@ class Resolver {
 
                 let optionals_weight = makePercentage(line_value);
                 if (optionals_weight == null) {
-                    this.logger.warn(`Invalid optionals-weight '${line_value}' at line ${this.file_line_num + 1} -- expected a number between 1 and 100`);
+                    this.logger.warn(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
                     continue;
                 }
                 this.optionals_weight = optionals_weight;
@@ -179,7 +181,7 @@ class Resolver {
                 let alphabet = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (alphabet.length == 0){
-                    this.logger.warn(`'alphabet' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'alphabet' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.alphabet = alphabet;
 
@@ -190,7 +192,7 @@ class Resolver {
                 let invisible = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (invisible.length == 0){
-                    this.logger.warn(`'invisible' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'invisible' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.invisible = invisible;
 
@@ -201,7 +203,7 @@ class Resolver {
                 let a_g = line_value.split(/[,\s]+/).filter(Boolean);
 
                 if (a_g.length == 0){
-                    this.logger.warn(`'alphabet-and-graphemes' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'alphabet-and-graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.graphemes = a_g;
                 this.alphabet = a_g;
@@ -212,7 +214,7 @@ class Resolver {
 
                 let graphemes = line_value.split(/[,\s]+/).filter(Boolean);
                 if (graphemes.length == 0){
-                    this.logger.warn(`'graphemes' was introduced but there were no graphemes listed at line ${this.file_line_num + 1} -- expected a list of graphemes`);
+                    this.logger.warn(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.graphemes = graphemes;
 
@@ -223,6 +225,7 @@ class Resolver {
                 if (line_value != "") {
                     this.wordshape_string = line_value;
                 }
+                this.wordshape_line_num = this.file_line_num;
 
             } else if (line.startsWith("BEGIN words:")) {
                 this.parse_words_block(file_array);
@@ -234,16 +237,19 @@ class Resolver {
                 let [myName, field, valid, isCapital, hasDollarSign] = getCatSeg(line_value);
 
                 if ( !valid || !isCapital ) {
-                    this.logger.warn(`Junk ignored at line ${this.file_line_num + 1} -- expected a category, segment, directive, ..., etc`);
+                    this.logger.warn(`Junk ignored -- expected a category, segment, directive, ..., etc`, this.file_line_num);
                     continue;
                 }
                 if (hasDollarSign) {
                     // SEGMENTS !!!
-                    if (!this.validateSegment(field)) { throw new Error(`The segment '${myName}' at line ${this.file_line_num + 1} had separator(s) outside sets -- expected separators for segments to appear only in sets`)}
-                    this.add_segment(myName, field);
+                    if (!this.validateSegment(field)) { this.logger.validation_error(`The segment '${myName}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
+                    if (!this.valid_words_brackets(field)) {
+                        this.logger.validation_error(`The segment '${name}' had missmatched brackets`, this.file_line_num);
+                    }
+                    this.segments.set(myName, field);
                 } else {
                     // CATEGORIES !!!
-                    this.add_category(myName, field);
+                    this.category_strings.set(myName, field);
                 }
             }
         }
@@ -284,16 +290,6 @@ class Resolver {
         }
         return "flat";
     }
-    
-    add_category(name:string, field:string) {
-        this.category_strings.set(name, field);
-    }
-    add_segment(name:string, field:string) {
-        if (!this.valid_words_brackets(field)) {
-            throw new Error(`The segment '${name}' had missmatched brackets`);
-        }
-        this.segments.set(name, field);
-    }
 
     set_wordshapes() {
         let result = [];
@@ -301,16 +297,16 @@ class Resolver {
         let insideBrackets = 0;
 
         if (this.wordshape_string.length == 0){
-            throw new Error(`No word-shapes to choose from -- expected 'words: wordshape1 wordshape2 ...'`);
+            this.logger.validation_error(`No word-shapes to choose from -- expected 'words: wordshape1 wordshape2 ...'`, this.wordshape_line_num);
         }
 
         this.wordshape_string = this.supra_builder.processString(this.wordshape_string);
 
         if (!this.valid_words_brackets(this.wordshape_string)) {
-            throw new Error("Word-shapes had missmatched brackets");
+            this.logger.validation_error(`Word-shapes had missmatched brackets`, this.wordshape_line_num);
         }
         if (!this.valid_words_weights(this.wordshape_string)) {
-            throw new Error("Word-shapes had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',' a bracket, or ' '");
+            this.logger.validation_error(`Word-shapes had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',' a bracket, or ' '`, this.wordshape_line_num);
         }
 
         for (let i = 0; i < this.wordshape_string.length; i++) {
@@ -467,17 +463,19 @@ class Resolver {
         return true;
     }
 
-    add_transform(target:string[], result:string[], line_num:string) {
+    add_transform(target:string[], result:string[], line_num:number) {
         this.transforms.push( { target:target, result:result, line_num:line_num} );
     }
 
     expand_categories() {
         for (const [key, value] of this.category_strings) {
             if (!this.valid_category_brackets(value)) {
-                throw new Error(`Category '${key}' had missmatched brackets`);
+                // THIS
+                this.logger.validation_error(`Category '${key}' had missmatched brackets`);
             }
             if (!this.valid_category_weights(value)) {
-                throw new Error(`Category '${key}' had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',', a bracket, or ' '`);
+                // THIS
+                this.logger.validation_error(`Category '${key}' had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',', a bracket, or ' '`);
             }
             this.category_strings.set( key, this.recursiveExpansion(value, this.category_strings, true) );
         }
@@ -655,7 +653,10 @@ class Resolver {
         this.wordshape_string = this.recursiveExpansion(this.wordshape_string, this.segments);
 
         // Remove dud segments
-        this.wordshape_string = this.wordshape_string.replace(/\$[A-Z]/g, '❓');
+        const match = this.wordshape_string.match(/\$[A-Z]/);
+        if (match) {
+            this.logger.validation_error(`Nonexistent segment detected: '${match[0]}'`, this.wordshape_line_num);
+        }
     }
 
     expand_segments() {
@@ -681,6 +682,7 @@ class Resolver {
                 for (const key of mappingKeys) {
                     if (str.startsWith(key, i)) {
                         if (history.includes(key)) {
+                            // THIS
                             this.logger.warn(`A cycle was detected when mapping '${key}'`);
                             result += '🔃';
                         } else {
@@ -744,9 +746,9 @@ class Resolver {
             row.shift();
 
             if (row.length > row_length) {
-                throw new Error(`Clusterfield row '${line}' too long at line ${this.file_line_num + 1}`);
+                this.logger.validation_error(`Clusterfield row '${line}' too long`, this.file_line_num);
             } else if (row.length < row_length) {
-                throw new Error(`Clusterfield row '${line}' too short at line ${this.file_line_num + 1}`);
+                this.logger.validation_error(`Clusterfield row '${line}' too short`, this.file_line_num);
             }
 
             for (let i = 0; i < row_length; ++i) {
@@ -761,7 +763,7 @@ class Resolver {
                 }
             }
         }
-        this.add_transform(concurrent_target, concurrent_result, `:${this.file_line_num}`);
+        this.add_transform(concurrent_target, concurrent_result, this.file_line_num);
     }
 
 

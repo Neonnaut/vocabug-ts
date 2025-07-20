@@ -1,13 +1,17 @@
 import Word from './word';
+import Logger from './logger';
 
-class Transformer {   
+class Transformer {
+    private logger: Logger;
     private graphemes: string[];
-    private transforms: { target:string[], result:string[], line_num:string }[];
+    private transforms: { target:string[], result:string[], line_num:number }[];
 
     constructor(
+        logger: Logger,
         graphemes: string[],
-        transforms: { target:string[], result:string[], line_num:string }[]
+        transforms: { target:string[], result:string[], line_num:number }[]
     ) {
+        this.logger = logger;
         this.graphemes = graphemes;
         this.transforms = transforms;
     }
@@ -47,7 +51,7 @@ class Transformer {
 applyTransform(
     word: Word,
     tokens: string[],
-    transform: { target: string[]; result: string[], line_num:string}
+    transform: { target: string[]; result: string[], line_num:number}
 ): string[] {
     function spanToLength(subTokens: string[], targetLen: number): number {
         let count = 0;
@@ -62,7 +66,7 @@ applyTransform(
 
     if (target.length !== result.length) {
         // We've already done this in resolover, but, you know...
-        throw new Error("Mismatched target/result concurrent set lengths in a transform");
+        this.logger.validation_error(`Mismatched target/result concurrent set lengths in a transform`, transform.line_num);
     }
 
     const replacements: { index: number; length: number; replacement: string }[] = [];
@@ -80,7 +84,7 @@ applyTransform(
 
                 if (window === rawSearch) {
                     word.rejected = true;
-                    word.record_transformation(`${rawSearch} → ^REJECT`, transform.line_num, "❌");
+                    word.record_transformation(`${rawSearch} → ^REJECT`, "❌", transform.line_num,);
                     return tokens;
                 }
             }
@@ -194,8 +198,8 @@ applyTransform(
 
     if (matchedTargets.length > 0) {
         word.record_transformation(
-        `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}`, transform.line_num,
-        normalized.join(" ")
+        `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}`, normalized.join(" "),
+        transform.line_num
         );
     }
 
@@ -226,7 +230,7 @@ normalizeReplacements(tokens: string[], replacements: { index: number; length: n
         }
 
         let tokens = this.graphemosis(word.get_last_form());
-        word.record_transformation("graphemosis", '', `${tokens.join(" ")}`);
+        word.record_transformation("graphemosis", `${tokens.join(" ")}`);
 
         for (const t of this.transforms) {
             if (word.rejected) {
@@ -235,12 +239,12 @@ normalizeReplacements(tokens: string[], replacements: { index: number; length: n
             tokens = this.applyTransform(word, tokens, t);
             if (tokens.length == 0) {
                 word.rejected = true;
-                word.record_transformation(`REJECT NULL WORD`, '', `❌`);
+                word.record_transformation(`REJECT NULL WORD`, `❌`);
             }
         }
 
         if (!word.rejected) {
-            word.record_transformation("retrographemosis", '', `${tokens.join("")}`);
+            word.record_transformation("retrographemosis", `${tokens.join("")}`);
         }
 
         return word;

@@ -1,9 +1,11 @@
+import Logger from './logger';
 import Word from './word';
 import Escape_Mapper from './escape_mapper';
 import SupraBuilder from './supra_builder';
-import { weightedRandomPick, get_distribution } from './utilities'
+import { weightedRandomPick, supraWeightedRandomPick, get_distribution } from './utilities'
 
 class Word_Builder {
+    private logger: Logger;
     private escape_mapper: Escape_Mapper;
     private supra_builder: SupraBuilder;
     private categories: Map< string, {graphemes:string[], weights:number[]} >;
@@ -12,6 +14,7 @@ class Word_Builder {
     private optionals_weight: number;
 
     constructor(
+        logger: Logger,
         escape_mapper: Escape_Mapper,
         supra_builder: SupraBuilder,
         categories: Map< string, {graphemes:string[], weights:number[]} >,
@@ -20,6 +23,8 @@ class Word_Builder {
         optionals_weight: number,
         debug: boolean,
     ) {
+        this.logger = logger;
+
         this.escape_mapper = escape_mapper;
         this.supra_builder = supra_builder
         this.categories = categories;
@@ -42,7 +47,7 @@ class Word_Builder {
         let stage_three = stage_two;
         if (this.supra_builder.idCounter != 1) {
             const [ids, weights] = this.supra_builder.extractLettersAndWeights(stage_two);
-            const chosen_id = weightedRandomPick(ids, weights);
+            const chosen_id = supraWeightedRandomPick(ids, weights);
             stage_three = this.supra_builder.replaceLetterAndClean(stage_two, Number(chosen_id));
         } 
 
@@ -50,9 +55,7 @@ class Word_Builder {
         let stage_four:string = "";
         for (let i = 0; i < stage_three.length; i++) { // going through each char of baby
             let new_char:string = stage_three[i];
-            if (!new_char){
-                throw new Error("Undefined char of word")
-            }
+
             for (const [category_key, category_field] of this.categories) { //going through C = [[a, b, c], [1, 2, 3]]
                 if (category_key == new_char) {
                     new_char = weightedRandomPick(category_field.graphemes, category_field.weights)

@@ -1,9 +1,14 @@
+import Logger from './logger';
+import { cappa } from './utilities';
+
 export class SupraBuilder {
-    private weights: Record<number, number>;
+    private logger: Logger;
+    private weights: Record<number, (number|'s')>;
     private letters: Record<number, string>;
     public idCounter: number;
 
-    constructor() {
+    constructor(logger: Logger) {
+        this.logger = logger
         this.weights = {};
         this.letters = {};
         this.idCounter = 1;
@@ -11,36 +16,39 @@ export class SupraBuilder {
 
     processString(input: string): string {
         const tokenRegex = /\{([^}]*)\}/g;
-        const validContentRegex = /^(\^|∅|[A-Z\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9])(?:\*(\d+(?:\.\d+)?))?$/;
+        const validContentRegex = new RegExp(
+        `^(\\^|∅|${cappa})(?:\\*((\\d+(?:\\.\\d+)?)|s))?$` );
 
         return input.replace(tokenRegex, (fullMatch, content) => {
             const match = validContentRegex.exec(content);
             if (!match) {
-                throw new Error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`);
+                this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`, null);
             }
 
             const letter = match[1];
-            const weight = match[2] ? Number(match[2]) : 1;
+            const rawWeight = match[2];
+            const weight = rawWeight === "s" ? "s" : (rawWeight ? Number(rawWeight) : 1);
 
             const id = this.idCounter++;
             this.weights[id] = weight;
             this.letters[id] = letter;
 
             return `{${id}}`;
+
         });
     }
 
-    extractLettersAndWeights(input: string): [string[], number[]] {
+    extractLettersAndWeights(input: string): [string[], (number|'s')[]] {
         const idRegex = /\{(\d+)\}/g;
         const ids: string[] = [];
-        const weights: number[] = [];
+        const weights: (number|'s')[] = [];
 
         let match: RegExpExecArray | null;
         while ((match = idRegex.exec(input)) !== null) {
             const id = Number(match[1]);
 
             if (!(id in this.letters) || !(id in this.weights)) {
-                throw new Error(`Missing data for ID '${id}'`);
+                this.logger.validation_error(`Missing data for ID '${id}'`, null);
             }
 
             ids.push(id.toString());
@@ -58,7 +66,7 @@ export class SupraBuilder {
 
             // Safety check
             if (!(id in this.letters)) {
-                throw new Error(`Unknown ID '${id}' found in input.`);
+                this.logger.validation_error(`Unknown ID '${id}' found in input.`, null);
             }
 
             // Keep only the target letter
@@ -66,7 +74,7 @@ export class SupraBuilder {
         });
     }
 
-    getWeights(): Record<number, number> {
+    getWeights(): Record<number, (number|'s')> {
         return this.weights;
     }
 
