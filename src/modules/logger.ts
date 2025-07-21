@@ -48,17 +48,21 @@ class Logger {
     }
 
     private extractLocation(stack?: string): string | null {
-        const line = stack?.split("\n")[1];
-        if (!line) return null;
+        if (!stack) return null;
 
-        const match = line.match(/(?:\(|\bat\s+)?(.*?):(\d+):(\d+)\)?/);
-        if (!match) return null;
+        const lines = stack.split("\n");
+        for (const line of lines) {
+            const match = line.match(/(?:\(|\bat\s+)?(.*?):(\d+):(\d+)\)?/);
+            if (match) {
+                let filePath = match[1].replace(/\?.*$/, ""); // Strip ?t=... junk
+                filePath = filePath.replace(/^.*\/src\//, "modules/"); // Map root
+                filePath = filePath.replace(/(\bmodules\b\/)\1/, "$1"); // Fix repetition
 
-        let filePath = match[1].replace(/\?.*$/, ""); // Strip ?t=... junk
-        filePath = filePath.replace(/^.*\/src\//, "modules/"); // Map root
-        filePath = filePath.replace(/(\bmodules\b\/)\1/, "$1"); // Fix repetition
+                return `${filePath}:${match[2]}`;
+            }
+        }
 
-        return `${filePath}:${match[2]}`;
+        return null; // Nothing matched
     }
 
     warn(warn: string, line_num: number|null = null): void {
