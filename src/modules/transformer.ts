@@ -282,7 +282,7 @@ class Transformer {
                 my_exceptions += ` ! ${exceptions[j].before}_${exceptions[j].after}`;
             }
             let my_conditions = '';
-            for (let j = 0; j < conditions.length    ; j++) {
+            for (let j = 0; j < conditions.length; j++) {
                 my_conditions += ` / ${conditions[j].before}_${conditions[j].after}`;
             }   
 

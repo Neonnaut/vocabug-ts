@@ -1,66 +1,70 @@
 ## Generic
 
 - [x] Comments
-- [] Examples
+- [x] Examples
+- [] Complete validation error line handling
 
 ## Interface
 
 - [] Syntax highlighting
-- [] Generate words button
-- [] Copy words button
-- [] Clear button
-- [] Number of words
-- [] Modes
-- [] Remove duplicates
-- [] Force word limit
-- [] Sort words
-- [] Capitalise words
-- [] Show keyboard
-- [] Editor wrap lines
-- [] Word divider
-- [] File save / load
-- [] Examples loading
+- [x] Generate words button
+- [x] Copy words button
+- [x] Clear button
+- [x] Number of words
+- [x] Modes
+- [x] Remove duplicates
+- [x] Force word limit
+- [x] Sort words
+- [x] Capitalise words
+- [x] Show keyboard
+- [x] Editor wrap lines
+- [x] Word divider
+- [x] File save / load
+- [x] Examples loading
 - [] Logo
 - [] Introduction paragraph
 - [] Use font awesome for buttons
 
 ## Word-gen
 
-- [] Null grapheme
-- [] Escape characters
-- [] Categories
-- [] Category sets
-- [] Category distribution
-- [] Category weights
-- [] Segments
-- [] Words directive
-- [] Words directive block
-- [] Words distribution
-- [] Pick-one-set
-- [] Optional-set
-- [] Optionals weight
-- [] Supra-set
-- [] Supra-set weights
-- [] Supra-set 's' weight
+- [x] Null grapheme
+- [x] Escape characters
+- [x] Categories
+- [x] Category sets
+- [x] Category distribution
+- [x] Category weights
+- [x] Segments
+- [x] Words directive
+- [x] Words directive block
+- [x] Words distribution
+- [x] Pick-one-set
+- [x] Optional-set
+- [x] Optionals weight
+- [x] Supra-set
+- [x] Supra-set weights
+- [x] Supra-set 's' weight
 
 ## Before transforms
 
-- [] Graphemes directive
-- [] Alphabet-graphemes directive
+- [x] Graphemes directive
+- [x] Alphabet-graphemes directive
+- [] Feature
+- [] Parafeature
+- [] Featurefield
 
 ## Transform
 
 - [] Transform char escape -- Important!!
-- [] Single change
-- [] Concurrent change
-- [] Reject
+- [x] Single change
+- [x] Concurrent change
+- [x] Reject
 - [] Alternator
 - [] Optionalator
-- [] Conditions
-- [] Multiple conditions
-- [] Word boundaries
-- [] Exceptions
-- [] Multiple exceptions
+- [x] Conditions
+- [x] Multiple conditions
+- [x] Word boundaries
+- [x] Exceptions
+- [x] Multiple exceptions
 - [] Using category
 - [] Using features
 - [] Wildcard
@@ -73,20 +77,21 @@
 - [] Insertion
 - [] Deletion
 - [] Metathesis
-- [] Cluster-field
+- [x] Cluster-field
+- [] Cluster field condition and exception
 - [] Engine, decompose
 - [] Engine, compose
-- [] Capitalise
-- [] De-capitalise
-- [] To-upper-case
-- [] To-lower-case
-- [] Xsampa-to-ipa
-- [] Ipa-to-Xsampa
+- [] Engine, Capitalise
+- [] Engine, De-capitalise
+- [] Engine, To-upper-case
+- [] Engine, To-lower-case
+- [] Engine, Xsampa-to-ipa
+- [] Engine, Ipa-to-Xsampa
 
 ## Collator
 
-- [] Alphabet directive
-- [] Invisible directive
+- [x] Alphabet directive
+- [x] Invisible directive
 
 ## Extra
 

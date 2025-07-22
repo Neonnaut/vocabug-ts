@@ -526,21 +526,37 @@ class Resolver {
         const conditions: { before: string; after: string }[] = [];
         const exceptions: { before: string; after: string }[] = [];
 
-        const blocks = environment.split('/').map(s => s.trim()).filter(Boolean);
+        let buffer = "";
+        let mode: "condition" | "exception" = "condition";
 
-        for (const block of blocks) {
-            const segments = block.split('!').map(s => s.trim()).filter(Boolean);
+        for (let i = 0; i < environment.length; i++) {
+            const ch = environment[i];
 
-            for (let i = 0; i < segments.length; i++) {
-                const kind = i === 0 ? 'condition' : 'exception';
-                const validated = this.validateContext(segments[i], kind);
-                if (kind === 'condition') {
-                    conditions.push(validated);
-                } else {
-                    exceptions.push(validated);
+            if (ch === '/') {
+                if (buffer.trim()) {
+                    const validated = this.validateContext(buffer.trim(), mode);
+                    (mode === "condition" ? conditions : exceptions).push(validated);
                 }
+                buffer = "";
+                mode = "condition";
+            } else if (ch === '!') {
+                if (buffer.trim()) {
+                    const validated = this.validateContext(buffer.trim(), mode);
+                    (mode === "condition" ? conditions : exceptions).push(validated);
+                }
+                buffer = "";
+                mode = "exception";
+            } else {
+                buffer += ch;
             }
         }
+
+        if (buffer.trim()) {
+            const validated = this.validateContext(buffer.trim(), mode);
+            (mode === "condition" ? conditions : exceptions).push(validated);
+        }
+
+
         return [target_array, result_array, conditions, exceptions];
     }
 
