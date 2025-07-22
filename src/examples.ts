@@ -21,8 +21,8 @@ graphemes: ee, oo, aa, ii, uu, ch
 
 ; Vocabug uses 'transforms' to change words, or outright reject them.
 BEGIN transform:
-nn, nm, np, sh, ss → ny, m, mp, s, s
-#aa#, #ee#, #ii#, #oo#, #uu# → a, e, i, o, u
+nn, nm, np, sh, ss -> ny, m, mp, s, s
+aa, ee, ii, oo, uu -> a, e, i, o, u / #_#
 yi -> ^REJECT
 END`,
   tonal:
@@ -57,7 +57,7 @@ BEGIN transform:
 ' á é ẹ́ í ó ọ́ ú
 \` à è ẹ̀ ì ò ọ̀ ù
 
-ci -> çi
+c -> ç / _i
 END`,
   romance:
 `; This should produce... simplified Spanish-looking words
@@ -169,12 +169,12 @@ e  eR  eR  yoR ai yo
 o  oR  +   +   +  o
 R  R   R   R   R  R
 
-shy jy chy -> sh j ch
+y -> ^ / sh_ / j_ / ch_
 
 aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
-#aa# #ee# #ii# #oo# #uu# -> a e i o u
+aa ee ii oo uu -> a e i o u / #_#
 END`,
   australian: 
 `; This does not represent a single Australian language, it does something
@@ -223,12 +223,13 @@ BEGIN transform:
 ai aʔ ac aŋ aɲ aj aw aʎ aɻ a@
 
 ; Long vowels become short before a consonant cluster or <ʔ>.
-R@ Rʔ @ -> ^ ʔ ^
+R -> ^ / _@ / _ʔ
 
 ; <ji>, <ʎi> and <wu> are rejected.
 ji ʎi wu jiR ʎiR wuR -> ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT
 
 ; Romaniser:
+@ > ^
 oR eR iR uR aR -> oo ee ii uu aa
 r ɻ n̪ t̪ ʔ ɳ -> rr r nh th ꞌ n
 ɲ ʎ j c ʈ ŋ -> ny ly y j t ng

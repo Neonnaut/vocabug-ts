@@ -5,8 +5,6 @@ import vocabug from '../src/index'
 
 import { describe, it, expect } from 'vitest';
 
-console.log(vocabug)
-
 describe('vocabug', () => {
   it('returns generated words', () => {
 

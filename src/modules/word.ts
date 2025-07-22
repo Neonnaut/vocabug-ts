@@ -6,13 +6,13 @@ class Word {
     private transformations: string[];
     private forms: string[];
     public rejected: boolean;
-    private line_nums: (number|null)[];
+    private line_nums: (string)[];
 
     constructor(skeleton: string, adult: string) {
         this.transformations = [skeleton];
         this.forms = [adult];
         this.rejected = false; // This may be changed in transforms or when the word is ""
-        this.line_nums = [null];
+        this.line_nums = [''];
     }
 
     get_last_form(): string { // Gets canonical word. Use this when sorting the words
@@ -28,7 +28,7 @@ class Word {
         if (Word.debug) {
             for (let i = 0; i < this.forms.length; i++) {
 
-                output += `⟨${this.transformations[i]}⟩${this.line_nums[i] || ""} 🔹 ⟨${this.forms[i]}⟩\n`;
+                output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} 🔹 ⟨${this.forms[i]}⟩\n`;
             }
             return output;
         }
@@ -42,7 +42,11 @@ class Word {
     record_transformation(rule:string, form:string, line_num:number|null = null): void {
         this.transformations.push(rule);
         this.forms.push(form);
-        this.line_nums.push(line_num);
+        let my_line_num = '';
+        if (line_num != null) {
+            my_line_num = `:${line_num+1}`
+        }
+        this.line_nums.push(my_line_num);
     }
 }
 

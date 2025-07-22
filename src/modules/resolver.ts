@@ -30,7 +30,16 @@ class Resolver {
     public wordshapes: { items:string[], weights:number[]};
     private wordshape_line_num: number;
     
-    public transforms: { target:string[], result:string[], line_num:number}[];
+    public pre_transforms: {
+        target:string[], result:string[],
+        conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        line_num:number
+    }[];
+    public transforms: {
+        target:string[], result:string[],
+        conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        line_num:number
+    }[];
     public graphemes: string[];
     public alphabet: string[];
     public invisible: string[];
@@ -106,6 +115,7 @@ class Resolver {
         this.wordshapes = { items: [], weights: [] };
         this.wordshape_line_num = 0;
         this.graphemes = [];
+        this.pre_transforms = [];
         this.transforms = [];
     }
 
@@ -137,17 +147,9 @@ class Resolver {
                     continue;
                 }
                 
-                let [target, result, valid] = GetTransform(line_value);
+                let [target, result, conditions, exceptions] = this.GetTransform(line_value);
 
-                if ( !valid ) {
-                    this.logger.warn(`Malformed transform '${line_value}' -- expected 'old → new' or a clusterfield`, this.file_line_num);
-                    continue;
-                } else if ( target.length != result.length ){
-                    this.logger.warn(`Malformed transform '${line_value}' -- expected an equal amount of concurrent-set targets to concurrent-set results`, this.file_line_num);
-                    continue;
-                }
-
-                this.add_transform( target, result, this.file_line_num );
+                this.add_transform(target, result, conditions, exceptions, this.file_line_num);
                 continue;
             }
 
@@ -463,8 +465,243 @@ class Resolver {
         return true;
     }
 
-    add_transform(target:string[], result:string[], line_num:number) {
-        this.transforms.push( { target:target, result:result, line_num:line_num} );
+    // TRANSFORMS !!!
+
+    // This is run on parsing file. We then have to run resolve_transforms aftter parse file
+    GetTransform(input: string): [
+        string[], string[],
+        { before: string; after: string }[],
+        { before: string; after: string }[]
+    ] {
+        if (input === "") {
+            this.logger.validation_error(`No input`, this.file_line_num)
+        }
+
+        const divided = input.split(/->|>|→/);
+        if (divided.length === 1) {
+            this.logger.validation_error(`No arrows in transform`, this.file_line_num)
+        }
+        if (divided.length !== 2) {
+            this.logger.validation_error(`Too many arrows in transform`, this.file_line_num);
+        }
+
+        const target = divided[0].trim();
+        if (target === "") {
+            this.logger.validation_error(`Target is empty in transform`, this.file_line_num);
+        }
+        if (!this.valid_transform_brackets(target)) {
+            this.logger.validation_error(`Target had missmatched brackets`, this.file_line_num);
+        }
+        const target_array = this.set_concurrent_changes(target);
+
+        const slashIndex = divided[1].indexOf('/');
+        const bangIndex = divided[1].indexOf('!');
+
+        const delimiterIndex = Math.min(
+            slashIndex === -1 ? Infinity : slashIndex,
+            bangIndex === -1 ? Infinity : bangIndex
+        );
+
+        const result = delimiterIndex === Infinity
+            ? divided[1].trim()
+            : divided[1].slice(0, delimiterIndex).trim();
+
+        if (result == "") {
+            this.logger.validation_error(`Result is empty in transform`, this.file_line_num);
+        }
+        if (!this.valid_transform_brackets(result)) {
+            this.logger.validation_error(`Result had missmatched brackets`, this.file_line_num);
+        }
+        const result_array = this.set_concurrent_changes(result);
+
+        // If result array is not the same as target array send error
+        if (target_array.length !== result_array.length) {
+            this.logger.validation_error(`Target and result concurrent changes have different lengths`, this.file_line_num)
+        }
+
+        const environment = delimiterIndex === Infinity
+            ? ''
+            : divided[1].slice(delimiterIndex).trim();
+
+        const conditions: { before: string; after: string }[] = [];
+        const exceptions: { before: string; after: string }[] = [];
+
+        const blocks = environment.split('/').map(s => s.trim()).filter(Boolean);
+
+        for (const block of blocks) {
+            const segments = block.split('!').map(s => s.trim()).filter(Boolean);
+
+            for (let i = 0; i < segments.length; i++) {
+                const kind = i === 0 ? 'condition' : 'exception';
+                const validated = this.validateContext(segments[i], kind);
+                if (kind === 'condition') {
+                    conditions.push(validated);
+                } else {
+                    exceptions.push(validated);
+                }
+            }
+        }
+        return [target_array, result_array, conditions, exceptions];
+    }
+
+    validateContext(segment: string, kind: 'condition' | 'exception'): { before: string; after: string } {
+        const parts = segment.split('_');
+        if (parts.length !== 2) {
+            this.logger.validation_error(`${kind} "${segment}" must contain exactly one underscore`, this.file_line_num)
+        }
+
+        const [before, after] = parts;
+        if (!before && !after) {
+            this.logger.validation_error(`${kind} "${segment}" must have content on at least one side of '_'`, this.file_line_num)
+        }
+
+        return {
+            before: before || '',
+            after: after || ''
+        };
+    }
+
+    add_transform(target:string[], result:string[], 
+        conditions:{ before:string, after:string }[],
+        exceptions:{ before:string, after:string }[],
+        line_num:number) {
+        this.pre_transforms.push( { target:target, result:result,
+            conditions:conditions, exceptions:exceptions,
+            line_num:line_num} );
+    }
+
+    set_concurrent_changes(target_result:string) {
+        let result = [];
+        let buffer = "";
+        let insideBrackets = 0;
+
+        for (let i = 0; i < target_result.length; i++) {
+            const char = target_result[i];
+
+            if (char === '[' || char === '(') {
+                insideBrackets++;
+            } else if (char === ']' || char === ')') {
+                insideBrackets--;
+            }
+
+            if ((char === ' ' || char === ',') && insideBrackets === 0) {
+                if (buffer.length > 0) {
+                    result.push(buffer);
+                    buffer = "";
+                }
+            } else {
+                buffer += char;
+            }
+        }
+
+        if (buffer.length > 0) {
+            result.push(buffer);
+        }
+
+        return result;
+    }
+
+
+
+    private parse_cluster(file_array:string[]) {
+        let line = file_array[this.file_line_num];
+        line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+        if (line === '') { return; } // Blank line. End clusterfield... early !!
+        let top_row = line.split(/[,\s]+/).filter(Boolean);
+        top_row.shift();
+        const row_length = top_row.length;
+        this.file_line_num ++;
+
+        let concurrent_target: string[] = [];
+        let concurrent_result: string[] = [];
+
+        for (; this.file_line_num < file_array.length; ++this.file_line_num) {
+            let line = file_array[this.file_line_num];
+            line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+            if (line === '') { break} // Blank line. End clusterfield !!
+
+            let row = line.split(/[,\s]+/).filter(Boolean);
+            let column = row[0];
+            row.shift();
+
+            if (row.length > row_length) {
+                this.logger.validation_error(`Clusterfield row too long`, this.file_line_num);
+            } else if (row.length < row_length) {
+                this.logger.validation_error(`Clusterfield row too short`, this.file_line_num);
+            }
+
+            for (let i = 0; i < row_length; ++i) {
+                if (row[i] === '+') {
+                    continue;
+                } else if (row[i] === '-') {
+                    concurrent_target.push(column + top_row[i]!);
+                    concurrent_result.push('^REJECT')
+                } else {
+                    concurrent_target.push(column + top_row[i]!);
+                    concurrent_result.push(row[i]!);
+                }
+            }
+        }
+        this.add_transform(concurrent_target, concurrent_result, 
+            [], [], this.file_line_num);
+    }
+
+    resolve_transforms() {
+         // Resolve brackets, put categories in transforms etc.
+        
+        let transforms = [];
+        for (let i = 0; i < this.pre_transforms.length; i++) {
+            let line_num = this.pre_transforms[i].line_num;
+
+            let target = this.pre_transforms[i].target;
+
+            let result = this.pre_transforms[i].result;
+
+            let exceptions = [];
+            for (let j = 0; j < this.pre_transforms[i].exceptions.length; j++) {
+                let exception_before = this.pre_transforms[i].exceptions[j].before
+                let exception_after = this.pre_transforms[i].exceptions[j].after;
+
+                exceptions.push({ before:exception_before, after:exception_after });
+            }
+
+            let conditions = [];
+            for (let j = 0; j < this.pre_transforms[i].conditions.length    ; j++) {
+                let condition_before = this.pre_transforms[i].conditions[j].before
+                let condition_after = this.pre_transforms[i].conditions[j].after;
+
+                conditions.push({ before:condition_before, after:condition_after });
+            }
+            transforms.push({
+                target: target, result: result,
+                conditions: conditions, exceptions: exceptions,
+                line_num: line_num
+            });
+        }
+        this.transforms = transforms;
+    }
+
+    //private parse_target_result(target, result): [string[],string[]] {
+
+    //}
+
+    valid_transform_brackets(str: string): boolean {
+        const stack: string[] = [];
+        const bracketPairs: Record<string, string> = {
+            ')': '(',
+            '}': '{',
+            ']': '[',
+        };
+        for (const char of str) {
+            if (Object.values(bracketPairs).includes(char)) {
+            stack.push(char); // Push opening brackets onto stack
+            } else if (Object.keys(bracketPairs).includes(char)) {
+            if (stack.length === 0 || stack.pop() !== bracketPairs[char]) {
+                return false; // Unmatched closing bracket
+            }
+            }
+        }
+        return stack.length === 0; // Stack should be empty if balanced
     }
 
     expand_categories() {
@@ -723,49 +960,6 @@ class Resolver {
             this.wordshape_string += line_value;   
         }
     }
-
-    private parse_cluster(file_array:string[]) {
-        let line = file_array[this.file_line_num];
-        line = line.replace(/;.*/u, '').trim(); // Remove comment!!
-        if (line === '') { return; } // Blank line. End clusterfield... early !!
-        let top_row = line.split(/[,\s]+/).filter(Boolean);
-        top_row.shift();
-        const row_length = top_row.length;
-        this.file_line_num ++;
-
-        let concurrent_target: string[] = [];
-        let concurrent_result: string[] = [];
-
-        for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-            let line = file_array[this.file_line_num];
-            line = line.replace(/;.*/u, '').trim(); // Remove comment!!
-            if (line === '') { break} // Blank line. End clusterfield !!
-
-            let row = line.split(/[,\s]+/).filter(Boolean);
-            let column = row[0];
-            row.shift();
-
-            if (row.length > row_length) {
-                this.logger.validation_error(`Clusterfield row '${line}' too long`, this.file_line_num);
-            } else if (row.length < row_length) {
-                this.logger.validation_error(`Clusterfield row '${line}' too short`, this.file_line_num);
-            }
-
-            for (let i = 0; i < row_length; ++i) {
-                if (row[i] === '+') {
-                    continue;
-                } else if (row[i] === '-') {
-                    concurrent_target.push(column + top_row[i]!);
-                    concurrent_result.push('^REJECT')
-                } else {
-                    concurrent_target.push(column + top_row[i]!);
-                    concurrent_result.push(row[i]!);
-                }
-            }
-        }
-        this.add_transform(concurrent_target, concurrent_result, this.file_line_num);
-    }
-
 
     create_record(): void {
         let categories = [];

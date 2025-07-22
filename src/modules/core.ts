@@ -55,6 +55,7 @@ function generate({
         r.expand_segments();
         r.expand_wordshape_segments();
         r.set_wordshapes();
+        r.resolve_transforms();
         r.create_record();
 
         const wordBuilder = new Word_Builder( logger,

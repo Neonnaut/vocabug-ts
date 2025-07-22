@@ -2,14 +2,23 @@ import Word from './word';
 import Logger from './logger';
 
 class Transformer {
-    private logger: Logger;
-    private graphemes: string[];
-    private transforms: { target:string[], result:string[], line_num:number }[];
+    public logger: Logger;
+   
+    public graphemes: string[];
+    public transforms: {
+        target:string[], result:string[],
+        conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        line_num:number
+    }[];
 
     constructor(
         logger: Logger,
         graphemes: string[],
-        transforms: { target:string[], result:string[], line_num:number }[]
+        transforms: {
+            target:string[], result:string[],
+            conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+            line_num:number
+        }[]
     ) {
         this.logger = logger;
         this.graphemes = graphemes;
@@ -48,175 +57,244 @@ class Transformer {
     }
 
 
-applyTransform(
-    word: Word,
-    tokens: string[],
-    transform: { target: string[]; result: string[], line_num:number}
-): string[] {
-    function spanToLength(subTokens: string[], targetLen: number): number {
-        let count = 0;
-        for (let i = 0; i < subTokens.length; i++) {
-            count += subTokens[i].length;
-            if (count >= targetLen) return i + 1;
+    applyTransform(
+        word: Word,
+        tokens: string[],
+        transform: {
+            target: string[];
+            result: string[];
+            conditions: { before: string; after: string }[];
+            exceptions: { before: string; after: string }[];
+            line_num: number;
         }
-        return subTokens.length;
-    }
+    ): string[] {
+        function spanToLength(subTokens: string[], targetLen: number): number {
+            let count = 0;
+            for (let i = 0; i < subTokens.length; i++) {
+                count += subTokens[i].length;
+                if (count >= targetLen) return i + 1;
+            }
+            return subTokens.length;
+        }
 
-    const { target, result } = transform;
+        function contextMatches(
+            full: string,
+            startIdx: number,
+            rawSearch: string,
+            before: string,
+            after: string
+        ): boolean {
+            const targetLen = rawSearch.length;
 
-    if (target.length !== result.length) {
-        // We've already done this in resolover, but, you know...
-        this.logger.validation_error(`Mismatched target/result concurrent set lengths in a transform`, transform.line_num);
-    }
+            // BEFORE logic
+            if (before === "#") {
+                if (startIdx !== 0) return false;
+            } else if (before.startsWith("#")) {
+                const expected = before.slice(1);
+                if (startIdx !== 0 || full.slice(0, startIdx) !== expected) return false;
+            } else {
+                const actual = full.slice(Math.max(0, startIdx - before.length), startIdx);
+                if (actual !== before) return false;
+            }
 
-    const replacements: { index: number; length: number; replacement: string }[] = [];
+            // AFTER logic
+            if (after === "#") {
+                if (startIdx + targetLen !== full.length) return false;
+            } else if (after.endsWith("#")) {
+                const expected = after.slice(0, -1);
+                if (startIdx + targetLen !== full.length || full.slice(startIdx + targetLen) !== expected) return false;
+            } else {
+                const actual = full.slice(startIdx + targetLen, startIdx + targetLen + after.length);
+                if (actual !== after) return false;
+            }
 
-    for (let i = 0; i < target.length; i++) {
-        let rawSearch = target[i];
-        const isDelete = result[i] === "^" || result[i] === "∅";
-        let replacement = isDelete ? "" : result[i];
+            return true;
+        }
 
-        if (replacement === "^REJECT" || replacement === "^R") {
-            for (let j = 0; j < tokens.length; j++) {
-                const subTokens = tokens.slice(j);
-                const span = spanToLength(subTokens, rawSearch.length);
-                const window = subTokens.slice(0, span).join("");
+        const { target, result, conditions, exceptions, line_num } = transform;
 
-                if (window === rawSearch) {
-                    word.rejected = true;
-                    word.record_transformation(`${rawSearch} → ^REJECT`, "❌", transform.line_num,);
-                    return tokens;
+        if (target.length !== result.length) {
+            this.logger.validation_error("Mismatched target/result concurrent set lengths in a transform", line_num)
+        }
+
+        const replacements: { index: number; length: number; replacement: string }[] = [];
+        const fullWord = tokens.join("");
+
+        for (let i = 0; i < target.length; i++) {
+            let rawTarget = target[i].replace(/\\/g, "");
+            let rawResult = result[i].replace(/\\/g, "");
+
+            if (rawResult === "^REJECT" || rawResult === "^R") {
+                for (let j = 0; j < tokens.length; j++) {
+                    const subTokens = tokens.slice(j);
+                    const span = spanToLength(subTokens, rawTarget.length);
+                    const window = subTokens.slice(0, span).join("");
+                    if (window === rawTarget) {
+                        const startIdx = tokens.slice(0, j).join("").length;
+
+                        const passes = conditions.length === 0 || conditions.some(c =>
+                            contextMatches(fullWord, startIdx, rawTarget, c.before, c.after)
+                        );
+                        const blocked = exceptions.some(e =>
+                            contextMatches(fullWord, startIdx, rawTarget, e.before, e.after)
+                        );
+
+                        if (passes && !blocked) {
+                            word.rejected = true;
+                            word.record_transformation(`${rawTarget} → ^REJECT`, "❌", line_num);
+                            return tokens;
+                        }
+                    }
+                }
+            }
+
+
+            if (rawTarget == "^") {
+                // Insertion case
+                if (conditions.length === 0) {
+                    this.logger.validation_error("Insertion requires at least one condition", line_num);
+                }
+                for (let j = 0; j <= tokens.length; j++) {
+                    const startIdx = tokens.slice(0, j).join("").length;
+                    const passes = conditions.some(cond => contextMatches(fullWord, startIdx, "", cond.before, cond.after));
+                    const blocked = exceptions.some(exc => contextMatches(fullWord, startIdx, "", exc.before, exc.after));
+                    if (passes && !blocked) {
+                        replacements.push({ index: j, length: 0, replacement: rawResult });
+                    }
+                }
+            } else if (rawResult === "^") {
+                // Deletion case
+                for (let j = 0; j < tokens.length; j++) {
+                    const span = spanToLength(tokens.slice(j), rawTarget.length);
+                    const window = tokens.slice(j, j + span).join("");
+                    if (window === rawTarget) {
+                        const startIdx = tokens.slice(0, j).join("").length;
+                        const passes = conditions.length === 0 || conditions.some(c => contextMatches(fullWord, startIdx, rawTarget, c.before, c.after));
+                        const blocked = exceptions.some(e => contextMatches(fullWord, startIdx, rawTarget, e.before, e.after));
+                        if (passes && !blocked) {
+                            replacements.push({ index: j, length: span, replacement: "" });
+                        }
+                    }
+                }
+            } else {
+                // Substitution case
+                for (let j = 0; j < tokens.length; j++) {
+                    const span = spanToLength(tokens.slice(j), rawTarget.length);
+                    const window = tokens.slice(j, j + span).join("");
+                    if (window === rawTarget) {
+                        const startIdx = tokens.slice(0, j).join("").length;
+                        const passes = conditions.length === 0 || conditions.some(c => contextMatches(fullWord, startIdx, rawTarget, c.before, c.after));
+                        const blocked = exceptions.some(e => contextMatches(fullWord, startIdx, rawTarget, e.before, e.after));
+                        if (passes && !blocked) {
+                            replacements.push({ index: j, length: span, replacement: rawResult });
+                        }
+                    }
                 }
             }
         }
 
+        // ✂️ Non-destructive replacement
+        replacements.sort((a, b) => a.index - b.index);
+        const blocked = new Set<number>();
+    // const resultTokens: string[] = [];
 
-        // 🔒 Full-string match: #...#
-        if (rawSearch.startsWith("#") && rawSearch.endsWith("#") && !rawSearch.endsWith("\\#") && rawSearch.length > 2) {
-            rawSearch = rawSearch.replace(/\\/g, "");
-            replacement = replacement.replace(/\\/g, "");
-            const needle = rawSearch.slice(1, -1);
-            const joined = tokens.join("");
-            if (joined === needle) {
-                replacements.push({ index: 0, length: tokens.length, replacement });
-            }
-            continue;
-        }
+    const insertionMap = new Map<number, string[]>();
+    const replacementMap = new Map<number, { length: number; replacement: string }>();
 
-        // ⛳ Prefix match: #abc
-        if (rawSearch.startsWith("#")) {
-            rawSearch = rawSearch.replace(/\\/g, "");
-            replacement = replacement.replace(/\\/g, "");
-            const needle = rawSearch.slice(1);
-            const span = spanToLength(tokens, needle.length);
-            const head = tokens.slice(0, span).join("");
-            if (head === needle) {
-                replacements.push({ index: 0, length: span, replacement });
-            }
-            continue;
-        }
-
-        // 🏁 Suffix match: abc#
-        if ( rawSearch.endsWith("#")  && !rawSearch.endsWith("\\#") ) {
-            rawSearch = rawSearch.replace(/\\/g, "");
-            replacement = replacement.replace(/\\/g, "");
-            const needle = rawSearch.slice(0, -1);
-            const reversed = [...tokens].reverse();
-            const span = spanToLength(reversed, needle.length);
-            const tail = reversed.slice(0, span).reverse().join("");
-            if (tail === needle) {
-                replacements.push({
-                    index: tokens.length - span,
-                    length: span,
-                    replacement,
-                });
-            }
-            continue;
-        }
-
-        rawSearch = rawSearch.replace(/\\/g, "");
-        replacement = replacement.replace(/\\/g, "");
-
-        // 🔍 Anywhere match
-        for (let j = 0; j < tokens.length; j++) {
-            const subTokens = tokens.slice(j);
-            const span = spanToLength(subTokens, rawSearch.length);
-            const window = subTokens.slice(0, span).join("");
-            if (window === rawSearch) {
-                replacements.push({ index: j, length: span, replacement });
-            }
+    for (const r of replacements) {
+        if (r.length === 0) {
+            if (!insertionMap.has(r.index)) insertionMap.set(r.index, []);
+            insertionMap.get(r.index)!.push(r.replacement);
+        } else {
+            replacementMap.set(r.index, r);
         }
     }
 
-    // ✂️ Apply replacements non-destructively
-    replacements.sort((a, b) => a.index - b.index);
-    const blocked = new Set<number>();
     const resultTokens: string[] = [];
-
     let i = 0;
+
     while (i < tokens.length) {
-        const match = replacements.find(
-            r =>
-                r.index === i &&
-                ![...Array(r.length).keys()].some(k => blocked.has(i + k))
-        );
-        if (match) {
-            if (match.replacement !== "") {
-                resultTokens.push(match.replacement);
+        // 🪛 Insert before i
+        if (insertionMap.has(i)) {
+            for (const rep of insertionMap.get(i)!) {
+                resultTokens.push(rep);
             }
-            for (let k = 0; k < match.length; k++) {
+        }
+
+        // 🔁 Replace current token span
+        const replacement = replacementMap.get(i);
+        if (replacement && ![...Array(replacement.length).keys()].some(k => blocked.has(i + k))) {
+            if (replacement.replacement !== "") {
+                resultTokens.push(replacement.replacement);
+            }
+            for (let k = 0; k < replacement.length; k++) {
                 blocked.add(i + k);
             }
-            i += match.length;
+            i += replacement.length;
         } else {
             resultTokens.push(tokens[i]);
             i++;
         }
     }
 
-    const normalized = this.graphemosis(resultTokens.join(""));
-
-    const appliedSet = this.normalizeReplacements(tokens, replacements);
-
-    const matchedTargets: string[] = [];
-    const matchedResults: string[] = [];
-
-    for (let i = 0; i < transform.target.length; i++) {
-        const target = transform.target[i].replace(/\\/g, "");
-        const result =
-        transform.result[i] === "^" || transform.result[i] === "∅"
-            ? ""
-            : transform.result[i].replace(/\\/g, "");
-        const recorded = transform.result[i];
-
-        if (appliedSet.has(`${target}→${result}`)) {
-            matchedTargets.push(transform.target[i]);
-            matchedResults.push(recorded);
+    // Handle insertions after the last token
+    if (insertionMap.has(tokens.length)) {
+        for (const rep of insertionMap.get(tokens.length)!) {
+            resultTokens.push(rep);
         }
     }
 
 
-    if (matchedTargets.length > 0) {
-        word.record_transformation(
-        `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}`, normalized.join(" "),
-        transform.line_num
+
+        const normalized = this.graphemosis(resultTokens.join(""));
+
+        // 🧾 Log transformation summary
+
+        const matchedPairs = new Set<string>();
+        const matchedTargets: string[] = [];
+        const matchedResults: string[] = [];
+
+    for (let i = 0; i < target.length; i++) {
+        const isInsertion = target[i] === "^";
+        const isDeletion = result[i] === "^";
+
+        const expected = isInsertion ? result[i] : (isDeletion ? "" : result[i]);
+
+        const matched = replacements.some(r =>
+            r.replacement === expected &&
+            ((isInsertion && r.length === 0) || (!isInsertion && r.length > 0))
         );
+
+        if (matched) {
+            const pair = `${target[i]} → ${result[i]}`;
+            if (!matchedPairs.has(pair)) {
+                matchedTargets.push(target[i]);
+                matchedResults.push(result[i]);
+                matchedPairs.add(pair);
+            }
+        }
     }
 
-    return normalized;
-}
 
-normalizeReplacements(tokens: string[], replacements: { index: number; length: number; replacement: string }[]): Set<string> {
-  const applied = new Set<string>();
+        if (matchedTargets.length > 0) {
+            let my_exceptions = '';
+            for (let j = 0; j < exceptions.length; j++) {
+                my_exceptions += ` ! ${exceptions[j].before}_${exceptions[j].after}`;
+            }
+            let my_conditions = '';
+            for (let j = 0; j < conditions.length    ; j++) {
+                my_conditions += ` / ${conditions[j].before}_${conditions[j].after}`;
+            }   
 
-  for (const r of replacements) {
-    const span = tokens.slice(r.index, r.index + r.length).join("");
-    applied.add(`${span}→${r.replacement}`);
-  }
+            word.record_transformation(
+                `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}${my_conditions}${my_exceptions}`,
+                normalized.join(" "),
+                line_num
+            );
+        }
 
-  return applied;
-}
-
+        return normalized;
+    }
 
     do_transforms(
         word: Word,
