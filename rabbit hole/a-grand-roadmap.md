@@ -21,8 +21,8 @@
 - [x] Word divider
 - [x] File save / load
 - [x] Examples loading
-- [] Logo
-- [] Introduction paragraph
+- [x] Logo
+- [x] Introduction paragraph
 - [] Use font awesome for buttons
 
 ## Word-gen
@@ -48,26 +48,27 @@
 
 - [x] Graphemes directive
 - [x] Alphabet-graphemes directive
-- [] Feature
-- [] Parafeature
-- [] Featurefield
 
 ## Transform
 
 - [] Transform char escape -- Important!!
 - [x] Single change
 - [x] Concurrent change
-- [] A merging, concurent change. e.g: `a, e -> ^REJECT`
-- [x] Reject
+- [x] A merging, concurent change. e.g: `a, e -> ^REJECT`
 - [] Alternator
 - [] Optionalator
+- [x] Reject
+- [x] Insertion
+- [x] Deletion
 - [x] Conditions
 - [x] Multiple conditions
 - [x] Word boundaries
 - [x] Exceptions
 - [x] Multiple exceptions
 - [] Using category
-- [] Using features
+- [x] Cluster-field
+- [x] Cluster field condition and exception
+
 - [] Wildcard
 - [] Ditto-mark
 - [] Plus-mark
@@ -76,12 +77,18 @@
 - [] Quantifier
 - [] Blocker
 - [] Positioner
-- [x] Insertion
-- [x] Deletion
+
 - [] Metathesis
-- [x] Cluster-field
-- [] Cluster field condition and exception
 - [] Chance block
+
+- [] Engine, decompose
+- [] Engine, compose
+- [] Engine, Capitalise
+- [] Engine, De-capitalise
+- [] Engine, To-upper-case
+- [] Engine, To-lower-case
+- [] Engine, Xsampa-to-ipa
+- [] Engine, Ipa-to-Xsampa
 
 ## Collator
 
@@ -98,15 +105,10 @@
 - [] word classes
 - [] If-else-then block
 - [] Rule macro
-- [] Engine, decompose
-- [] Engine, compose
-- [] Engine, Capitalise
-- [] Engine, De-capitalise
-- [] Engine, To-upper-case
-- [] Engine, To-lower-case
-- [] Engine, Xsampa-to-ipa
-- [] Engine, Ipa-to-Xsampa
-
+- [] Feature
+- [] Parafeature
+- [] Featurefield
+- [] Using features
 
 ## Docs
 

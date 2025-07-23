@@ -514,23 +514,41 @@ class Resolver {
         }
         const result_array = this.set_concurrent_changes(result);
 
+        // Yo. We are doing merging change
+        if (result_array.length === 1 && target_array.length > 1) {
+            // Now fill the rest of the result array with the same value
+            while (result_array.length < target_array.length) {
+                result_array.push(result_array[0]);
+            }
+        }
+
         // If result array is not the same as target array send error
         if (target_array.length !== result_array.length) {
-            this.logger.validation_error(`Target and result concurrent changes have different lengths`, this.file_line_num)
+            this.logger.validation_error(`Target and result concurrent changes have missmatched lengths`, this.file_line_num)
         }
 
         const environment = delimiterIndex === Infinity
             ? ''
             : divided[1].slice(delimiterIndex).trim();
 
+        const { conditions, exceptions } = this.get_environment(environment);
+
+        return [target_array, result_array, conditions, exceptions];
+    }
+
+    get_environment(environment_string:string):
+    {
+        conditions: { before: string; after: string }[];
+        exceptions: { before: string; after: string }[];
+    } {
         const conditions: { before: string; after: string }[] = [];
         const exceptions: { before: string; after: string }[] = [];
 
         let buffer = "";
         let mode: "condition" | "exception" = "condition";
 
-        for (let i = 0; i < environment.length; i++) {
-            const ch = environment[i];
+        for (let i = 0; i < environment_string.length; i++) {
+            const ch = environment_string[i];
 
             if (ch === '/') {
                 if (buffer.trim()) {
@@ -556,8 +574,10 @@ class Resolver {
             (mode === "condition" ? conditions : exceptions).push(validated);
         }
 
-
-        return [target_array, result_array, conditions, exceptions];
+        return {
+            conditions: conditions,
+            exceptions: exceptions
+        };
     }
 
     validateContext(segment: string, kind: 'condition' | 'exception'): { before: string; after: string } {
@@ -631,10 +651,20 @@ class Resolver {
         let concurrent_target: string[] = [];
         let concurrent_result: string[] = [];
 
+        let my_conditions: { before: string, after: string }[] = [];
+        let my_exceptions: { before: string, after: string }[] = [];
+
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
             let line = file_array[this.file_line_num];
             line = line.replace(/;.*/u, '').trim(); // Remove comment!!
             if (line === '') { break} // Blank line. End clusterfield !!
+
+            if (line.startsWith('/') || line.startsWith('!')) {
+                const { conditions, exceptions } = this.get_environment(line);
+                my_conditions.push(...conditions);
+                my_exceptions.push(...exceptions);
+                continue
+            }
 
             let row = line.split(/[,\s]+/).filter(Boolean);
             let column = row[0];
@@ -659,11 +689,11 @@ class Resolver {
             }
         }
         this.add_transform(concurrent_target, concurrent_result, 
-            [], [], this.file_line_num);
+            my_conditions, my_exceptions, this.file_line_num);
     }
 
     resolve_transforms() {
-         // Resolve brackets, put categories in transforms etc.
+         // Resolve brackets, put categories in transforms, make a milkshake, etc.
         
         let transforms = [];
         for (let i = 0; i < this.pre_transforms.length; i++) {
