@@ -57,6 +57,7 @@
 - [] Transform char escape -- Important!!
 - [x] Single change
 - [x] Concurrent change
+- [] A merging, concurent change. e.g: `a, e -> ^REJECT`
 - [x] Reject
 - [] Alternator
 - [] Optionalator
@@ -71,22 +72,16 @@
 - [] Ditto-mark
 - [] Plus-mark
 - [] Anythings-mark
+- [] Backreference
 - [] Quantifier
 - [] Blocker
 - [] Positioner
-- [] Insertion
-- [] Deletion
+- [x] Insertion
+- [x] Deletion
 - [] Metathesis
 - [x] Cluster-field
 - [] Cluster field condition and exception
-- [] Engine, decompose
-- [] Engine, compose
-- [] Engine, Capitalise
-- [] Engine, De-capitalise
-- [] Engine, To-upper-case
-- [] Engine, To-lower-case
-- [] Engine, Xsampa-to-ipa
-- [] Engine, Ipa-to-Xsampa
+- [] Chance block
 
 ## Collator
 
@@ -101,10 +96,26 @@
 - [] Custom chance for each optional
 - [] Promises `words: Cj->{u,o,a}UV`
 - [] word classes
+- [] If-else-then block
+- [] Rule macro
+- [] Engine, decompose
+- [] Engine, compose
+- [] Engine, Capitalise
+- [] Engine, De-capitalise
+- [] Engine, To-upper-case
+- [] Engine, To-lower-case
+- [] Engine, Xsampa-to-ipa
+- [] Engine, Ipa-to-Xsampa
+
 
 ## Docs
 
 - [] Questions and answers
 - [] How to write def files
 
+## Tests
+
+- [] Vitest colla
+- [] Vitest examples
+- [] Vitest transforms
 

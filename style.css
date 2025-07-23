@@ -193,7 +193,7 @@ nav {min-height: 38px;}
 nav, footer {
   background: var(--toolbar-bg);
 
-  max-width: 808px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2px 0;
 }
@@ -1017,6 +1017,8 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 
 .voc-ipa-table button {
   color: #000;
+
+  border-radius: 0;
 
   font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
   width: 28px;
