@@ -226,7 +226,7 @@ ai aʔ ac aŋ aɲ aj aw aʎ aɻ a@
 R -> ^ / _@ / _ʔ
 
 ; <ji>, <ʎi> and <wu> are rejected.
-ji ʎi wu jiR ʎiR wuR -> ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT ^REJECT
+ji ʎi wu jiR ʎiR wuR -> ^REJECT
 
 ; Romaniser:
 @ > ^
