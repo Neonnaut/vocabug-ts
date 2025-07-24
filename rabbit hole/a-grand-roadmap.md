@@ -51,6 +51,8 @@
 
 ## Transform
 
+- [] Rename pre etc. to pending
+
 - [] Transform char escape -- Important!!
 - [x] Single change
 - [x] Concurrent change
@@ -81,14 +83,14 @@
 - [] Metathesis
 - [] Chance block
 
-- [] Engine, decompose
-- [] Engine, compose
-- [] Engine, Capitalise
-- [] Engine, De-capitalise
-- [] Engine, To-upper-case
-- [] Engine, To-lower-case
-- [] Engine, Xsampa-to-ipa
-- [] Engine, Ipa-to-Xsampa
+- [x] Engine, decompose
+- [x] Engine, compose
+- [x] Engine, Capitalise
+- [x] Engine, De-capitalise
+- [x] Engine, To-upper-case
+- [x] Engine, To-lower-case
+- [x] Engine, Xsampa-to-ipa
+- [x] Engine, Ipa-to-Xsampa
 
 ## Collator
 

@@ -1,6 +1,8 @@
 import Word from './word';
 import Logger from './logger';
 
+import { xsampa_to_ipa, ipa_to_xsampa } from './xsama';
+
 class Transformer {
     public logger: Logger;
    
@@ -113,12 +115,43 @@ class Transformer {
 
         const { target, result, conditions, exceptions, line_num } = transform;
 
+        const fullWord = tokens.join("");
+
+        if (target[0] === "engine:") {
+            let modifiedWord = ''
+            switch (result[0]) {
+                case "decompose":
+                    modifiedWord = fullWord.normalize("NFD"); break;
+                case "compose":
+                    modifiedWord = fullWord.normalize("NFC"); break;
+                case "capitalise":
+                    modifiedWord = fullWord.charAt(0).toUpperCase() + fullWord.slice(1); break;
+                case "de-capitalise":
+                    modifiedWord = fullWord.charAt(0).toLowerCase() + fullWord.slice(1); break;
+                case "to-upper-case":
+                    modifiedWord = fullWord.toUpperCase(); break;
+                case "to-lower-case":
+                    modifiedWord = fullWord.toLowerCase(); break;
+                case "xsampa-to-ipa":
+                    modifiedWord = xsampa_to_ipa(fullWord); break;
+                case "ipa-to-xsampa":
+                    modifiedWord = ipa_to_xsampa(fullWord); break;
+                default:
+                    this.logger.validation_error("This should not have happened");
+            }
+            word.record_transformation(
+                `${target[0]} ${result[0]}`,
+                modifiedWord,
+                line_num
+            );
+            return this.graphemosis(modifiedWord);
+        }
+
         if (target.length !== result.length) {
             this.logger.validation_error("Mismatched target/result concurrent set lengths in a transform", line_num)
         }
 
         const replacements: { index: number; length: number; replacement: string }[] = [];
-        const fullWord = tokens.join("");
 
         for (let i = 0; i < target.length; i++) {
             let rawTarget = target[i].replace(/\\/g, "");

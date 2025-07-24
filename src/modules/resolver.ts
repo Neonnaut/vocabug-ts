@@ -146,6 +146,21 @@ class Resolver {
                     this.parse_cluster(file_array);
                     continue;
                 }
+
+                if (line.startsWith("engine:")) {
+                    line_value = line.substring(7).trim().toLowerCase();
+
+                    if (line_value == "decompose"||line_value == "compose" ||
+                        line_value == "capitalise" || line_value == "de-capitalise" ||
+                        line_value == "to-upper-case" || line_value == "to-lower-case" ||
+                        line_value == "xsampa-to-ipa" || line_value == "ipa-to-xsampa"
+                    ) {
+                        this.add_transform(
+                            ["engine:"], [line_value], [], [], this.file_line_num
+                        )
+                        continue;
+                    } 
+                }
                 
                 let [target, result, conditions, exceptions] = this.GetTransform(line_value);
 
@@ -467,6 +482,7 @@ class Resolver {
 
     // TRANSFORMS !!!
 
+
     // This is run on parsing file. We then have to run resolve_transforms aftter parse file
     GetTransform(input: string): [
         string[], string[],
@@ -700,8 +716,9 @@ class Resolver {
             let line_num = this.pre_transforms[i].line_num;
 
             let target = this.pre_transforms[i].target;
-
             let result = this.pre_transforms[i].result;
+
+            //target = this.recursiveExpansion(target, this.category_strings, true);
 
             let exceptions = [];
             for (let j = 0; j < this.pre_transforms[i].exceptions.length; j++) {
