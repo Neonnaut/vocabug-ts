@@ -46,13 +46,17 @@ const vocabugTransformRules = [
 
 const vocabugClusterRules = [
   { token: "escape",   regex: /\\./ },
-  { token: "link",     regex: /,/ },
+  { token: "link",     regex: /,|\/|!|,|_/ },
   { token: "operator", regex: /\+|\-|\^REJECT|\^R|\^|∅/ }, // > and ;
   { token: "regexp",   regex: /#/ }
 ];
 
 const vocabugDistroRules = [
-  { token: "meta",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
+  { token: "operator",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
+];
+
+const vocabugEngineRules = [
+  { token: "operator",     regex: /\s+(compose|decompose|capitalise|decapitalise|to-upper-case|to-lower-case|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/ }
 ];
 
 const vocabugListRules = [
@@ -106,7 +110,9 @@ const vocabugLang = StreamLanguage.define({
                 state.blanko = true;
             }
 
-            if (stream.string.trim() && state.mode != 'clusterBlock' && state.mode != 'transform' && state.mode != 'wordsBlock') {
+            if (state.mode == 'engine') {
+                state.mode = 'transform';
+            } else if (stream.string.trim() && state.mode != 'clusterBlock' && state.mode != 'transform' && state.mode != 'wordsBlock') {
                 state.mode = 'none';
             }
 
@@ -212,6 +218,13 @@ const vocabugLang = StreamLanguage.define({
                 state.mode = 'clusterBlock';
                 return "meta";
             }
+            // Engine
+            if (stream.match(/engine(?=:)/)) {
+                state.doIndent = true
+                state.mode = 'engine';
+                return "meta";
+            }
+
             for (let rule of vocabugTransformRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
@@ -272,6 +285,15 @@ const vocabugLang = StreamLanguage.define({
                     return rule.token;
                 }
             }
+        }
+
+        if (state.mode == 'engine') {
+            for (let rule of vocabugEngineRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+            state.mode = 'transform';
         }
 
         if (state.mode == 'clusterBlock') {
