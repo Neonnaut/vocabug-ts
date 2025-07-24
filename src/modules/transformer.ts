@@ -140,7 +140,7 @@ class Transformer {
                     this.logger.validation_error("This should not have happened");
             }
             word.record_transformation(
-                `${target[0]} ${result[0]}`,
+                `${result[0]}`,
                 modifiedWord,
                 line_num
             );
