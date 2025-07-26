@@ -1,7 +1,7 @@
 import Word from './word';
 import Logger from './logger';
 
-import { xsampa_to_ipa, ipa_to_xsampa } from './xsama';
+import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
 
 class Transformer {
     public logger: Logger;
@@ -117,7 +117,7 @@ class Transformer {
 
         const fullWord = tokens.join("");
 
-        if (target[0] === "engine:") {
+        if (target[0] === "$") {
             let modifiedWord = ''
             switch (result[0]) {
                 case "decompose":

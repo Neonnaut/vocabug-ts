@@ -2,18 +2,18 @@
 /**
  * @name Xcode
  */
-import { tags as t } from '@lezer/highlight';
+import { tags as t } from "@lezer/highlight";
 
-import { createTheme, type CreateThemeOptions } from '@uiw/codemirror-themes';
-import { EditorView } from 'codemirror';
+import { createTheme, type CreateThemeOptions } from "@uiw/codemirror-themes";
+import { EditorView } from "codemirror";
 
 const Darky = EditorView.theme({
   "&": {
     fontSize: "12pt",
-    color: '#eee'
+    color: "#bee79d"
   },
   ".cm-gutters": {
-    color: "#777",
+    color: "#777777",
     minWidth: "25.6px",
     userSelect: "none"
   },
@@ -22,7 +22,7 @@ const Darky = EditorView.theme({
   },
   "&.cm-editor": {
     colorScheme: "dark;",
-    border: "1px solid #555;",
+    border: "1px solid #555555;",
     height: "100%;",
     width: "100%;"
   },
@@ -40,10 +40,10 @@ const Darky = EditorView.theme({
 const Lighty = EditorView.theme({
   "&": {
     fontSize: "12pt",
-    color: '#000'
+    color: "#277022"
   },
   ".cm-gutters": {
-    color: "#999",
+    color: "#999999",
     minWidth: "25.6px",
     userSelect: "none"
   },
@@ -51,7 +51,7 @@ const Lighty = EditorView.theme({
     minWidth: "100%"
   },
   "&.cm-editor": {
-    border: "1px solid #AAA;",
+    border: "1px solid #aaaaaa;",
     height: "100%;",
     width: "100%;"
   },
@@ -66,45 +66,46 @@ const Lighty = EditorView.theme({
   }
 });
 
-export const defaultSettingsXcodeLight: CreateThemeOptions['settings'] = {
-  background: '#fff',
-  foreground: '#3D3D3D',
-  selection: '#BBDFFF',
-  selectionMatch: '#fae098',
-  gutterBackground: '#eee',
-  gutterForeground: '#AFAFAF',
-  lineHighlight: '#d5e6ff69',
+export const defaultSettingsXcodeLight: CreateThemeOptions["settings"] = {
+  background: "#ffffff",
+  foreground: "#3d3d3d",
+  selection: "#d6ecffff",
+  selectionMatch: "#fae098",
+  gutterBackground: "#eee",
+  gutterForeground: "#afafaf",
+  lineHighlight: "#d5e6ff69",
 };
 
-export const xcodeLightStyle: CreateThemeOptions['styles'] = [
-  // Comment / GREEN / #
-  { tag: t.comment, color: "#277022" },
-
-  // Escape char / Greenblue
-  { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
-
+export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#000000" },
 
-  // Directive / BLUE / words: categories: with: letters: random-rate:
+  // Comment / GREEN / #
+  { tag: t.comment, color: "#000000"},
+
+  // Escape char / CREAM ON BLACK
+  { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
+
+  // Directive / RED / words: alphabet: etc.
   { tag: [t.meta, t.name], color: "#a11c08ff" },
 
-  // RegExp / BROWN / . + * ? ^ $ | \ ( ) [ ] { }
-  // Operator / BROWN / = > : 
+  // LIGHT BLUE / commas, equals sign, colon
+  { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, 
+
+  // CYAN / ^REJECT, ->, +, -
+  { tag: t.operator, color: "#024bba", fontWeight: "bold"}, 
+
+  // PINK / #, +, *, (, {, [
   { tag: t.regexp, color: "#990085ff" },
 
-  { tag: t.operator, color: "#024bba", fontWeight: "bold"},
-
-  { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, // commas and stuff
-
-  // Classes / RED /
+  // ORANGE / Categories
   { tag: t.className, color: "#7f5700ff" },
 
-  // Weights
+  // RED ITALIC / Weights
   { tag: t.strong, color: "#a11c08ff", fontWeight: "italic" }
 ];
 
 export function xcodeLightInit(options?: Partial<CreateThemeOptions>) {
-  const { theme = 'light', settings = {}, styles = [] } = options || {};
+  const { theme = "light", settings = {}, styles = [] } = options || {};
   return createTheme({
     theme: theme,
     settings: {
@@ -117,37 +118,38 @@ export function xcodeLightInit(options?: Partial<CreateThemeOptions>) {
 
 export const xcodeLight = [Lighty, xcodeLightInit()];
 
-export const defaultSettingsXcodeDark: CreateThemeOptions['settings'] = {
-  background: '#23272e',
-  foreground: '#23272e',
-  gutterBackground: '#1e2227',
-  caret: '#fff',
-  selection: '#22528b',
-  selectionMatch: '#594406',
-  lineHighlight: '#ffffff0f',
+export const defaultSettingsXcodeDark: CreateThemeOptions["settings"] = {
+  background: "#23272e",
+  foreground: "#23272e",
+  gutterBackground: "#1e2227",
+  caret: "#ffffff",
+  selection: "#153763ff",
+  selectionMatch: "#594406",
+  lineHighlight: "#ffffff0f",
 };
 
-export const xcodeDarkStyle: CreateThemeOptions['styles'] = [
-  // Comment / GREEN / #
-  { tag: t.comment, color: "#bee79d"}, 
-
-  // Escape char / Greenblue
-  { tag: t.escape, color: "#f0f0f0", backgroundColor:"#584747" }, 
-
+export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#eeeeeeff" },
 
-  // Directive / BLUE / words: categories: with: letters: random-rate: name:
+  // Comment / GREEN / #
+  { tag: t.comment, color: "#eeeeee"}, 
+
+  // Escape char / CREAM ON BLACK
+  { tag: t.escape, color: "#f0f0f0", backgroundColor:"#584747" }, 
+
+  // Directive / RED / words: alphabet: etc.
   { tag: [t.meta, t.name], color: "#ff7a7a" },
 
-  // RegExp / Brown / . + * ? ^ $ | \ ( ) [ ] { }
-  // Operator / Brown / = > : 
-  { tag: t.regexp, color: "#e687e4" },
+  // LIGHT BLUE / commas, equals sign, colon
+  { tag: t.link, color: "#a6d3f7" , fontWeight: "bold" },
   
+  // CYAN / ^REJECT, ->, +, -
   { tag: t.operator, color: "#44ebd0ff" , fontWeight: "bold" },
 
-  { tag: t.link, color: "#a6d3f7" , fontWeight: "bold" }, // commas and stuff
+  // PINK / #, +, *, (, {, [
+  { tag: t.regexp, color: "#e687e4" },
 
-  // Classes / RED /
+  // ORANGE / Categories
   { tag: t.className, color: "#ffcd90" },
 
   // Weights
@@ -155,7 +157,7 @@ export const xcodeDarkStyle: CreateThemeOptions['styles'] = [
 ];
 
 export const xcodeDarkInit = (options?: Partial<CreateThemeOptions>) => {
-  const { theme = 'dark', settings = {}, styles = [] } = options || {};
+  const { theme = "dark", settings = {}, styles = [] } = options || {};
   return createTheme({
     theme: theme,
     settings: {

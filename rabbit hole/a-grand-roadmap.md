@@ -111,6 +111,7 @@
 - [] Parafeature
 - [] Featurefield
 - [] Using features
+- [] "AI" generate a def file, like Gleb
 
 ## Docs
 

@@ -37,38 +37,14 @@ const cappa = "[A-Z" +
     // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
     "\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]";
 
-const vocabugTransformRules = [
-  { token: "escape",   regex: /\\./ },
-  { token: "link",     regex: />|->|→|\/|!|,|_/ },
-  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /#/ }
-];
-
-const vocabugClusterRules = [
-  { token: "escape",   regex: /\\./ },
-  { token: "link",     regex: /,|\/|!|,|_/ },
-  { token: "operator", regex: /\+|\-|\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /#/ }
-];
-
 const vocabugDistroRules = [
   { token: "operator",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
 ];
-
 const vocabugEngineRules = [
   { token: "operator",     regex: /\s+(compose|decompose|capitalise|decapitalise|to-upper-case|to-lower-case|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/ }
 ];
-
 const vocabugListRules = [
   { token: "link",     regex: /,/ }
-];
-
-const vocabugWordRules = [
-  { token: "escape",   regex: /\\./ },
-  { token: "link",     regex: /,|=/ },
-  { token: "operator", regex: /\^|∅/ },
-  { token: "regexp",   regex: /[()\[\]{}]/ },
-  { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
 ];
 
 const vocabugCategoryRules = [
@@ -77,6 +53,30 @@ const vocabugCategoryRules = [
   { token: "operator", regex: /\^|∅/ },
   { token: "regexp",   regex: /\[|\]/ },
   { token: "strong",   regex: /(\*\d+(\.\d+)?)/ } // Weights
+];
+
+const vocabugWordRules = [
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: /,|=/ },
+  { token: "operator", regex: /\^|∅/ },
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}/ },
+  { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
+];
+
+const vocabugTransformRules = [
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: />|->|→|\/|!|,|_/ },
+  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|\?|…|=\{|@\{|~\{|<[1-9]|\|/ }
+];
+
+// @ $ & * + = | ? < ~
+
+const vocabugClusterRules = [
+  { token: "escape",   regex: /\\./ },
+  { token: "link",     regex: /,|\/|!|,|_/ },
+  { token: "operator", regex: /\+|\-|\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|\?|…|=\{|@\{|~\{|<[1-9]|\|/ }
 ];
 
 const vocabugLang = StreamLanguage.define({
@@ -219,8 +219,7 @@ const vocabugLang = StreamLanguage.define({
                 return "meta";
             }
             // Engine
-            if (stream.match(/engine(?=:)/)) {
-                state.doIndent = true
+            if (stream.match(/\$(?= )/)) {
                 state.mode = 'engine';
                 return "meta";
             }

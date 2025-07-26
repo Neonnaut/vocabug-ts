@@ -147,19 +147,25 @@ class Resolver {
                     continue;
                 }
 
-                if (line.startsWith("engine:")) {
-                    line_value = line.substring(7).trim().toLowerCase();
+                if (line.startsWith("$ ")) { // Engine
+                    line_value = line.substring(2).trim().toLowerCase();
 
-                    if (line_value == "decompose"||line_value == "compose" ||
-                        line_value == "capitalise" || line_value == "de-capitalise" ||
-                        line_value == "to-upper-case" || line_value == "to-lower-case" ||
-                        line_value == "xsampa-to-ipa" || line_value == "ipa-to-xsampa"
-                    ) {
-                        this.add_transform(
-                            ["engine:"], [line_value], [], [], this.file_line_num
-                        )
-                        continue;
-                    } 
+                    line_value = line_value.replace(/\bcapitalize\b/g, 'capitalise')
+
+                    for (const engine of line_value.split(/\s+/)) {
+                        if (engine == "decompose"||engine == "compose" ||
+                            engine == "capitalise" || engine == "de-capitalise" ||
+                            engine == "to-upper-case" || engine == "to-lower-case" ||
+                            engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa"
+                        ) {
+                            this.add_transform(
+                                ["$"], [engine], [], [], this.file_line_num
+                            )
+                        } else {
+                            this.logger.validation_error(`Trash engine found'${line_value}'`, this.file_line_num);
+                        }
+                    }
+                    continue;
                 }
                 
                 let [target, result, conditions, exceptions] = this.GetTransform(line_value);
@@ -708,6 +714,7 @@ class Resolver {
             my_conditions, my_exceptions, this.file_line_num);
     }
 
+
     resolve_transforms() {
          // Resolve brackets, put categories in transforms, make a milkshake, etc.
         
@@ -717,6 +724,18 @@ class Resolver {
 
             let target = this.pre_transforms[i].target;
             let result = this.pre_transforms[i].result;
+
+            let xesult = '';
+            for (const char of target[0]) {
+                const entry = this.categories.get(char);
+                if (entry) {
+                xesult += entry.graphemes.join('');
+                } else {
+                xesult += char;
+                }
+            }
+            this.logger.info(xesult)
+
 
             //target = this.recursiveExpansion(target, this.category_strings, true);
 

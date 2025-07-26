@@ -28,7 +28,7 @@ class Word {
         if (Word.debug) {
             for (let i = 0; i < this.forms.length; i++) {
 
-                output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} 🔹 ⟨${this.forms[i]}⟩\n`;
+                output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} ➤ ⟨${this.forms[i]}⟩\n`;
             }
             return output;
         }

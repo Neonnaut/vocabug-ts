@@ -50,7 +50,7 @@
         </ol>
         </li>
         <li><a href="#vocComments">Using comments</a></li>
-        <li><a href="#vocGraphemes">About graphemes</a>
+        <li><a href="#vocAboutGraphemes">About graphemes</a>
         <ol class="nice-list">
           <li><a href="#vocNullGrapheme">Null grapheme</a></li>
           
@@ -79,7 +79,7 @@
           <li><a href="#vocPickOne">Pick-one-set</a></li>
           <li><a href="#vocOptional">Optional-set</a>
           <ol class="nice-list">
-            <li><a href="#vocOptionalWeight">Optional weight</a></li>
+            <li><a href="#vocOptionalsWeight">Optional weight</a></li>
           </ol>
           </li>
           <li><a href="#vocSupraSet">Supra-set</a>
@@ -89,19 +89,19 @@
           </li>
         </ol>
         </li>
-        <li><a href="">Default distributions</a></li>
-        <li><a href="">Assigning weights</a></li>
-        <li><a href="#vocAlphabetisationAndGraphs">Alphabetisation</a>
+        <li><a href="#vocDistributions">Default distributions</a></li>
+        <li><a href="#vocAssigningWeights">Assigning weights</a></li>
+        <li><a href="#vocAlphabetisation">Alphabetisation</a>
         <ol class="nice-list">
-          <li><a href="#vocAlphabetisation">Invisibility</a></li>
+          <li><a href="#vocInvisibility">Invisibility</a></li>
         </ol>
         </li>
-        <li><a href="#vocGraphs">Defining graphemes</a></li>
+        <li><a href="#vocGraphemes">Defining graphemes</a></li>
         <li><a href="#nescaTransform">Transform</a></li>
         <li><a href="#nescaTheChange">The change</a>
         <ol class="nice-list">
-          <li><a href="#nescaConcurrentSet">Concurrent change</a></li>
-          <li><a href="#nescaMergingSet">Merging change</a></li>
+          <li><a href="#nescaConcurrentChange">Concurrent change</a></li>
+          <li><a href="#nescaMergingChange">Merging change</a></li>
           <li><a href="#nescaReject">Reject</a></li>
         </ol>
         </li>
@@ -119,10 +119,10 @@
 
         <li><a href="#nescaUsingCategories">Using categories</a></li>
 
-        <li><a href="#vocCategories">Alternator and Optionalator</a>
+        <li><a href="#nescaAltAndOpt">Alternator and Optionalator</a>
         <ol class="nice-list">
-          <li><a href="#nescaOptionalSet">Alternator-set</a></li>
-          <li><a href="#nescaOptionalSet">Optionalator-set</a></li>
+          <li><a href="#nescaAlternatorSet">Alternator-set</a></li>
+          <li><a href="#nescaOptionalatorSet">Optionalator-set</a></li>
         </ol>
         </li>
 
@@ -130,18 +130,16 @@
 
         <li><a href="#nescaWildcardAndPositioning">Wildcard, repetition and positioning</a>
         <ol class="nice-list">
-          <li><a href="#nescaWildcard">Wildcard</a></li>
-          <li><a href="#nescaDittoMark">Ditto-mark</a></li>
           <li><a href="#nescaPlusMark">Plus-mark</a></li>
+          <li><a href="#nescaKleeneStar">Kleene-star</a></li>
+          <li><a href="#nescaGeminateMark">Geminate-mark</a></li>
+          <li><a href="#nescaWildcard">Wildcard</a></li>
           <li><a href="#nescaAnythingsMark">Anythings-mark</a></li>
 
-          <li><a href="#nescaAnythingsMark">Backreference</a></li>
-          
           <li><a href="#nescaQuantifier">Quantifier</a></li>
-
-          <li><a href="#nescaBlocker">Blocker</a></li>
-
           <li><a href="#nescaPositioner">Positioner</a></li>
+          <li><a href="#nescaBlocker">Blocker</a></li>
+          <li><a href="#nescaBackreference">Backreference</a></li>
         </ol>
         </li>
 
@@ -189,13 +187,13 @@
       </ul>
       
       <h2 id="vocComments"><a class="head-num">3</a>Using comments</h2>
-      <p>If a line contains a semicolon <code class="example">;</code> everything after it on that line is ignored and not interpreted as Vocabug syntax -- unless <code class="example">;</code> is <a href="#vocWordCreationEscape">escaped</a>. You can use this to leave notes about what something does or why you made certain decisions.</p>
+      <p>If a line contains a semicolon <code class="example">;</code> everything after it on that line is ignored and not interpreted as Vocabug syntax -- unless <code class="example">;</code> is <a href="#vocEscapeWord">escaped</a>. You can use this to leave notes about what something does or why you made certain decisions.</p>
 
       <h2 id="vocAboutGraphemes"><a class="head-num">4</a>About graphemes</h2>
       <p>Graphemes are indivisible meaningful characters that make a generated word in Vocabug. Phonemes can be thought of as graphemes. If we use English words <code class="example">sky</code> and <code class="example">shy</code> as examples to illustrate this, <code class="example">sky</code> is made up by the graphemes <code class="example">s</code> + <code class="example">k</code> + <code class="example">y</code>, while <code class="example">shy</code> is made up by <code class="example">sh</code> + <code class="example">y</code>.</p>
 
       <h3 id="vocNullGrapheme"><a class="head-num">4.1</a>Null grapheme</h3>
-      <p>If a word is built using the syntax character <code class="example">^</code> or <code class="example">∅</code>, it will disappear in the generated word. In other words <code class="example">^</code> is a null grapheme. If you want to use <code class="example">^</code> as a grapheme, you will need to <a href="#vocWordCreationEscape">escape it</a>. To use other syntax characters as graphemes, they must be escaped too.</p>
+      <p>If a word is built using the syntax character <code class="example">^</code> or <code class="example">∅</code>, it will disappear in the generated word. In other words <code class="example">^</code> is a null grapheme. If you want to use <code class="example">^</code> as a grapheme, you will need to <a href="#vocEscapeWord">escape it</a>. To use other syntax characters as graphemes, they must be escaped too.</p>
 
       <h3 id="vocEscapingCharacters"><a class="head-num">4.2</a>Escaping characters</h3>
       <p>A single-length character following the syntax character <code class="example">\</code> ignores any meaning it might have had in the generator, including backslashes themselves. This way, anything including capital letters that have already been defined as categories, brackets, even spaces can be graphemes.</p>
@@ -226,7 +224,7 @@
           </tr>
           <tr>
             <td><code class="example">$</code></td>
-            <td>Defines a <a href="#vocSegment">segment</a> when followed by a capital letter</td>
+            <td>Defines a <a href="#vocSegments">segment</a> when followed by a capital letter</td>
           </tr>
           <tr>
             <td><code class="example">,</code> or <code class="example">&nbsp;</code></td>
@@ -234,7 +232,7 @@
           </tr>
           <tr>
             <td><code class="example">*</code></td>
-            <td>Gives <a href="#vocWeights">weight</a> to an item</td>
+            <td>Gives <a href="#vocAssigningWeights">weight</a> to an item</td>
           </tr>
           <tr>
             <td><code class="example">[</code> and <code class="example">]</code></td>
@@ -288,11 +286,11 @@
           </tr>
           <tr>
             <td><code class="example">[</code> and <code class="example">]</code></td>
-            <td><a href="#nescaConcurrentSet">Alternator-set</a></td>
+            <td><a href="#nescaAlternatorSet">Alternator-set</a></td>
           </tr>
           <tr>
             <td><code class="example">(</code> and <code class="example">)</code></td>
-            <td><a href="#nescaOptionalSet">Optionalator-set</a></td>
+            <td><a href="#nescaOptionalatorSet">Optionalator-set</a></td>
           </tr>
           <tr>
             <td><code class="example">C</code>, <code class="example">D</code>, <code class="example">K</code>, ...</td>
@@ -327,40 +325,40 @@
             <td><a href="#nescaWordBoundary">Word boundary</a></td>
           </tr>
           <tr>
+            <td><code class="example">+</code></td>
+            <td><a href="#nescaPlusMark">Plus-mark</a>, matches as 1 or more of the previous grapheme</td>
+          </tr>
+          <tr>
             <td><code class="example">*</code></td>
+            <td><a href="#nescaWildcard">Kleene-star</a>, matches as 0, 1, or more of the previous grapheme</td>
+          </tr>
+          <tr>
+            <td><code class="example">:</code></td>
+            <td><a href="#nescaGeminateMark">Geminate-mark</a>, matches exactly twice to the previous grapheme</td>
+          </tr>
+          <tr>
+            <td><code class="example">&</code></td>
             <td><a href="#nescaWildcard">Wildcard</a>, matches exactly 1 of any grapheme</td>
           </tr>
           <tr>
-            <td><code class="example">"</code></td>
-            <td><a href="#nescaDittoMark">Ditto-mark</a>, matches exactly 1 of the previous grapheme</td>
+            <td><code class="example">?</code>, <code class="example">…</code></td>
+            <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches 1 or more of any grapheme. It is non-greedy</td>
           </tr>
           <tr>
-            <td><code class="example">+</code></td>
-            <td><a href="#nescaPlusMark">Plus-mark</a>, matches 1 or more of the previous character</td>
-          </tr>
-          <tr>
-            <td><code class="example">. . .</code></td>
-            <td><a href="#nescaAnythingsMark">Backreference</a></td>
-          </tr>
-          <tr>
-            <td><code class="example">&</code>, <code class="example">…</code></td>
-            <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches 1 or more of any character. It is non-greedy</td>
-          </tr>
-          <tr>
-            <td><code class="example">=[</code> and <code class="example">]</code></td>
+            <td><code class="example">={</code> and <code class="example">}</code></td>
             <td><a href="#nescaQuantifier">Quantifier</a></td>
           </tr>
           <tr>
-            <td><code class="example">&lt;[</code> and <code class="example">]</code></td>
-            <td><a href="#nescaBlocker">Blocker</a></td>
-          </tr>
-          <tr>
-            <td><code class="example">@[</code> and <code class="example">]</code></td>
+            <td><code class="example">@{</code> and <code class="example">}</code></td>
             <td><a href="#nescaPositioner">Positioner</a></td>
           </tr>
           <tr>
-            <td><code class="example">1</code>, <code class="example">2</code>, ... <code class="example">9</code></td>
-            <td>For <a href="#nescaMetathesis">metathesis</a>. In <code class="example">RESULT</code>, these represent the targets</td>
+            <td><code class="example">~{</code> and <code class="example">}</code></td>
+            <td><a href="#nescaBlocker">Blocker</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">&lt;1</code>, <code class="example">&lt;2</code>, ... <code class="example">&lt;9</code></td>
+            <td><a href="#nescaBackreference">Backreference</a></td>
           </tr>
           <tr>
             <td><code class="example">|</code></td>
@@ -370,7 +368,7 @@
       </table>
 
       <h2 id="vocCategories"><a class="head-num">5</a>Categories</h2>
-      <p>A category is a set of <a href="#vocGraphemes">graphemes</a> with a key. The key is a singular-length capital letter. For example:</p>
+      <p>A category is a set of <a href="#vocAboutGraphemes">graphemes</a> with a key. The key is a singular-length capital letter. For example:</p>
       <pre class="example">C = t, n, k, m, ch, l, ꞌ, s, r, d, h, w, b, y, p, g
 F = n, l, ꞌ, t, k, r, p
 V = a, i, e, u, o</pre>
@@ -432,7 +430,7 @@ words: t[V, x]</pre>
       <p>In the above example, there is a 10% chance of getting one of <code class="example">tan</code>, <code class="example">tat</code> or <code class="example">tal</code>, but a 90% chance of <code class="example">ta</code>.</p>
 
       <h4 id="vocOptionalsWeight"><a class="head-num">6.4.1</a>Optionals weight</h4>
-      <p>By default, an optional-set has a 10% chance of being included in the word. You can change this probability.</p>
+      <p>By default, an optional-set has a 10% chance of being included in the word. You can change this probability with the <code class="example">optionals-weight:</code> directive.</p>
 
       <h3 id="vocSupraSet"><a class="head-num">6.5</a>Supra-set</h3>
       <p>A 'supra-set', is applied over the entire word, and there can only be one supra set. Curly brackets <code class="example">{</code> and <code class="example">}</code>, denotes each item in the supra-set and their location in the word. The items of a supra-set can only be a category, or the null grapheme <code class="example">^</code>. Only one item in the supra-set will be picked for that generated word.</p>
@@ -445,7 +443,7 @@ words: t[V, x]</pre>
       <p>You can set the weights of supra-set items like so:</p>
       <pre class="example">M = m<br>N = n<br>$X = ka{M*8}<br>$Y = te{N*2}<br>words: $X$Y</pre>
       <p>The above example has an 80% chance of generating <code class="example">kamte</code> and a 20% chance of generating <code class="example">katen</code>.</p>
-      <p>Supra-set item weights support a sentinel value -- a 'super-heavy' value <code class="example">s</code>. This <code class="example">s</code> will ensure the supra-set item attached to this weight is always chosen over others. For example: <code class="example">{b*s}</code></p>
+      <p>Supra-set item weights support a sentinel value -- a 'super-heavy' value <code class="example">s</code>. This <code class="example">s</code> will ensure the supra-set item attached to this weight is always chosen over others. For example: <code class="example">{V*s}</code></p>
 
       <h2 id="vocDistributions"><a class="head-num">7</a>Default distributions</h2>
       <p><b>The ordering of items matters</b> in <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> and <a href="#vocWords">word-shapes</a>. The first item will be chosen the most often, the second grapheme the second most often, and so on.</p>
@@ -460,7 +458,7 @@ words: t[V, x]</pre>
 
       <img src="img/distribution.png" alt="Distribution graph" style="width: 100%;">
 
-      <h2 id="vocCategoryWeights"><a class="head-num">8</a>Assigning weights</h2>
+      <h2 id="vocAssigningWeights"><a class="head-num">8</a>Assigning weights</h2>
       <p>If you want to set your own frequency for graphemes in a <a href="#vocCategories">category</a> or category-set, items in a <a href="#vocPickOne">pick-one-set</a>, or <a href="#vocOptional">optional-set</a>, or <a href="#vocWords">word-shapes</a> in the <code class="example">words:</code> directive, you can use an asterisk <code class="example">*</code> to specify the weight for each item, like so:</p>
       <pre class="example">V = a*5, e*4, i*3, o*2, u*1
 $S = [V*8 x*2]
@@ -478,7 +476,7 @@ words: $S:2 y</pre>
       <pre class="example">invisible-alphabet: ., ˈ<br></pre>
       <p>This would order generated words <code class="example">ˈpa.ta ˈca.ta za.ˈta ca.ˈa</code> as   <code class="example">ca.ˈa, ˈca.ta, ˈpa.ta, za.ˈta</code></p>
 
-      <h2 id="vocGraphs"><a class="head-num">10</a>Defining graphemes</h2>
+      <h2 id="vocGraphemes"><a class="head-num">10</a>Defining graphemes</h2>
       <p>The <code class="example">graphemes:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nescaTransform">transformations</a>.</p>
       <pre class="example">graphemes: a, b, c, ch, e, f, h, i, k, l, m, n, o, p, p', r, s, t, t', y</pre>
       <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
@@ -490,7 +488,7 @@ words: $S:2 y</pre>
       <p>A rule can be summarised in four fields: <code class="example">CHANGE / CONDITION ! EXCEPTION</code>. The characters <code class="example">/</code> and <code class="example">!</code> that precede each field (except for the <code class="example">CHANGE</code>) are necessary for signalling each field. For example, including a <code class="example">!</code> will signal that this rule contains an exception, and all text following it until the next field marker will be interpreted as such.</p>
 
       <p>Every rule begins on a new line and must contain a <code class="example">CHANGE</code>. The <code class="example">CONDITION</code> or <code class="example">EXCEPTION</code> fields are optional.</p>
-      <p>If you want to capture graphemes that are normally syntax characters in transforms, you will need to <a href="#nescaTransformEscape">escape them</a>.</p>
+      <p>If you want to capture graphemes that are normally syntax characters in transforms, you will need to <a href="#vocEscapeTransform">escape them</a>.</p>
 
       <p>When this document uses examples to explain transformations, the last comment shows an example word transforming. For example <code class="example">; amda ==> ampa</code> means the rule will transform the word <code class="example">amda</code> into <code class="example">ampa</code></p>
 
@@ -515,14 +513,14 @@ words: $S:2 y</pre>
       <pre class="example">; Replace every /o/ with /x/<br>  o -> x<br>; bodido ==> bxdidx</pre>
       <p>In this rule, we see every instance of <code class="example">o</code> become <code class="example">x</code>.</p>
 
-      <h3 id="nescaConcurrentSet"><a class="head-num">12.1</a>Concurrent change</h3>
+      <h3 id="nescaConcurrentChange"><a class="head-num">12.1</a>Concurrent change</h3>
       <p>Concurrent change is achieved by listing multiple graphemes in <code class="example">TARGET</code> separated by commas, and listing the same amount of resultant graphemes in <code class="example">RESULT</code> separated by commas. Changes in a concurrent change execute at the same time:</p>
       <pre class="example">; Switch /o/ and /a/ around<br>  o, a -> a, o<br>; boda ==> bado</pre>
       <p>Notice that the above example is different to the example below:</p>
       <pre class="example">  o -> a<br>  a -> o<br>; boda ==> bodo</pre>
       <p>where each change is on its own line. We can see <code class="example">o</code> merge with <code class="example">a</code>, then <code class="example">a</code> becomes <code class="example">o</code>.</p>
 
-      <h3 id="nescaConcurrentSet"><a class="head-num">12.2</a>Merging change</h3>
+      <h3 id="nescaMergingChange"><a class="head-num">12.2</a>Merging change</h3>
       <p>Instead of listing each <code class="example">RESULT</code> in a councurrent change, we can instead list just one that all the <code class="example">TARGET</code>s will merge into:</p>
       <pre class="example">; Merge /o/ and /a/ into x<br>  o, a -> x<br>; boda ==> bxdx</pre>
       <p>This is equivalant to:</p>
@@ -571,11 +569,11 @@ words: $S:2 y</pre>
       <p>You can reference categories in transforms. The category will behave in the same way as an alternator set:</p>
       <pre class="example">  B = x, y, z<br>  transform:<br>  B -> ^<br>; xapay ==> apa</pre>
 
-      <h2 id="nescaUsingCategories"><a class="head-num">17</a>Alternator and Optionalator</h2>
+      <h2 id="nescaAltAndOpt"><a class="head-num">17</a>Alternator and Optionalator</h2>
 
-      <h3 id="nescaOptionalSet"><a class="head-num">17.1</a>Alternator-set</h3>
+      <h3 id="nescaAlternatorSet"><a class="head-num">17.1</a>Alternator-set</h3>
 
-      <h3 id="nescaOptionalSet"><a class="head-num">17.2</a>Optionalator-set</h3>
+      <h3 id="nescaOptionalatorSet"><a class="head-num">17.2</a>Optionalator-set</h3>
       <p>Items in an optional-set can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
       <pre class="example">; Merge /x/ and /xw/ into /k/<br>  x(w) -> k<br>; xwaxaħa ==> kakaħa</pre>
       <p>Optional-set can also attach to an alternator-set:</p>
@@ -720,38 +718,37 @@ n mp +  +  nn +</pre>
       <h2 id="nescaWildcardAndPositioning"><a class="head-num">19</a>Wildcards, repetition and positioning</h2>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
 
-      <h3 id="nescaWildcard"><a class="head-num">19.1</a>Wildcard</h3>
-      <p>Wildcard using an astrisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
-      <pre class="example">  a -> e / _*<br>; apappap ==> apappep</pre>
+      <h3 id="nescaPlusMark"><a class="head-num">19.1</a>Plus-mark</h3>
+      <p>Plus-mark, using <code class="example">+</code>, will match as many (or zero) times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it.</p>
+      <pre class="example">  a+ -> o<br>; raraaaaa ==> raro</pre>
+      <pre class="example">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
 
-      <p>Wildcard can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
+      <h3 id="nescaKleeneStar"><a class="head-num">19.2</a>Kleene-star</h3>
+      <p>Plus-mark, using <code class="example">+</code>, will match as many (or zero) times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it.</p>
+      <pre class="example">  a+ -> o<br>; raraaaaa ==> raro</pre>
+      <pre class="example">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
 
-      <h3 id="nescaDittoMark"><a class="head-num">19.2</a>Ditto-mark</h3>
+      <h3 id="nescaGeminateMark"><a class="head-num">19.3</a>Geminate-mark</h3>
       <p>Ditto-mark using double-quote <code class="example">"</code>, will duplicate once the grapheme, or grapheme from a set, category, or feature, to the left of it. In other words, you can capture an item only when it is geminated using the ditto-mark:</p>
       <pre class="example">  a" -> o<br>; aaata => oata</pre>
 
+      <h3 id="nescaWildcard"><a class="head-num">19.4</a>Wildcard</h3>
+      <p>Wildcard using an astrisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
+      <pre class="example">  a -> e / _*<br>; apappap ==> apappep</pre>
+      <p>Wildcard can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
       <p>Ditto-mark can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(")</code>, thereby allowing it to match zero copies as well.</p>
-
-      <h3 id="nescaPlusMark"><a class="head-num">19.3</a>Plus-mark</h3>
-      <p>Plus-mark, using <code class="example">+</code>, will match as many (or zero) times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it.</p>
-      <pre class="example">  a+ -> o<br>; raraaaaa ==> raro</pre>
-
-      <pre class="example">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
 
       <p>Plus-mark can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(+)</code>, thereby allowing it to match zero copies as well.</p>
 
       <p>You may want to match zero, once, or as many times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it, known occasionally as a <a href="https://en.wikipedia.org/wiki/Kleene_star">Kleene-star</a>. To do this, you need to enclose the grapheme, set, category, or feature and the plus-mark in an <a href="#vocOptional">optional-set</a>, and the plus-mark by itself inside another optional-set:</p>
       <pre class="example">; /i/ followed by either 0, 1, or more /a/ becomes /e/<br>  i(a(+)) -> e<br>; ririaaaaa ==> rere</pre>
 
-      <h3 id="nescaAnythingsMark"><a class="head-num">19.4</a>Anythings-mark</h3>
+      <h3 id="nescaAnythingsMark"><a class="head-num">19.5</a>Anythings-mark</h3>
       <p>The anythings-mark uses ampersand <code class="example">&</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
       <pre class="example">  b&t -> x<br>; babãitto => xto</pre>
       <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="example">t</code> and beyond like <code class="example">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
-      
       <p>The example below uses an optional anythings-mark in the condition:</p>
       <pre class="example">; Simulate spreading of nasality to vowels<br>  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ](…)_ <br>; babãittati => babãĩttãtĩ</pre>
-
-      <h3 id="nescaAnythingsMark"><a class="head-num">19.5</a>Backreference</h3>
 
       <h3 id="nescaQuantifier"><a class="head-num">19.6</a>Quantifier</h3>
       <p>The quantifier matches as many times its digit(s), enclosed in <code class="example">=[</code> and <code class="example">]</code>, to the things to the left.</p>
@@ -822,10 +819,6 @@ n mp +  +  nn +</pre>
         </tbody>
       </table>
 
-      <h3 id="nescaBlocker"><a class="head-num">19.7</a>Blocker</h3>
-      <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="example">&lt;[</code> and <code class="example">]</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
-      <pre class="example">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ](&)&lt;[k, g]_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
-
       <h3 id="nescaPositioner"><a class="head-num">19.8</a>Positioner</h3>
       <p>Positioners, enclosed in <code class="example">@[</code> and <code class="example">]</code>, allows a grapheme to the left of it to be captured only when it is the Nth in the word:</p>
       <pre class="example">; Change the second /o/ in a word to /x/ after the second /s/<br>  o@[2] -> x / s@[2]_
@@ -839,6 +832,12 @@ n mp +  +  nn +</pre>
       <p>The number in the positioner can also be a range. To do this, put a <code class="example">-</code> between the lowest and highest range:</p>
       <pre class="example">; Change the first to third /o/ in a word to /x/<br>  o@[1:3] -> x
 ; sososoo ==> sxsxsxo</pre>
+
+      <h3 id="nescaBlocker"><a class="head-num">19.7</a>Blocker</h3>
+      <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="example">&lt;[</code> and <code class="example">]</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
+      <pre class="example">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ](&)&lt;[k, g]_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
+
+      <h3 id="nescaBackreference"><a class="head-num">19.5</a>Backreference</h3>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">20</a>Advanced rules</h2>
 
@@ -903,11 +902,11 @@ END</pre>
       -->
 
       <h3 id="nescaEngine"><a class="head-num">20.3</a>Engine</h3>
-      <p>The engine statement provides useful functions that you can call at any point in the definition-build. You can also call a list of these functions in one line e.g: <code class="example">engine: compose, capitalise</code></p>
+      <p>The engine statement provides useful functions that you can call at any point in the definition-build. You call these engines following a <code class="example">$</code> and a space on a new line. You can also call a list of these functions in one line. For example: <code class="example">$ compose, capitalise</code></p>
 
       <ul class="paragraphian">
-        <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, <code class="example">n</code> \u006E + <code class="example">◌̃ </code> \u0303. The typescript function is called Normalize("NFD")</li>
-        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1. The typescript function is called Normalize("NFC")</li>
+        <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, <code class="example">n</code> \u006E + <code class="example">◌̃ </code> \u0303</li>
+        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1</li>
         <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
         <li><code class="example">de-capitalise</code> will convert the first character of a word to lowercase</li>
         <li><code class="example">to-upper-case</code> will convert all characters of a word to uppercase</li>
