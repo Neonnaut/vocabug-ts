@@ -323,7 +323,7 @@ class Resolver {
             this.logger.validation_error(`No word-shapes to choose from -- expected 'words: wordshape1 wordshape2 ...'`, this.wordshape_line_num);
         }
 
-        this.wordshape_pending = this.supra_builder.processString(this.wordshape_pending);
+        this.wordshape_pending = this.supra_builder.processString(this.wordshape_pending, this.wordshape_line_num);
 
         if (!this.valid_words_brackets(this.wordshape_pending)) {
             this.logger.validation_error(`Word-shapes had missmatched brackets`, this.wordshape_line_num);

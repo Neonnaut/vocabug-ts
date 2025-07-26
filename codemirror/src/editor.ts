@@ -9,7 +9,7 @@ import {
 } from '@codemirror/view';
 
 // Themes
-import { xcodeLight, xcodeDark } from './dist';
+import { xcodeLight, xcodeDark } from '../dark-light';
 const themeConfig = new Compartment();
 const lineWrapConfig = new Compartment();
 
@@ -77,9 +77,18 @@ const vocabugClusterRules = [
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|\?|…|=\{|@\{|~\{|<[1-9]|\|/ }
 ];
 
+type State = {
+  mode: string;
+  transform: boolean;
+  doIndent: boolean;
+  blanko: boolean;
+  classList: string[];
+  classMacList: string[];
+};
+
 const vocabugLang = StreamLanguage.define({
     name: "Vocabug",
-    startState: (i) => { return {
+    startState: (i): State => { return {
         mode: 'none',
         transform: false,
         doIndent: false,
@@ -167,7 +176,7 @@ const vocabugLang = StreamLanguage.define({
                 }
 
                 const macroRegex = new RegExp(`(\\$${cappa})(?=\\s*=)`, "u");
-                let match = stream.match(macroRegex);
+                let match = stream.match(macroRegex) as RegExpMatchArray;;
                 if (match) {
                     state.classMacList.push(match[1]);
                     state.mode = 'segmentLine';
@@ -176,7 +185,7 @@ const vocabugLang = StreamLanguage.define({
 
                 // Class
                 const ClassRegex = new RegExp(`(${cappa})(?=\\s*=)`, "u");
-                match = stream.match(ClassRegex);
+                match = stream.match(ClassRegex) as RegExpMatchArray;
                 if (match) {
                     state.classList.push(match[1]);
                     state.classMacList.push(match[1]);
@@ -311,7 +320,7 @@ const vocabugLang = StreamLanguage.define({
     }
 });
 
-function createEditorState(initialContents, myTheme) {
+function createEditorState(initialContents:string, myTheme:string) {
     let extensions = [
         lineNumbers(),
         highlightActiveLineGutter(),
@@ -341,11 +350,11 @@ function createEditorState(initialContents, myTheme) {
     });
 }
 
-function createEditorView(state, parent) {
+function createEditorView(state:EditorState, parent:HTMLElement) {
     return new EditorView({ state, parent });
 }
 
-function themeIdentifier(myTheme) {
+function themeIdentifier(myTheme:string) {
     switch (myTheme) {
         case 'light':
             return xcodeLight;
@@ -356,13 +365,13 @@ function themeIdentifier(myTheme) {
     }
 }
 
-function changeEditorTheme(myEditor, myTheme) {
+function changeEditorTheme(myEditor:EditorView, myTheme:string) {
     myEditor.dispatch({
         effects: themeConfig.reconfigure(themeIdentifier(myTheme))
     })
 }
 
-function changeEditorLineWrap(myEditor, wrapping) {
+function changeEditorLineWrap(myEditor:EditorView, wrapping:boolean) {
     myEditor.dispatch({
         effects: [lineWrapConfig.reconfigure(
             wrapping ? EditorView.lineWrapping : []

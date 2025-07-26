@@ -14,7 +14,7 @@ export class SupraBuilder {
         this.idCounter = 1;
     }
 
-    processString(input: string): string {
+    processString(input: string, wordshape_line_num:number): string {
         const tokenRegex = /\{([^}]*)\}/g;
         const validContentRegex = new RegExp(
         `^(\\^|∅|${cappa})(?:\\*((\\d+(?:\\.\\d+)?)|s))?$` );
@@ -22,8 +22,7 @@ export class SupraBuilder {
         return input.replace(tokenRegex, (fullMatch, content) => {
             const match = validContentRegex.exec(content);
             if (!match) {
-                // THIS
-                this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`, null);
+                this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`, wordshape_line_num);
             }
 
             const letter = match[1];

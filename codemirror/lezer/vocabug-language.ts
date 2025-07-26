@@ -1,4 +1,4 @@
-import { parser } from "./lezer/vocabug-parser";
+/*import { parser } from "./lezer/vocabug-parser";
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
 import { styleTags, tags as t } from "@lezer/highlight";
 
@@ -32,4 +32,4 @@ export const vocabugLanguage = LRLanguage.define({
 // Extension
 export function VocabugSupport() {
   return new LanguageSupport(vocabugLanguage);
-}
+}*/
