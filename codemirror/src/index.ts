@@ -10,7 +10,7 @@ import { EditorView } from "codemirror";
 const Darky = EditorView.theme({
   "&": {
     fontSize: "12pt",
-    color: "#bee79d"
+    color: "#eeeeeeff"
   },
   ".cm-gutters": {
     color: "#777777",
@@ -40,7 +40,7 @@ const Darky = EditorView.theme({
 const Lighty = EditorView.theme({
   "&": {
     fontSize: "12pt",
-    color: "#277022"
+    color: "#000000"
   },
   ".cm-gutters": {
     color: "#999999",
@@ -80,7 +80,7 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#000000" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#000000"},
+  { tag: t.comment, color: "#277022"},
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
@@ -129,10 +129,10 @@ export const defaultSettingsXcodeDark: CreateThemeOptions["settings"] = {
 };
 
 export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
-  { tag: t.variableName, color: "#eeeeeeff" },
+  { tag: t.variableName, color: "#eeeeff" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#eeeeee"}, 
+  { tag: t.comment, color: "#bee79d"}, 
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#f0f0f0", backgroundColor:"#584747" }, 
