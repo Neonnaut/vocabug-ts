@@ -70,8 +70,6 @@ const vocabugTransformRules = [
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|\?|…|=\{|@\{|~\{|<[1-9]|\|/ }
 ];
 
-// @ $ & * + = | ? < ~
-
 const vocabugClusterRules = [
   { token: "escape",   regex: /\\./ },
   { token: "link",     regex: /,|\/|!|,|_/ },

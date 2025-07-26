@@ -2,11 +2,11 @@
 
 - [x] Comments
 - [x] Examples
-- [] Complete validation error line handling
+- [x] Complete validation error line handling
 
 ## Interface
 
-- [] Syntax highlighting
+- [x] Syntax highlighting
 - [x] Generate words button
 - [x] Copy words button
 - [x] Clear button
@@ -23,7 +23,6 @@
 - [x] Examples loading
 - [x] Logo
 - [x] Introduction paragraph
-- [] Use font awesome for buttons
 
 ## Word-gen
 
@@ -51,8 +50,6 @@
 
 ## Transform
 
-- [] Rename pre etc. to pending
-
 - [] Transform char escape -- Important!!
 - [x] Single change
 - [x] Concurrent change
@@ -71,15 +68,17 @@
 - [x] Cluster-field
 - [x] Cluster field condition and exception
 
-- [] Wildcard
-- [] Ditto-mark
 - [] Plus-mark
+- [] Kleene-star
+- [] Geminate-mark
+- [] Wildcard
 - [] Anythings-mark
-- [] Backreference
-- [] Quantifier
-- [] Blocker
-- [] Positioner
 
+- [] Quantifier
+- [] Positioner
+- [] Blocker
+
+- [] Backreference
 - [] Metathesis
 - [] Chance block
 
@@ -97,6 +96,17 @@
 - [x] Alphabet directive
 - [x] Invisible directive
 
+## Docs
+
+- [] Questions and answers
+- [] How to write def files
+
+## Tests
+
+- [x] Vitest colla
+- [x] Vitest examples
+- [] Vitest transforms
+
 ## Extra
 
 - [] HTML entities
@@ -112,15 +122,4 @@
 - [] Featurefield
 - [] Using features
 - [] "AI" generate a def file, like Gleb
-
-## Docs
-
-- [] Questions and answers
-- [] How to write def files
-
-## Tests
-
-- [] Vitest colla
-- [] Vitest examples
-- [] Vitest transforms
 

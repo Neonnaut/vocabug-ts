@@ -20,13 +20,13 @@ class Resolver {
     public word_divider: string;
 
     public category_distribution: string;
-    private category_strings: Map<string, string>;
-    public categories: Map<string, { graphemes:string[], weights:number[]} >;
+    private category_pending: Map<string, { content:string, line_num:number }>;
+    public categories: Map<string, { graphemes:string[], weights:number[] }>;
     
-    public segments: Map<string, string>;
+    public segments: Map<string, { content:string, line_num:number }>;
     public optionals_weight: number;
     public wordshape_distribution: string;
-    private wordshape_string: string;
+    private wordshape_pending: string;
     public wordshapes: { items:string[], weights:number[]};
     private wordshape_line_num: number;
     
@@ -104,14 +104,14 @@ class Resolver {
         }
         
         this.category_distribution = "gusein-zade";
-        this.category_strings = new Map;
+        this.category_pending = new Map;
         this.categories = new Map;
         this.optionals_weight = 10;
         this.segments = new Map;
         this.wordshape_distribution = "zipfian";
         this.alphabet = [];
         this.invisible = [];
-        this.wordshape_string = ""
+        this.wordshape_pending = ""
         this.wordshapes = { items: [], weights: [] };
         this.wordshape_line_num = 0;
         this.graphemes = [];
@@ -246,7 +246,7 @@ class Resolver {
                 line_value = this.escape_mapper.escapeBackslashPairs(line_value);
                 
                 if (line_value != "") {
-                    this.wordshape_string = line_value;
+                    this.wordshape_pending = line_value;
                 }
                 this.wordshape_line_num = this.file_line_num;
 
@@ -269,10 +269,10 @@ class Resolver {
                     if (!this.valid_words_brackets(field)) {
                         this.logger.validation_error(`The segment '${name}' had missmatched brackets`, this.file_line_num);
                     }
-                    this.segments.set(myName, field);
+                    this.segments.set(myName, {content: field, line_num:this.file_line_num });
                 } else {
                     // CATEGORIES !!!
-                    this.category_strings.set(myName, field);
+                    this.category_pending.set(myName, { content:field, line_num:this.file_line_num });
                 }
             }
         }
@@ -319,21 +319,21 @@ class Resolver {
         let buffer = "";
         let insideBrackets = 0;
 
-        if (this.wordshape_string.length == 0){
+        if (this.wordshape_pending.length == 0){
             this.logger.validation_error(`No word-shapes to choose from -- expected 'words: wordshape1 wordshape2 ...'`, this.wordshape_line_num);
         }
 
-        this.wordshape_string = this.supra_builder.processString(this.wordshape_string);
+        this.wordshape_pending = this.supra_builder.processString(this.wordshape_pending);
 
-        if (!this.valid_words_brackets(this.wordshape_string)) {
+        if (!this.valid_words_brackets(this.wordshape_pending)) {
             this.logger.validation_error(`Word-shapes had missmatched brackets`, this.wordshape_line_num);
         }
-        if (!this.valid_words_weights(this.wordshape_string)) {
+        if (!this.valid_words_weights(this.wordshape_pending)) {
             this.logger.validation_error(`Word-shapes had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',' a bracket, or ' '`, this.wordshape_line_num);
         }
 
-        for (let i = 0; i < this.wordshape_string.length; i++) {
-            const char = this.wordshape_string[i];
+        for (let i = 0; i < this.wordshape_pending.length; i++) {
+            const char = this.wordshape_pending[i];
 
             if (char === '[' || char === '(') {
                 insideBrackets++;
@@ -736,9 +736,6 @@ class Resolver {
             }
             this.logger.info(xesult)
 
-
-            //target = this.recursiveExpansion(target, this.category_strings, true);
-
             let exceptions = [];
             for (let j = 0; j < this.pre_transforms[i].exceptions.length; j++) {
                 let exception_before = this.pre_transforms[i].exceptions[j].before
@@ -787,22 +784,25 @@ class Resolver {
     }
 
     expand_categories() {
-        for (const [key, value] of this.category_strings) {
-            if (!this.valid_category_brackets(value)) {
-                // THIS
-                this.logger.validation_error(`Category '${key}' had missmatched brackets`);
+        for (const [key, value] of this.category_pending) {
+            if (!this.valid_category_brackets(value.content)) {
+                this.logger.validation_error(`Category '${key}' had missmatched brackets`, value.line_num);
             }
-            if (!this.valid_category_weights(value)) {
-                // THIS
-                this.logger.validation_error(`Category '${key}' had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',', a bracket, or ' '`);
+            if (!this.valid_category_weights(value.content)) {
+                this.logger.validation_error(`Category '${key}' had invalid weights -- expected weights to follow an item and look like '*NUMBER' followed by either ',', a bracket, or ' '`, value.line_num);
             }
-            this.category_strings.set( key, this.recursiveExpansion(value, this.category_strings, true) );
+            
+            for (const [key, value] of this.category_pending.entries()) {
+                const expandedContent = this.recursiveExpansion(value.content, this.category_pending);
+                this.category_pending.set(key, {
+                    content: expandedContent,
+                    line_num: value.line_num, // Preserve original line_num
+                });
+            }
         }
 
-
-
-        for (const [key, value] of this.category_strings) {
-            const newCategoryField: { graphemes:string[], weights:number[]} = this.resolve_nested_categories(value, this.category_distribution);
+        for (const [key, value] of this.category_pending) {
+            const newCategoryField: { graphemes:string[], weights:number[]} = this.resolve_nested_categories(value.content, this.category_distribution);
             this.categories.set(key, newCategoryField);
         }
     }
@@ -969,25 +969,29 @@ class Resolver {
     }
 
     expand_wordshape_segments() {
-        this.wordshape_string = this.recursiveExpansion(this.wordshape_string, this.segments);
+        this.wordshape_pending = this.recursiveExpansion(this.wordshape_pending, this.segments);
 
         // Remove dud segments
-        const match = this.wordshape_string.match(/\$[A-Z]/);
+        const match = this.wordshape_pending.match(/\$[A-Z]/);
         if (match) {
             this.logger.validation_error(`Nonexistent segment detected: '${match[0]}'`, this.wordshape_line_num);
         }
     }
 
     expand_segments() {
-        for (const [key, value] of this.segments) {
-            this.segments.set(key, this.recursiveExpansion(value, this.segments, false));
+        for (const [key, value] of this.segments.entries()) {
+            const expandedContent = this.recursiveExpansion(value.content, this.segments);
+            this.segments.set(key, {
+                content: expandedContent,
+                line_num: value.line_num, // Preserve original line_num
+            });
         }
-    }
 
+    }
 
     recursiveExpansion(
         input: string,
-        mappings: Map<string, string>,
+        mappings: Map<string, { content: string, line_num: number }>,
         encloseInBrackets: boolean = false
     ): string {
         const mappingKeys = [...mappings.keys()].sort((a, b) => b.length - a.length);
@@ -999,13 +1003,15 @@ class Resolver {
                 let matched = false;
 
                 for (const key of mappingKeys) {
+                    const entry = mappings.get(key)!;
+
                     if (str.startsWith(key, i)) {
                         if (history.includes(key)) {
-                            // THIS
-                            this.logger.warn(`A cycle was detected when mapping '${key}'`);
+                            this.logger.warn(`A cycle was detected when mapping '${key}'`, entry.line_num);
                             result += '🔃';
                         } else {
-                            let resolved = resolveMapping(mappings.get(key) || '', [...history, key]);
+                            const entry = mappings.get(key);
+                            const resolved = resolveMapping(entry?.content || '', [...history, key]);
                             result += encloseInBrackets ? `[${resolved}]` : resolved;
                         }
                         i += key.length;
@@ -1030,7 +1036,7 @@ class Resolver {
         if (line_value === 'END') {return}
         line_value = line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ") ? line_value : line_value + " ";
 
-        this.wordshape_string += line_value;
+        this.wordshape_pending += line_value;
         this.file_line_num ++;
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
@@ -1039,7 +1045,7 @@ class Resolver {
             if (line_value === 'END') { break} // END !!
             line_value = line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ") ? line_value : line_value + " ";
 
-            this.wordshape_string += line_value;   
+            this.wordshape_pending += line_value;   
         }
     }
 

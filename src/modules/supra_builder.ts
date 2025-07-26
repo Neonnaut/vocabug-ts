@@ -22,6 +22,7 @@ export class SupraBuilder {
         return input.replace(tokenRegex, (fullMatch, content) => {
             const match = validContentRegex.exec(content);
             if (!match) {
+                // THIS
                 this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`, null);
             }
 
