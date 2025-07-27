@@ -1,3 +1,4 @@
+// @ts-ignore
 import MyWorker from './worker?worker';
 
 import { examples } from './examples.ts';

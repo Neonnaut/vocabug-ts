@@ -15,10 +15,10 @@ So... here we are, Nesca uses its own domain specific language (DSL) for matchin
 | ?#         | ;        | Comment                            |
 | \1         | <1       | Backreference                      |
 |            | :        | Geminate                           |
-| *          | *        | 0 or more                          |
+| *          | (T+)     | 0 or more                          |
 | +          | +        | 1 or more                          |
-| .          | &        | Any character except new line (\n) |
-| .+?        | ?        | Any series of characters ungreedy  |
+| .          | *        | Any character except new line (\n) |
+| .+?        | &        | Any series of characters ungreedy  |
 | ?          | (T)      | 0 or 1                             |
 | {3}        | ={3}     | Exactly 3                          |
 | {3,}       | ={3+}    | 3 or more                          |

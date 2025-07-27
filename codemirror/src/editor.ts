@@ -67,14 +67,14 @@ const vocabugTransformRules = [
   { token: "escape",   regex: /\\./ },
   { token: "link",     regex: />|->|→|\/|!|,|_/ },
   { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|\?|…|=\{|@\{|~\{|<[1-9]|\|/ }
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|…|=\{|@\{|~\{|<[1-9]|\|/ }
 ];
 
 const vocabugClusterRules = [
   { token: "escape",   regex: /\\./ },
   { token: "link",     regex: /,|\/|!|,|_/ },
   { token: "operator", regex: /\+|\-|\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|\?|…|=\{|@\{|~\{|<[1-9]|\|/ }
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|\&|…|=\{|@\{|~\{|<[1-9]|\|/ }
 ];
 
 type State = {

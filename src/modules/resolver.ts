@@ -27,7 +27,7 @@ class Resolver {
     public optionals_weight: number;
     public wordshape_distribution: string;
     private wordshape_pending: string;
-    public wordshapes: { items:string[], weights:number[]};
+    public wordshapes: { items:string[], weights:number[] };
     private wordshape_line_num: number;
     
     public pre_transforms: {

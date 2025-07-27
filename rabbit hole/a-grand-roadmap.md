@@ -69,7 +69,6 @@
 - [x] Cluster field condition and exception
 
 - [] Plus-mark
-- [] Kleene-star
 - [] Geminate-mark
 - [] Wildcard
 - [] Anythings-mark
@@ -109,6 +108,8 @@
 
 ## Extra
 
+- [] Syllable dividers
+- [] Drop off for individual optionals
 - [] HTML entities
 - [] Alternative graphs
 - [] HTML entities, good, keep them in `{}`
