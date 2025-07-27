@@ -2,7 +2,7 @@ import type Escape_Mapper from './escape_mapper';
 import Logger from './logger';
 import SupraBuilder from './supra_builder';
 
-import { getCatSeg, GetTransform, makePercentage, get_distribution
+import { getCatSeg, makePercentage, get_distribution
  } from './utilities'
 
 class Resolver {
@@ -30,14 +30,16 @@ class Resolver {
     public wordshapes: { items:string[], weights:number[] };
     private wordshape_line_num: number;
     
-    public pre_transforms: {
+    public transform_pending: {
         target:string[], result:string[],
         conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        chance:(number|null),
         line_num:number
     }[];
     public transforms: {
         target:string[], result:string[],
         conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        chance:(number|null),
         line_num:number
     }[];
     public graphemes: string[];
@@ -115,7 +117,7 @@ class Resolver {
         this.wordshapes = { items: [], weights: [] };
         this.wordshape_line_num = 0;
         this.graphemes = [];
-        this.pre_transforms = [];
+        this.transform_pending = [];
         this.transforms = [];
     }
 
@@ -154,23 +156,23 @@ class Resolver {
 
                     for (const engine of line_value.split(/\s+/)) {
                         if (engine == "decompose"||engine == "compose" ||
-                            engine == "capitalise" || engine == "de-capitalise" ||
+                            engine == "capitalise" || engine == "decapitalise" ||
                             engine == "to-upper-case" || engine == "to-lower-case" ||
                             engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa"
                         ) {
                             this.add_transform(
-                                ["$"], [engine], [], [], this.file_line_num
+                                ["$"], [engine], [], [], null, this.file_line_num
                             )
                         } else {
-                            this.logger.validation_error(`Trash engine found'${line_value}'`, this.file_line_num);
+                            this.logger.validation_error(`Trash engine '${engine}' found`, this.file_line_num);
                         }
                     }
                     continue;
                 }
                 
-                let [target, result, conditions, exceptions] = this.GetTransform(line_value);
+                let [target, result, conditions, exceptions, chance] = this.get_transform(line_value);
 
-                this.add_transform(target, result, conditions, exceptions, this.file_line_num);
+                this.add_transform(target, result, conditions, exceptions, chance, this.file_line_num);
                 continue;
             }
 
@@ -490,10 +492,11 @@ class Resolver {
 
 
     // This is run on parsing file. We then have to run resolve_transforms aftter parse file
-    GetTransform(input: string): [
+    get_transform(input: string): [
         string[], string[],
         { before: string; after: string }[],
-        { before: string; after: string }[]
+        { before: string; after: string }[],
+        (number|null)
     ] {
         if (input === "") {
             this.logger.validation_error(`No input`, this.file_line_num)
@@ -518,10 +521,12 @@ class Resolver {
 
         const slashIndex = divided[1].indexOf('/');
         const bangIndex = divided[1].indexOf('!');
+        const questionIndex = divided[1].indexOf('?');
 
         const delimiterIndex = Math.min(
             slashIndex === -1 ? Infinity : slashIndex,
-            bangIndex === -1 ? Infinity : bangIndex
+            bangIndex === -1 ? Infinity : bangIndex,
+            questionIndex === -1 ? Infinity : questionIndex
         );
 
         const result = delimiterIndex === Infinity
@@ -553,64 +558,100 @@ class Resolver {
             ? ''
             : divided[1].slice(delimiterIndex).trim();
 
-        const { conditions, exceptions } = this.get_environment(environment);
+        const { conditions, exceptions, chance } = this.get_environment(environment);
 
-        return [target_array, result_array, conditions, exceptions];
+        return [target_array, result_array, conditions, exceptions, chance];
     }
 
-    get_environment(environment_string:string):
-    {
+    get_environment(environment_string: string): {
         conditions: { before: string; after: string }[];
         exceptions: { before: string; after: string }[];
+        chance: number | null;
     } {
         const conditions: { before: string; after: string }[] = [];
         const exceptions: { before: string; after: string }[] = [];
+        let chance: number | null = null;
 
         let buffer = "";
-        let mode: "condition" | "exception" = "condition";
+        let mode: "condition" | "exception" | "chance" = "condition";
 
         for (let i = 0; i < environment_string.length; i++) {
             const ch = environment_string[i];
 
             if (ch === '/') {
                 if (buffer.trim()) {
-                    const validated = this.validateContext(buffer.trim(), mode);
+                    const validated = this.validate_environment(buffer.trim(), mode);
                     (mode === "condition" ? conditions : exceptions).push(validated);
                 }
                 buffer = "";
                 mode = "condition";
             } else if (ch === '!') {
                 if (buffer.trim()) {
-                    const validated = this.validateContext(buffer.trim(), mode);
+                    const validated = this.validate_environment(buffer.trim(), mode);
                     (mode === "condition" ? conditions : exceptions).push(validated);
                 }
                 buffer = "";
                 mode = "exception";
+            } else if (ch === '?') {
+                if (buffer.trim()) {
+                    const validated = this.validate_environment(buffer.trim(), mode);
+                    (mode === "condition" ? conditions : exceptions).push(validated);
+                }
+                buffer = "";
+                mode = "chance";
             } else {
                 buffer += ch;
             }
         }
 
         if (buffer.trim()) {
-            const validated = this.validateContext(buffer.trim(), mode);
-            (mode === "condition" ? conditions : exceptions).push(validated);
+            const segment = buffer.trim();
+            if (mode === "chance") {
+                const parsed = parseInt(segment, 10);
+                if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                    chance = parsed;
+                } else {
+                    this.logger.validation_error(`Chance value "${segment}" must be between 0 and 100`, this.file_line_num);
+                }
+            } else {
+                const validated = this.validate_environment(segment, mode);
+                (mode === "condition" ? conditions : exceptions).push(validated);
+            }
         }
 
         return {
             conditions: conditions,
-            exceptions: exceptions
+            exceptions: exceptions,
+            chance: chance
         };
     }
 
-    validateContext(segment: string, kind: 'condition' | 'exception'): { before: string; after: string } {
+    validate_environment(segment: string, kind: 'condition' | 'exception' | 'chance'): { before: string; after: string } {
+        if (kind === 'chance') {
+            const parsed = parseInt(segment, 10);
+            if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                return { before: segment, after: '' };
+            } else {
+                this.logger.validation_error(`chance "${segment}" must be a number between 0 and 100`, this.file_line_num);
+                return { before: '', after: '' };
+            }
+        }
+
+        if (/^\d{1,2}\?$/.test(segment) && kind === 'condition') {
+            return {
+                before: segment,
+                after: ''
+            };
+        }
+
         const parts = segment.split('_');
         if (parts.length !== 2) {
-            this.logger.validation_error(`${kind} "${segment}" must contain exactly one underscore`, this.file_line_num)
+            this.logger.validation_error(`${kind} "${segment}" must contain exactly one underscore`, this.file_line_num);
         }
 
         const [before, after] = parts;
         if (!before && !after) {
-            this.logger.validation_error(`${kind} "${segment}" must have content on at least one side of '_'`, this.file_line_num)
+            this.logger.validation_error(`${kind} "${segment}" must have content on at least one side of '_'`, this.file_line_num);
         }
 
         return {
@@ -622,9 +663,11 @@ class Resolver {
     add_transform(target:string[], result:string[], 
         conditions:{ before:string, after:string }[],
         exceptions:{ before:string, after:string }[],
+        chance:(number|null),
         line_num:number) {
-        this.pre_transforms.push( { target:target, result:result,
+        this.transform_pending.push( { target:target, result:result,
             conditions:conditions, exceptions:exceptions,
+            chance:chance,
             line_num:line_num} );
     }
 
@@ -711,7 +754,7 @@ class Resolver {
             }
         }
         this.add_transform(concurrent_target, concurrent_result, 
-            my_conditions, my_exceptions, this.file_line_num);
+            my_conditions, my_exceptions, null, this.file_line_num);
     }
 
 
@@ -719,12 +762,13 @@ class Resolver {
          // Resolve brackets, put categories in transforms, make a milkshake, etc.
         
         let transforms = [];
-        for (let i = 0; i < this.pre_transforms.length; i++) {
-            let line_num = this.pre_transforms[i].line_num;
+        for (let i = 0; i < this.transform_pending.length; i++) {
+            let line_num = this.transform_pending[i].line_num;
 
-            let target = this.pre_transforms[i].target;
-            let result = this.pre_transforms[i].result;
+            let target = this.transform_pending[i].target;
+            let result = this.transform_pending[i].result;
 
+            /*
             let xesult = '';
             for (const char of target[0]) {
                 const entry = this.categories.get(char);
@@ -735,25 +779,29 @@ class Resolver {
                 }
             }
             this.logger.info(xesult)
+            */
+
+            let chance = this.transform_pending[i].chance;
 
             let exceptions = [];
-            for (let j = 0; j < this.pre_transforms[i].exceptions.length; j++) {
-                let exception_before = this.pre_transforms[i].exceptions[j].before
-                let exception_after = this.pre_transforms[i].exceptions[j].after;
+            for (let j = 0; j < this.transform_pending[i].exceptions.length; j++) {
+                let exception_before = this.transform_pending[i].exceptions[j].before
+                let exception_after = this.transform_pending[i].exceptions[j].after;
 
                 exceptions.push({ before:exception_before, after:exception_after });
             }
 
             let conditions = [];
-            for (let j = 0; j < this.pre_transforms[i].conditions.length    ; j++) {
-                let condition_before = this.pre_transforms[i].conditions[j].before
-                let condition_after = this.pre_transforms[i].conditions[j].after;
+            for (let j = 0; j < this.transform_pending[i].conditions.length    ; j++) {
+                let condition_before = this.transform_pending[i].conditions[j].before
+                let condition_after = this.transform_pending[i].conditions[j].after;
 
                 conditions.push({ before:condition_before, after:condition_after });
             }
             transforms.push({
                 target: target, result: result,
                 conditions: conditions, exceptions: exceptions,
+                chance: chance,
                 line_num: line_num
             });
         }
@@ -1008,7 +1056,7 @@ class Resolver {
                     if (str.startsWith(key, i)) {
                         if (history.includes(key)) {
                             this.logger.warn(`A cycle was detected when mapping '${key}'`, entry.line_num);
-                            result += '🔃';
+                            result += '�';
                         } else {
                             const entry = mappings.get(key);
                             const resolved = resolveMapping(entry?.content || '', [...history, key]);
@@ -1063,7 +1111,7 @@ class Resolver {
 
         let segments = [];
         for (const [key, value] of this.segments) {
-            segments.push(`  ${key} = ${value}`);
+            segments.push(`  ${key} = ${value.content}`);
         }
 
         let wordshapes = [];
@@ -1073,7 +1121,16 @@ class Resolver {
 
         let transforms = [];
         for (let i = 0; i < this.transforms.length; i++) {
-            transforms.push(`  ⟨${this.transforms[i].target.join(", ")} → ${this.transforms[i].result.join(", ")}⟩`);
+            let chance = this.transforms[i].chance ? ` ? ${this.transforms[i].chance}` : '';
+            let exceptions = '';
+            for (let j = 0; j < this.transforms[i].exceptions.length; j++) {
+                exceptions += ` ! ${this.transforms[i].exceptions[j].before}_${this.transforms[i].exceptions[j].after}`;
+            }
+            let conditions = '';
+            for (let j = 0; j < this.transforms[i].conditions.length    ; j++) {
+                conditions += ` / ${this.transforms[i].conditions[j].before}_${this.transforms[i].conditions[j].after}`;
+            }   
+            transforms.push(`  ⟨${this.transforms[i].target.join(", ")} → ${this.transforms[i].result.join(", ")}${conditions}${exceptions}${chance}⟩:${this.transforms[i].line_num}`);
         }
 
         let info:string =

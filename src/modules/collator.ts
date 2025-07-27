@@ -10,7 +10,7 @@ function collator(
     return words.sort(Intl.Collator().compare);
   }
 
-  customAlphabet.push("🔃");
+  customAlphabet.push("�");
 
   const orderMap = new Map<string, number>();
   customAlphabet.forEach((char, index) => orderMap.set(char, index));

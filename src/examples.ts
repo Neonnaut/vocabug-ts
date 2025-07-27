@@ -57,7 +57,7 @@ BEGIN transform:
 ' á é ẹ́ í ó ọ́ ú
 \` à è ẹ̀ ì ò ọ̀ ù
 
-c -> ç / _i
+c -> ç / _i / _í / _ì
 END`,
   romance:
 `; This should produce... simplified Spanish-looking words
@@ -103,6 +103,7 @@ o   oa e  oj o  u
 u   wa we wi wo u
 
 qwa qwo qwu qa qo qu -> kwa kwo kwu ka ko ku
+qwá qwó qwú qá qó qú -> kwá kwó kwú ká kó kú
 
 nj gj gn gl qw -> ň ň ň ʎ q
 

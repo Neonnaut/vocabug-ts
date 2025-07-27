@@ -10,6 +10,7 @@ class Transformer {
     public transforms: {
         target:string[], result:string[],
         conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        chance:(number|null),
         line_num:number
     }[];
 
@@ -19,6 +20,7 @@ class Transformer {
         transforms: {
             target:string[], result:string[],
             conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+            chance:(number|null),
             line_num:number
         }[]
     ) {
@@ -67,6 +69,7 @@ class Transformer {
             result: string[];
             conditions: { before: string; after: string }[];
             exceptions: { before: string; after: string }[];
+            chance: (number | null);
             line_num: number;
         }
     ): string[] {
@@ -113,9 +116,14 @@ class Transformer {
             return true;
         }
 
-        const { target, result, conditions, exceptions, line_num } = transform;
+        const { target, result, conditions, exceptions, chance, line_num } = transform;
 
         const fullWord = tokens.join("");
+
+        if (chance !== null && Math.random() * 100 >= chance) {
+            // 🎲 Roll failed — skip transformation entirely
+            return tokens;
+        }
 
         if (target[0] === "$") {
             let modifiedWord = ''
@@ -126,7 +134,7 @@ class Transformer {
                     modifiedWord = fullWord.normalize("NFC"); break;
                 case "capitalise":
                     modifiedWord = fullWord.charAt(0).toUpperCase() + fullWord.slice(1); break;
-                case "de-capitalise":
+                case "decapitalise":
                     modifiedWord = fullWord.charAt(0).toLowerCase() + fullWord.slice(1); break;
                 case "to-upper-case":
                     modifiedWord = fullWord.toUpperCase(); break;
@@ -180,7 +188,6 @@ class Transformer {
                     }
                 }
             }
-
 
             if (rawTarget == "^") {
                 // Insertion case
@@ -317,10 +324,11 @@ class Transformer {
             let my_conditions = '';
             for (let j = 0; j < conditions.length; j++) {
                 my_conditions += ` / ${conditions[j].before}_${conditions[j].after}`;
-            }   
+            }
+            const my_chance = chance !== null ? ` ? ${chance}` : '';
 
             word.record_transformation(
-                `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}${my_conditions}${my_exceptions}`,
+                `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}${my_conditions}${my_exceptions}${my_chance}`,
                 normalized.join(" "),
                 line_num
             );

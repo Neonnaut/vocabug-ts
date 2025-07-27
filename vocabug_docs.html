@@ -717,29 +717,22 @@ n mp +  +  nn +</pre>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
 
       <h3 id="nescaPlusMark"><a class="head-num">19.1</a>Plus-mark</h3>
-      <p>Plus-mark, using <code class="example">+</code>, will match once or as many times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it.</p>
+      <p>Plus-mark, using <code class="example">+</code>, will match once or as many times as possible to the grapheme, or grapheme in a set or category, to the left of it.</p>
       <pre class="example">  a+ -> o<br>; raraaaaa ==> raro</pre>
       <pre class="example">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
 
       <h3 id="nescaKleeneStar"><a class="head-num">19.2</a>Kleene-star</h3>
       <p>Occasionlly, you may want to match a grapheme whether it exists, there is one of it, or there is multiple of it consecutively, known as a "Kleene-star". There is no dedicated character for a Kleene star Plus-mark, using <code class="example">*</code>, will match as many (or zero) times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it.</p>
-      <pre class="example">  (a+) -> o<br>; raraaaaa ==> raro</pre>
-      <pre class="example">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
+      <pre class="example">  o(a+) -> o<br>; roaroaaaaa ==> raro</pre>
 
       <h3 id="nescaGeminateMark"><a class="head-num">19.3</a>Geminate-mark</h3>
-      <p>Geminate-mark using colon <code class="example">:</code>, will duplicate once the grapheme, or grapheme from a set, category, or feature, to the left of it. In other words, you can capture an item only when it is geminated using the geminate-mark:</p>
+      <p>Geminate-mark using colon <code class="example">:</code>, will match twice to the grapheme, or grapheme from a set or category, to the left of it. In other words, you can capture an item only when it is geminated using the geminate-mark:</p>
       <pre class="example">  a: -> o<br>; aaata => oata</pre>
 
       <h3 id="nescaWildcard"><a class="head-num">19.4</a>Wildcard</h3>
       <p>Wildcard using asterisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
       <pre class="example">  a -> e / _*<br>; apappap ==> apappep</pre>
       <p>Wildcard can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
-      <p>Ditto-mark can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(")</code>, thereby allowing it to match zero copies as well.</p>
-
-      <p>Plus-mark can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(+)</code>, thereby allowing it to match zero copies as well.</p>
-
-      <p>You may want to match zero, once, or as many times as possible to the grapheme, or grapheme in a set, category, or feature, to the left of it, known occasionally as a <a href="https://en.wikipedia.org/wiki/Kleene_star">Kleene-star</a>. To do this, you need to enclose the grapheme, set, category, or feature and the plus-mark in an <a href="#vocOptional">optional-set</a>, and the plus-mark by itself inside another optional-set:</p>
-      <pre class="example">; /i/ followed by either 0, 1, or more /a/ becomes /e/<br>  i(a(+)) -> e<br>; ririaaaaa ==> rere</pre>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">19.5</a>Anythings-mark</h3>
       <p>The anythings-mark uses question-mark <code class="example">&</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
@@ -752,12 +745,10 @@ n mp +  +  nn +</pre>
       <p>The quantifier matches as many times its digit(s), enclosed in <code class="example">=[</code> and <code class="example">]</code>, to the things to the left.</p>
       <pre class="example">  Change /o/ into /x/ only when preceded by three /r/s<br>  o -> x / r=[3]_
 ; ororrro ==> ororrrx</pre>
-      <p>The digits in the quantifier can also be a list:</p>
-      <pre class="example">  Change a sequence of 2 or 4 /o/s into /x/<br>  o -> x / r=[2, 4]_
-; toootoooo ==> txotx</pre>
-      <p>The numbers in the quantifier can also be a range of numbers. To do this, put a <code class="example">:</code> between the lowest and highest range. (The ranges must be in the order of lowest to highest):</p>
-      <pre class="example">  Change a sequence of 2 to 4 /o/s into /x/<br>  o -> x / r=[2:4]_
-; toootoooo ==> txtx</pre>
+      <p>The digits in the quantifier can also be a range:</p>
+      <pre class="example">  Change a sequence of 2 to 4 /o/s into /x/<br>  o -> x / r=[2, 4]_
+; toootooooo ==> txtxo</pre>
+      
 
       <br>
       <b>Using the <code class="example">+</code> symbol</b>
@@ -863,7 +854,7 @@ END</pre>
         <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, <code class="example">n</code> \u006E + <code class="example">◌̃ </code> \u0303</li>
         <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1</li>
         <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
-        <li><code class="example">de-capitalise</code> will convert the first character of a word to lowercase</li>
+        <li><code class="example">decapitalise</code> will convert the first character of a word to lowercase</li>
         <li><code class="example">to-upper-case</code> will convert all characters of a word to uppercase</li>
         <li><code class="example">to-lower-case</code> will convert all characters of a word to lowercase</li>
         <li><code class="example">xsampa_to_ipa</code> will convert graphemes of a word written in X-SAMPA into IPA</li>

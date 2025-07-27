@@ -56,29 +56,6 @@ function getCatSeg(input: string): [string, string, boolean, boolean, boolean] {
     return [word, field, true, isValid, hasDollarSign]; // Return word, field, valid, isCapital, hasDollarSign
 }
 
-function GetTransform(input: string): [string[], string[], boolean] {
-    if (input === "") {
-        return [[], [], false]; // Handle invalid inputs
-    }
-
-    const divided = input.split(/->|>|→/); 
-    if (divided.length !== 2) {
-        return [[], [], false]; // Ensure division results in exactly two parts
-    }
-
-    let target:any = divided[0].trim();
-    let result:any = divided[1].trim();
-
-    if (target === "" || result === "") {
-        return [[], [], false]; // Handle empty parts
-    }
-
-    target = target.split(/[,\s]+/).filter(Boolean);
-    result = result.split(/[,\s]+/).filter(Boolean);
-
-    return [target, result, true]; // Return word, field, valid
-}
-
 function weightedRandomPick(items:string[], weights:number[]): string {
     const totalWeight = weights.reduce((acc, w) => acc + w, 0);
     let randomValue = Math.random() * totalWeight;
@@ -170,5 +147,5 @@ function get_distribution(n: number, default_distribution:string): number[] {
 export {
   get_last, capitalise, makePercentage, weightedRandomPick, get_distribution,
   supraWeightedRandomPick,
-  getCatSeg, GetTransform, cappa
+  getCatSeg, cappa
 };
