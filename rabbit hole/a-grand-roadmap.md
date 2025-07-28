@@ -64,6 +64,7 @@
 - [x] Word boundaries
 - [x] Exceptions
 - [x] Multiple exceptions
+- [x] Chance
 - [] Using category
 - [x] Cluster-field
 - [x] Cluster field condition and exception
@@ -79,7 +80,6 @@
 
 - [] Backreference
 - [] Metathesis
-- [] Chance block
 
 - [x] Engine, decompose
 - [x] Engine, compose

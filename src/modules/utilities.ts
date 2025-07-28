@@ -19,21 +19,21 @@ function capitalise(str: string): string {
     return str[0].toUpperCase() + str.slice(1);
 }
 
-const makePercentage = (input: string): number | null => {
+const make_percentage = (input: string): number | null => {
   const num = Number(input);
   return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
 };
 
-function validateCatSegName(str: string): [boolean, boolean] {
+function validate_cat_seg_name(str: string): [boolean, boolean] {
 
     const regex = new RegExp(`^(${cappa}|\\$${cappa})$`, "u");
 
-    const hasDollarSign = str.includes("$");
+    const has_dollar_sign = str.includes("$");
 
-    return [regex.test(str), hasDollarSign];
+    return [regex.test(str), has_dollar_sign];
 }
 
-function getCatSeg(input: string): [string, string, boolean, boolean, boolean] {
+function get_cat_seg(input: string): [string, string, boolean, boolean, boolean] {
     const divider = "=";
   
     if (input === "") {
@@ -51,45 +51,45 @@ function getCatSeg(input: string): [string, string, boolean, boolean, boolean] {
         return ['', '', false, false, false]; // Handle empty parts
     }
 
-    const [isValid, hasDollarSign] = validateCatSegName(word);
+    const [is_valid, has_dollar_sign] = validate_cat_seg_name(word);
 
-    return [word, field, true, isValid, hasDollarSign]; // Return word, field, valid, isCapital, hasDollarSign
+    return [word, field, true, is_valid, has_dollar_sign]; // Return word, field, valid, isCapital, has_dollar_sign
 }
 
-function weightedRandomPick(items:string[], weights:number[]): string {
-    const totalWeight = weights.reduce((acc, w) => acc + w, 0);
-    let randomValue = Math.random() * totalWeight;
+function weighted_random_pick(items:string[], weights:number[]): string {
+    const total_weight = weights.reduce((acc, w) => acc + w, 0);
+    let random_value = Math.random() * total_weight;
 
     for (let i = 0; i < items.length; i++) {
-        if (randomValue < weights[i]) {
+        if (random_value < weights[i]) {
             return items[i];
         }
-        randomValue -= weights[i];
+        random_value -= weights[i];
     }
 
     return '';
 }
 
-function supraWeightedRandomPick(items: string[], weights: (number|'s')[]): string {
+function supra_weighted_random_pick(items: string[], weights: (number|'s')[]): string {
     for (let i = 0; i < items.length; i++) {
         if (weights[i] === "s") {
             return items[i]; // override: pick first 's'
         }
     }
 
-    const totalWeight = weights.reduce<number>((sum, w) =>
+    const total_weight = weights.reduce<number>((sum, w) =>
     typeof w === "number" && w > 0 ? sum + w : sum
     , 0);
 
-    if (totalWeight === 0) return '';
+    if (total_weight === 0) return '';
 
-    let randomValue = Math.random() * totalWeight;
+    let random_value = Math.random() * total_weight;
 
     for (let i = 0; i < items.length; i++) {
         const w = weights[i];
         if (typeof w !== "number" || w <= 0) continue;
-        if (randomValue < w) return items[i];
-        randomValue -= w;
+        if (random_value < w) return items[i];
+        random_value -= w;
     }
 
     return '';
@@ -145,7 +145,7 @@ function get_distribution(n: number, default_distribution:string): number[] {
 }
 
 export {
-  get_last, capitalise, makePercentage, weightedRandomPick, get_distribution,
-  supraWeightedRandomPick,
-  getCatSeg, cappa
+  get_last, capitalise, make_percentage, weighted_random_pick, get_distribution,
+  supra_weighted_random_pick,
+  get_cat_seg, cappa
 };

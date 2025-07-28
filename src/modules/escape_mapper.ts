@@ -8,7 +8,7 @@ class Escape_Mapper {
         this.counter = 1;
     }
 
-    escapeBackslashPairs(input: string): string {
+    escape_backslash_pairs(input: string): string {
       const reverse = new Map<string, string>(); // original char → placeholder
 
       const result = input.replace(/\\(.)/g, (_, char) => {
@@ -26,7 +26,7 @@ class Escape_Mapper {
       return result;
     }
 
-escapeBackslashSpace(input: string): string {
+    escape_backslash_space(input: string): string {
       const reverse = new Map<string, string>(); // original char → placeholder
 
       const result = input.replace(/\\(\\| )/g, (_, char) => {
@@ -44,11 +44,11 @@ escapeBackslashSpace(input: string): string {
       return result;
     }
 
-    restoreEscapedChars(input: string): string {
+    restore_escaped_chars(input: string): string {
       return input.split("").map(c => this.map.has(c) ? this.map.get(c)! : c).join("");
     }
 
-    restorePreserveEscapedChars(input: string): string {
+    restore_preserve_escaped_chars(input: string): string {
       return input
       .split("")
       .map(c => this.map.has(c) ? "\\" + this.map.get(c) : c)

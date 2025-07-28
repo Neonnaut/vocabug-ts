@@ -1,4 +1,4 @@
-const xsampaToIpaCodeMap: Record<string, number> = {
+const xsampa_to_ipa_code_map: Record<string, number> = {
   "b_<" : 595, // voiced bilabial implosive [ɓ]
   "d_<" : 599, // voiced alveolar implosive [ɗ]
   "d`" : 598, // voiced retroflex plosive [ɖ]
@@ -151,7 +151,7 @@ const xsampaToIpaCodeMap: Record<string, number> = {
   "_z" : 842, // denasalisation [◌͊]
 }
 
-const IpaCodeMapToxsampa: Record<number, string> = {
+const ipa_code_map_to_xsampa: Record<number, string> = {
   595 : "b_<", // voiced bilabial implosive [ɓ]
   599 : "d_<", // voiced alveolar implosive [ɗ]
   598 : "d`", // voiced retroflex plosive [ɖ]
@@ -298,10 +298,8 @@ const IpaCodeMapToxsampa: Record<number, string> = {
   842 : "_z", // denasalisation [◌͊]
 }
 
-
-
 function xsampa_to_ipa(input: string) {
-  const tokens = Object.keys(xsampaToIpaCodeMap).sort((a, b) => b.length - a.length);
+  const tokens = Object.keys(xsampa_to_ipa_code_map).sort((a, b) => b.length - a.length);
   let result = '';
   let i = 0;
 
@@ -309,7 +307,7 @@ function xsampa_to_ipa(input: string) {
     let matched = false;
     for (const token of tokens) {
       if (input.startsWith(token, i)) {
-        const code = xsampaToIpaCodeMap[token];
+        const code = xsampa_to_ipa_code_map[token];
         result += String.fromCharCode(code);
         i += token.length;
         matched = true;
@@ -330,7 +328,7 @@ function ipa_to_xsampa(ipa_in: string) {
 
   for (let i = 0; i < ipa_in.length; i++) {
     const code = ipa_in.charCodeAt(i);
-    const xsampa = IpaCodeMapToxsampa[code];
+    const xsampa = ipa_code_map_to_xsampa[code];
     result += xsampa !== undefined ? xsampa : ipa_in[i]; // fallback to original char
   }
 

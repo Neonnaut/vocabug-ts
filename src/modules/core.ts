@@ -4,7 +4,7 @@ import Transformer from './transformer';
 import Text_Builder from './text_builder';
 import Logger from './logger';
 import Escape_Mapper from './escape_mapper'; 
-import SupraBuilder from './supra_builder';
+import Supra_Builder from './supra_builder';
 
 type generate_options = {
   file: string;
@@ -42,7 +42,7 @@ function generate({
         //y = y.join("cab")
 
         const escape_mapper = new Escape_Mapper();
-        const supra_builder = new SupraBuilder(logger);
+        const supra_builder = new Supra_Builder(logger);
 
         const r = new Resolver(
             logger, escape_mapper, supra_builder,
@@ -58,7 +58,7 @@ function generate({
         r.resolve_transforms();
         r.create_record();
 
-        const wordBuilder = new Word_Builder( logger,
+        const word_builder = new Word_Builder( logger,
             escape_mapper, r.supra_builder, r.categories, r.wordshapes,
             r.category_distribution, r.optionals_weight, r.debug
         );
@@ -67,7 +67,7 @@ function generate({
             r.graphemes, r.transforms
         );
 
-        const textBuilder = new Text_Builder(
+        const text_builder = new Text_Builder(
             logger, build_start, r.num_of_words, r.paragrapha,
             r.remove_duplicates, r.force_word_limit, r.sort_words,
             r.capitalise_words, r.word_divider, r.alphabet, r.invisible
@@ -75,15 +75,15 @@ function generate({
 
         // Yo! this is where we generate da words !!
         // Wow. Such words
-        while (!textBuilder.terminated) {
-            let word = wordBuilder.make_word();
+        while (!text_builder.terminated) {
+            let word = word_builder.make_word();
             word = transformer.do_transforms(word);
-            textBuilder.add_word(word);
+            text_builder.add_word(word);
         }
-        text = textBuilder.make_text();
+        text = text_builder.make_text();
         
     } catch (e: unknown) {
-        if (!(e instanceof logger.ValidationError)) {
+        if (!(e instanceof logger.Validation_Error)) {
             logger.uncaught_error(e as Error);
         }
     }

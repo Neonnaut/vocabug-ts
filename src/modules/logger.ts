@@ -11,7 +11,7 @@ class Logger {
         this.diagnostics = [];
     }
 
-    UncaughtError = class UncaughtError extends Error {
+    Uncaught_Error = class Uncaught_Error extends Error {
         constructor(original: Error) {
             super(original.message); // Preserve original message
             this.name = original.name || "Error";
@@ -24,21 +24,21 @@ class Logger {
     };
 
     uncaught_error(original: Error) {
-        const err = new this.UncaughtError(original);
-        const location = this.extractLocation(err.stack);
-        const logMessage = `${err.name}: ${err.message}${location ? " @ " + location : ""}`;
-        this.errors.push(logMessage);
+        const err = new this.Uncaught_Error(original);
+        const location = this.extract_location(err.stack);
+        const log_message = `${err.name}: ${err.message}${location ? " @ " + location : ""}`;
+        this.errors.push(log_message);
     }
 
-    ValidationError = class ValidationError extends Error {
+    Validation_Error = class Validation_Error extends Error {
         constructor(message: string) {
             super(message);
-            this.name = "ValidationError";
+            this.name = "Validation_Error";
             Object.setPrototypeOf(this, new.target.prototype);
         }
     };
     validation_error(message: string, line_num: number|null = null): never {
-        const err = new this.ValidationError(message);
+        const err = new this.Validation_Error(message);
         if (line_num || line_num == 0) {
             this.errors.push(`Error: ${message} @ line ${line_num+1}.`);
         } else {
@@ -47,18 +47,18 @@ class Logger {
         throw err;
     }
 
-    private extractLocation(stack?: string): string | null {
+    private extract_location(stack?: string): string | null {
         if (!stack) return null;
 
         const lines = stack.split("\n");
         for (const line of lines) {
             const match = line.match(/(?:\(|\bat\s+)?(.*?):(\d+):(\d+)\)?/);
             if (match) {
-                let filePath = match[1].replace(/\?.*$/, ""); // Strip ?t=... junk
-                filePath = filePath.replace(/^.*\/src\//, "modules/"); // Map root
-                filePath = filePath.replace(/(\bmodules\b\/)\1/, "$1"); // Fix repetition
+                let file_path = match[1].replace(/\?.*$/, ""); // Strip ?t=... junk
+                file_path = file_path.replace(/^.*\/src\//, "modules/"); // Map root
+                file_path = file_path.replace(/(\bmodules\b\/)\1/, "$1"); // Fix repetition
 
-                return `${filePath}:${match[2]}`;
+                return `${file_path}:${match[2]}`;
             }
         }
 

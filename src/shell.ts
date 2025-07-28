@@ -12,8 +12,8 @@ function create_file_editor() {
     let content = ''; let theme = 'dark'; let filename = '';
     if (localStorage.hasOwnProperty('vocabug')) {
         try {
-            const gotLocalStorage = JSON.parse(localStorage.getItem('vocabug') || '[]') as [string, string];
-            content = gotLocalStorage[0]; filename = gotLocalStorage[1];
+            const got_LocalStorage = JSON.parse(localStorage.getItem('vocabug') || '[]') as [string, string];
+            content = got_LocalStorage[0]; filename = got_LocalStorage[1];
         } catch {
             localStorage.removeItem("vocabug");
             content = examples.basic;
@@ -28,7 +28,7 @@ function create_file_editor() {
     }
 
     if (filename) {
-        setFilename(filename);
+        set_filename(filename);
     }
 
     // Create file editor
@@ -59,9 +59,9 @@ window.addEventListener("load", () => {
 
     // Generate button
     document.getElementById("generate-words")?.addEventListener("click", function () {
-        const generateButton = this as HTMLButtonElement;
-        const outputMessage = document.getElementById('voc-output-message') as HTMLDivElement;
-        generateButton.disabled = true;
+        const generate_button = this as HTMLButtonElement;
+        const output_message = document.getElementById('voc-output-message') as HTMLDivElement;
+        generate_button.disabled = true;
 
         try {
             w.postMessage({
@@ -77,31 +77,31 @@ window.addEventListener("load", () => {
                 word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
             });
             w.onerror = function (e: ErrorEvent) {
-                generateButton.disabled = false;
-                outputMessage.innerHTML = `<p class='error-message'>${e.message}</p>`;
+                generate_button.disabled = false;
+                output_message.innerHTML = `<p class='error-message'>${e.message}</p>`;
             };
 
         } catch (e) {
-            generateButton.disabled = false;
+            generate_button.disabled = false;
             const error_message = e instanceof Error ? e.message : String(e);
-            outputMessage.innerHTML = `<p class='error-message'>${error_message}</p>`;
+            output_message.innerHTML = `<p class='error-message'>${error_message}</p>`;
         }
     });
 
     // After generating words 
     w.onmessage = (e: MessageEvent) => {
-        const outputWordsField = document.getElementById('voc-output-words-field') as HTMLInputElement;
-        const outputMessage = document.getElementById('voc-output-message') as HTMLDivElement;
-        const filenameInput = document.getElementById('file-name') as HTMLInputElement;
-        const generateWordsButton = document.getElementById("generate-words") as HTMLButtonElement;
+        const output_words_field = document.getElementById('voc-output-words-field') as HTMLInputElement;
+        const output_message = document.getElementById('voc-output-message') as HTMLDivElement;
+        const filename_input = document.getElementById('file-name') as HTMLInputElement;
+        const generate_words_button = document.getElementById("generate-words") as HTMLButtonElement;
 
-        if (outputWordsField) {
+        if (output_words_field) {
             // Transfer words to the output
-            outputWordsField.value = e.data.words;
-            outputWordsField.focus();
+            output_words_field.value = e.data.words;
+            output_words_field.focus();
         }
 
-        const filename = filenameInput?.value || "";
+        const filename = filename_input?.value || "";
 
         let output_message_html = '';
 
@@ -128,37 +128,37 @@ window.addEventListener("load", () => {
                 console.debug(message);
             }
         }
-        outputMessage.innerHTML = output_message_html;
+        output_message.innerHTML = output_message_html;
 
         // Store file contents in local storage to be retrieved on page refresh
         localStorage.setItem('vocabug', JSON.stringify([e.data.file, filename]));
 
-        if (generateWordsButton) {
-            generateWordsButton.disabled = false;
+        if (generate_words_button) {
+            generate_words_button.disabled = false;
         }
     };
 
     // Copy results button
     document.getElementById("output-words-copy")?.addEventListener("click", () => {
-        const outputWordsField = document.getElementById("voc-output-words-field") as HTMLTextAreaElement;
+        const output_words_field = document.getElementById("voc-output-words-field") as HTMLTextAreaElement;
         
-        if (outputWordsField && outputWordsField.value !== "") {
+        if (output_words_field && output_words_field.value !== "") {
             // Select text for deprecated way and aesthetics
-            outputWordsField.select();
-            outputWordsField.setSelectionRange(0, 99999); // For mobile devices
-            outputWordsField.focus();
+            output_words_field.select();
+            output_words_field.setSelectionRange(0, 99999); // For mobile devices
+            output_words_field.focus();
 
             if (!navigator.clipboard) {
                 document.execCommand("copy"); // Deprecated way
             } else {
-                navigator.clipboard.writeText(outputWordsField.value);
+                navigator.clipboard.writeText(output_words_field.value);
             }
         }
     });
 
     // Clear button
-    const clearButton = document.getElementById("voc-clear-editor") as HTMLButtonElement | null;
-    clearButton?.addEventListener("click", () => {
+    const clear_button = document.getElementById("voc-clear-editor") as HTMLButtonElement | null;
+    clear_button?.addEventListener("click", () => {
         const confirmed = window.confirm("Clear EDITOR TEXT and GENERATED WORDS?");
         if (confirmed) {
             editor.dispatch({
@@ -168,15 +168,15 @@ window.addEventListener("load", () => {
                     insert: ''
                 }
             });
-            setFilename('');
-            clearResults();
+            set_filename('');
+            clear_results();
         }
     });
 
     // Wrap lines checkbox
-    const wrapLinesCheckbox = document.getElementById("editor-wrap-lines") as HTMLInputElement | null;
-    wrapLinesCheckbox?.addEventListener("click", () => {
-        if (wrapLinesCheckbox.checked) {
+    const wrap_lines_checkbox = document.getElementById("editor-wrap-lines") as HTMLInputElement | null;
+    wrap_lines_checkbox?.addEventListener("click", () => {
+        if (wrap_lines_checkbox.checked) {
             cm6.changeEditorLineWrap(editor, true);
         } else {
             cm6.changeEditorLineWrap(editor, false);
@@ -186,21 +186,21 @@ window.addEventListener("load", () => {
     // Mode buttons
     document.querySelectorAll("input[name='mode-type']").forEach((element) => {
         element.addEventListener("click", () => {
-            const wordListMode = document.getElementById("word-list-mode") as HTMLInputElement;
-            const sortWords = document.getElementById("sort-words") as HTMLInputElement;
-            const capitaliseWords = document.getElementById("capitalise-words") as HTMLInputElement;
-            const removeDuplicates = document.getElementById("remove-duplicates") as HTMLInputElement;
-            const wordDivider = document.getElementById("word-divider") as HTMLInputElement;
-            const forceWords = document.getElementById("force-words") as HTMLInputElement;
+            const word_list_mode = document.getElementById("word-list-mode") as HTMLInputElement;
+            const sort_words = document.getElementById("sort-words") as HTMLInputElement;
+            const capitalise_words = document.getElementById("capitalise-words") as HTMLInputElement;
+            const remove_duplicates = document.getElementById("remove-duplicates") as HTMLInputElement;
+            const word_divider = document.getElementById("word-divider") as HTMLInputElement;
+            const force_words = document.getElementById("force-words") as HTMLInputElement;
 
-            if (wordListMode?.checked) {
-                if (sortWords) sortWords.disabled = false;
-                if (capitaliseWords) capitaliseWords.disabled = false;
-                if (removeDuplicates) removeDuplicates.disabled = false;
-                if (wordDivider) wordDivider.disabled = false;
-                if (forceWords) forceWords.disabled = false;
+            if (word_list_mode?.checked) {
+                if (sort_words) sort_words.disabled = false;
+                if (capitalise_words) capitalise_words.disabled = false;
+                if (remove_duplicates) remove_duplicates.disabled = false;
+                if (word_divider) word_divider.disabled = false;
+                if (force_words) force_words.disabled = false;
             } else {
-                [sortWords, capitaliseWords, removeDuplicates, wordDivider, forceWords].forEach(element => {
+                [sort_words, capitalise_words, remove_duplicates, word_divider, force_words].forEach(element => {
                     if (element) element.disabled = true;
                 });
             }
@@ -208,35 +208,35 @@ window.addEventListener("load", () => {
     });
 
     // Load file button
-    const loadButton = document.getElementById("load-file") as HTMLButtonElement | null;
+    const load_button = document.getElementById("load-file") as HTMLButtonElement | null;
 
-    loadButton?.addEventListener("click", () => {
+    load_button?.addEventListener("click", () => {
         const input = document.createElement("input");
         input.type = "file";
 
         input.onchange = () => {
-            const fileInput = input.files?.[0];
-            if (!fileInput) return;
+            const file_input = input.files?.[0];
+            if (!file_input) return;
 
             const reader = new FileReader();
-            reader.readAsText(fileInput);
+            reader.readAsText(file_input);
 
             reader.onloadend = () => {
-                const fileText = reader.result;
-                if (typeof fileText !== "string") return;
+                const file_text = reader.result;
+                if (typeof file_text !== "string") return;
 
-                const filename = fileInput.name.replace(/\.[^/.]+$/, "");
-                setFilename(filename);
+                const filename = file_input.name.replace(/\.[^/.]+$/, "");
+                set_filename(filename);
 
                 editor.dispatch({
                     changes: {
                         from: 0,
                         to: editor.state.doc.length,
-                        insert: fileText
+                        insert: file_text
                     }
                 });
 
-                localStorage.setItem("vocabug", JSON.stringify([fileText, filename]));
+                localStorage.setItem("vocabug", JSON.stringify([file_text, filename]));
             };
         };
 
@@ -244,23 +244,23 @@ window.addEventListener("load", () => {
     });
 
     // Save file button
-    const saveButton = document.getElementById("save-file") as HTMLButtonElement | null;
-    const fileNameInput = document.getElementById("file-name") as HTMLInputElement | null;
-    saveButton?.addEventListener("click", () => {
-        const fileContent = editor.state.doc.toString();
-        const blob = new Blob([fileContent], { type: "text/plain" });
+    const save_button = document.getElementById("save-file") as HTMLButtonElement | null;
+    const file_name_input = document.getElementById("file-name") as HTMLInputElement | null;
+    save_button?.addEventListener("click", () => {
+        const file_content = editor.state.doc.toString();
+        const blob = new Blob([file_content], { type: "text/plain" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
 
-        const rawName = fileNameInput?.value || "";
-        const downloadName = rawName === "" ? "vocabug.txt" : `${rawName}.txt`;
+        const raw_name = file_name_input?.value || "";
+        const download_name = raw_name === "" ? "vocabug.txt" : `${raw_name}.txt`;
 
-        link.download = downloadName;
+        link.download = download_name;
         link.click();
         URL.revokeObjectURL(link.href);
 
         // Save input text in user's local storage for the next session
-        localStorage.setItem("vocabug", JSON.stringify([fileContent, rawName]));
+        localStorage.setItem("vocabug", JSON.stringify([file_content, raw_name]));
     });
 
     // Examples buttons
@@ -280,18 +280,18 @@ window.addEventListener("load", () => {
                 });
             }
 
-            setFilename('');
-            clearResults();
+            set_filename('');
+            clear_results();
         });
     });    
 
     // Show keyboard toggle
     document.getElementById("show-keyboard")?.addEventListener("click", () => {
-        const keyboardTable = document.getElementById("voc-keyboard-table") as HTMLDivElement;
+        const keyboard_table = document.getElementById("voc-keyboard-table") as HTMLDivElement;
         const checkbox = document.getElementById('show-keyboard') as HTMLInputElement;
         
-        if (keyboardTable && checkbox) {
-            keyboardTable.style.display = checkbox.checked ? "block" : "none";
+        if (keyboard_table && checkbox) {
+            keyboard_table.style.display = checkbox.checked ? "block" : "none";
         }
     });
 
@@ -311,12 +311,11 @@ window.addEventListener("load", () => {
     });
 });
 
-function clearResults(): void {
+function clear_results(): void {
     (document.getElementById('voc-output-message') as HTMLInputElement).value = "";
     (document.getElementById('voc-output-words-field') as HTMLInputElement).value = "";
 }
 
-function setFilename(filename: string): void {
+function set_filename(filename: string): void {
     (document.getElementById('file-name') as HTMLInputElement).value = filename;
 }
-

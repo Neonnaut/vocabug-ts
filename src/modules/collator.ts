@@ -3,25 +3,25 @@ import Logger from "./logger";
 function collator(
   logger: Logger,
   words: string[],
-  customAlphabet: string[],
+  custom_alphabet: string[],
   invisible: string[] = []
 ): string[] {
-  if (customAlphabet.length === 0) {
+  if (custom_alphabet.length === 0) {
     return words.sort(Intl.Collator().compare);
   }
 
-  customAlphabet.push("�");
+  custom_alphabet.push("�");
 
-  const orderMap = new Map<string, number>();
-  customAlphabet.forEach((char, index) => orderMap.set(char, index));
+  const order_map = new Map<string, number>();
+  custom_alphabet.forEach((char, index) => order_map.set(char, index));
 
-  const invisibleSet = new Set<string>(invisible);
-  const unknownSet = new Set<string>();
+  const invisible_set = new Set<string>(invisible);
+  const unknown_set = new Set<string>();
 
   function tokenize(input: string): string[] {
     const tokens: string[] = [];
-    const graphemes = Array.from(orderMap.keys())
-      .concat(Array.from(invisibleSet)) // So invisible graphemes get matched as units
+    const graphemes = Array.from(order_map.keys())
+      .concat(Array.from(invisible_set)) // So invisible graphemes get matched as units
       .sort((a, b) => b.length - a.length);
 
     let i = 0;
@@ -46,9 +46,9 @@ function collator(
     return tokens;
   }
 
-  function customCompare(a: string, b: string): number {
-    const aTokens = tokenize(a).filter(t => !invisibleSet.has(t));
-    const bTokens = tokenize(b).filter(t => !invisibleSet.has(t));
+  function custom_compare(a: string, b: string): number {
+    const aTokens = tokenize(a).filter(t => !invisible_set.has(t));
+    const bTokens = tokenize(b).filter(t => !invisible_set.has(t));
 
     for (let i = 0; i < Math.max(aTokens.length, bTokens.length); i++) {
       const aTok = aTokens[i];
@@ -56,11 +56,11 @@ function collator(
       if (aTok === undefined) return -1;
       if (bTok === undefined) return 1;
 
-      const aIndex = orderMap.get(aTok);
-      const bIndex = orderMap.get(bTok);
+      const aIndex = order_map.get(aTok);
+      const bIndex = order_map.get(bTok);
 
-      if (aIndex === undefined) unknownSet.add(aTok);
-      if (bIndex === undefined) unknownSet.add(bTok);
+      if (aIndex === undefined) unknown_set.add(aTok);
+      if (bIndex === undefined) unknown_set.add(bTok);
 
       if ((aIndex ?? Infinity) !== (bIndex ?? Infinity)) {
         return (aIndex ?? Infinity) - (bIndex ?? Infinity);
@@ -70,11 +70,11 @@ function collator(
     return 0;
   }
 
-  const sorted = [...words].sort(customCompare);
+  const sorted = [...words].sort(custom_compare);
 
-  if (unknownSet.size > 0) {
+  if (unknown_set.size > 0) {
     logger.warn(
-      `The custom order stated in 'alphabet' was ignored because words had unknown graphemes: '${Array.from(unknownSet).join(", ")}' missing from 'alphabet'`
+      `The custom order stated in 'alphabet' was ignored because words had unknown graphemes: '${Array.from(unknown_set).join(", ")}' missing from 'alphabet'`
     );
     return words.sort(Intl.Collator().compare);
   }

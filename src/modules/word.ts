@@ -8,9 +8,9 @@ class Word {
     public rejected: boolean;
     private line_nums: (string)[];
 
-    constructor(skeleton: string, adult: string) {
-        this.transformations = [skeleton];
-        this.forms = [adult];
+    constructor(first_stage: string, last_stage: string) {
+        this.transformations = [first_stage];
+        this.forms = [last_stage];
         this.rejected = false; // This may be changed in transforms or when the word is ""
         this.line_nums = [''];
     }

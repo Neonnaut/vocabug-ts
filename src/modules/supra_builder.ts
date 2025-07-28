@@ -1,17 +1,17 @@
 import Logger from './logger';
 import { cappa } from './utilities';
 
-export class SupraBuilder {
+export class Supra_Builder {
     private logger: Logger;
     private weights: Record<number, (number|'s')>;
     private letters: Record<number, string>;
-    public idCounter: number;
+    public id_counter: number;
 
     constructor(logger: Logger) {
         this.logger = logger
         this.weights = {};
         this.letters = {};
-        this.idCounter = 1;
+        this.id_counter = 1;
     }
 
     processString(input: string, wordshape_line_num:number): string {
@@ -29,7 +29,7 @@ export class SupraBuilder {
             const rawWeight = match[2];
             const weight = rawWeight === "s" ? "s" : (rawWeight ? Number(rawWeight) : 1);
 
-            const id = this.idCounter++;
+            const id = this.id_counter++;
             this.weights[id] = weight;
             this.letters[id] = letter;
 
@@ -38,7 +38,7 @@ export class SupraBuilder {
         });
     }
 
-    extractLettersAndWeights(input: string): [string[], (number|'s')[]] {
+    extract_letters_and_weights(input: string): [string[], (number|'s')[]] {
         const idRegex = /\{(\d+)\}/g;
         const ids: string[] = [];
         const weights: (number|'s')[] = [];
@@ -58,7 +58,7 @@ export class SupraBuilder {
         return [ ids, weights ];
     }
 
-    replaceLetterAndClean(input: string, targetID: number): string {
+    replace_letter_and_clean(input: string, targetID: number): string {
         const idRegex = /\{(\d+)\}/g;
 
         return input.replace(idRegex, (_match, idStr) => {
@@ -83,4 +83,4 @@ export class SupraBuilder {
     }
 }
 
-export default SupraBuilder;
+export default Supra_Builder;

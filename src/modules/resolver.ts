@@ -1,14 +1,14 @@
 import type Escape_Mapper from './escape_mapper';
 import Logger from './logger';
-import SupraBuilder from './supra_builder';
+import Supra_Builder from './supra_builder';
 
-import { getCatSeg, makePercentage, get_distribution
+import { get_cat_seg, make_percentage, get_distribution
  } from './utilities'
 
 class Resolver {
     private logger: Logger;
     private escape_mapper: Escape_Mapper;
-    public supra_builder: SupraBuilder
+    public supra_builder: Supra_Builder
 
     public num_of_words: number;
     public debug: boolean;
@@ -51,7 +51,7 @@ class Resolver {
     constructor(
         logger: Logger,
         escape_mapper: Escape_Mapper,
-        supra_builder: SupraBuilder,
+        supra_builder: Supra_Builder,
 
         num_of_words_string: number | string,
         mode: string,
@@ -131,7 +131,7 @@ class Resolver {
             let line = file_array[this.file_line_num];
             let line_value = '';
 
-            line = this.escape_mapper.escapeBackslashSpace(line);
+            line = this.escape_mapper.escape_backslash_space(line);
             line = line.replace(/(?<!\\);.*/u, '').trim(); // Remove comment unless escaped with backslash
 
             if (line === '') { continue; } // Blank line !!
@@ -192,7 +192,7 @@ class Resolver {
             } else if (line.startsWith("optionals-weight:")) {
                 line_value = line.substring(17).replace(/%/g, "").trim();
 
-                let optionals_weight = makePercentage(line_value);
+                let optionals_weight = make_percentage(line_value);
                 if (optionals_weight == null) {
                     this.logger.warn(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
                     continue;
@@ -201,7 +201,7 @@ class Resolver {
 
             } else if (line.startsWith("alphabet:")) {
                 line_value = line.substring(9).trim();
-                line_value = this.escape_mapper.restorePreserveEscapedChars(line_value);
+                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
 
                 let alphabet = line_value.split(/[,\s]+/).filter(Boolean);
 
@@ -212,7 +212,7 @@ class Resolver {
 
             } else if (line.startsWith("invisible:")) {
                 line_value = line.substring(10).trim();
-                line_value = this.escape_mapper.restorePreserveEscapedChars(line_value);
+                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
 
                 let invisible = line_value.split(/[,\s]+/).filter(Boolean);
 
@@ -223,7 +223,7 @@ class Resolver {
 
             } else if (line.startsWith("alphabet-and-graphemes:")) {
                 line_value = line.substring(23).trim();
-                line_value = this.escape_mapper.restorePreserveEscapedChars(line_value);
+                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
 
                 let a_g = line_value.split(/[,\s]+/).filter(Boolean);
 
@@ -235,7 +235,7 @@ class Resolver {
 
             } else if (line.startsWith("graphemes:")) {
                 line_value = line.substring(10).trim();
-                line_value = this.escape_mapper.escapeBackslashPairs(line_value);
+                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
 
                 let graphemes = line_value.split(/[,\s]+/).filter(Boolean);
                 if (graphemes.length == 0){
@@ -245,7 +245,7 @@ class Resolver {
 
             } else if (line.startsWith("words:")) {
                 line_value = line.substring(6).trim();
-                line_value = this.escape_mapper.escapeBackslashPairs(line_value);
+                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
                 
                 if (line_value != "") {
                     this.wordshape_pending = line_value;
@@ -257,15 +257,15 @@ class Resolver {
 
             } else { // It's a category or segment
                 line_value = line;
-                line_value = this.escape_mapper.escapeBackslashPairs(line_value);
+                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
 
-                let [myName, field, valid, isCapital, hasDollarSign] = getCatSeg(line_value);
+                let [myName, field, valid, isCapital, has_dollar_sign] = get_cat_seg(line_value);
 
                 if ( !valid || !isCapital ) {
                     this.logger.warn(`Junk ignored -- expected a category, segment, directive, ..., etc`, this.file_line_num);
                     continue;
                 }
-                if (hasDollarSign) {
+                if (has_dollar_sign) {
                     // SEGMENTS !!!
                     if (!this.validateSegment(field)) { this.logger.validation_error(`The segment '${myName}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
                     if (!this.valid_words_brackets(field)) {
@@ -633,7 +633,6 @@ class Resolver {
                 return { before: segment, after: '' };
             } else {
                 this.logger.validation_error(`chance "${segment}" must be a number between 0 and 100`, this.file_line_num);
-                return { before: '', after: '' };
             }
         }
 
@@ -1158,7 +1157,7 @@ class Resolver {
             `\nGraphemes: ` + this.graphemes.join(', ') +
             `\nAlphabet: ` + this.alphabet.join(', ') +
             `\nInvisible: ` + this.invisible.join(', ');
-        info = this.escape_mapper.restorePreserveEscapedChars(info);
+        info = this.escape_mapper.restore_preserve_escaped_chars(info);
 
         this.logger.diagnostic(info);
     }
