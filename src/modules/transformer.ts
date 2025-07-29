@@ -51,17 +51,17 @@ class Transformer {
         return tokens;
     }
 
-    spanToLength(tokens: string[], targetLength: number): number {
+    span_to_length(tokens: string[], target_length: number): number {
         let total = 0;
         for (let i = 0; i < tokens.length; i++) {
             total += tokens[i].length;
-            if (total >= targetLength) return i + 1;
+            if (total >= target_length) return i + 1;
         }
         return tokens.length;
     }
 
 
-    applyTransform(
+    apply_transform(
         word: Word,
         tokens: string[],
         transform: {
@@ -73,23 +73,23 @@ class Transformer {
             line_num: number;
         }
     ): string[] {
-        function spanToLength(subTokens: string[], targetLen: number): number {
+        function span_to_length(sub_tokens: string[], target_len: number): number {
             let count = 0;
-            for (let i = 0; i < subTokens.length; i++) {
-                count += subTokens[i].length;
-                if (count >= targetLen) return i + 1;
+            for (let i = 0; i < sub_tokens.length; i++) {
+                count += sub_tokens[i].length;
+                if (count >= target_len) return i + 1;
             }
-            return subTokens.length;
+            return sub_tokens.length;
         }
 
-        function contextMatches(
+        function context_matches(
             full: string,
             startIdx: number,
-            rawSearch: string,
+            raw_search: string,
             before: string,
             after: string
         ): boolean {
-            const targetLen = rawSearch.length;
+            const target_len = raw_search.length;
 
             // BEFORE logic
             if (before === "#") {
@@ -104,12 +104,12 @@ class Transformer {
 
             // AFTER logic
             if (after === "#") {
-                if (startIdx + targetLen !== full.length) return false;
+                if (startIdx + target_len !== full.length) return false;
             } else if (after.endsWith("#")) {
                 const expected = after.slice(0, -1);
-                if (startIdx + targetLen !== full.length || full.slice(startIdx + targetLen) !== expected) return false;
+                if (startIdx + target_len !== full.length || full.slice(startIdx + target_len) !== expected) return false;
             } else {
-                const actual = full.slice(startIdx + targetLen, startIdx + targetLen + after.length);
+                const actual = full.slice(startIdx + target_len, startIdx + target_len + after.length);
                 if (actual !== after) return false;
             }
 
@@ -118,7 +118,7 @@ class Transformer {
 
         const { target, result, conditions, exceptions, chance, line_num } = transform;
 
-        const fullWord = tokens.join("");
+        const full_word = tokens.join("");
 
         if (chance !== null && Math.random() * 100 >= chance) {
             // 🎲 Roll failed — skip transformation entirely
@@ -126,33 +126,33 @@ class Transformer {
         }
 
         if (target[0] === "$") {
-            let modifiedWord = ''
+            let modified_word = ''
             switch (result[0]) {
                 case "decompose":
-                    modifiedWord = fullWord.normalize("NFD"); break;
+                    modified_word = full_word.normalize("NFD"); break;
                 case "compose":
-                    modifiedWord = fullWord.normalize("NFC"); break;
+                    modified_word = full_word.normalize("NFC"); break;
                 case "capitalise":
-                    modifiedWord = fullWord.charAt(0).toUpperCase() + fullWord.slice(1); break;
+                    modified_word = full_word.charAt(0).toUpperCase() + full_word.slice(1); break;
                 case "decapitalise":
-                    modifiedWord = fullWord.charAt(0).toLowerCase() + fullWord.slice(1); break;
+                    modified_word = full_word.charAt(0).toLowerCase() + full_word.slice(1); break;
                 case "to-upper-case":
-                    modifiedWord = fullWord.toUpperCase(); break;
+                    modified_word = full_word.toUpperCase(); break;
                 case "to-lower-case":
-                    modifiedWord = fullWord.toLowerCase(); break;
+                    modified_word = full_word.toLowerCase(); break;
                 case "xsampa-to-ipa":
-                    modifiedWord = xsampa_to_ipa(fullWord); break;
+                    modified_word = xsampa_to_ipa(full_word); break;
                 case "ipa-to-xsampa":
-                    modifiedWord = ipa_to_xsampa(fullWord); break;
+                    modified_word = ipa_to_xsampa(full_word); break;
                 default:
                     this.logger.validation_error("This should not have happened");
             }
             word.record_transformation(
                 `${result[0]}`,
-                modifiedWord,
+                modified_word,
                 line_num
             );
-            return this.graphemosis(modifiedWord);
+            return this.graphemosis(modified_word);
         }
 
         if (target.length !== result.length) {
@@ -162,55 +162,55 @@ class Transformer {
         const replacements: { index: number; length: number; replacement: string }[] = [];
 
         for (let i = 0; i < target.length; i++) {
-            let rawTarget = target[i].replace(/\\/g, "");
-            let rawResult = result[i].replace(/\\/g, "");
+            let raw_target = target[i].replace(/\\/g, "");
+            let raw_result = result[i].replace(/\\/g, "");
 
-            if (rawResult === "^REJECT" || rawResult === "^R") {
+            if (raw_result === "^REJECT" || raw_result === "^R") {
                 for (let j = 0; j < tokens.length; j++) {
-                    const subTokens = tokens.slice(j);
-                    const span = spanToLength(subTokens, rawTarget.length);
-                    const window = subTokens.slice(0, span).join("");
-                    if (window === rawTarget) {
+                    const sub_tokens = tokens.slice(j);
+                    const span = span_to_length(sub_tokens, raw_target.length);
+                    const window = sub_tokens.slice(0, span).join("");
+                    if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
 
                         const passes = conditions.length === 0 || conditions.some(c =>
-                            contextMatches(fullWord, startIdx, rawTarget, c.before, c.after)
+                            context_matches(full_word, startIdx, raw_target, c.before, c.after)
                         );
                         const blocked = exceptions.some(e =>
-                            contextMatches(fullWord, startIdx, rawTarget, e.before, e.after)
+                            context_matches(full_word, startIdx, raw_target, e.before, e.after)
                         );
 
                         if (passes && !blocked) {
                             word.rejected = true;
-                            word.record_transformation(`${rawTarget} → ^REJECT`, "❌", line_num);
+                            word.record_transformation(`${raw_target} → ^REJECT`, "❌", line_num);
                             return tokens;
                         }
                     }
                 }
             }
 
-            if (rawTarget == "^") {
+            if (raw_target == "^") {
                 // Insertion case
                 if (conditions.length === 0) {
                     this.logger.validation_error("Insertion requires at least one condition", line_num);
                 }
                 for (let j = 0; j <= tokens.length; j++) {
                     const startIdx = tokens.slice(0, j).join("").length;
-                    const passes = conditions.some(cond => contextMatches(fullWord, startIdx, "", cond.before, cond.after));
-                    const blocked = exceptions.some(exc => contextMatches(fullWord, startIdx, "", exc.before, exc.after));
+                    const passes = conditions.some(cond => context_matches(full_word, startIdx, "", cond.before, cond.after));
+                    const blocked = exceptions.some(exc => context_matches(full_word, startIdx, "", exc.before, exc.after));
                     if (passes && !blocked) {
-                        replacements.push({ index: j, length: 0, replacement: rawResult });
+                        replacements.push({ index: j, length: 0, replacement: raw_result });
                     }
                 }
-            } else if (rawResult === "^") {
+            } else if (raw_result === "^") {
                 // Deletion case
                 for (let j = 0; j < tokens.length; j++) {
-                    const span = spanToLength(tokens.slice(j), rawTarget.length);
+                    const span = span_to_length(tokens.slice(j), raw_target.length);
                     const window = tokens.slice(j, j + span).join("");
-                    if (window === rawTarget) {
+                    if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
-                        const passes = conditions.length === 0 || conditions.some(c => contextMatches(fullWord, startIdx, rawTarget, c.before, c.after));
-                        const blocked = exceptions.some(e => contextMatches(fullWord, startIdx, rawTarget, e.before, e.after));
+                        const passes = conditions.length === 0 || conditions.some(c => context_matches(full_word, startIdx, raw_target, c.before, c.after));
+                        const blocked = exceptions.some(e => context_matches(full_word, startIdx, raw_target, e.before, e.after));
                         if (passes && !blocked) {
                             replacements.push({ index: j, length: span, replacement: "" });
                         }
@@ -219,14 +219,14 @@ class Transformer {
             } else {
                 // Substitution case
                 for (let j = 0; j < tokens.length; j++) {
-                    const span = spanToLength(tokens.slice(j), rawTarget.length);
+                    const span = span_to_length(tokens.slice(j), raw_target.length);
                     const window = tokens.slice(j, j + span).join("");
-                    if (window === rawTarget) {
+                    if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
-                        const passes = conditions.length === 0 || conditions.some(c => contextMatches(fullWord, startIdx, rawTarget, c.before, c.after));
-                        const blocked = exceptions.some(e => contextMatches(fullWord, startIdx, rawTarget, e.before, e.after));
+                        const passes = conditions.length === 0 || conditions.some(c => context_matches(full_word, startIdx, raw_target, c.before, c.after));
+                        const blocked = exceptions.some(e => context_matches(full_word, startIdx, raw_target, e.before, e.after));
                         if (passes && !blocked) {
-                            replacements.push({ index: j, length: span, replacement: rawResult });
+                            replacements.push({ index: j, length: span, replacement: raw_result });
                         }
                     }
                 }
@@ -236,87 +236,85 @@ class Transformer {
         // ✂️ Non-destructive replacement
         replacements.sort((a, b) => a.index - b.index);
         const blocked = new Set<number>();
-    // const resultTokens: string[] = [];
+        // const result_tokens: string[] = [];
 
-    const insertionMap = new Map<number, string[]>();
-    const replacementMap = new Map<number, { length: number; replacement: string }>();
+        const insertion_map = new Map<number, string[]>();
+        const replacement_map = new Map<number, { length: number; replacement: string }>();
 
-    for (const r of replacements) {
-        if (r.length === 0) {
-            if (!insertionMap.has(r.index)) insertionMap.set(r.index, []);
-            insertionMap.get(r.index)!.push(r.replacement);
-        } else {
-            replacementMap.set(r.index, r);
-        }
-    }
-
-    const resultTokens: string[] = [];
-    let i = 0;
-
-    while (i < tokens.length) {
-        // 🪛 Insert before i
-        if (insertionMap.has(i)) {
-            for (const rep of insertionMap.get(i)!) {
-                resultTokens.push(rep);
+        for (const r of replacements) {
+            if (r.length === 0) {
+                if (!insertion_map.has(r.index)) insertion_map.set(r.index, []);
+                insertion_map.get(r.index)!.push(r.replacement);
+            } else {
+                replacement_map.set(r.index, r);
             }
         }
 
-        // 🔁 Replace current token span
-        const replacement = replacementMap.get(i);
-        if (replacement && ![...Array(replacement.length).keys()].some(k => blocked.has(i + k))) {
-            if (replacement.replacement !== "") {
-                resultTokens.push(replacement.replacement);
+        const result_tokens: string[] = [];
+        let i = 0;
+
+        while (i < tokens.length) {
+            // 🪛 Insert before i
+            if (insertion_map.has(i)) {
+                for (const rep of insertion_map.get(i)!) {
+                    result_tokens.push(rep);
+                }
             }
-            for (let k = 0; k < replacement.length; k++) {
-                blocked.add(i + k);
+
+            // 🔁 Replace current token span
+            const replacement = replacement_map.get(i);
+            if (replacement && ![...Array(replacement.length).keys()].some(k => blocked.has(i + k))) {
+                if (replacement.replacement !== "") {
+                    result_tokens.push(replacement.replacement);
+                }
+                for (let k = 0; k < replacement.length; k++) {
+                    blocked.add(i + k);
+                }
+                i += replacement.length;
+            } else {
+                result_tokens.push(tokens[i]);
+                i++;
             }
-            i += replacement.length;
-        } else {
-            resultTokens.push(tokens[i]);
-            i++;
         }
-    }
 
-    // Handle insertions after the last token
-    if (insertionMap.has(tokens.length)) {
-        for (const rep of insertionMap.get(tokens.length)!) {
-            resultTokens.push(rep);
+        // Handle insertions after the last token
+        if (insertion_map.has(tokens.length)) {
+            for (const rep of insertion_map.get(tokens.length)!) {
+                result_tokens.push(rep);
+            }
         }
-    }
 
-
-
-        const normalized = this.graphemosis(resultTokens.join(""));
+        const normalized = this.graphemosis(result_tokens.join(""));
 
         // 🧾 Log transformation summary
 
-        const matchedPairs = new Set<string>();
-        const matchedTargets: string[] = [];
-        const matchedResults: string[] = [];
+        const matched_pairs = new Set<string>();
+        const matched_targets: string[] = [];
+        const matched_results: string[] = [];
 
-    for (let i = 0; i < target.length; i++) {
-        const isInsertion = target[i] === "^";
-        const isDeletion = result[i] === "^";
+        for (let i = 0; i < target.length; i++) {
+            const is_insertion = target[i] === "^";
+            const is_deletion = result[i] === "^";
 
-        const expected = isInsertion ? result[i] : (isDeletion ? "" : result[i]);
+            const expected = is_insertion ? result[i] : (is_deletion ? "" : result[i]);
 
-        const matched = replacements.some(r =>
-            r.replacement === expected &&
-            ((isInsertion && r.length === 0) || (!isInsertion && r.length > 0))
-        );
+            const matched = replacements.some(r =>
+                r.replacement === expected &&
+                ((is_insertion && r.length === 0) || (!is_insertion && r.length > 0))
+            );
 
-        if (matched) {
-            const pair = `${target[i]} → ${result[i]}`;
-            if (!matchedPairs.has(pair)) {
-                matchedTargets.push(target[i]);
-                matchedResults.push(result[i]);
-                matchedPairs.add(pair);
+            if (matched) {
+                const pair = `${target[i]} → ${result[i]}`;
+                if (!matched_pairs.has(pair)) {
+                    matched_targets.push(target[i]);
+                    matched_results.push(result[i]);
+                    matched_pairs.add(pair);
+                }
             }
         }
-    }
 
 
-        if (matchedTargets.length > 0) {
+        if (matched_targets.length > 0) {
             let my_exceptions = '';
             for (let j = 0; j < exceptions.length; j++) {
                 my_exceptions += ` ! ${exceptions[j].before}_${exceptions[j].after}`;
@@ -328,7 +326,7 @@ class Transformer {
             const my_chance = chance !== null ? ` ? ${chance}` : '';
 
             word.record_transformation(
-                `${matchedTargets.join(", ")} → ${matchedResults.join(", ")}${my_conditions}${my_exceptions}${my_chance}`,
+                `${matched_targets.join(", ")} → ${matched_results.join(", ")}${my_conditions}${my_exceptions}${my_chance}`,
                 normalized.join(" "),
                 line_num
             );
@@ -355,7 +353,7 @@ class Transformer {
             if (word.rejected) {
                 break;
             }
-            tokens = this.applyTransform(word, tokens, t);
+            tokens = this.apply_transform(word, tokens, t);
             if (tokens.length == 0) {
                 word.rejected = true;
                 word.record_transformation(`REJECT NULL WORD`, `❌`);

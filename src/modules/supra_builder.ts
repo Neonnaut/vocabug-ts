@@ -14,20 +14,20 @@ export class Supra_Builder {
         this.id_counter = 1;
     }
 
-    processString(input: string, wordshape_line_num:number): string {
-        const tokenRegex = /\{([^}]*)\}/g;
-        const validContentRegex = new RegExp(
+    process_string(input: string, wordshape_line_num:number): string {
+        const token_regex = /\{([^}]*)\}/g;
+        const valid_content_regex = new RegExp(
         `^(\\^|∅|${cappa})(?:\\*((\\d+(?:\\.\\d+)?)|s))?$` );
 
-        return input.replace(tokenRegex, (fullMatch, content) => {
-            const match = validContentRegex.exec(content);
+        return input.replace(token_regex, (fullMatch, content) => {
+            const match = valid_content_regex.exec(content);
             if (!match) {
                 this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`, wordshape_line_num);
             }
 
             const letter = match[1];
-            const rawWeight = match[2];
-            const weight = rawWeight === "s" ? "s" : (rawWeight ? Number(rawWeight) : 1);
+            const raw_weight = match[2];
+            const weight = raw_weight === "s" ? "s" : (raw_weight ? Number(raw_weight) : 1);
 
             const id = this.id_counter++;
             this.weights[id] = weight;
@@ -39,12 +39,12 @@ export class Supra_Builder {
     }
 
     extract_letters_and_weights(input: string): [string[], (number|'s')[]] {
-        const idRegex = /\{(\d+)\}/g;
+        const id_regex = /\{(\d+)\}/g;
         const ids: string[] = [];
         const weights: (number|'s')[] = [];
 
         let match: RegExpExecArray | null;
-        while ((match = idRegex.exec(input)) !== null) {
+        while ((match = id_regex.exec(input)) !== null) {
             const id = Number(match[1]);
 
             if (!(id in this.letters) || !(id in this.weights)) {
@@ -58,11 +58,11 @@ export class Supra_Builder {
         return [ ids, weights ];
     }
 
-    replace_letter_and_clean(input: string, targetID: number): string {
-        const idRegex = /\{(\d+)\}/g;
+    replace_letter_and_clean(input: string, target_ID: number): string {
+        const id_regex = /\{(\d+)\}/g;
 
-        return input.replace(idRegex, (_match, idStr) => {
-            const id = Number(idStr);
+        return input.replace(id_regex, (_match, id_str) => {
+            const id = Number(id_str);
 
             // Safety check
             if (!(id in this.letters)) {
@@ -70,7 +70,7 @@ export class Supra_Builder {
             }
 
             // Keep only the target letter
-            return id === targetID ? `${this.letters[id]}` : '';
+            return id === target_ID ? `${this.letters[id]}` : '';
         });
     }
 

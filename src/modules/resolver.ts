@@ -259,22 +259,22 @@ class Resolver {
                 line_value = line;
                 line_value = this.escape_mapper.escape_backslash_pairs(line_value);
 
-                let [myName, field, valid, isCapital, has_dollar_sign] = get_cat_seg(line_value);
+                let [my_name, field, valid, is_capital, has_dollar_sign] = get_cat_seg(line_value);
 
-                if ( !valid || !isCapital ) {
+                if ( !valid || !is_capital ) {
                     this.logger.warn(`Junk ignored -- expected a category, segment, directive, ..., etc`, this.file_line_num);
                     continue;
                 }
                 if (has_dollar_sign) {
                     // SEGMENTS !!!
-                    if (!this.validateSegment(field)) { this.logger.validation_error(`The segment '${myName}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
+                    if (!this.validate_segment(field)) { this.logger.validation_error(`The segment '${my_name}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
                     if (!this.valid_words_brackets(field)) {
                         this.logger.validation_error(`The segment '${name}' had missmatched brackets`, this.file_line_num);
                     }
-                    this.segments.set(myName, {content: field, line_num:this.file_line_num });
+                    this.segments.set(my_name, {content: field, line_num:this.file_line_num });
                 } else {
                     // CATEGORIES !!!
-                    this.category_pending.set(myName, { content:field, line_num:this.file_line_num });
+                    this.category_pending.set(my_name, { content:field, line_num:this.file_line_num });
                 }
             }
         }
@@ -282,22 +282,22 @@ class Resolver {
         this.category_distribution = this.parse_distribution(this.category_distribution);
     }
 
-    validateSegment(str: string): boolean {
-        let insideSquare = false;
-        let insideParen = false;
+    validate_segment(str: string): boolean {
+        let inside_square = false;
+        let inside_paren = false;
 
         // We don't want random space or comma inside segment
 
         for (let i = 0; i < str.length; i++) {
             const char = str[i];
 
-            if (char === "[") insideSquare = true;
-            else if (char === "]") insideSquare = false;
+            if (char === "[") inside_square = true;
+            else if (char === "]") inside_square = false;
 
-            else if (char === "(") insideParen = true;
-            else if (char === ")") insideParen = false;
+            else if (char === "(") inside_paren = true;
+            else if (char === ")") inside_paren = false;
 
-            if ((char === "," || char === " ") && !insideSquare && !insideParen) {
+            if ((char === "," || char === " ") && !inside_square && !inside_paren) {
             return false;
             }
         }
@@ -319,13 +319,13 @@ class Resolver {
     set_wordshapes() {
         let result = [];
         let buffer = "";
-        let insideBrackets = 0;
+        let inside_brackets = 0;
 
         if (this.wordshape_pending.length == 0){
             this.logger.validation_error(`No word-shapes to choose from -- expected 'words: wordshape1 wordshape2 ...'`, this.wordshape_line_num);
         }
 
-        this.wordshape_pending = this.supra_builder.processString(this.wordshape_pending, this.wordshape_line_num);
+        this.wordshape_pending = this.supra_builder.process_string(this.wordshape_pending, this.wordshape_line_num);
 
         if (!this.valid_words_brackets(this.wordshape_pending)) {
             this.logger.validation_error(`Word-shapes had missmatched brackets`, this.wordshape_line_num);
@@ -338,12 +338,12 @@ class Resolver {
             const char = this.wordshape_pending[i];
 
             if (char === '[' || char === '(') {
-                insideBrackets++;
+                inside_brackets++;
             } else if (char === ']' || char === ')') {
-                insideBrackets--;
+                inside_brackets--;
             }
 
-            if ((char === ' ' || char === ',') && insideBrackets === 0) {
+            if ((char === ' ' || char === ',') && inside_brackets === 0) {
                 if (buffer.length > 0) {
                     result.push(buffer);
                     buffer = "";
@@ -357,31 +357,31 @@ class Resolver {
             result.push(buffer);
         }
 
-        let [resultStr, resultNum] = this.extract_wordshape_value_and_weight(result, this.wordshape_distribution);
-        for (let i = 0; i < resultStr.length; i++) {
-            this.wordshapes.items.push(resultStr[i]);
-            this.wordshapes.weights.push(resultNum[i]); ///
+        let [result_str, result_num] = this.extract_wordshape_value_and_weight(result, this.wordshape_distribution);
+        for (let i = 0; i < result_str.length; i++) {
+            this.wordshapes.items.push(result_str[i]);
+            this.wordshapes.weights.push(result_num[i]); ///
         } 
     }
 
     valid_words_brackets(str: string): boolean {
         const stack: string[] = [];
-        const bracketPairs: Record<string, string> = {
+        const bracket_pairs: Record<string, string> = {
             ')': '(',
             '>': '<',
             ']': '[',
         };
         for (const char of str) {
-            if (Object.values(bracketPairs).includes(char)) {
-            stack.push(char); // Push opening brackets onto stack
-            } else if (Object.keys(bracketPairs).includes(char)) {
-            if (stack.length === 0 || stack.pop() !== bracketPairs[char]) {
-                return false; // Unmatched closing bracket
-            }
+            if (Object.values(bracket_pairs).includes(char)) {
+                stack.push(char); // Push opening brackets onto stack
+            } else if (Object.keys(bracket_pairs).includes(char)) {
+                if (stack.length === 0 || stack.pop() !== bracket_pairs[char]) {
+                    return false; // Unmatched closing bracket
+                }
             }
         }
         return stack.length === 0; // Stack should be empty if balanced
-        }
+    }
 
     extract_wordshape_value_and_weight(
     input_list: string[],
@@ -393,21 +393,21 @@ class Resolver {
         const combine_adjacent_chunks = (str: string): string[] => {
             const chunks: string[] = [];
             let buffer = '';
-            let bracketDepth = 0;
-            let parenDepth = 0;
+            let bracket_depth = 0;
+            let paren_depth = 0;
 
             for (let i = 0; i < str.length; i++) {
                 const char = str[i];
                 buffer += char;
 
-                if (char === '[') bracketDepth++;
-                if (char === ']') bracketDepth--;
-                if (char === '(') parenDepth++;
-                if (char === ')') parenDepth--;
+                if (char === '[') bracket_depth++;
+                if (char === ']') bracket_depth--;
+                if (char === '(') paren_depth++;
+                if (char === ')') paren_depth--;
 
                 const atEnd = i === str.length - 1;
 
-                if ((char === ',' && bracketDepth === 0 && parenDepth === 0) || atEnd) {
+                if ((char === ',' && bracket_depth === 0 && paren_depth === 0) || atEnd) {
                     if (char !== ',' && atEnd) {
                         // Final character is part of buffer
                     } else {
@@ -464,24 +464,24 @@ class Resolver {
     valid_words_weights(str: string): boolean {
 
         // Rule 1: asterisk must be followed by a number (integer or decimal)
-        const asteriskWithoutNumber = /\*(?!\d+(\.\d+)?)/g;
+        const asterisk_without_number = /\*(?!\d+(\.\d+)?)/g;
 
         // Rule 2: asterisk must not appear at the start
-        const asteriskAtStart = /^\*/; // Returns false if follows rule
+        const asterisk_at_start = /^\*/; // Returns false if follows rule
 
         // Rule 3: asterisk must not be preceded by space or comma
-        const asteriskAfterSpaceOrComma = /[ ,]\*/g; // Returns false if follows rule
+        const asterisk_after_space_or_comma = /[ ,]\*/g; // Returns false if follows rule
 
         // Rule 4: asterisk-number (int or decimal) pair
         // must be followed by space, comma, }, ], ), or end of string
-        const asteriskNumberBadSuffix = /\*(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,}\]\)\n]|$)/g;
+        const asterisk_number_bad_suffix = /\*(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,}\]\)\n]|$)/g;
 
         // If any are true return false
         if (
-            asteriskWithoutNumber.test(str) ||
-            asteriskAtStart.test(str) ||
-            asteriskAfterSpaceOrComma.test(str) ||
-            asteriskNumberBadSuffix.test(str)
+            asterisk_without_number.test(str) ||
+            asterisk_at_start.test(str) ||
+            asterisk_after_space_or_comma.test(str) ||
+            asterisk_number_bad_suffix.test(str)
         ) {
             return false;
         }
@@ -519,19 +519,19 @@ class Resolver {
         }
         const target_array = this.set_concurrent_changes(target);
 
-        const slashIndex = divided[1].indexOf('/');
-        const bangIndex = divided[1].indexOf('!');
-        const questionIndex = divided[1].indexOf('?');
+        const slash_index = divided[1].indexOf('/');
+        const bang_index = divided[1].indexOf('!');
+        const question_index = divided[1].indexOf('?');
 
-        const delimiterIndex = Math.min(
-            slashIndex === -1 ? Infinity : slashIndex,
-            bangIndex === -1 ? Infinity : bangIndex,
-            questionIndex === -1 ? Infinity : questionIndex
+        const delimiter_index = Math.min(
+            slash_index === -1 ? Infinity : slash_index,
+            bang_index === -1 ? Infinity : bang_index,
+            question_index === -1 ? Infinity : question_index
         );
 
-        const result = delimiterIndex === Infinity
+        const result = delimiter_index === Infinity
             ? divided[1].trim()
-            : divided[1].slice(0, delimiterIndex).trim();
+            : divided[1].slice(0, delimiter_index).trim();
 
         if (result == "") {
             this.logger.validation_error(`Result is empty in transform`, this.file_line_num);
@@ -554,9 +554,9 @@ class Resolver {
             this.logger.validation_error(`Target and result concurrent changes have missmatched lengths`, this.file_line_num)
         }
 
-        const environment = delimiterIndex === Infinity
+        const environment = delimiter_index === Infinity
             ? ''
-            : divided[1].slice(delimiterIndex).trim();
+            : divided[1].slice(delimiter_index).trim();
 
         const { conditions, exceptions, chance } = this.get_environment(environment);
 
@@ -608,6 +608,9 @@ class Resolver {
             const segment = buffer.trim();
             if (mode === "chance") {
                 const parsed = parseInt(segment, 10);
+                if ( chance != null) {
+                    this.logger.validation_error(`Duplicate chance value '${segment}'`, this.file_line_num);
+                }
                 if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
                     chance = parsed;
                 } else {
@@ -632,7 +635,7 @@ class Resolver {
             if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
                 return { before: segment, after: '' };
             } else {
-                this.logger.validation_error(`chance "${segment}" must be a number between 0 and 100`, this.file_line_num);
+                this.logger.validation_error(`Chance "${segment}" must be a number between 0 and 100`, this.file_line_num);
             }
         }
 
@@ -673,18 +676,18 @@ class Resolver {
     set_concurrent_changes(target_result:string) {
         let result = [];
         let buffer = "";
-        let insideBrackets = 0;
+        let inside_brackets = 0;
 
         for (let i = 0; i < target_result.length; i++) {
             const char = target_result[i];
 
             if (char === '[' || char === '(') {
-                insideBrackets++;
+                inside_brackets++;
             } else if (char === ']' || char === ')') {
-                insideBrackets--;
+                inside_brackets--;
             }
 
-            if ((char === ' ' || char === ',') && insideBrackets === 0) {
+            if ((char === ' ' || char === ',') && inside_brackets === 0) {
                 if (buffer.length > 0) {
                     result.push(buffer);
                     buffer = "";
@@ -700,8 +703,6 @@ class Resolver {
 
         return result;
     }
-
-
 
     private parse_cluster(file_array:string[]) {
         let line = file_array[this.file_line_num];
@@ -755,7 +756,6 @@ class Resolver {
         this.add_transform(concurrent_target, concurrent_result, 
             my_conditions, my_exceptions, null, this.file_line_num);
     }
-
 
     resolve_transforms() {
          // Resolve brackets, put categories in transforms, make a milkshake, etc.
@@ -813,16 +813,16 @@ class Resolver {
 
     valid_transform_brackets(str: string): boolean {
         const stack: string[] = [];
-        const bracketPairs: Record<string, string> = {
+        const bracket_pairs: Record<string, string> = {
             ')': '(',
             '}': '{',
             ']': '[',
         };
         for (const char of str) {
-            if (Object.values(bracketPairs).includes(char)) {
+            if (Object.values(bracket_pairs).includes(char)) {
             stack.push(char); // Push opening brackets onto stack
-            } else if (Object.keys(bracketPairs).includes(char)) {
-            if (stack.length === 0 || stack.pop() !== bracketPairs[char]) {
+            } else if (Object.keys(bracket_pairs).includes(char)) {
+            if (stack.length === 0 || stack.pop() !== bracket_pairs[char]) {
                 return false; // Unmatched closing bracket
             }
             }
@@ -840,32 +840,32 @@ class Resolver {
             }
             
             for (const [key, value] of this.category_pending.entries()) {
-                const expandedContent = this.recursiveExpansion(value.content, this.category_pending);
+                const expanded_content = this.recursive_expansion(value.content, this.category_pending);
                 this.category_pending.set(key, {
-                    content: expandedContent,
+                    content: expanded_content,
                     line_num: value.line_num, // Preserve original line_num
                 });
             }
         }
 
         for (const [key, value] of this.category_pending) {
-            const newCategoryField: { graphemes:string[], weights:number[]} = this.resolve_nested_categories(value.content, this.category_distribution);
-            this.categories.set(key, newCategoryField);
+            const new_category_field: { graphemes:string[], weights:number[]} = this.resolve_nested_categories(value.content, this.category_distribution);
+            this.categories.set(key, new_category_field);
         }
     }
 
     valid_category_brackets(str: string): boolean {
         const stack: string[] = [];
-        const bracketPairs: Record<string, string> = {
+        const bracket_pairs: Record<string, string> = {
             ']': '['
         };
         for (const char of str) {
-            if (Object.values(bracketPairs).includes(char)) {
-            stack.push(char); // Push opening brackets onto stack
-            } else if (Object.keys(bracketPairs).includes(char)) {
-            if (stack.length === 0 || stack.pop() !== bracketPairs[char]) {
-                return false; // Unmatched closing bracket
-            }
+            if (Object.values(bracket_pairs).includes(char)) {
+                stack.push(char); // Push opening brackets onto stack
+            } else if (Object.keys(bracket_pairs).includes(char)) {
+                if (stack.length === 0 || stack.pop() !== bracket_pairs[char]) {
+                    return false; // Unmatched closing bracket
+                }
             }
         }
         return stack.length === 0; // Stack should be empty if balanced
@@ -873,24 +873,24 @@ class Resolver {
 
     valid_category_weights(str: string): boolean {
         // Rule 1: asterisk must be followed by a number (integer or decimal)
-        const asteriskWithoutNumber = /\*(?!\d+(\.\d+)?)/g;
+        const asterisk_without_number = /\*(?!\d+(\.\d+)?)/g;
 
         // Rule 2: asterisk must not appear at the start
-        const asteriskAtStart = /^\*/; // Returns false if follows rule
+        const asterisk_at_start = /^\*/; // Returns false if follows rule
 
         // Rule 3: asterisk must not be preceded by space or comma
-        const asteriskAfterSpaceOrComma = /[ ,\[\]]\*/g; // Returns false if follows rule
+        const asterisk_after_space_or_comma = /[ ,\[\]]\*/g; // Returns false if follows rule
 
         // Rule 4: asterisk-number (int or decimal) pair
         // must be followed by space, comma, ], or end of string
-        const asteriskNumberBadSuffix = /\*(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,\]\n]|$)/g;
+        const asterisk_number_bad_suffix = /\*(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,\]\n]|$)/g;
 
         // If any are true return false
         if (
-            asteriskWithoutNumber.test(str) ||
-            asteriskAtStart.test(str) ||
-            asteriskAfterSpaceOrComma.test(str) ||
-            asteriskNumberBadSuffix.test(str)
+            asterisk_without_number.test(str) ||
+            asterisk_at_start.test(str) ||
+            asterisk_after_space_or_comma.test(str) ||
+            asterisk_number_bad_suffix.test(str)
         ) {
             return false;
         }
@@ -964,15 +964,15 @@ class Resolver {
         // console.log(`🔁 Evaluating expression: "${expr}" (multiplier=${multiplier})`);
         const tokens = tokenize(expr);
     
-        const usesExplicitWeights = tokens.some(t =>
+        const uses_explicit_weights = tokens.some(t =>
           typeof t === "string" && t.includes("*")
         );
     
-        const dist = usesExplicitWeights
+        const dist = uses_explicit_weights
           ? Array(tokens.length).fill(1)
           : get_distribution(tokens.length, default_distribution);
     
-        //if (usesExplicitWeights) {
+        //if (uses_explicit_weights) {
           // console.log(`📊 Explicit weights detected; using flat distribution`);
         //} else {
           // console.log(`📊 No explicit weights; using distribution "${default_distribution}"`);
@@ -982,24 +982,24 @@ class Resolver {
     
         for (let i = 0; i < tokens.length; i++) {
           const token = tokens[i];
-          const tokenWeight = dist[i] * multiplier;
+          const token_weight = dist[i] * multiplier;
     
           if (typeof token === 'string') {
-            const [key, rawWeight] = token.split('*');
-            const hasCustomWeight = rawWeight !== undefined && rawWeight !== '';
-            const literalWeight = hasCustomWeight ? parseFloat(rawWeight) : 1;
-            const finalWeight = hasCustomWeight ? literalWeight * multiplier : tokenWeight;
+            const [key, raw_weight] = token.split('*');
+            const has_custom_weight = raw_weight !== undefined && raw_weight !== '';
+            const literal_weight = has_custom_weight ? parseFloat(raw_weight) : 1;
+            const final_weight = has_custom_weight ? literal_weight * multiplier : token_weight;
     
-            // console.log(`🔹 Literal "${key.trim()}" → weight: ${finalWeight}`);
-            entries.push({ key: key.trim(), weight: finalWeight });
+            // console.log(`🔹 Literal "${key.trim()}" → weight: ${final_weight}`);
+            entries.push({ key: key.trim(), weight: final_weight });
     
           } else {
             // console.log(`🔂 Recursing into nested group: "${token.group}" with weight ${token.weight}`);
-            const innerEntries = evaluate(token.group, 1);
-            const total = innerEntries.reduce((sum, e) => sum + e.weight, 0);
+            const inner_entries = evaluate(token.group, 1);
+            const total = inner_entries.reduce((sum, e) => sum + e.weight, 0);
     
-            for (const { key, weight } of innerEntries) {
-              const scaled = (weight / total) * token.weight * tokenWeight;
+            for (const { key, weight } of inner_entries) {
+              const scaled = (weight / total) * token.weight * token_weight;
               // console.log(`  ↪ "${key}" scaled to ${scaled.toFixed(4)}`);
               entries.push({ key, weight: scaled });
             }
@@ -1016,7 +1016,7 @@ class Resolver {
     }
 
     expand_wordshape_segments() {
-        this.wordshape_pending = this.recursiveExpansion(this.wordshape_pending, this.segments);
+        this.wordshape_pending = this.recursive_expansion(this.wordshape_pending, this.segments);
 
         // Remove dud segments
         const match = this.wordshape_pending.match(/\$[A-Z]/);
@@ -1027,23 +1027,22 @@ class Resolver {
 
     expand_segments() {
         for (const [key, value] of this.segments.entries()) {
-            const expandedContent = this.recursiveExpansion(value.content, this.segments);
+            const expanded_content = this.recursive_expansion(value.content, this.segments);
             this.segments.set(key, {
-                content: expandedContent,
+                content: expanded_content,
                 line_num: value.line_num, // Preserve original line_num
             });
         }
-
     }
 
-    recursiveExpansion(
+    recursive_expansion(
         input: string,
         mappings: Map<string, { content: string, line_num: number }>,
-        encloseInBrackets: boolean = false
+        enclose_in_brackets: boolean = false
     ): string {
         const mappingKeys = [...mappings.keys()].sort((a, b) => b.length - a.length);
 
-        const resolveMapping = (str: string, history: string[] = []): string => {
+        const resolve_mapping = (str: string, history: string[] = []): string => {
             let result = '', i = 0;
 
             while (i < str.length) {
@@ -1058,8 +1057,8 @@ class Resolver {
                             result += '�';
                         } else {
                             const entry = mappings.get(key);
-                            const resolved = resolveMapping(entry?.content || '', [...history, key]);
-                            result += encloseInBrackets ? `[${resolved}]` : resolved;
+                            const resolved = resolve_mapping(entry?.content || '', [...history, key]);
+                            result += enclose_in_brackets ? `[${resolved}]` : resolved;
                         }
                         i += key.length;
                         matched = true;
@@ -1073,7 +1072,7 @@ class Resolver {
             return result;
         };
 
-        return resolveMapping(input);
+        return resolve_mapping(input);
     }
 
     private parse_words_block(file_array:string[]) {
@@ -1099,11 +1098,11 @@ class Resolver {
     create_record(): void {
         let categories = [];
         for (const [key, value] of this.categories) {
-            let catField:string[] = [];
+            let cat_field:string[] = [];
             for (let i = 0; i < value.graphemes.length; i++) {
-                catField.push(`${value.graphemes[i]}:${value.weights[i]}`);
+                cat_field.push(`${value.graphemes[i]}:${value.weights[i]}`);
             }
-            const category_field:string = `${catField.join(', ')}`;
+            const category_field:string = `${cat_field.join(', ')}`;
 
             categories.push(`  ${key} = ${category_field}`);
         }

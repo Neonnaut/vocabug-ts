@@ -162,25 +162,25 @@ class Text_Builder {
 
     paragraphify(words: string[]): string {
         if (words.length === 0) return '';
-        if (words.length === 1) return capitalise(words[0]) + this.randomEndPunctuation();
+        if (words.length === 1) return capitalise(words[0]) + this.random_end_punctuation();
 
         const result: string[] = [];
 
-        let shouldCapitalise = true;
+        let should_capitalise = true;
         for (let i = 0; i < words.length; i++) {
             let word = words[i];
 
-            if (shouldCapitalise) {
+            if (should_capitalise) {
                 word = capitalise(word);
-                shouldCapitalise = false;
+                should_capitalise = false;
             }
 
             if (i === words.length - 1) {
                 result.push(word); // Hold final punctuation until the end
             } else if (i % 7 === 0 && i !== 0) {
-                const punctuation = this.randomEndPunctuation();
+                const punctuation = this.random_end_punctuation();
                 result.push(word + punctuation);
-                shouldCapitalise = true; // Capitalize next word
+                should_capitalise = true; // Capitalize next word
             } else if (i % 6 === 0 && i !== 0) {
                 result.push(word + ','); // Sprinkle commas
             } else {
@@ -194,12 +194,12 @@ class Text_Builder {
         paragraph = paragraph.replace(/[,\s]*$/, '');
 
         // Add final punctuation (., ?, or ! with weighted odds)
-        paragraph += this.randomEndPunctuation();
+        paragraph += this.random_end_punctuation();
 
         return paragraph;
     }
 
-    randomEndPunctuation(): string {
+    random_end_punctuation(): string {
         const roll = Math.random();
         if (roll < 0.005) return '...';     // 0.4% chance of exclamation
         if (roll < 0.03) return '!';     // 2% chance of exclamation
