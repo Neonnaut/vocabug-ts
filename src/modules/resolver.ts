@@ -1100,7 +1100,7 @@ class Resolver {
         for (const [key, value] of this.categories) {
             let cat_field:string[] = [];
             for (let i = 0; i < value.graphemes.length; i++) {
-                cat_field.push(`${value.graphemes[i]}:${value.weights[i]}`);
+                cat_field.push(`${value.graphemes[i]}*${value.weights[i]}`);
             }
             const category_field:string = `${cat_field.join(', ')}`;
 
@@ -1114,7 +1114,7 @@ class Resolver {
 
         let wordshapes = [];
         for (let i = 0; i < this.wordshapes.items.length; i++) {
-            wordshapes.push(`⟨${this.wordshapes.items[i]}⟩:${this.wordshapes.weights[i]}`);
+            wordshapes.push(`  ${this.wordshapes.items[i]}*${this.wordshapes.weights[i]}`);
         }
 
         let transforms = [];
@@ -1150,7 +1150,7 @@ class Resolver {
             `\nOptionals-weight: ` + this.optionals_weight +
 
             `\nWordshape-distribution: ` + this.wordshape_distribution +
-            `\nWordshapes: ` + wordshapes.join(', ') + `\n}` +
+            `\nWordshapes {\n` + wordshapes.join('\n') + `\n}` +
 
             `\nTransforms {\n` + transforms.join('\n') + `\n}` +
             `\nGraphemes: ` + this.graphemes.join(', ') +
