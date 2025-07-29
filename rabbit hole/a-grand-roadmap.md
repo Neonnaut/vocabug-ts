@@ -54,6 +54,7 @@
 - [x] Single change
 - [x] Concurrent change
 - [x] A merging, concurent change. e.g: `a, e -> ^REJECT`
+- [] Using category
 - [] Alternator
 - [] Optionalator
 - [x] Reject
@@ -65,7 +66,6 @@
 - [x] Exceptions
 - [x] Multiple exceptions
 - [x] Chance
-- [] Using category
 - [x] Cluster-field
 - [x] Cluster field condition and exception
 
@@ -108,7 +108,7 @@
 
 ## Extra
 
-- [] Syllable dividers
+- [] Syllable dividers and capturing syllables
 - [] Drop off for individual optionals
 - [] HTML entities
 - [] Alternative graphs
