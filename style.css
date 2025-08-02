@@ -403,7 +403,7 @@ thead {
 .fixed-header thead tr {
   display: block;
 }
-code.example {
+code.example, code.voc-static {
   font-family: monospace;
   word-wrap: break-word;
   padding: 0 2px 1px 2px;
@@ -412,7 +412,7 @@ code.example {
   border-radius: 3px;
   font-size: 1.18em;
 }
-pre.example {
+pre.example, pre.voc-static {
   background: var(--code-bg);
   color: var(--code-text);
   border-radius: 3px;

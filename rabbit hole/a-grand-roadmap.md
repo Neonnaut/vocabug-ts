@@ -54,7 +54,7 @@
 - [x] Single change
 - [x] Concurrent change
 - [x] A merging, concurent change. e.g: `a, e -> ^REJECT`
-- [] Using category
+- [x] Using category
 - [] Alternator
 - [] Optionalator
 - [x] Reject
@@ -123,4 +123,6 @@
 - [] Featurefield
 - [] Using features
 - [] "AI" generate a def file, like Gleb
-
+- [] Invisible graphemes EXTRA
+- [] Static code highlighted snippits in docs
+- [] Lezer grammar

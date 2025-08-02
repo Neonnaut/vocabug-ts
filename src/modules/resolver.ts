@@ -31,7 +31,7 @@ class Resolver {
     private wordshape_line_num: number;
     
     public transform_pending: {
-        target:string[], result:string[],
+        target:string, result:string,
         conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
         chance:(number|null),
         line_num:number
@@ -161,7 +161,7 @@ class Resolver {
                             engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa"
                         ) {
                             this.add_transform(
-                                ["$"], [engine], [], [], null, this.file_line_num
+                                "$", engine, [], [], null, this.file_line_num
                             )
                         } else {
                             this.logger.validation_error(`Trash engine '${engine}' found`, this.file_line_num);
@@ -493,7 +493,7 @@ class Resolver {
 
     // This is run on parsing file. We then have to run resolve_transforms aftter parse file
     get_transform(input: string): [
-        string[], string[],
+        string, string,
         { before: string; after: string }[],
         { before: string; after: string }[],
         (number|null)
@@ -517,7 +517,6 @@ class Resolver {
         if (!this.valid_transform_brackets(target)) {
             this.logger.validation_error(`Target had missmatched brackets`, this.file_line_num);
         }
-        const target_array = this.set_concurrent_changes(target);
 
         const slash_index = divided[1].indexOf('/');
         const bang_index = divided[1].indexOf('!');
@@ -539,20 +538,6 @@ class Resolver {
         if (!this.valid_transform_brackets(result)) {
             this.logger.validation_error(`Result had missmatched brackets`, this.file_line_num);
         }
-        const result_array = this.set_concurrent_changes(result);
-
-        // Yo. We are doing merging change
-        if (result_array.length === 1 && target_array.length > 1) {
-            // Now fill the rest of the result array with the same value
-            while (result_array.length < target_array.length) {
-                result_array.push(result_array[0]);
-            }
-        }
-
-        // If result array is not the same as target array send error
-        if (target_array.length !== result_array.length) {
-            this.logger.validation_error(`Target and result concurrent changes have missmatched lengths`, this.file_line_num)
-        }
 
         const environment = delimiter_index === Infinity
             ? ''
@@ -560,7 +545,7 @@ class Resolver {
 
         const { conditions, exceptions, chance } = this.get_environment(environment);
 
-        return [target_array, result_array, conditions, exceptions, chance];
+        return [target, result, conditions, exceptions, chance];
     }
 
     get_environment(environment_string: string): {
@@ -662,7 +647,7 @@ class Resolver {
         };
     }
 
-    add_transform(target:string[], result:string[], 
+    add_transform(target:string, result:string, 
         conditions:{ before:string, after:string }[],
         exceptions:{ before:string, after:string }[],
         chance:(number|null),
@@ -753,64 +738,19 @@ class Resolver {
                 }
             }
         }
-        this.add_transform(concurrent_target, concurrent_result, 
+        this.add_transform(concurrent_target.join(','), concurrent_result.join(','), 
             my_conditions, my_exceptions, null, this.file_line_num);
     }
 
-    resolve_transforms() {
-         // Resolve brackets, put categories in transforms, make a milkshake, etc.
-        
-        let transforms = [];
-        for (let i = 0; i < this.transform_pending.length; i++) {
-            let line_num = this.transform_pending[i].line_num;
-
-            let target = this.transform_pending[i].target;
-            let result = this.transform_pending[i].result;
-
-            /*
-            let xesult = '';
-            for (const char of target[0]) {
-                const entry = this.categories.get(char);
-                if (entry) {
-                xesult += entry.graphemes.join('');
-                } else {
-                xesult += char;
-                }
-            }
-            this.logger.info(xesult)
-            */
-
-            let chance = this.transform_pending[i].chance;
-
-            let exceptions = [];
-            for (let j = 0; j < this.transform_pending[i].exceptions.length; j++) {
-                let exception_before = this.transform_pending[i].exceptions[j].before
-                let exception_after = this.transform_pending[i].exceptions[j].after;
-
-                exceptions.push({ before:exception_before, after:exception_after });
-            }
-
-            let conditions = [];
-            for (let j = 0; j < this.transform_pending[i].conditions.length    ; j++) {
-                let condition_before = this.transform_pending[i].conditions[j].before
-                let condition_after = this.transform_pending[i].conditions[j].after;
-
-                conditions.push({ before:condition_before, after:condition_after });
-            }
-            transforms.push({
-                target: target, result: result,
-                conditions: conditions, exceptions: exceptions,
-                chance: chance,
-                line_num: line_num
-            });
-        }
-        this.transforms = transforms;
+    set_transforms(resolved_transforms: {  // From resolve_transforms !!
+        target:string[], result:string[],
+        conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        chance:(number|null),
+        line_num:number
+    }[]) {
+        this.transforms = resolved_transforms;
     }
-
-    //private parse_target_result(target, result): [string[],string[]] {
-
-    //}
-
+    
     valid_transform_brackets(str: string): boolean {
         const stack: string[] = [];
         const bracket_pairs: Record<string, string> = {

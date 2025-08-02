@@ -5,6 +5,7 @@ import Text_Builder from './text_builder';
 import Logger from './logger';
 import Escape_Mapper from './escape_mapper'; 
 import Supra_Builder from './supra_builder';
+import Transform_Resolver from './transform_resolver';
 
 type generate_options = {
   file: string;
@@ -38,8 +39,6 @@ function generate({
 
     try {
         const build_start = Date.now();
-        //let y = "yab"
-        //y = y.join("cab")
 
         const escape_mapper = new Escape_Mapper();
         const supra_builder = new Supra_Builder(logger);
@@ -55,7 +54,12 @@ function generate({
         r.expand_segments();
         r.expand_wordshape_segments();
         r.set_wordshapes();
-        r.resolve_transforms();
+
+        const z = new Transform_Resolver(
+            logger, r.categories, r.transform_pending
+        )
+
+        r.set_transforms(z.resolve_transforms());
         r.create_record();
 
         const word_builder = new Word_Builder( logger,

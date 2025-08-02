@@ -253,10 +253,15 @@ class Transformer {
         const result_tokens: string[] = [];
         let i = 0;
 
+        const applied_targets: string[] = [];
+        const applied_results: string[] = [];
+
         while (i < tokens.length) {
             // 🪛 Insert before i
             if (insertion_map.has(i)) {
                 for (const rep of insertion_map.get(i)!) {
+                    applied_targets.push("^");             // insertion
+                    applied_results.push(rep);
                     result_tokens.push(rep);
                 }
             }
@@ -264,9 +269,14 @@ class Transformer {
             // 🔁 Replace current token span
             const replacement = replacement_map.get(i);
             if (replacement && ![...Array(replacement.length).keys()].some(k => blocked.has(i + k))) {
+                const replaced_chunk = tokens.slice(i, i + replacement.length).join("");
                 if (replacement.replacement !== "") {
                     result_tokens.push(replacement.replacement);
                 }
+
+                applied_targets.push(replaced_chunk);
+                applied_results.push(replacement.replacement);
+
                 for (let k = 0; k < replacement.length; k++) {
                     blocked.add(i + k);
                 }
@@ -280,6 +290,8 @@ class Transformer {
         // Handle insertions after the last token
         if (insertion_map.has(tokens.length)) {
             for (const rep of insertion_map.get(tokens.length)!) {
+                applied_targets.push("^");
+                applied_results.push(rep);
                 result_tokens.push(rep);
             }
         }
@@ -288,45 +300,20 @@ class Transformer {
 
         // 🧾 Log transformation summary
 
-        const matched_pairs = new Set<string>();
-        const matched_targets: string[] = [];
-        const matched_results: string[] = [];
-
-        for (let i = 0; i < target.length; i++) {
-            const is_insertion = target[i] === "^";
-            const is_deletion = result[i] === "^";
-
-            const expected = is_insertion ? result[i] : (is_deletion ? "" : result[i]);
-
-            const matched = replacements.some(r =>
-                r.replacement === expected &&
-                ((is_insertion && r.length === 0) || (!is_insertion && r.length > 0))
-            );
-
-            if (matched) {
-                const pair = `${target[i]} → ${result[i]}`;
-                if (!matched_pairs.has(pair)) {
-                    matched_targets.push(target[i]);
-                    matched_results.push(result[i]);
-                    matched_pairs.add(pair);
-                }
-            }
-        }
-
-
-        if (matched_targets.length > 0) {
+        if (applied_targets.length > 0) {
             let my_exceptions = '';
             for (let j = 0; j < exceptions.length; j++) {
                 my_exceptions += ` ! ${exceptions[j].before}_${exceptions[j].after}`;
             }
             let my_conditions = '';
-            for (let j = 0; j < conditions.length; j++) {
+            for (let j = 0; j < conditions.length    ; j++) {
                 my_conditions += ` / ${conditions[j].before}_${conditions[j].after}`;
-            }
-            const my_chance = chance !== null ? ` ? ${chance}` : '';
+            }   
+
+            const transformation_str = `${applied_targets.join(", ")} → ${applied_results.join(", ")}`;
 
             word.record_transformation(
-                `${matched_targets.join(", ")} → ${matched_results.join(", ")}${my_conditions}${my_exceptions}${my_chance}`,
+                `${transformation_str}${my_conditions}${my_exceptions}`,
                 normalized.join(" "),
                 line_num
             );
