@@ -225,41 +225,43 @@ class Transform_Resolver {
     categories_into_transform(input: string): string {
         let output = '';
         const length = input.length;
-    
+
         for (let i = 0; i < length; i++) {
             const char = input[i];
 
-            // ⏭️ Skip "^R" or "^REJECT" sequences
+            // ⏭️ Skip "^R" or "^REJECT" sequences and preserve them
             if (char === '^') {
                 const slice = input.slice(i, i + 8); // Enough to cover "^REJECT"
                 if (slice.startsWith('^R')) {
                     const rejectMatch = slice.startsWith('^REJECT') ? '^REJECT' : '^R';
-                    i += rejectMatch.length - 1; // Skip the entire sequence
+                    output += rejectMatch;
+                    i += rejectMatch.length - 1;
+                    continue; // ✅ Prevent further processing of this sequence
                 }
             }
-    
-            // Check if current char is a defined category key
+
+            // ✅ Category key expansion
             if (this.categories.has(char)) {
                 const prev = input[i - 1] ?? '';
                 const next = input[i + 1] ?? '';
-    
+
                 const isBoundaryBefore = i === 0 || ' ,([)'.includes(prev);
                 const isBoundaryAfter  = i === length - 1 || ' ,([)]'.includes(next);
-    
+
                 if (isBoundaryBefore && isBoundaryAfter) {
-                    // ✅ Valid key usage – expand
                     const entry = this.categories.get(char)!;
-                    output += entry.graphemes.join(', ');
+                    output += entry.graphemes.filter(g => g !== '^').join(', ');
                 } else {
-                    // ❌ Invalid adjacency
-                    this.logger.validation_error(`Category key "${char}" is adjacent to other content at position ${i}`,  this.line_num);
+                    this.logger.validation_error(
+                        `Category key "${char}" is adjacent to other content at position ${i}`,
+                        this.line_num
+                    );
                 }
             } else {
-                // Not a category key – just pass it through
                 output += char;
             }
         }
-    
+
         return output;
     }
     
