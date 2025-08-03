@@ -314,7 +314,7 @@
           </tr>
           <tr>
             <td><code class="voc-static">?</code></td>
-            <td>A <a href="#nescaTheCondition"> chance condition</a> follows this character</td>
+            <td>A <a href="#nescaChanceCondition"> chance condition</a> follows this character</td>
           </tr>
           <tr>
             <td><code class="voc-static">!</code></td>
@@ -345,16 +345,16 @@
             <td><a href="#nescaWildcard">Wildcard</a>, matches exactly 1 of any grapheme</td>
           </tr>
           <tr>
-            <td><code class="voc-static">&</code>, <code class="voc-static">…</code></td>
+            <td><code class="voc-static">~</code> or <code class="voc-static">…</code></td>
             <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches 1 or more of any grapheme. It is non-greedy</td>
+          </tr>
+          <tr>
+            <td><code class="voc-static">~{</code> or <code class="voc-static">…{</code> and <code class="voc-static">}</code></td>
+            <td><a href="#nescaBlocker">Blocker</a></td>
           </tr>
           <tr>
             <td><code class="voc-static">@{</code> and <code class="voc-static">}</code></td>
             <td><a href="#nescaPositioner">Positioner</a></td>
-          </tr>
-          <tr>
-            <td><code class="voc-static">~{</code> and <code class="voc-static">}</code></td>
-            <td><a href="#nescaBlocker">Blocker</a></td>
           </tr>
           <tr>
             <td><code class="voc-static">&lt;1</code>, <code class="voc-static">&lt;2</code>, ... <code class="voc-static">&lt;9</code></td>
@@ -492,13 +492,13 @@ words: $S:2 y</pre>
       <p>When this document uses examples to explain transformations, the last comment shows an example word transforming. For example <code class="voc-static">; amda ==> ampa</code> means the rule will transform the word <code class="voc-static">amda</code> into <code class="voc-static">ampa</code></p>
 
 
-      <!--<h4 id="vocAlternativeGraphs"><a class="head-num">Nope</a>Alternative graphemes</h4>
+      <h4 id="vocAlternativeGraphs"><a class="head-num">Nope</a>Alternative graphemes</h4>
       <p>The <code class="voc-static">graphs:</code> directive can tell Vocabug which character + combining diacritic sequences are to be treated as alternatives of a base grapheme. Let's name these alternatives the 'children' and the base grapheme the 'parent'. You can do this by enclosing the 'children' in <code class="voc-static">&lt;[</code> and <code class="voc-static">]</code> as a set, directly after their 'parent'.</p>
       <p>Important: The left-most precomposed character of a 'child' must be the same as its 'parent'.</p>
       <p>This should be useful for tonal languages that mark tone with diacritics on vowels. In these tonal languages, we no longer need to list every variation of a vowel + diacritic to capture a vowel:</p>
       <pre class="voc-static">  graphs: a, &lt;[á, à, ā, ǎ], h, i, &lt;[í, ì, ī, ǐ], k, l, m, n, o, &lt;[ó, ò, ō, ǒ], t<br>  a -> o<br>; mápǎ ==> mópǒ</pre>
       <p>However we can still capture a vowel with a tone mark, such as <code class="voc-static">ǎ</code>:</p>
-      <pre class="voc-static">  ǎ -> o<br>; mápǎ ==> mápo</pre> -->
+      <pre class="voc-static">  ǎ -> o<br>; mápǎ ==> mápo</pre> 
 
 
       <h2 id="nescaTheChange"><a class="head-num">12</a>The change</h2>
@@ -559,18 +559,17 @@ words: $S:2 y</pre>
       <p><code class="voc-static">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="voc-static">TARGET</code>, or the end of the word if it is in <code class="voc-static">RESULT</code></p>
       <pre class="voc-static">  o -> x / p_p#<br>; opoppop ==> opoppxp</pre>
 
+      <h2 id="nescaChanceCondition"><a class="head-num">14.3</a>The chance condition</h2>
+      <p>The chance condition is placed following a <code class="voc-static">?</code> as a number from 0 to 100. This numer represents the chance of the transformation occuring:</p>
+      <pre class="voc-static">aa -> a ? 30</pre>
+      <p>In the above example, the transformation will execute only 30% of the time.</p>
+
       <h2 id="nescaTheException"><a class="head-num">15</a>The exception</h2>
       <p>Exceptions are placed following a <code class="voc-static">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- but they will make sure the content in the exception does not execute a change:</p>
       <pre class="voc-static">aa -> a ! _#</pre>
       <p>In the above example, the transformation will not execute if <code class="voc-static">aa</code> is at the end of the word.</p>
 
-      <h2 id="nescaTheException"><a class="head-num">15</a>The chance condition</h2>
-      <p>Exceptions are placed following a <code class="voc-static">?</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- but they will make sure the content in the exception does not execute a change:</p>
-      <pre class="voc-static">aa -> a ! _#</pre>
-      <p>In the above example, the transformation will not execute if <code class="voc-static">aa</code> is at the end of the word.</p>
-
       <h2 id="nescaUsingCategories"><a class="head-num">16</a>Using categories</h2>
-      <p>TODO!</p>
       <p>You can reference categories in transforms. The category will behave in the same way as an alternator set:</p>
       <pre class="voc-static">  B = x, y, z<br>  transform:<br>  B -> ^<br>; xapay ==> apa</pre>
 
@@ -581,21 +580,24 @@ words: $S:2 y</pre>
       <p>These are designed to be fussy, they cannot be nested, they cannot stand on their own.</p>
 
       <h3 id="nescaAlternatorSet"><a class="head-num">17.1</a>Alternator-set</h3>
-      <p>TODO</p>
+      <p>Enclosed in square brackets, <code class="voc-static">[</code> and <code class="voc-static">]</code>, only one Item in an alternator set will be part of each sequence. For example:</p>
+      <pre class="voc-static">  p[w, j] -> pp</pre>
+      <p>The above example is equivalant to:</p>
+      <pre class="voc-static">  pw pj -> pp</pre>
+      <p>These can also be used in exceptions and conditions</p>
 
       <h3 id="nescaOptionalatorSet"><a class="head-num">17.2</a>Optionalator-set</h3>
-      <p>TODO</p>
-      <p>Items in an optional-set can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
+      <p>Items in an optionalator, enclosed in <code class="voc-static">(</code> and <code class="voc-static">)</code> can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
       <pre class="voc-static">; Merge /x/ and /xw/ into /k/<br>  x(w) -> k<br>; xwaxaħa ==> kakaħa</pre>
       <p>Optional-set can also attach to an alternator-set:</p>
       <pre class="voc-static">; Merge /x/, /xw/, /ħ/ and /ħw/ into /k/<br>  [x, ħ](w) -> k<br>; xwaxaħa ==> kakaka</pre>
       <p>Looking at the above example, Let's say you wanted to preserve this optional /w/ following /k/ or /ħ/. We can do this by writing this /w/ in <code class="voc-static">RESULT</code>, enclosed by round brackets:</p>
-      <pre class="voc-static">; Like the previous rule, but preserve labialisation<br>  {x, ħ}(w) -> k(w)<br>; xwaxaħa ==> kwahaka</pre>
+      <pre class="voc-static">; Like the previous rule, but preserve labialisation<br>  [x, ħ](w) -> k(w)<br>; xwaxaħa ==> kwahaka</pre>
       <p>The optional-set can also be a merging change, or concurrent change too:</p>
       <pre class="voc-static">; Like the previous rule, but preserve palatalisation and labialisation <br>  [x ħ](w, j) -> k(w, j)<br>; xwaxjaxa ==> kwakjaka</pre>
 
 
-      <!--
+      
       <h2 id="nescaFeature"><a class="head-num">16</a>The features directive</h2>
       <p>Let's say you had the grapheme, or rather, <i>phon</i>eme /<code class="voc-static">i</code>/ and wanted to capture it by its distinctive vowel features, <code class="voc-static">+high</code> and <code class="voc-static">+front</code>, and turn it into a phoneme marked with <code class="voc-static">+high</code> and <code class="voc-static">+back</code> features, perhaps /<code class="voc-static">ɯ</code>/. The <code class="voc-static">features:</code> directive block lets you do this:</p>
 
@@ -709,7 +711,7 @@ END</pre>
   glottal    - - - - - - - - - + - - - - . . . . . . . . . . . . .
 END
 </pre>
--->
+
 
       <h2 id="nescaClusterfield"><a class="head-num">18</a>Cluster-field</h2>
       <p>Cluster-field is a way to target sequences of graphemes and change them. They are laid out as tables, and start with <code class="voc-static">%</code> followed by a space. The first part of a sequence is in the first column, and the second part is in the first row. For example:</p>
@@ -743,11 +745,11 @@ n mp +  +  nn +</pre>
 ; toootooooo ==> txtxo</pre>
 
 
-      <p>At the beginning of the list, <code class="voc-static">+</code> represents all the possible numbers lower than the number to the right, not including zero.</p>
+      <p>At the beginning of the list, <code class="voc-static">,</code> represents all the possible numbers lower than the number to the right, not including zero.</p>
       <pre class="voc-static">  Change a sequence of 1 to 10 /o/s into /x/<br>  o -> x / r+{,10}_
 ; toootoooo ==> txtx</pre>
 
-      <p>And finally at the end of the list, <code class="voc-static">+</code> represents all possible numbers larger than the number to the the left</p>
+      <p>And finally at the end of the list, <code class="voc-static">,</code> represents all possible numbers larger than the number to the the left</p>
         <pre class="voc-static">  Change a sequence of 4 to as many as possible /o/s into /x/<br>  o -> x / r+{4,}_
 ; toootooooo ==> toootx</pre>
 
@@ -765,25 +767,23 @@ n mp +  +  nn +</pre>
       <p>Wildcard can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="voc-static">(*)</code>, thereby allowing it to match nothing as well.</p>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">19.6</a>Anythings-mark</h3>
-      <p>The anythings-mark uses ampersand <code class="voc-static">&</code> or the ellipsis character <code class="voc-static">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
-      <pre class="voc-static">  b&t -> x<br>; babãitto => xto</pre>
+      <p>The anythings-mark uses tilde <code class="voc-static">~</code> or the ellipsis character <code class="voc-static">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
+      <pre class="voc-static">  b~t -> x<br>; babãitto => xto</pre>
       <p>As we can see, the rule matched <code class="voc-static">b</code> followed by anything else until it reached the first <code class="voc-static">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="voc-static">t</code> and beyond like <code class="voc-static">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
       <p>The example below uses an optional anythings-mark in the condition:</p>
-      <pre class="voc-static">; Simulate spreading of nasality to vowels<br>  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]&_ <br>; babãittati => babãĩttãtĩ</pre>
+      <pre class="voc-static">; Simulate spreading of nasality to vowels<br>  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]~_ <br>; babãittati => babãĩttãtĩ</pre>
 
+      <h3 id="nescaBlocker"><a class="head-num">19.7</a>Anythings-mark-with-blocker</h3>
+      <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="voc-static">~[</code> and <code class="voc-static">]</code> that will block spreading. For example we might want the graphemes <code class="voc-static">k</code> or <code class="voc-static">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
+      <pre class="voc-static">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]&~{k, g}_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
 
-
-      <h3 id="nescaPositioner"><a class="head-num">19.7</a>Positioner</h3>
+      <h3 id="nescaPositioner"><a class="head-num">19.8</a>Positioner</h3>
       <p>Positioners, enclosed in <code class="voc-static">@{</code> and <code class="voc-static">}</code>, allows a grapheme to the left of it to be captured only when it is the Nth in the word:</p>
       <pre class="voc-static">; Change the second /o/ in a word to /x/ after the second /s/<br>  o@{2} -> x / s@{2}_
 ; sososo ==> sosxso</pre>
       <p>If we want to match the last occurence of a grapheme in a word, use <code class="voc-static">-1</code>. For the second last occurence of a grapheme in a word, use <code class="voc-static">-2</code>, and so forth:</p>
       <pre class="voc-static">; Change the last /o/ in a word to /x/<br>  o@{-1} -> x
 ; sososo ==> sososx</pre>
-
-      <h3 id="nescaBlocker"><a class="head-num">19.8</a>Blocker</h3>
-      <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="voc-static">~[</code> and <code class="voc-static">]</code> that will block spreading. For example we might want the graphemes <code class="voc-static">k</code> or <code class="voc-static">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
-      <pre class="voc-static">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]&~{k, g}_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
 
       <h3 id="nescaBackreference"><a class="head-num">19.9</a>Backreference</h3>
       <p> <code class="voc-static">&lt;1</code></p>
@@ -823,7 +823,7 @@ n mp +  +  nn +</pre>
       <pre class="voc-static">BEGIN chance 15:<br>  a -> e<br>END</pre>
       <p>In the above example we have a 15% chance of words with an <code class="voc-static">a</code> in them such as <code class="voc-static">pa</code> becoming <code class="voc-static">pe</code></p>
 
-      <!--
+      
       <h3 id="nescaIfThenElse"><a class="head-num">18.1</a>If block</h3>
       <p>Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.</p>
       <p>It should feel familiar to anyone who knows a bit about programming languages</p>
@@ -850,7 +850,7 @@ END</pre>
   do-rule-macro: resyllabify<br>  ʔ -> ^<br>  do-rule-macro: resyllabify
 ; iaruʔitua ==> jaruʔitwa ==> jaruitwa  ==> jarwitwa</pre>
       <p>In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.</p>
-      -->
+      
 
       <h3 id="nescaEngine"><a class="head-num">20.3</a>Engine</h3>
       <p>The engine statement provides useful functions that you can call at any point in the definition-build. You call these engines following a <code class="voc-static">$</code> and a space on a new line. You can also call a list of these functions in one line. For example: <code class="voc-static">$ compose, capitalise</code></p>

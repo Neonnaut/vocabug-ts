@@ -32,7 +32,7 @@ class Resolver {
     
     public transform_pending: {
         target:string, result:string,
-        conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        conditions:string[], exceptions:string[],
         chance:(number|null),
         line_num:number
     }[];
@@ -494,8 +494,8 @@ class Resolver {
     // This is run on parsing file. We then have to run resolve_transforms aftter parse file
     get_transform(input: string): [
         string, string,
-        { before: string; after: string }[],
-        { before: string; after: string }[],
+        string[],
+        string[],
         (number|null)
     ] {
         if (input === "") {
@@ -549,12 +549,12 @@ class Resolver {
     }
 
     get_environment(environment_string: string): {
-        conditions: { before: string; after: string }[];
-        exceptions: { before: string; after: string }[];
+        conditions: string[];
+        exceptions: string[];
         chance: number | null;
     } {
-        const conditions: { before: string; after: string }[] = [];
-        const exceptions: { before: string; after: string }[] = [];
+        const conditions: string[] = [];
+        const exceptions: string[] = [];
         let chance: number | null = null;
 
         let buffer = "";
@@ -614,21 +614,14 @@ class Resolver {
         };
     }
 
-    validate_environment(segment: string, kind: 'condition' | 'exception' | 'chance'): { before: string; after: string } {
+    validate_environment(segment: string, kind: 'condition' | 'exception' | 'chance'): string {
         if (kind === 'chance') {
             const parsed = parseInt(segment, 10);
             if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-                return { before: segment, after: '' };
+                return segment;
             } else {
                 this.logger.validation_error(`Chance "${segment}" must be a number between 0 and 100`, this.file_line_num);
             }
-        }
-
-        if (/^\d{1,2}\?$/.test(segment) && kind === 'condition') {
-            return {
-                before: segment,
-                after: ''
-            };
         }
 
         const parts = segment.split('_');
@@ -641,15 +634,12 @@ class Resolver {
             this.logger.validation_error(`${kind} "${segment}" must have content on at least one side of '_'`, this.file_line_num);
         }
 
-        return {
-            before: before || '',
-            after: after || ''
-        };
+        return `${before}_${after}`;
     }
 
     add_transform(target:string, result:string, 
-        conditions:{ before:string, after:string }[],
-        exceptions:{ before:string, after:string }[],
+        conditions:string[],
+        exceptions:string[],
         chance:(number|null),
         line_num:number) {
         this.transform_pending.push( { target:target, result:result,
@@ -701,8 +691,8 @@ class Resolver {
         let concurrent_target: string[] = [];
         let concurrent_result: string[] = [];
 
-        let my_conditions: { before: string, after: string }[] = [];
-        let my_exceptions: { before: string, after: string }[] = [];
+        let my_conditions: string[] = [];
+        let my_exceptions: string[] = [];
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
             let line = file_array[this.file_line_num];

@@ -55,8 +55,8 @@
 - [x] Concurrent change
 - [x] A merging, concurent change. e.g: `a, e -> ^REJECT`
 - [x] Using category
-- [] Alternator
-- [] Optionalator
+- [x] Alternator
+- [x] Optionalator
 - [x] Reject
 - [x] Insertion
 - [x] Deletion
@@ -69,17 +69,15 @@
 - [x] Cluster-field
 - [x] Cluster field condition and exception
 
-- [] Plus-mark
+- [] Quantifier
+- [] Bound quantifier
 - [] Geminate-mark
 - [] Wildcard
 - [] Anythings-mark
-
-- [] Quantifier
+- [] Blocked Anythings-mark
 - [] Positioner
-- [] Blocker
 
 - [] Backreference
-- [] Metathesis
 
 - [x] Engine, decompose
 - [x] Engine, compose
@@ -99,30 +97,10 @@
 
 - [] Questions and answers
 - [] How to write def files
+- [] better examples
 
 ## Tests
 
 - [x] Vitest colla
 - [x] Vitest examples
 - [] Vitest transforms
-
-## Extra
-
-- [] Syllable dividers and capturing syllables
-- [] Drop off for individual optionals
-- [] HTML entities
-- [] Alternative graphs
-- [] HTML entities, good, keep them in `{}`
-- [] Custom chance for each optional
-- [] Promises `words: Cj->{u,o,a}UV`
-- [] word classes
-- [] If-else-then block
-- [] Rule macro
-- [] Feature
-- [] Parafeature
-- [] Featurefield
-- [] Using features
-- [] "AI" generate a def file, like Gleb
-- [] Invisible graphemes EXTRA
-- [] Static code highlighted snippits in docs
-- [] Lezer grammar

@@ -6,7 +6,7 @@ class Transform_Resolver {
     public categories: Map<string, { graphemes:string[], weights:number[] }>;
     public transform_pending: {
         target:string, result:string,
-        conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+        conditions:string[], exceptions:string[],
         chance:(number|null),
         line_num:number
     }[];
@@ -23,7 +23,7 @@ class Transform_Resolver {
         { graphemes:string[], weights:number[] }>,
         transform_pending: {
             target:string, result:string,
-            conditions:{ before:string, after:string }[], exceptions:{ before:string, after:string }[],
+            conditions:string[], exceptions:string[],
             chance:(number|null),
             line_num:number
         }[]
@@ -63,24 +63,50 @@ class Transform_Resolver {
 
             let chance = this.transform_pending[i].chance;
 
-            let exceptions = [];
-            for (let j = 0; j < this.transform_pending[i].exceptions.length; j++) {
-                let exception_before = this.transform_pending[i].exceptions[j].before
-                let exception_after = this.transform_pending[i].exceptions[j].after;
-
-                exceptions.push({ before:exception_before, after:exception_after });
-            }
-
-            let conditions = [];
+            let new_conditions:{ before:string, after:string }[] = []
+            let new_exceptions:{ before:string, after:string }[] = [];
             for (let j = 0; j < this.transform_pending[i].conditions.length; j++) {
-                let condition_before = this.transform_pending[i].conditions[j].before
-                let condition_after = this.transform_pending[i].conditions[j].after;
 
-                conditions.push({ before:condition_before, after:condition_after });
+                let my_condition = this.transform_pending[i].conditions[j];
+                // Validate brackets
+                if (!this.valid_transform_brackets(my_condition)) {
+                    this.logger.validation_error(`Invalid brackets in condition "${my_condition}"`, this.line_num);
+                }
+                let alt_opt_condition = this.resolve_alt_opt(my_condition);
+                for (let k = 0; k < alt_opt_condition.length; k++) {
+                    for (let l = 0; l < alt_opt_condition.length; l++) {
+                        let split_condition = alt_opt_condition[k][l].split('_');
+                        new_conditions.push({
+                            before:split_condition[0],
+                            after:split_condition[1]
+                        });
+                    }
+                }
             }
+            for (let j = 0; j < this.transform_pending[i].exceptions.length; j++) {
+
+                // EXCEPTIONS
+                let my_exception = this.transform_pending[i].exceptions[j];
+                // Validate brackets
+                if (!this.valid_transform_brackets(my_exception)) {
+                    this.logger.validation_error(`Invalid brackets in exception "${my_exception}"`, this.line_num);
+                }
+                let alt_opt_exception = this.resolve_alt_opt(my_exception);
+                for (let k = 0; k < alt_opt_exception.length; k++) {
+                    for (let l = 0; l < alt_opt_exception.length; l++) {
+                        let split_exception = alt_opt_exception[k][l].split('_');
+                        new_exceptions.push({
+                            before:split_exception[0],
+                            after:split_exception[1]
+                        });
+                    }
+                }
+            }
+
+
             this.transforms.push({
                 target: target_length_match, result: result_length_match,
-                conditions: conditions, exceptions: exceptions,
+                conditions: new_conditions, exceptions: new_exceptions,
                 chance: chance,
                 line_num: this.line_num
             });
@@ -250,7 +276,8 @@ class Transform_Resolver {
 
                 if (isBoundaryBefore && isBoundaryAfter) {
                     const entry = this.categories.get(char)!;
-                    output += entry.graphemes.filter(g => g !== '^').join(', ');
+                    output += entry.graphemes.filter(g => !['^','∅'].some(b => g.includes(b))).join(', ');
+
                 } else {
                     this.logger.validation_error(
                         `Category key "${char}" is adjacent to other content at position ${i}`,
@@ -281,13 +308,12 @@ class Transform_Resolver {
 
             // 🔁 Nested level: Broadcast if only one element
             if (resItem.length === 1 && targetItem.length > 1) {
-            resItem = Array(targetItem.length).fill(resItem[0]);
+                resItem = Array(targetItem.length).fill(resItem[0]);
             }
 
             // ❌ Nested length mismatch
-            if (resItem.length !== targetItem.length) {
-                
-            this.logger.validation_error(`An alternator / optionalator length mismatch occured: target has ${targetItem.length}, result has ${resItem.length}`, this.line_num);
+            if (resItem.length !== targetItem.length) {   
+                this.logger.validation_error(`An alternator / optionalator length mismatch occured: target has ${targetItem.length}, result has ${resItem.length}`, this.line_num);
             }
 
             return resItem;

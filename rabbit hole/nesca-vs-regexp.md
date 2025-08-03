@@ -18,11 +18,11 @@ So... here we are, Nesca uses its own domain specific language (DSL) for matchin
 | *          | (T+)     | 0 or more                          |
 | +          | +        | 1 or more                          |
 | .          | *        | Any character except new line (\n) |
-| .+?        | &        | Any series of characters ungreedy  |
+| .+?        | ~        | Any series of characters ungreedy  |
 | ?          | (T)      | 0 or 1                             |
-| {3}        | ={3}     | Exactly 3                          |
-| {3,}       | ={3+}    | 3 or more                          |
-| {3,5}      | ={3,5}   | 3, 4 or 5                          |
+| {3}        | +{3}     | Exactly 3                          |
+| {3,}       | +{3,}    | 3 or more                          |
+| {3,5}      | +{3,5}   | 3, 4 or 5                          |
 | \          | \        | Escape following character         |
 | (a\|b)     | [a, b]   | a or b                             |
 | [^abc]     |          | Not (a or b or c)                  |
