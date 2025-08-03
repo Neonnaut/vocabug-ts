@@ -130,8 +130,8 @@
 
         <li><a href="#nescaWildcardAndPositioning">Wildcard, repetition and positioning</a>
         <ol class="nice-list">
-          <li><a href="#nescaPlusMark">Quantifier</a></li>
-          <li><a href="#nescaQuantifier">Bound quantifier</a></li>
+          <li><a href="#nescaQuantifier">Quantifier</a></li>
+          <li><a href="#nescaBoundedQuantifier">Bounded quantifier</a></li>
           <li><a href="#nescaKleeneStar">Kleene-star</a></li>
           <li><a href="#nescaGeminateMark">Geminate-mark</a></li>
           <li><a href="#nescaWildcard">Wildcard</a></li>
@@ -328,11 +328,11 @@
           </tr>
           <tr>
             <td><code class="voc-static">+</code></td>
-            <td><a href="#nescaPlusMark">Quantifier</a>, matches as 1 or more of the previous grapheme</td>
+            <td><a href="#nescaQuantifier">Quantifier</a>, matches as 1 or more of the previous grapheme</td>
           </tr>
           <tr>
             <td><code class="voc-static">+{</code> and <code class="voc-static">}</code></td>
-            <td><a href="#nescaQuantifier">Bound quantifier</a></td>
+            <td><a href="#nescaBoundedQuantifier">Bounded quantifier</a></td>
           </tr>
           <tr>
             <td><code class="voc-static">:</code></td>
@@ -357,10 +357,6 @@
           <tr>
             <td><code class="voc-static">&lt;1</code>, <code class="voc-static">&lt;2</code>, ... <code class="voc-static">&lt;9</code></td>
             <td><a href="#nescaBackreference">Backreference</a></td>
-          </tr>
-          <tr>
-            <td><code class="voc-static">&</code></td>
-            <td>For <a href="#nescaMetathesis">metathesis</a>. Indicates the content (if any) between the targets.</td>
           </tr>
         </tbody>
       </table>
@@ -602,7 +598,7 @@ n mp +  +  nn +</pre>
       <h2 id="nescaWildcardAndPositioning"><a class="head-num">19</a>Wildcards, repetition and positioning</h2>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
 
-      <h3 id="nescaPlusMark"><a class="head-num">19.1</a>Quantifier</h3>
+      <h3 id="nescaQuantifier"><a class="head-num">19.1</a>Quantifier</h3>
       <p>Quantifier, using <code class="voc-static">+</code>, will match once or as many times as possible to the grapheme, or grapheme in a set or category, to the left of it.</p>
       <pre class="voc-static">  a+ -> o<br>; raraaaaa ==> raro</pre>
       <pre class="voc-static">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
@@ -644,7 +640,7 @@ n mp +  +  nn +</pre>
       <p>The example below uses an optional anythings-mark in the condition:</p>
       <pre class="voc-static">; Simulate spreading of nasality to vowels<br>  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]~_ <br>; babãittati => babãĩttãtĩ</pre>
 
-      <h3 id="nescaBlocker"><a class="head-num">19.7</a>Anythings-mark-with-blocker</h3>
+      <h3 id="nescaBlocker"><a class="head-num">19.7</a>Blocked-anythings-mark</h3>
       <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="voc-static">~[</code> and <code class="voc-static">]</code> that will block spreading. For example we might want the graphemes <code class="voc-static">k</code> or <code class="voc-static">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       <pre class="voc-static">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]&~{k, g}_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
 
@@ -689,7 +685,7 @@ n mp +  +  nn +</pre>
       <p><b>How do I target syllables or syllable division in transforms?</b></p>
       <p>Vocabug does not have a built-in way to target syllables, but you can use a <code class="voc-static">.</code> character as a syllable divider like <code class="example">words: $S.$S, $S.$S.$S</code>, and then reference it in transforms.</p>
 
-      <p><b>What is a natural order of consonants?</b></p>
+      <p><b>What is a natural frequency for consonants?</b></p>
      
       <p>There is no one-size-fits-all answer to this question, and different analyses of word lists may produce different data on what the general expectation is. For example, in English, /ð/ is very uncommon among all the words in English, however it is a common phoneme among sentences because of the prevalence of the words <code class="example">this</code>, <code class="example">that</code>, <code class="example">those</code> and <code class="example">the</code>. And indeed, morphology and historical sound changes can skew any initial control you might have over frequencies.</p>
      

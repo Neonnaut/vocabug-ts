@@ -51,6 +51,53 @@ class Transformer {
         return tokens;
     }
 
+    /**
+     * Parses a target string containing a quantifier.
+     * Supports:
+     *   - "a+" → { base: "a", suffix: "" }
+     *   - "a+i" → { base: "a", suffix: "i" }
+     */
+    parse_quantified_target(raw: string): { base: string, suffix: string } | null {
+        const idx = raw.indexOf("+");
+
+        // Must have a grapheme before the '+'
+        if (idx <= 0) return null;
+
+        const base = raw[idx - 1];
+        const suffix = raw.slice(idx + 1); // May be empty
+
+        return { base, suffix };
+    }
+
+
+    /**
+     * Matches a quantified sequence:
+     * - One or more of `base`
+     * - Optionally followed by `suffix`
+     */
+    match_quantified_sequence(tokens: string[], start: number, base: string, suffix: string): number {
+        let i = start;
+        let count = 0;
+
+        // Match one or more of the base grapheme
+        while (i < tokens.length && tokens[i] === base) {
+            i++;
+            count++;
+        }
+
+        if (count === 0) return 0;
+
+        // If suffix is present, match it exactly
+        for (let j = 0; j < suffix.length; j++) {
+            if (i + j >= tokens.length || tokens[i + j] !== suffix[j]) {
+                return 0;
+            }
+        }
+
+        return count + suffix.length;
+    }
+
+
     span_to_length(tokens: string[], target_length: number): number {
         let total = 0;
         for (let i = 0; i < tokens.length; i++) {
@@ -73,14 +120,6 @@ class Transformer {
             line_num: number;
         }
     ): string[] {
-        function span_to_length(sub_tokens: string[], target_len: number): number {
-            let count = 0;
-            for (let i = 0; i < sub_tokens.length; i++) {
-                count += sub_tokens[i].length;
-                if (count >= target_len) return i + 1;
-            }
-            return sub_tokens.length;
-        }
 
         function context_matches(
             full: string,
@@ -155,6 +194,8 @@ class Transformer {
             return this.graphemosis(modified_word);
         }
 
+
+
         if (target.length !== result.length) {
             this.logger.validation_error("Mismatched target/result concurrent set lengths in a transform", line_num)
         }
@@ -165,10 +206,48 @@ class Transformer {
             let raw_target = target[i].replace(/\\/g, "");
             let raw_result = result[i].replace(/\\/g, "");
 
+            // 🔍 Check if the target contains a quantifier
+            const quant = this.parse_quantified_target(raw_target);
+            if (quant) {
+                const { base, suffix } = quant;
+
+                // 🔁 Scan through tokens to find matches
+                for (let j = 0; j < tokens.length; j++) {
+                    const span = this.match_quantified_sequence(tokens, j, base, suffix);
+
+                    if (span > 0) {
+                        const window = tokens.slice(j, j + span).join("");
+                        const startIdx = tokens.slice(0, j).join("").length;
+
+                        // ✅ Check conditions
+                        const passes = conditions.length === 0 || conditions.some(c =>
+                            context_matches(full_word, startIdx, window, c.before, c.after)
+                        );
+
+                        // 🚫 Check exceptions
+                        const blocked = exceptions.some(e =>
+                            context_matches(full_word, startIdx, window, e.before, e.after)
+                        );
+
+                        // ✂️ Apply replacement if valid
+                        if (passes && !blocked) {
+                            replacements.push({ index: j, length: span, replacement: raw_result });
+
+                            // ⏩ Skip ahead past the matched span
+                            j += span - 1;
+                        }
+                    }
+                }
+
+                // Skip further processing for this target — already handled
+                continue;
+            }
+
+
             if (raw_result === "^REJECT" || raw_result === "^R") {
                 for (let j = 0; j < tokens.length; j++) {
                     const sub_tokens = tokens.slice(j);
-                    const span = span_to_length(sub_tokens, raw_target.length);
+                    const span = this.span_to_length(sub_tokens, raw_target.length);
                     const window = sub_tokens.slice(0, span).join("");
                     if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
@@ -205,7 +284,7 @@ class Transformer {
             } else if (raw_result === "^") {
                 // Deletion case
                 for (let j = 0; j < tokens.length; j++) {
-                    const span = span_to_length(tokens.slice(j), raw_target.length);
+                    const span = this.span_to_length(tokens.slice(j), raw_target.length);
                     const window = tokens.slice(j, j + span).join("");
                     if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
@@ -219,7 +298,7 @@ class Transformer {
             } else {
                 // Substitution case
                 for (let j = 0; j < tokens.length; j++) {
-                    const span = span_to_length(tokens.slice(j), raw_target.length);
+                    const span = this.span_to_length(tokens.slice(j), raw_target.length);
                     const window = tokens.slice(j, j + span).join("");
                     if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
