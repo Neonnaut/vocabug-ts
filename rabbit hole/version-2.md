@@ -2,70 +2,78 @@
 
 ## 1. PRIORITY Metathesis
 
-Metathesis
 Metathesis in this program refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.
 
 To make a rule a metathesis rule, use these symbols:
 
-The pipe | marks the content (if any) between the targets we want to reorder. You must use the same amount of |s in TARGET as in RESULT
-Numbers in RESULT refer to the targets. Reordering these numbers reorders the targets. It is possible to have up to nine
-Underscores _ in a condition or exception, are references to the targets. Unlike a normal rule, we can have multiple
+The pipe `|` marks the content (if any) between the targets we want to reorder. You must use the same amount of `|`s in `TARGET` as in `RESULT`
+
+Numbers in `RESULT` refer to the targets. Reordering these numbers, reorders the targets. It is possible to have up to nine
+Underscores `_` in a condition or exception, are references to the targets. Unlike a normal rule, we can have multiple
 Local metathesis
 
-A typical type of metathesis is local two-place metathesis:
+### Local two-place metathesis:
 
+```
 ; An intervocalic stop + nasal sequence becomes nasal + stop
   [stop]|[nasal] -> 2|1 / V__V 
 ; watna ==> wanta
-Long-distance metathesis
+```
+
+### Long-distance metathesis
 
 The example below approximates metathesis that occured in Spanish:
 
+```
 r|l -> 2|1 / _(…)[plosive]_
 ; parabla ==> palabra
-One-place metathesis
+```
 
-To simulate one-place metathesis, move |s.
+### One-place metathesis
+
+To simulate one-place metathesis, move `|`s.
 
 The example below is metathesis where words beginning with stop + vowel will try and move an r in a stop + r cluster to form a word initial stop + r cluster:
 
+```
 {stop}|r -> 12| / #_{vowel}…{stop}_ 
 ; kabatros ==> krabatos
-Metathesis madness
+```
 
-Three or more items, to a maximum of 9, switching places, are possible, with shuffling of any |:
+### Metathesis madness
 
+Three or more items, to a maximum of 9, switching places, are possible, also with shuffling of any `|`:
+
+```
   x|y|z -> ||321
 ; xaayooz ==> aaoozyx
+```
 
 ## 2. PRIORITY Features
 
-- [] Feature
-- [] Parafeature
-- [] Featurefield
-- [] Using features
+Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, `+high` and `+front`, and turn it into a phoneme marked with `+high` and `+back` features, perhaps /ɯ/. The features: directive block lets you do this:
 
+A feature prepended with a plus sign `+` is a 'pro-feature'. For example `+voice`. We can define a set of graphemes that are marked by this feature by using this pro-feature. For example: `+voice = b, d, g, v, z`
+A feature prepended with a minus sign `-` is an 'anti-feature'. For example `-voice`. We can define a set of graphemes that are marked by a lack of this feature by using this anti-feature. For example: `-voice = p, t, k, f, s`
 
-The features directive
-Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, +high and +front, and turn it into a phoneme marked with +high and +back features, perhaps /ɯ/. The features: directive block lets you do this:
+Where does this leave graphemes that are not marked by either the pro-feature or the anti-feature of a feature?, you might ask. Such graphemes are *unmarked* by that feature.
 
-Features are defined inside the features block. The features block begins with BEGIN features and terminates with END
-A feature prepended with a plus sign + is a 'pro-feature'. For example +voice. In the features block, we can define a set of graphemes that are marked by this feature by using this pro-feature. For example: +voice = b, d, g, v, z
-A feature prepended with a minus sign - is an 'anti-feature'. For example -voice. In the features block, we can define a set of graphemes that are marked by a lack of this feature by using this anti-feature. For example: -voice = p, t, k, f, s
-Where does this leave graphemes that are not marked by either the pro-feature or the anti-feature of a feature?, you might ask. Such graphemes are unmarked by that feature.
-To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' using curly brackets { and }. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix {+high, +back} captures the graphemes: u, ɯ, another feature-matrix {+high, +back, -round} would capture ɯ only.
+To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' using curly brackets `{` and `}`. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix `{+high, +back}` captures the graphemes: `u, ɯ`, another feature-matrix `{+high, +back, -round}` would capture `ɯ` only.
 The very simple example below is written to change all voiceless graphemes that have a voiced counterpart into their voiced counterparts:
 
-BEGIN features:
-  -voice = p, t, k, f, s
-  +voice = b, d, g, v, z
-END
+```
+-voice = p, t, k, f, s
++voice = b, d, g, v, z
+```
 
+```
   {-voice} -> {+voice}
 ; tamefa ==> dameva
-In this rule, in RESULT, {+voice} has a symmetrical one-to-one change of graphemes from the graphemes in {-voice} in TARGET, leading to a concurrent change. Let's quickly imagine a scenario where the only {+voice} grapheme was b. The result will be a merging of all -voice graphemes into b: tamepfa ==> bamebba. Similarly, in a different scenario where the only -voice grapheme was p, p would become the first grapheme in {+voice}, which happens to be b: tamepfa ==> tamebfa
+```
 
-Para-feature
+In this rule, in `RESULT`, `{+voice}` has a symmetrical one-to-one change of graphemes from the graphemes in `{-voice}` in `TARGET`, leading to a concurrent change. Let's quickly imagine a scenario where the only `{+voice}` grapheme was `b`. The result will be a merging of all `-voice` graphemes into `b`: `tamepfa ==> bamebba`. Similarly, in a different scenario where the only `-voice` grapheme was `p`, `p` would become the first grapheme in `{+voice}`, which happens to be `b`: `tamepfa ==> tamebfa`
+
+### Para-feature
 
 A feature defined without a prepended plus or minus sign is a 'para-feature'. A para-feature is a pro-feature without a listed anti-feature counterpart. Instead, the graphemes marked as the anti-feature are the graphemes in the graphs: directive that are not not marked by the para-feature.
 
@@ -214,6 +222,8 @@ END
 In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.
 
 ## 10. Promises
+
+
 
 `words: Cj->{u,o,a}UV`, `C({p,b,t,d,k,g}<-r)a`
 

@@ -72,9 +72,11 @@
 - [] Quantifier
 - [] Bound quantifier
 - [] Geminate-mark
+
 - [] Wildcard
 - [] Anythings-mark
 - [] Blocked Anythings-mark
+
 - [] Positioner
 
 - [] Backreference
@@ -92,15 +94,3 @@
 
 - [x] Alphabet directive
 - [x] Invisible directive
-
-## Docs
-
-- [] Questions and answers
-- [] How to write def files
-- [] better examples
-
-## Tests
-
-- [x] Vitest colla
-- [x] Vitest examples
-- [] Vitest transforms
