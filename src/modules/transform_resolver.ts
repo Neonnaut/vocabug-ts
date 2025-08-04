@@ -40,7 +40,13 @@ class Transform_Resolver {
         for (let i = 0; i < this.transform_pending.length; i++) {
             this.line_num = this.transform_pending[i].line_num;
 
-            const target = this.transform_pending[i].target; // string
+            let target = this.transform_pending[i].target; // string
+
+            if (target.includes(":")) {
+                target = target.replace(/(.)\:/g, "$1+{2}");
+            }
+
+
             // Replace category keys with category graphemes, must be item, or alone
             const target_with_cat = this.categories_into_transform(target);
             // Resolve alternators or optionalators as array of arrays

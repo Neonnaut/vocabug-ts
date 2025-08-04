@@ -1,6 +1,13 @@
 import Word from './word';
 import Logger from './logger';
 
+type Quantifier = {
+    base: string;
+    min: number;
+    max: number | null; // null means unbounded
+    suffix: string;
+};
+
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
 
 class Transformer {
@@ -51,51 +58,67 @@ class Transformer {
         return tokens;
     }
 
-    /**
-     * Parses a target string containing a quantifier.
-     * Supports:
-     *   - "a+" → { base: "a", suffix: "" }
-     *   - "a+i" → { base: "a", suffix: "i" }
-     */
-    parse_quantified_target(raw: string): { base: string, suffix: string } | null {
-        const idx = raw.indexOf("+");
 
-        // Must have a grapheme before the '+'
-        if (idx <= 0) return null;
 
-        const base = raw[idx - 1];
-        const suffix = raw.slice(idx + 1); // May be empty
+parse_quantified_target(raw: string): Quantifier | null {
+    // Match full quantifier syntax: a+{n}, a+{n,m}, a+{,n}, a+{n,}, a+
+    const fullMatch = raw.match(/^(.)(\+\{(\d*)?,?(\d*)?\})(.*)$/);
+    if (fullMatch) {
+        const base = fullMatch[1];
+        const rawMin = fullMatch[3];
+        const rawMax = fullMatch[4];
+        const suffix = fullMatch[5];
 
-        return { base, suffix };
+        const min = rawMin ? parseInt(rawMin, 10) : (rawMax ? 1 : 1);
+        const max = rawMax ? parseInt(rawMax, 10) : (rawMin ? null : 1);
+
+        return { base, min, max, suffix };
     }
 
+    // Fallback: legacy `a+suffix` → treated as +{1,}
+    const idx = raw.indexOf("+");
+    if (idx <= 0) return null;
 
-    /**
-     * Matches a quantified sequence:
-     * - One or more of `base`
-     * - Optionally followed by `suffix`
-     */
-    match_quantified_sequence(tokens: string[], start: number, base: string, suffix: string): number {
-        let i = start;
-        let count = 0;
+    const base = raw[idx - 1];
+    const suffix = raw.slice(idx + 1);
 
-        // Match one or more of the base grapheme
-        while (i < tokens.length && tokens[i] === base) {
-            i++;
-            count++;
-        }
+    return { base, min: 1, max: null, suffix };
+}
 
-        if (count === 0) return 0;
+match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number {
+    const max = q.max ?? tokens.length; // If max is null, treat as unlimited
+    const maxPossible = Math.min(max, tokens.length - start - q.suffix.length);
 
-        // If suffix is present, match it exactly
-        for (let j = 0; j < suffix.length; j++) {
-            if (i + j >= tokens.length || tokens[i + j] !== suffix[j]) {
-                return 0;
+    for (let count = q.min; count <= maxPossible; count++) {
+        let valid = true;
+
+        // Check base repetition
+        for (let i = 0; i < count; i++) {
+            if (tokens[start + i] !== q.base) {
+                valid = false;
+                break;
             }
         }
 
-        return count + suffix.length;
+        // Check suffix
+        if (valid) {
+            for (let j = 0; j < q.suffix.length; j++) {
+                if (tokens[start + count + j] !== q.suffix[j]) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        if (valid) {
+            return count + q.suffix.length;
+        }
     }
+
+    return 0;
+}
+
+
 
 
     span_to_length(tokens: string[], target_length: number): number {
@@ -209,11 +232,9 @@ class Transformer {
             // 🔍 Check if the target contains a quantifier
             const quant = this.parse_quantified_target(raw_target);
             if (quant) {
-                const { base, suffix } = quant;
-
-                // 🔁 Scan through tokens to find matches
+                // 🔁 Scan through tokens to find bounded quantifier matches
                 for (let j = 0; j < tokens.length; j++) {
-                    const span = this.match_quantified_sequence(tokens, j, base, suffix);
+                    const span = this.match_bounded_quantifier(tokens, j, quant);
 
                     if (span > 0) {
                         const window = tokens.slice(j, j + span).join("");
@@ -238,10 +259,10 @@ class Transformer {
                         }
                     }
                 }
-
-                // Skip further processing for this target — already handled
+                // ✅ Skip further processing for this target — already handled
                 continue;
             }
+
 
 
             if (raw_result === "^REJECT" || raw_result === "^R") {

@@ -599,12 +599,12 @@ n mp +  +  nn +</pre>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
 
       <h3 id="nescaQuantifier"><a class="head-num">19.1</a>Quantifier</h3>
-      <p>Quantifier, using <code class="voc-static">+</code>, will match once or as many times as possible to the grapheme, or grapheme in a set or category, to the left of it.</p>
+      <p>Quantifier, using <code class="voc-static">+</code>, will match once or as many times as possible to the grapheme to the left of it. Quantifier cannot be used in <code class="voc-static">RESULT</code>:</p>
       <pre class="voc-static">  a+ -> o<br>; raraaaaa ==> raro</pre>
       <pre class="voc-static">; [p,t,k]+ -> [b,d,g]<br>; atppakkka ==> atbaga</pre>
 
       <h3 id="nescaBoundedQuantifier"><a class="head-num">19.2</a>Bounded quantifier</h3>
-      <p>The quantifier matches as many times its digit(s), enclosed in <code class="voc-static">+{</code> and <code class="voc-static">}</code>, to the things to the left.</p>
+      <p>The bounded quantifier matches as many times its digit(s), enclosed in <code class="voc-static">+{</code> and <code class="voc-static">}</code>, to the things to the left.</p>
       <pre class="voc-static">  Change /o/ into /x/ only when preceded by three /r/s<br>  o -> x / r+{3}_
 ; ororrro ==> ororrrx</pre>
       <p>The digits in the quantifier can also be a range:</p>
