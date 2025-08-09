@@ -1,5 +1,6 @@
 // Yikes, there is so much of this that I needed to put it in a separate file to resolver.
 import Logger from './logger';
+import Nesca_Grammar_Stream from './nesca_grammar_stream';
 
 class Transform_Resolver {
     private logger: Logger;
@@ -16,6 +17,7 @@ class Transform_Resolver {
         chance:(number|null),
         line_num:number
     }[] = [];
+
     private line_num: number;
 
     constructor(
@@ -337,11 +339,11 @@ class Transform_Resolver {
         };
         for (const char of str) {
             if (Object.values(bracket_pairs).includes(char)) {
-            stack.push(char); // Push opening brackets onto stack
+                stack.push(char); // Push opening brackets onto stack
             } else if (Object.keys(bracket_pairs).includes(char)) {
-            if (stack.length === 0 || stack.pop() !== bracket_pairs[char]) {
-                return false; // Unmatched closing bracket
-            }
+                if (stack.length === 0 || stack.pop() !== bracket_pairs[char]) {
+                    return false; // Unmatched closing bracket
+                }
             }
         }
         return stack.length === 0; // Stack should be empty if balanced

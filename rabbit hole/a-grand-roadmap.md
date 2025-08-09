@@ -50,7 +50,6 @@
 
 ## Transform
 
-- [] Transform char escape -- Important!!
 - [x] Single change
 - [x] Concurrent change
 - [x] A merging, concurent change. e.g: `a, e -> ^REJECT`
@@ -69,6 +68,8 @@
 - [x] Cluster-field
 - [x] Cluster field condition and exception
 
+- [] Transform char escape -- Important!!
+
 - [] Quantifier
 - [] Bound quantifier
 - [] Geminate-mark
@@ -77,9 +78,7 @@
 - [] Anythings-mark
 - [] Blocked Anythings-mark
 
-- [] Positioner
-
-- [] Backreference
+- [] xsampa - ipa does not support superscript
 
 - [x] Engine, decompose
 - [x] Engine, compose

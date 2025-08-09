@@ -58,68 +58,65 @@ class Transformer {
         return tokens;
     }
 
+    /*
+    parse_quantified_target(raw: string): Quantifier | null {
+        // Match full quantifier syntax: a+{n}, a+{n,m}, a+{,n}, a+{n,}, a+
+        const fullMatch = raw.match(/^(.)(\+\{(\d*)?,?(\d*)?\})(.*)$/);
+        if (fullMatch) {
+            const base = fullMatch[1];
+            const rawMin = fullMatch[3];
+            const rawMax = fullMatch[4];
+            const suffix = fullMatch[5];
 
+            const min = rawMin ? parseInt(rawMin, 10) : (rawMax ? 1 : 1);
+            const max = rawMax ? parseInt(rawMax, 10) : (rawMin ? null : 1);
 
-parse_quantified_target(raw: string): Quantifier | null {
-    // Match full quantifier syntax: a+{n}, a+{n,m}, a+{,n}, a+{n,}, a+
-    const fullMatch = raw.match(/^(.)(\+\{(\d*)?,?(\d*)?\})(.*)$/);
-    if (fullMatch) {
-        const base = fullMatch[1];
-        const rawMin = fullMatch[3];
-        const rawMax = fullMatch[4];
-        const suffix = fullMatch[5];
-
-        const min = rawMin ? parseInt(rawMin, 10) : (rawMax ? 1 : 1);
-        const max = rawMax ? parseInt(rawMax, 10) : (rawMin ? null : 1);
-
-        return { base, min, max, suffix };
-    }
-
-    // Fallback: legacy `a+suffix` → treated as +{1,}
-    const idx = raw.indexOf("+");
-    if (idx <= 0) return null;
-
-    const base = raw[idx - 1];
-    const suffix = raw.slice(idx + 1);
-
-    return { base, min: 1, max: null, suffix };
-}
-
-match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number {
-    const max = q.max ?? tokens.length; // If max is null, treat as unlimited
-    const maxPossible = Math.min(max, tokens.length - start - q.suffix.length);
-
-    for (let count = q.min; count <= maxPossible; count++) {
-        let valid = true;
-
-        // Check base repetition
-        for (let i = 0; i < count; i++) {
-            if (tokens[start + i] !== q.base) {
-                valid = false;
-                break;
-            }
+            return { base, min, max, suffix };
         }
 
-        // Check suffix
-        if (valid) {
-            for (let j = 0; j < q.suffix.length; j++) {
-                if (tokens[start + count + j] !== q.suffix[j]) {
+        // Fallback: legacy `a+suffix` → treated as +{1,}
+        const idx = raw.indexOf("+");
+        if (idx <= 0) return null;
+
+        const base = raw[idx - 1];
+        const suffix = raw.slice(idx + 1);
+
+        return { base, min: 1, max: null, suffix };
+    }
+
+    match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number {
+        const max = q.max ?? tokens.length; // If max is null, treat as unlimited
+        const maxPossible = Math.min(max, tokens.length - start - q.suffix.length);
+
+        for (let count = q.min; count <= maxPossible; count++) {
+            let valid = true;
+
+            // Check base repetition
+            for (let i = 0; i < count; i++) {
+                if (tokens[start + i] !== q.base) {
                     valid = false;
                     break;
                 }
             }
+
+            // Check suffix
+            if (valid) {
+                for (let j = 0; j < q.suffix.length; j++) {
+                    if (tokens[start + count + j] !== q.suffix[j]) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            if (valid) {
+                return count + q.suffix.length;
+            }
         }
 
-        if (valid) {
-            return count + q.suffix.length;
-        }
+        return 0;
     }
-
-    return 0;
-}
-
-
-
+    */
 
     span_to_length(tokens: string[], target_length: number): number {
         let total = 0;
@@ -130,6 +127,39 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
         return tokens.length;
     }
 
+    context_matches(
+        full: string,
+        startIdx: number,
+        raw_search: string,
+        before: string,
+        after: string
+    ): boolean {
+        const target_len = raw_search.length;
+
+        // BEFORE logic
+        if (before === "#") {
+            if (startIdx !== 0) return false;
+        } else if (before.startsWith("#")) {
+            const expected = before.slice(1);
+            if (startIdx !== 0 || full.slice(0, startIdx) !== expected) return false;
+        } else {
+            const actual = full.slice(Math.max(0, startIdx - before.length), startIdx);
+            if (actual !== before) return false;
+        }
+
+        // AFTER logic
+        if (after === "#") {
+            if (startIdx + target_len !== full.length) return false;
+        } else if (after.endsWith("#")) {
+            const expected = after.slice(0, -1);
+            if (startIdx + target_len !== full.length || full.slice(startIdx + target_len) !== expected) return false;
+        } else {
+            const actual = full.slice(startIdx + target_len, startIdx + target_len + after.length);
+            if (actual !== after) return false;
+        }
+
+        return true;
+    }
 
     apply_transform(
         word: Word,
@@ -143,40 +173,6 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
             line_num: number;
         }
     ): string[] {
-
-        function context_matches(
-            full: string,
-            startIdx: number,
-            raw_search: string,
-            before: string,
-            after: string
-        ): boolean {
-            const target_len = raw_search.length;
-
-            // BEFORE logic
-            if (before === "#") {
-                if (startIdx !== 0) return false;
-            } else if (before.startsWith("#")) {
-                const expected = before.slice(1);
-                if (startIdx !== 0 || full.slice(0, startIdx) !== expected) return false;
-            } else {
-                const actual = full.slice(Math.max(0, startIdx - before.length), startIdx);
-                if (actual !== before) return false;
-            }
-
-            // AFTER logic
-            if (after === "#") {
-                if (startIdx + target_len !== full.length) return false;
-            } else if (after.endsWith("#")) {
-                const expected = after.slice(0, -1);
-                if (startIdx + target_len !== full.length || full.slice(startIdx + target_len) !== expected) return false;
-            } else {
-                const actual = full.slice(startIdx + target_len, startIdx + target_len + after.length);
-                if (actual !== after) return false;
-            }
-
-            return true;
-        }
 
         const { target, result, conditions, exceptions, chance, line_num } = transform;
 
@@ -217,8 +213,6 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
             return this.graphemosis(modified_word);
         }
 
-
-
         if (target.length !== result.length) {
             this.logger.validation_error("Mismatched target/result concurrent set lengths in a transform", line_num)
         }
@@ -229,6 +223,7 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
             let raw_target = target[i].replace(/\\/g, "");
             let raw_result = result[i].replace(/\\/g, "");
 
+            /*
             // 🔍 Check if the target contains a quantifier
             const quant = this.parse_quantified_target(raw_target);
             if (quant) {
@@ -242,12 +237,12 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
 
                         // ✅ Check conditions
                         const passes = conditions.length === 0 || conditions.some(c =>
-                            context_matches(full_word, startIdx, window, c.before, c.after)
+                            this.context_matches(full_word, startIdx, window, c.before, c.after)
                         );
 
                         // 🚫 Check exceptions
                         const blocked = exceptions.some(e =>
-                            context_matches(full_word, startIdx, window, e.before, e.after)
+                            this.context_matches(full_word, startIdx, window, e.before, e.after)
                         );
 
                         // ✂️ Apply replacement if valid
@@ -262,8 +257,7 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
                 // ✅ Skip further processing for this target — already handled
                 continue;
             }
-
-
+            */
 
             if (raw_result === "^REJECT" || raw_result === "^R") {
                 for (let j = 0; j < tokens.length; j++) {
@@ -274,10 +268,10 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
                         const startIdx = tokens.slice(0, j).join("").length;
 
                         const passes = conditions.length === 0 || conditions.some(c =>
-                            context_matches(full_word, startIdx, raw_target, c.before, c.after)
+                            this.context_matches(full_word, startIdx, raw_target, c.before, c.after)
                         );
                         const blocked = exceptions.some(e =>
-                            context_matches(full_word, startIdx, raw_target, e.before, e.after)
+                            this.context_matches(full_word, startIdx, raw_target, e.before, e.after)
                         );
 
                         if (passes && !blocked) {
@@ -289,28 +283,30 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
                 }
             }
 
-            if (raw_target == "^") {
+            if ( (raw_target == "^" && raw_result == "^") || (raw_target == "∅" && raw_result == "∅")) {
+                this.logger.validation_error("Insertion of deletion is not valid syntax grammar", line_num)
+            } else if (raw_target == "^" || raw_target == "∅") {
                 // Insertion case
                 if (conditions.length === 0) {
                     this.logger.validation_error("Insertion requires at least one condition", line_num);
                 }
                 for (let j = 0; j <= tokens.length; j++) {
                     const startIdx = tokens.slice(0, j).join("").length;
-                    const passes = conditions.some(cond => context_matches(full_word, startIdx, "", cond.before, cond.after));
-                    const blocked = exceptions.some(exc => context_matches(full_word, startIdx, "", exc.before, exc.after));
+                    const passes = conditions.some(cond => this.context_matches(full_word, startIdx, "", cond.before, cond.after));
+                    const blocked = exceptions.some(exc => this.context_matches(full_word, startIdx, "", exc.before, exc.after));
                     if (passes && !blocked) {
                         replacements.push({ index: j, length: 0, replacement: raw_result });
                     }
                 }
-            } else if (raw_result === "^") {
+            } else if (raw_result === "^" || raw_result === "∅") {
                 // Deletion case
                 for (let j = 0; j < tokens.length; j++) {
                     const span = this.span_to_length(tokens.slice(j), raw_target.length);
                     const window = tokens.slice(j, j + span).join("");
                     if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
-                        const passes = conditions.length === 0 || conditions.some(c => context_matches(full_word, startIdx, raw_target, c.before, c.after));
-                        const blocked = exceptions.some(e => context_matches(full_word, startIdx, raw_target, e.before, e.after));
+                        const passes = conditions.length === 0 || conditions.some(c => this.context_matches(full_word, startIdx, raw_target, c.before, c.after));
+                        const blocked = exceptions.some(e => this.context_matches(full_word, startIdx, raw_target, e.before, e.after));
                         if (passes && !blocked) {
                             replacements.push({ index: j, length: span, replacement: "" });
                         }
@@ -323,8 +319,8 @@ match_bounded_quantifier(tokens: string[], start: number, q: Quantifier): number
                     const window = tokens.slice(j, j + span).join("");
                     if (window === raw_target) {
                         const startIdx = tokens.slice(0, j).join("").length;
-                        const passes = conditions.length === 0 || conditions.some(c => context_matches(full_word, startIdx, raw_target, c.before, c.after));
-                        const blocked = exceptions.some(e => context_matches(full_word, startIdx, raw_target, e.before, e.after));
+                        const passes = conditions.length === 0 || conditions.some(c => this.context_matches(full_word, startIdx, raw_target, c.before, c.after));
+                        const blocked = exceptions.some(e => this.context_matches(full_word, startIdx, raw_target, e.before, e.after));
                         if (passes && !blocked) {
                             replacements.push({ index: j, length: span, replacement: raw_result });
                         }

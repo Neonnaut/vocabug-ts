@@ -242,14 +242,14 @@ END`,
 ; Tu-foot shows complex consonant clusters,
 ; two types of vowel harmony, pitch accent.
 
-    p, pː, tː, k, kː, ʔ,
+    p, pp, tt, k, kk, ʔ,
     ts, tts, ks, kks,
-    s, sː, x,
-    m, mː, n, nː,
+    s, ss, x,
+    m, mm, n, nn,
     w, j,
 
     a, ɯ, o, u,
-    e, i, ø, y`,
+    e, i, ø, y,
 
   tests: 
 `; This is a comment.

@@ -169,6 +169,28 @@ END
 
 - [] Named escapes, good, keep them in `{}`
 
+## Positioner
+
+Positioners, enclosed in `@{ and }`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
+
+```
+; Change the second /o/ in a word to /x/ after the second /s/
+  o@{2} -> x / s@{2}_
+; sososo ==> sosxso
+```
+If we want to match the last occurence of a grapheme in a word, use `-1`. For the second last occurence of a grapheme in a word, use `-2`, and so forth:
+```
+; Change the last /o/ in a word to /x/
+  o@{-1} -> x
+; sososo ==> sososx
+```
+
+## Backrefernce
+
+```
+<1 <2
+```
+
 ## 4. Word classes
 
 ## 5. If then else block

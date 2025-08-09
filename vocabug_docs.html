@@ -112,6 +112,7 @@
         <ol class="nice-list">
           <li><a href="#nescaMultipleCondition">Multiple conditions in one rule</a></li>
           <li><a href="#nescaWordBoundary">Word boundary</a></li>
+          <li><a href="#nescaChanceCondition">The chance condition</a></li>
         </ol>
         </li>
 
@@ -137,8 +138,6 @@
           <li><a href="#nescaWildcard">Wildcard</a></li>
           <li><a href="#nescaAnythingsMark">Anythings-mark</a></li>
           <li><a href="#nescaBlocker">Blocked-anythings-mark</a></li>
-          <li><a href="#nescaPositioner">Positioner</a></li> 
-          <li><a href="#nescaBackreference">Backreference</a></li>
         </ol>
         </li>
 
@@ -348,15 +347,7 @@
           </tr>
           <tr>
             <td><code class="voc-static">~{</code> or <code class="voc-static">…{</code> and <code class="voc-static">}</code></td>
-            <td><a href="#nescaBlocker">Blocker</a></td>
-          </tr>
-          <tr>
-            <td><code class="voc-static">@{</code> and <code class="voc-static">}</code></td>
-            <td><a href="#nescaPositioner">Positioner</a></td>
-          </tr>
-          <tr>
-            <td><code class="voc-static">&lt;1</code>, <code class="voc-static">&lt;2</code>, ... <code class="voc-static">&lt;9</code></td>
-            <td><a href="#nescaBackreference">Backreference</a></td>
+            <td><a href="#nescaBlocker">Blocked-anythings-mark</a></td>
           </tr>
         </tbody>
       </table>
@@ -504,9 +495,9 @@ words: $S:2 y</pre>
       <p>where each change is on its own line. We can see <code class="voc-static">o</code> merge with <code class="voc-static">a</code>, then <code class="voc-static">a</code> becomes <code class="voc-static">o</code>.</p>
 
       <h3 id="nescaMergingChange"><a class="head-num">12.2</a>Merging change</h3>
-      <p>Instead of listing each <code class="voc-static">RESULT</code> in a councurrent change, we can instead list just one that all the <code class="voc-static">TARGET</code>s will merge into:</p>
+      <p>Instead of listing each <code class="voc-static">RESULT</code> in a concurrent change, we can instead list just one that all the <code class="voc-static">TARGET</code>s will merge into:</p>
       <pre class="voc-static">; Merge /o/ and /a/ into x<br>  o, a -> x<br>; boda ==> bxdx</pre>
-      <p>This is equivalant to:</p>
+      <p>This is equivalent to:</p>
       <pre class="voc-static">; Merge /o/ and /a/ into x<br>  o, a -> x, x<br>; boda ==> bxdx</pre>
 
       <h3 id="nescaReject"><a class="head-num">12.5</a>Reject</h3>
@@ -543,8 +534,8 @@ words: $S:2 y</pre>
       <p><code class="voc-static">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="voc-static">TARGET</code>, or the end of the word if it is in <code class="voc-static">RESULT</code></p>
       <pre class="voc-static">  o -> x / p_p#<br>; opoppop ==> opoppxp</pre>
 
-      <h2 id="nescaChanceCondition"><a class="head-num">14.3</a>The chance condition</h2>
-      <p>The chance condition is placed following a <code class="voc-static">?</code> as a number from 0 to 100. This numer represents the chance of the transformation occuring:</p>
+      <h3 id="nescaChanceCondition"><a class="head-num">14.3</a>The chance condition</h3>
+      <p>The chance condition is placed following a <code class="voc-static">?</code> as a number from 0 to 100. This number represents the chance of the transformation occuring:</p>
       <pre class="voc-static">aa -> a ? 30</pre>
       <p>In the above example, the transformation will execute only 30% of the time.</p>
 
@@ -566,16 +557,16 @@ words: $S:2 y</pre>
       <h3 id="nescaAlternatorSet"><a class="head-num">17.1</a>Alternator-set</h3>
       <p>Enclosed in square brackets, <code class="voc-static">[</code> and <code class="voc-static">]</code>, only one Item in an alternator set will be part of each sequence. For example:</p>
       <pre class="voc-static">  p[w, j] -> pp</pre>
-      <p>The above example is equivalant to:</p>
+      <p>The above example is equivalent to:</p>
       <pre class="voc-static">  pw pj -> pp</pre>
-      <p>These can also be used in exceptions and conditions</p>
+      <p>These can also be used in exceptions and conditions.</p>
 
       <h3 id="nescaOptionalatorSet"><a class="head-num">17.2</a>Optionalator-set</h3>
       <p>Items in an optionalator, enclosed in <code class="voc-static">(</code> and <code class="voc-static">)</code> can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
       <pre class="voc-static">; Merge /x/ and /xw/ into /k/<br>  x(w) -> k<br>; xwaxaħa ==> kakaħa</pre>
       <p>Optional-set can also attach to an alternator-set:</p>
       <pre class="voc-static">; Merge /x/, /xw/, /ħ/ and /ħw/ into /k/<br>  [x, ħ](w) -> k<br>; xwaxaħa ==> kakaka</pre>
-      <p>Looking at the above example, Let's say you wanted to preserve this optional /w/ following /k/ or /ħ/. We can do this by writing this /w/ in <code class="voc-static">RESULT</code>, enclosed by round brackets:</p>
+      <p>Looking at the above example, let's say you wanted to preserve this optional /w/ following /k/ or /ħ/. We can do this by writing this /w/ in <code class="voc-static">RESULT</code>, enclosed by round brackets:</p>
       <pre class="voc-static">; Like the previous rule, but preserve labialisation<br>  [x, ħ](w) -> k(w)<br>; xwaxaħa ==> kwahaka</pre>
       <p>The optional-set can also be a merging change, or concurrent change too:</p>
       <pre class="voc-static">; Like the previous rule, but preserve palatalisation and labialisation <br>  [x ħ](w, j) -> k(w, j)<br>; xwaxjaxa ==> kwakjaka</pre>
@@ -621,11 +612,15 @@ n mp +  +  nn +</pre>
 ; toootooooo ==> toootx</pre>
 
       <h3 id="nescaGeminateMark"><a class="head-num">19.3</a>Geminate-mark</h3>
-      <p>Geminate-mark using colon <code class="voc-static">:</code>, will match twice to the grapheme, or grapheme from a set or category, to the left of it. This is equivalant to <code class="voc-static">+{2}</code>. In other words, you can capture an item only when it is geminated using the geminate-mark:</p>
+      <p>Geminate-mark using colon <code class="voc-static">:</code>, will match twice to the grapheme, or grapheme from a set or category, to the left of it. This is equivalent to <code class="voc-static">+{2}</code>. In other words, you can capture an item only when it is geminated using the geminate-mark:</p>
       <pre class="voc-static">  a: -> o<br>; aaata => oata</pre>
 
+      <p>Unlike quantifier, a geminate mark can be used in <code class="example">RESULT</code>:</p>
+
+      <pre class="voc-static">  a -> a:<br>; tat => taat</pre>
+
       <h3 id="nescaKleeneStar"><a class="head-num">19.4</a>Kleene-star</h3>
-      <p>Occasionlly, you may want to match a grapheme whether it exists, there is one of it, or there is multiple of it consecutively, known as a "Kleene-star". There is <b>no</b> dedicated character for a Kleene star. Instead, you wrap the content followed by a quantifier, in an optionalator.</p>
+      <p>Occasionally, you may want to match a grapheme whether it exists, there is one of it, or there is multiple of it consecutively, known as a "Kleene-star". There is <b>no</b> dedicated character for a Kleene star. Instead, you wrap the content followed by a quantifier, in an optionalator.</p>
       <pre class="voc-static">  o(a+) -> o<br>; roaroaaaaa ==> raro</pre>
 
       <h3 id="nescaWildcard"><a class="head-num">19.5</a>Wildcard</h3>
@@ -643,19 +638,6 @@ n mp +  +  nn +</pre>
       <h3 id="nescaBlocker"><a class="head-num">19.7</a>Blocked-anythings-mark</h3>
       <p>Blocker is designed to block the spread of greedy, spreading, behaviour of the anythings-mark. You enclose a set of graphemes inside <code class="voc-static">~[</code> and <code class="voc-static">]</code> that will block spreading. For example we might want the graphemes <code class="voc-static">k</code> or <code class="voc-static">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       <pre class="voc-static">  [a, i, u] -> [ã, ĩ, ũ] / [ã, ĩ, ũ]&~{k, g}_<br>; pabãdruliga ==> pabãdrũlĩga</pre>
-
-      <h3 id="nescaPositioner"><a class="head-num">19.8</a>Positioner</h3>
-      <p>Positioners, enclosed in <code class="voc-static">@{</code> and <code class="voc-static">}</code>, allows a grapheme to the left of it to be captured only when it is the Nth in the word:</p>
-      <pre class="voc-static">; Change the second /o/ in a word to /x/ after the second /s/<br>  o@{2} -> x / s@{2}_
-; sososo ==> sosxso</pre>
-      <p>If we want to match the last occurence of a grapheme in a word, use <code class="voc-static">-1</code>. For the second last occurence of a grapheme in a word, use <code class="voc-static">-2</code>, and so forth:</p>
-      <pre class="voc-static">; Change the last /o/ in a word to /x/<br>  o@{-1} -> x
-; sososo ==> sososx</pre>
-
-      <h3 id="nescaBackreference"><a class="head-num">19.9</a>Backreference</h3>
-      <p> <code class="voc-static">&lt;1</code></p>
-      <p>A backreference, simply is the target.</p>
-      <pre class="voc-static">  &. -> ^REJECT / _&lt;1<br>  </pre>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">20</a>Advanced rules</h2>
 
@@ -677,22 +659,22 @@ n mp +  +  nn +</pre>
       <p>Here are some common questions and answers about Vocabug:</p>
       
       <p><b>The Generate button is greyed out</b></p>
-      <p>This means Vocabug is busy generating words for you, and will eventually become clickable again. If this is taking to long, perhaps you have <code class="example">force word limit</code> accidentally on.</p>
+      <p>This means Vocabug is busy generating words for you, and will eventually become clickable again. If you think this is taking too long, perhaps you have <code class="example">force word limit</code> accidentally on.</p>
 
-      <p><b>Invalid regular expession error on generation</b></p>
+      <p><b>Invalid regular expression error on generation</b></p>
       <p>This error occurs because you are using Vocabug in an old browser or old browser version that does not support lookbehind. <a href="https://caniuse.com/js-regexp-lookbehind">You can check if this applies to you here</a>.</p>
 
       <p><b>How do I target syllables or syllable division in transforms?</b></p>
       <p>Vocabug does not have a built-in way to target syllables, but you can use a <code class="voc-static">.</code> character as a syllable divider like <code class="example">words: $S.$S, $S.$S.$S</code>, and then reference it in transforms.</p>
 
-      <p><b>What is a natural frequency for consonants?</b></p>
+      <p><b>What is a natural frequency for consonants in a language?</b></p>
      
-      <p>There is no one-size-fits-all answer to this question, and different analyses of word lists may produce different data on what the general expectation is. For example, in English, /ð/ is very uncommon among all the words in English, however it is a common phoneme among sentences because of the prevalence of the words <code class="example">this</code>, <code class="example">that</code>, <code class="example">those</code> and <code class="example">the</code>. And indeed, morphology and historical sound changes can skew any initial control you might have over frequencies.</p>
+      <p>There is no one-size-fits-all answer to this question, and different analyses of word lists may produce different data on what the general expectation is. For example, in English, /ð/ is very uncommon among all the words in English, however it is a common phoneme among sentences because of the prevalence of the words <code class="example">this</code>, <code class="example">that</code>, <code class="example">those</code> and <code class="example">the</code>. And indeed, morphology and historical sound changes can skew any initial control you might have over frequencies. The main takeaway here is that phonemes that are easy to pronounce and distinguish will be the most common.</p>
      
       <p>However, a good rule of thumb is that the most common class will come from 'Class A', then 'Class B', and finally 'Class Z'.</p>
      
       <ul class="paragraphian">
-        <li>Class A: <code class="example">nasals</code>, and <code class="example">voiceless plosives</code>, with alveolar consonants in this class being much more common, such as <code class="example">t</code> and <code class="example">n</code> (an exception to this being Australian languages with their word-initial consonants). Certain phonemes such as <code class="example">ŋ</code> may have a much lower frequency depending on the language. Certain alveolar phonemes that would belong in Class B such as <code class="example">s</code> may belong in this class, depending on the language. The main takeaway here is that phonemes that are easy to pronounce and distinguish will be the most common.</li>
+        <li>Class A: <code class="example">nasals</code>, and <code class="example">voiceless plosives</code>, with alveolar consonants in this class being much more common, such as <code class="example">t</code> and <code class="example">n</code> (an exception to this being Australian languages with their word-initial consonants). Certain phonemes such as <code class="example">ŋ</code> may have a much lower frequency depending on the language. Certain alveolar phonemes that would belong in Class B such as <code class="example">s</code> may belong in this class, depending on the language.</li>
 
         <li>Class B: The next most common class... is everything else not in Class A or Z. Some broad patterns across languages you might observe are <code class="example">g</code> having a much lower frequency compared to the other <code class="example">voiced plosives</code>, and <code class="example">affricates</code> being particularly low in frequency inside this class.</li>
 
@@ -700,8 +682,8 @@ n mp +  +  nn +</pre>
 
       </ul>
 
-      <p><b>How do I weight an idividual optional-set?</b></p>
-      <p>Using the <code class="examples">Optionals-weight:</code> directive, effects the weight of all optional-sets. As of version 1, there is no direct way to weight an individual optional-set. You can however, use <code class="example">^</code> like <code class="example">a[b, c, ^*3]</code></p>
+      <p><b>How do I weight an individual optional-set?</b></p>
+      <p>Using the <code class="example">Optionals-weight:</code> directive, affects the weight of all optional-sets. As of version 1, there is no direct way to weight an individual optional-set. You can however, use <code class="example">^</code> as an item in an alternator, like <code class="example">a[b, c, ^*3]</code></p>
 
     </section>
 
