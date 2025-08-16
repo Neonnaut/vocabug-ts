@@ -1,0 +1,53 @@
+{
+  "name": "vocabug",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Word generator program for conlangers",
+  "author": "Neonnaut",
+  "license": "MIT",
+  "homepage": "https://neonnaut.neocities.org/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neonnaut/vocabug-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Neonnaut/vocabug-ts/issues"
+  },
+  "keywords": [
+    "conlanging",
+    "wordgen",
+    "vocabulary",
+    "vocabug"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:win": "tsc.cmd && vite.cmd",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.12",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
+  },
+  "main": "./dist/vocabug.cjs.js",
+  "module": "./dist/vocabug.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vocabug.es.js",
+      "require": "./dist/vocabug.cjs.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README"
+  ],
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.1"
+  }
+}

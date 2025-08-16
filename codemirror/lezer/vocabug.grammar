@@ -1,0 +1,73 @@
+@top Program { Line* }
+@skip { space }
+
+space { " " | "\t" }
+
+AnyChar { "." }
+Digit {"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"}
+
+Line {
+  TransformBlock | WordsBlock | CategoryLine | SegmentLine
+  | DistributionLine | GraphemeListLine | MetaLine
+  | Comment | BlankLine
+}
+
+Comment { ";" "." }
+BlankLine { }
+
+TransformBlock {
+  "BEGIN" "transform" ":" TransformLine* "END"
+}
+
+TransformLine {
+  "%"?
+  (Escape | Operator | Regexp | Reject)*
+}
+
+Escape { "\\" AnyChar }
+Operator { ">" | "->" | "→" | "+" | "-" | "=" | "," }
+Regexp { "^" | "#" | "(" | ")" | "[" | "]" | "{" | "}" }
+Reject { "^REJECT" }
+
+WordsBlock {
+  "BEGIN" "words" ":" WordLine* "END"
+}
+
+WordLine { WordToken ("," WordToken)* }
+
+WordToken { Escape | Regexp | Operator | Weight | MacroName | ClassName }
+
+Weight { "*" Number | "?" Number }
+MacroName { "$" ClassChar }
+ClassName { ClassChar }
+
+CategoryLine { ClassChar "=" WordToken+ }
+SegmentLine { "$" ClassChar "=" WordToken+ }
+
+DistributionLine {
+  ("wordshape-distribution" | "category-distribution") ":" DistributionType
+}
+
+DistributionType {
+  "zipfian" | "flat" | "gusein-zade" | "shallow"
+}
+
+GraphemeListLine {
+  ("graphemes" | "alphabet" | "invisible" | "alphabet-and-graphemes") ":" ClassChar ("," ClassChar)*
+}
+
+MetaLine { "optionals-weight" ":" Digit Digit? }
+
+ClassChar {
+  "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K"
+  | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+  | "V" | "W" | "X" | "Y" | "Z"
+  | "\u00C1" | "\u0106" | "\u00C9" | "\u01F4" | "\u00CD" | "\u1E30"
+  | "\u0139" | "\u1E3E" | "\u0143" | "\u00D3" | "\u1E54" | "\u0154"
+  | "\u015A" | "\u00DA" | "\u1E82" | "\u00DD" | "\u0179" | "\u0393"
+  | "\u0394" | "\u0398" | "\u039B" | "\u039E" | "\u03A0" | "\u03A3"
+  | "\u03A6" | "\u03A8" | "\u03A9"
+}
+
+Number { "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
++ ("." "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"+)? }
