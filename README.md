@@ -24,12 +24,10 @@ Install with `npm install vocabug`, or `yarn add vocabug` and import it with eit
 ```ts
 const vocabug = require('vocabug'); // CommonJS (Node.js)
 
-import vocabug = require('vocabug'); // in TypeScript with --module commonjs, node12, or nodenext
-
 import vocabug from 'vocabug'; // ES modules
 ```
 
-There are two parts to the `vocabug` instance, the main function `generate()` and `examples`
+There are two parts inside this `vocabug` instance, the main function `generate()` and `examples`, below is a very minimal use of the program:
 ```ts
 import vocabug from 'vocabug';
 const def = vocabug.generate({
