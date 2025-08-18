@@ -1,6 +1,6 @@
 {
   "name": "vocabug",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Word generator program for conlangers",
   "author": "Neonnaut",
