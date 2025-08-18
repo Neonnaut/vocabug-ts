@@ -1,22 +1,26 @@
 # Version 2
 
-## 1. PRIORITY Backrefernce
+## 1. \[PRIORITY\] Backrefernce
 
-A backreference is a reference to the target. It can only be used in conditions or exceptions.
+A backreference is a reference to the captured target. It can only be used in conditions or exceptions. This uses `<1`.
 
 ```
-<1 <2
+  CV > ^REJECT / _<1+{2,}
+; Reject a word when it has 3 or more duplicate CV syllables in a word
 ```
 
-## 2. PRIORITY Metathesis
+Other backreferences such as `<2`, `<3`, `<4` ... are used for metathesis.
+
+## 2. \[PRIORITY\] Metathesis
 
 Metathesis in this program refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.
 
 To make a rule a metathesis rule, use these symbols:
 
-The ampersand `&` marks the content (if any) between the targets we want to reorder. You must use the same amount of `&`s in `TARGET` as in `RESULT`
+The ampersand `&` marks the content (if any) between the targets we want to reorder. You must use the same amount of `&`s in `TARGET` as in `RESULT`.
 
 Numbers in `RESULT` refer to the targets. Reordering these numbers, reorders the targets. It is possible to have up to nine
+
 Underscores `_` in a condition or exception, are references to the targets. Unlike a normal rule, we can have multiple
 Local metathesis
 
@@ -24,7 +28,7 @@ Local metathesis
 
 ```
 ; An intervocalic stop + nasal sequence becomes nasal + stop
-  [stop]|[nasal] -> 2|1 / V__V 
+  [stop]&[nasal] -> <2&<1 / V<1<2V 
 ; watna ==> wanta
 ```
 
@@ -57,7 +61,7 @@ Three or more items, to a maximum of 9, switching places, are possible, also wit
 ; xaayooz ==> aaoozyx
 ```
 
-## 3. PRIORITY Features
+## 3. \[PRIORITY\] Features
 
 Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, `+high` and `+front`, and turn it into a phoneme marked with `+high` and `+back` features, perhaps /ɯ/. The features: directive block lets you do this:
 
@@ -173,11 +177,17 @@ BEGIN features:
   glottal    - - - - - - - - - + - - - - . . . . . . . . . . . . .
 END
 
-## 4. PRIORITY Named escapes
+## 4. \[PRIORITY\] Named escapes
 
-- [] Named escapes, good, keep them in `{}`
+Named escapes, good, keep them in `{}`
 
-## 5. Positioner
+Perhaps `@{Space}` would produce " ". `@{Acute}` makes the combining diacritic.
+
+## 5. Long form category keys
+
+Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
+
+## 6. Positioner
 
 Positioners, enclosed in `@{ and }`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
 
@@ -193,9 +203,11 @@ If we want to match the last occurence of a grapheme in a word, use `-1`. For th
 ; sososo ==> sososx
 ```
 
-## 6. Word classes
+## 7. Word classes
 
-## 7. If then else block
+Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
+
+## 8. If then else block
 
 If block
 Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
@@ -220,13 +232,23 @@ else:
 END
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
-## 8. Syllable dividers and capturing syllables
+## 9. Syllable dividers and capturing syllables
 
-## 9. Chance for individual optionals
+## 10. Chance for individual optionals
 
-## 10. Alternative graphs
+## 11. Alternative graphs
 
-## 11. Rule macro
+Tells what character + combining diacritic sequences to be treated as alternatives of another grapheme
+
+The left-most precomposed character is the thing being modified
+
+```
+graphemes: a <[á à ǎ â] b d e <[é è ě ê] f g h i <[í ì ǐ î] k l m n o <[ó ò ǒ ô] p r s t u <[ú ù ǔ û] w y
+```
+
+now `a > o` will target `a` with an acute accent.
+
+## 12. Rule macro
 
 Rule macro saves rules to be used later in the definition-build as many times as needed. The rules inside the define-rule-macro: block do not run until invoked using do-rule-macro:
 
@@ -245,30 +267,31 @@ END
 ```
 In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.
 
-## 12. Promises
+## 13. Promises
 
+This would ensure that if a the optional `y` appears, The only graphemes that would be in the pool for `V` would be `a,o,a`, avoiding a `yi` syllable inside generation.
 
+This would also work backwards and forwards:
 
-`words: Cj->{u,o,a}UV`, `C({p,b,t,d,k,g}<-r)a`
+`words: C(j->{u,o,a})V`, `C({p,b,t,d,k,g}<-r)a`
 
-## 13. Invisible graphemes EXTRA
+This represents an almost idealist view on word generation
 
-This would "skip" graphemes
+## 14. Invisible graphemes EXTRA
+
+This would "skip" graphemes in the TARGET, CONDITION and EXCEPTION, like so:
 
 ```
 invisible-graphemes: .
 
-tt > d
-bat.ta > ba.da
+  tt > d
+  bat.ta > ba.da
+; 'tt' becomes 'd'. Ignore any '.' between 't's
 ```
 
-## 14. Lezer grammar
+## 15. Lezer grammar
 
-Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax
-
-## 15. Static code highlighted snippits in docs
-
-The examples in the doc have no syntax highlighting
+Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
 
 ## 16. "AI" generate a def file, like Gleb
 

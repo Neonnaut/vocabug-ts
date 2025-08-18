@@ -66,7 +66,6 @@ function weighted_random_pick(items:string[], weights:number[]): string {
         }
         random_value -= weights[i];
     }
-
     return '';
 }
 
@@ -96,23 +95,21 @@ function supra_weighted_random_pick(items: string[], weights: (number|'s')[]): s
 }
 
 function guseinzade_distribution(no_of_items: number): number[] {
-    const jitter = (val: number, percent: number = 7): number =>
-        val * (1 + (percent * (Math.random() - 0.5)) / 100);
     const weights: number[] = [];
     for (let i = 0; i < no_of_items; ++i) {
-        weights.push(jitter(Math.log(no_of_items + 1) - Math.log(i + 1)));
+        weights.push(Math.log(no_of_items + 1) - Math.log(i + 1));
     }
     return weights;
 }
+
 function zipfian_distribution(no_of_items: number): number[] {
-    const jitter = (val: number, percent: number = 2): number =>
-        val * (1 + (percent * (Math.random() - 0.5)) / 100);
     const weights: number[] = [];
     for (let i = 0; i < no_of_items; ++i) {
-        weights.push(jitter(10 / Math.pow(i + 1, 0.9)));
+        weights.push(10 / Math.pow(i + 1, 0.9)); // exponent can be 0.9
     }
     return weights;
 }
+
 function shallow_distribution(no_of_items: number): number[] {
     const weights: number[] = [];
 
@@ -133,6 +130,12 @@ function flat_distribution(no_of_items: number): number[] {
     }
     return weights;
 }
+
+function normalise(weights: number[]): number[] {
+    const total = weights.reduce((sum, w) => sum + w, 0);
+    return weights.map(w => w / total);
+}
+
 
 function get_distribution(n: number, default_distribution:string): number[] {
   // Essentially get weights for a distribution based on the number of items

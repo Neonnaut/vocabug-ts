@@ -45,7 +45,7 @@ class Word_Builder {
 
         // Stage three, resolved supra-set
         let stage_three = stage_two;
-        if (this.supra_builder.id_counter != 1) {
+        if (this.supra_builder.id_counter != 1) { // Is 1 if no supra-set
             const [ids, weights] = this.supra_builder.extract_letters_and_weights(stage_two);
             const chosen_id = supra_weighted_random_pick(ids, weights);
             stage_three = this.supra_builder.replace_letter_and_clean(stage_two, Number(chosen_id));

@@ -74,39 +74,44 @@ END`,
 
 optionals-weight: 15 %
 
-C = [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
+C = ^ [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
 V = a i o u e
 F = n r l s m
 X = n r l s
 T = '
 $S = CV(F)
-$X = CV({T*1},{T*3}F) ; 3rd last
-$Y = CV({^*80},{^*95}F) ; 2nd last
-$Z = CV({T*3},{T*9}X) ; last
+$X = CV[{T*1}*9,{T*3}F] ; 3rd last syllable
+$Y = CV[{^*80}*9,{^*95}F] ; 2nd last syllable
+$Z = CV[{T*3}*10,{T*9}X] ; last syllable
+
+Σ = a,e,i,o,u,á,é,í,ó,ú
 
 BEGIN words:
-  $Y$Z $X$Y$Z $S$X$Y$Z
+  aia iu $Y$Z $X$Y$Z $S$X$Y$Z
 END
 
 BEGIN transform:
 
-a' e' i' o' u' -> á é í ó ú
-áa aá ée eé íi ií óo oó úu uú -> á á é é í í ó ó ú ú
+a',e',i',o',u' -> á,é,í,ó,ú ; Get stressed vowel
+u:+, u'u> o, e / _# ; /u/ final vowels should be less prominant
+[a,e,i,o,u]:+ -> [a,e,i,o,u] ; Vowels of 2+ length become 1
+áa,ée,íi,óo,úu -> á,é,í,ó,ú
+[a,e,o,u,á,é,í,ó,ú][Σ] > ^REJECT / #_#
 
 ; Enlace y Hiato
-; [a,e,i,o,u]+ -> [a,e,i,o,u]
 %   a  e  i  o  u
-a   a  aj aj o  aw
-e   ea e  ej eo ew
-i   ja je i  jo ju
-o   oa e  oj o  u
-u   wa we wi wo u
+a   +  aj aj o  aw
+e   +  +  ej +  ew
+i   ja je +  jo ju
+o   +  e  oj +  ju
+u   wa we wi wo +
+
+; qw[a,o,u] -> k[k]
 
 qwa qwo qwu qa qo qu -> kwa kwo kwu ka ko ku
 qwá qwó qwú qá qó qú -> kwá kwó kwú ká kó kú
 
 nj gj gn gl qw -> ň ň ň ʎ q
-
 jg jn jj jl ww -> ň ň j ʎ w
 
 %  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  z  
@@ -118,6 +123,8 @@ s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z
 
 ; Taco-taco, burrito-burrito
 k q č h ň ʎ j w > c qu ch j ñ ll i u
+
+i > y / #_[Σ] / [Σ]_[Σ]
 
 END`,
   japanese: 
@@ -143,6 +150,9 @@ words: $A$S$S $A$S$S$S $A $A$S$S$S$S $A$S
 graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 BEGIN transform:
+
+[a,e,i,o,u]+ > ^ / R_
+[a,e,i,o,u]+{3,} > [a,e,i,o,u]: ; Sequence of 3+ vowels becomes 2
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
 %  i   u   e   o   ya   yu   yo
@@ -489,7 +499,7 @@ BEGIN transform:
 
   ; Tonogenesis:
 
-  ; Sandhi: impossible
+  ; Sandhi: impossible?
 
 END`
 */

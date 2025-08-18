@@ -98,7 +98,7 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   { tag: t.regexp, color: "#990085ff" },
 
   // ORANGE / Categories
-  { tag: t.className, color: "#7f5700ff" },
+  { tag: t.tagName, color: "#7f5700ff" },
 
   // RED ITALIC / Weights
   { tag: t.strong, color: "#a11c08ff", fontWeight: "italic" }
@@ -150,7 +150,7 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.regexp, color: "#e687e4" },
 
   // ORANGE / Categories
-  { tag: t.className, color: "#ffcd90" },
+  { tag: t.tagName, color: "#ffcd90" },
 
   // Weights
   { tag: t.strong, color: "#ff7a7a", fontStyle: "italic" }

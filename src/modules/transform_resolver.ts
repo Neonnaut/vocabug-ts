@@ -85,13 +85,11 @@ class Transform_Resolver {
             let new_conditions:{ before:Token[], after:Token[] }[] = []
             let new_exceptions:{ before:Token[], after:Token[] }[] = [];
 
-            let conditions_pending: string[];
-            let exceptions_pending: string[];
-
             for (let j = 0; j < this.transform_pending[i].conditions.length; j++) {
 
                 // CONDITIONS
                 let my_condition = this.transform_pending[i].conditions[j];
+                my_condition = this.categories_into_transform(my_condition);
                 // Validate brackets
                 if (!this.valid_transform_brackets(my_condition)) {
                     this.logger.validation_error(`Invalid brackets in condition "${my_condition}"`, this.line_num);
@@ -113,6 +111,7 @@ class Transform_Resolver {
 
                 // EXCEPTIONS
                 let my_exception = this.transform_pending[i].exceptions[j];
+                my_exception = this.categories_into_transform(my_exception);
                 // Validate brackets
                 if (!this.valid_transform_brackets(my_exception)) {
                     this.logger.validation_error(`Invalid brackets in exception "${my_exception}"`, this.line_num);
@@ -202,8 +201,8 @@ class Transform_Resolver {
             const before = str.slice(0, openIndex).trim();
             const after = str.slice(i + 1).trim();
             const hasOutsideContent = /[^\s,]/.test(before) || /[^\s,]/.test(after);
-            if (!hasOutsideContent) {
-                this.logger.validation_error("Alternator / optionalator must be part of a larger token", this.line_num);
+            if (!hasOutsideContent && char===")") {
+                this.logger.validation_error("Optionalator must be part of a larger token", this.line_num);
             }
         }
     }

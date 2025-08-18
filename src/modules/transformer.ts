@@ -494,7 +494,7 @@ match_pattern_at(
 
         let tokens = this.graphemosis(word.get_last_form());
 
-        if (this.debug) { word.record_transformation("graphemosis", `${tokens.join("")}`); }
+        if (this.debug) { word.record_transformation("graphemosis", `${tokens.join(" ")}`); }
 
         for (const t of this.transforms) {
             if (word.rejected) {

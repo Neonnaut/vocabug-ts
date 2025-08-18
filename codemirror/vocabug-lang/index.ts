@@ -26,7 +26,7 @@ const vocabugDistroRules = [
   { token: "operator",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
 ];
 const vocabugEngineRules = [
-  { token: "operator",     regex: /\s+(compose|decompose|capitalise|decapitalise|to-upper-case|to-lower-case|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/ }
+  { token: "operator",     regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-upper-case|to-lower-case|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/ }
 ];
 const vocabugListRules = [
   { token: "link",     regex: /,/ }
@@ -166,7 +166,7 @@ const vocabugParser: StreamParser<State> = {
                 if (match) {
                     state.classMacList.push(match[1]);
                     state.mode = 'segmentLine';
-                    return "className";
+                    return "tagName";
                 }
 
                 // Class
@@ -176,7 +176,7 @@ const vocabugParser: StreamParser<State> = {
                     state.classList.push(match[1]);
                     state.classMacList.push(match[1]);
                     state.mode = 'categoryLine';
-                    return "className";
+                    return "tagName";
                 }
             }
         }
@@ -195,7 +195,7 @@ const vocabugParser: StreamParser<State> = {
             }
             for (let classo of state.classMacList) {
                 if (stream.match(classo)) {
-                    return "className";
+                    return "tagName";
                 }
             }
         }
@@ -219,7 +219,7 @@ const vocabugParser: StreamParser<State> = {
 
             for (let classo of state.classList) {
                 if (stream.match(classo)) {
-                    return "className";
+                    return "tagName";
                 }
             }
 
@@ -253,7 +253,7 @@ const vocabugParser: StreamParser<State> = {
             }
             for (let classo of state.classMacList) {
                 if (stream.match(classo)) {
-                    return "className";
+                    return "tagName";
                 }
             }
         }
@@ -261,7 +261,7 @@ const vocabugParser: StreamParser<State> = {
         if (state.mode == 'categoryLine') {
             for (let classo of state.classList) {
                 if (stream.match(classo)) {
-                    return "className";
+                    return "tagName";
                 }
             }
 
@@ -275,7 +275,7 @@ const vocabugParser: StreamParser<State> = {
         if (state.mode == 'segmentLine') {
             for (let classo of state.classMacList) {
                 if (stream.match(classo)) {
-                    return "className";
+                    return "tagName";
                 }
             }
             for (let rule of vocabugWordRules) {

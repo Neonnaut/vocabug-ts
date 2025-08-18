@@ -60,6 +60,19 @@ html {
   --off-white: #f3f3f3;
   --pale-brown: #eee9e9;
   --pale-blue: #ffedf8;
+
+  --prog-variable: #eeeeff;
+  --prog-comment: #bee79d;
+  --prog-escape: #f0f0f0;
+  --prog-escape-background: #584747;
+  --prog-directive: #ff7a7a;
+  --prog-link: #a6d3f7;
+  --prog-operator: #44ebd0;
+  --prog-regexp: #e687e4;
+  --prog-catkey: #ffcd90;
+  --prog-weight: #ff7a7a;
+  --prog: #ffffff;
+  --prog-background: #080808;
 }
 
 .light-mode {
@@ -120,6 +133,19 @@ html {
   --off-white: #ffffff;
   --pale-brown: #fbf6f9;
   --pale-blue: #c9f3ffbb;
+
+  --prog-variable: #000000;
+  --prog-comment: #277022;
+  --prog-escape: #000000;
+  --prog-escape-background: #e8d9cc;
+  --prog-directive: #a11c08ff;
+  --prog-link: #0066b9ff;
+  --prog-operator: #024bba;
+  --prog-regexp: #990085ff;
+  --prog-catkey: #7f5700ff;
+  --prog-weight: #a11c08ff;
+  --prog: #000;
+  --prog-background: #eeeded;
 }
 
 .warm-mode {
@@ -180,6 +206,19 @@ html {
   --off-white: #ffffff;
   --pale-brown: #edebeb;
   --pale-blue: #c9f3ffbb;
+
+  --prog-variable: #eeeeff;
+  --prog-comment: #bee79d;
+  --prog-escape: #f0f0f0;
+  --prog-escape-background: #584747;
+  --prog-directive: #ff7a7a;
+  --prog-link: #a6d3f7;
+  --prog-operator: #44ebd0;
+  --prog-regexp: #e687e4;
+  --prog-catkey: #ffcd90;
+  --prog-weight: #ff7a7a;
+  --prog: #ffffff;
+  --prog-background: #333333;
 }
 
 body {
@@ -422,6 +461,51 @@ pre.example, pre.voc-static {
   margin: 0;
   padding: 8px 8px;
 }
+
+.prog-pre {
+  font-family: monospace;
+  white-space: pre;
+  background: var(--prog-background);
+  color: var(--prog);
+  border-radius: 3px;
+  font-size: 1.18em;
+  overflow-y: clip;
+  overflow-x: auto;
+  margin: 0;
+  padding: 8px 8px;
+}
+
+.prog-pre .variable {
+  color:var(--prog-directive);
+}
+.prog-pre .comment {
+  color:var(--prog-comment);
+}
+.prog-pre .escape {
+  color:var(--prog-escape);
+  background: var(--prog-escape-background);
+}
+.prog-pre .directive {
+  color:var(--prog-directive);
+}
+.prog-pre .link {
+  color:var(--prog-link);
+}
+.prog-pre .operator {
+  color:var(--prog-operator);
+  font-weight: bold;
+}
+.prog-pre .regexp {
+  color:var(--prog-regexp);
+}
+.prog-pre .catkey {
+  color:var(--prog-catkey);
+}
+.prog-pre .weight {
+  color:var(--prog-weight);
+  font-style: italic;
+}
+
 abbr:hover {
   cursor: help;
 }
