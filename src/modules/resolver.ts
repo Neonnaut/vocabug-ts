@@ -4,7 +4,7 @@ import Supra_Builder from './supra_builder';
 
 import { get_cat_seg, make_percentage, get_distribution
  } from './utilities'
-import { Token, Generation_Mode } from './types';
+import type { Token, Generation_Mode } from './types';
 
 class Resolver {
     private logger: Logger;

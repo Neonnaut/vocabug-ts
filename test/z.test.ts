@@ -13,11 +13,9 @@ describe('vocabug', () => {
     const n = new Nesca_Grammar_Stream(logger, ['a', 'b', 'ch'], escape_mapper);
 
     const tokens = n.main_parser("#asdfg#", "BEFORE", 1);
-    console.log(tokens);
+    expect(tokens.length).toBeGreaterThan(0);
 
     const tokens2 = n.main_parser("asd+{4}*fg::~{a,b,c}\\", "TARGET", 1);
-    console.log(tokens2);
-
-    expect(1).toBeGreaterThan(0);
+    expect(tokens2.length).toBeGreaterThan(0);;
   });
 });

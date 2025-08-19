@@ -131,10 +131,12 @@ function flat_distribution(no_of_items: number): number[] {
     return weights;
 }
 
+/*
 function normalise(weights: number[]): number[] {
     const total = weights.reduce((sum, w) => sum + w, 0);
     return weights.map(w => w / total);
 }
+*/
 
 
 function get_distribution(n: number, default_distribution:string): number[] {

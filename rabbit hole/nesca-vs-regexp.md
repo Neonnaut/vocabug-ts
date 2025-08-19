@@ -47,3 +47,21 @@ TOKEN,TOKEN,TOKEN    TOKEN
 | +, { }  | YES    | NO     | YES    | YES   | IF MODE IS RESULT
 | *       | YES    | NO     | YES    | YES   | IF MODE IS RESULT
 | …{ or   | YES    | NO     | YES    | YES   | IF MODE IS RESULT
+
+
+|                        | TARGET | RESULT | BEFORE | AFTER |
+|------------------------|--------|--------|--------|-------|
+| Transform char escape  | G      | G      | G      | G     |
+| Using category         |        |        |        |       |
+| Alternator             |        |        |        |       |
+| Optionalator           |        |        |        |       |
+| Reject                 | X      |        | X      | X     |
+| Insertion              |        | X      | X      | X     |
+| Deletion               | X      | G      | X      | X     |
+| Word boundaries        | X      | X      |        |       |
+| Quantifier             |        |        |        |       |
+| Bound quantifier       |        |        |        |       |
+| Geminate-mark          |        |        |        |       |
+| Wildcard               |        |        |        |       |
+| Anythings-mark         |        |        |        |       |
+| Blocked Anythings-mark |        |        |        |       |

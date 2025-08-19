@@ -6,8 +6,8 @@
 
 import Logger from './logger.js';
 import Escape_Mapper from './escape_mapper.js';
-import { Token } from './types';
-import { Token_Stream_Mode } from './types';
+import type { Token } from './types';
+import type { Token_Stream_Mode } from './types';
 
 class Nesca_Grammar_Stream {
    public logger: Logger;

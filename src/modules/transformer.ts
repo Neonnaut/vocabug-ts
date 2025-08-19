@@ -1,8 +1,15 @@
 import Word from './word';
 import Logger from './logger';
-import { Token } from './types';
+import type { Token } from './types';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
+
+type MatchResult = {
+    start: number; // actual match start
+    end: number;   // exclusive end index
+    matched: string[]; // matched tokens
+};
+
 
 class Transformer {
     public logger: Logger;
@@ -90,134 +97,159 @@ class Transformer {
         return this.graphemosis(modified_word);
     }
 
-    environment_helper(pattern: Token[], stream: string[]): boolean {
-        const result = this.match_pattern_at(stream, pattern, 0);
-        return result === stream.length;
-    }
-
-    target_to_word_match(
-        word_tokens: string[],
-        raw_target: Token[]
-    ): [number, number, string[]] {
-        for (let j = 0; j <= word_tokens.length; j++) {
-            const end = this.match_pattern_at(word_tokens, raw_target, j);
-            if (end !== null) {
-                return [
-                    j,
-                    end - j,
-                    word_tokens.slice(j, end)
-                ];
-            }
+private total_bounds(pattern: Token[]): [number, number] {
+    let min = 0;
+    let max = 0;
+    for (const token of pattern) {
+        if (token.type === 'grapheme' || token.type === 'wildcard' || token.type === 'anythings-mark') {
+            min += token.min;
+            max += token.max === Infinity ? Infinity : token.max;
         }
-        return [0, 0, []];
     }
+    return [min, max];
+}
+
+
+target_to_word_match(
+    word_tokens: string[],
+    raw_target: Token[]
+): [number, number, string[]] {
+    for (let j = 0; j <= word_tokens.length; j++) {
+        const result = this.match_pattern_at(word_tokens, raw_target, j, word_tokens.length);
+        if (result !== null) {
+            return [result.start, result.end - result.start, result.matched];
+        }
+    }
+    return [0, 0, []];
+}
 
 match_pattern_at(
     stream: string[],
     pattern: Token[],
     start: number,
     max_end?: number
-): number | null {
-        let i = start;
-        let j = 0;
+): MatchResult | null {
+    let i = start;
+    let j = 0;
+    const matched: string[] = [];
 
-        while (j < pattern.length) {
-            const token = pattern[j];
-
-            if (token.type === 'grapheme') {
-                let count = 0;
-                while (
-                    count < token.max &&
-                    stream[i + count] === token.base
-                ) {
-                    count++;
-                }
-
-                if (count < token.min) return null;
-                i += count;
-            }
-
-            else if (token.type === 'wildcard') {
-                const available = Math.min(token.max, stream.length - i);
-                if (available < token.min) return null;
-
-                i += available;
-            }
-
-            else if (token.type === 'anythings-mark') {
-                const blocked = token.blocked_by ?? [];
-                const nextToken = pattern[j + 1];
-                const min = token.min;
-                const max = token.max;
-
-                let count = 0;
-                const max_available = max_end !== undefined
-                    ? Math.min(max, max_end - i)
-                    : max;
-
-                while (
-                    count < max_available &&
-                    stream[i + count] !== undefined &&
-                    !blocked.includes(stream[i + count]) &&
-                    !(
-                        nextToken?.type === 'grapheme' &&
-                        stream[i + count] === nextToken.base
-                    )
-                ) {
-                    count++;
-                }
-
-                if (count < min) return null;
-                i += count;
-            }
-
-
+    while (j < pattern.length) {
+        const token = pattern[j];
+        if (
+            token.type !== 'grapheme' &&
+            token.type !== 'wildcard' &&
+            token.type !== 'anythings-mark'
+        ) {
             j++;
+            continue;
         }
-        return i;
-    }
 
-    environment_match(
-        word_stream: string[],
-        startIdx: number,
-        raw_target: Token[],
-        before: Token[],
-        after: Token[]
-    ): boolean {
-        const target_len = raw_target.length;
+        const min = token.min;
+        const max = token.max;
+        const max_available = max_end !== undefined
+            ? Math.min(max, max_end - i)
+            : max;
 
-        // BEFORE logic
-        const has_boundary_before = before.length > 0 && before[0].type === 'word-boundary';
-        const before_tokens = has_boundary_before ? before.slice(1) : before;
-
-        // Try matching backwards from startIdx
-        const max_before_start = 0;
-
-        let before_matched = false;
-
-        for (let i = 0; i <= startIdx; i++) {
-            const end = this.match_pattern_at(word_stream, before_tokens, i, startIdx);
-            if (end === startIdx) {
-                if (has_boundary_before && i !== 0) continue;
-                before_matched = true;
-                break;
+        if (token.type === 'grapheme') {
+            let count = 0;
+            while (
+                count < max_available &&
+                stream[i + count] === token.base
+            ) {
+                count++;
             }
+
+            if (count < min) {;
+                return null;
+            }
+
+            matched.push(...stream.slice(i, i + count));
+            i += count;
         }
 
-        if (!before_matched) return false;
+        else if (token.type === 'wildcard') {
+            const available = Math.min(max_available, stream.length - i);
 
-        // AFTER logic
-        const has_boundary_after = after.length > 0 && after[after.length - 1].type === 'word-boundary';
-        const after_tokens = has_boundary_after ? after.slice(0, -1) : after;
-        const after_start = startIdx + target_len;
+            if (available < min) {
+                return null;
+            }
 
-        const after_end = this.match_pattern_at(word_stream, after_tokens, after_start);
-        if (after_end === null) return false;
+            matched.push(...stream.slice(i, i + available));
+            i += available;
+        }
 
-        if (has_boundary_after && after_end !== word_stream.length) return false;
+        else if (token.type === 'anythings-mark') {
+            const blocked = token.blocked_by ?? [];
+            const nextToken = pattern[j + 1];
 
-        return true;
+            let count = 0;
+            while (
+                count < max_available &&
+                stream[i + count] !== undefined &&
+                !blocked.includes(stream[i + count]) &&
+                !(nextToken?.type === 'grapheme' && stream[i + count] === nextToken.base)
+            ) {
+                count++;
+            }
+
+            if (count < min) {
+                return null;
+            }
+
+            matched.push(...stream.slice(i, i + count));
+            i += count;
+        }
+
+        j++;
     }
+
+    return {
+        start,
+        end: i,
+        matched
+    };
+}
+
+
+environment_match(
+    word_stream: string[],
+    startIdx: number,
+    raw_target: string[],
+    before: Token[],
+    after: Token[]
+): boolean {
+    const target_len = raw_target.length;
+
+    // BEFORE logic
+    const has_boundary_before = before.length > 0 && before[0].type === 'word-boundary';
+    const before_tokens = has_boundary_before ? before.slice(1) : before;
+
+    let before_matched = false;
+
+    for (let i = 0; i <= startIdx; i++) {
+        const result = this.match_pattern_at(word_stream, before_tokens, i, startIdx);
+        if (result !== null && result.end === startIdx) {
+            if (has_boundary_before && result.start !== 0) continue;
+            before_matched = true;
+            break;
+        }
+    }
+
+    if (!before_matched) return false;
+
+    // AFTER logic
+    const has_boundary_after = after.length > 0 && after[after.length - 1].type === 'word-boundary';
+    const after_tokens = has_boundary_after ? after.slice(0, -1) : after;
+    const after_start = startIdx + target_len;
+
+    const result = this.match_pattern_at(word_stream, after_tokens, after_start, word_stream.length);
+
+    if (result === null) return false;
+
+    if (has_boundary_after && result.end !== word_stream.length) return false;
+
+    return true;
+}
 
     replacementa(
         word_stream: string[],
@@ -432,10 +464,10 @@ match_pattern_at(
 
                     // Condition match and exception not match
                     const passes = conditions.length === 0 || conditions.some(c =>
-                        this.environment_match(word_stream, global_index, raw_target, c.before, c.after)
+                        this.environment_match(word_stream, global_index, matched_stream, c.before, c.after)
                     );
                     const blocked = exceptions.some(e =>
-                        this.environment_match(word_stream, global_index, raw_target, e.before, e.after)
+                        this.environment_match(word_stream, global_index, matched_stream, e.before, e.after)
                     );
                     if (!passes || blocked) {
                         cursor = global_index + 1; continue; // skip this match

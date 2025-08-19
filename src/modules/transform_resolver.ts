@@ -1,7 +1,7 @@
 // Yikes, there is so much of this that I needed to put it in a separate file to resolver.
 import Logger from './logger';
 import Nesca_Grammar_Stream from './nesca_grammar_stream';
-import { Token } from './types';
+import type { Token } from './types';
 
 class Transform_Resolver {
     private logger: Logger;

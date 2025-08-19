@@ -1,11 +1,11 @@
-import Logger from './logger';
+//import Logger from './logger';
 import Word from './word';
 import Escape_Mapper from './escape_mapper';
 import Supra_Builder from './supra_builder';
 import { weighted_random_pick, supra_weighted_random_pick, get_distribution } from './utilities'
 
 class Word_Builder {
-    private logger: Logger;
+    //private logger: Logger;
     private escape_mapper: Escape_Mapper;
     private supra_builder: Supra_Builder;
     private categories: Map< string, {graphemes:string[], weights:number[]} >;
@@ -14,7 +14,7 @@ class Word_Builder {
     private optionals_weight: number;
 
     constructor(
-        logger: Logger,
+        //logger: Logger,
         escape_mapper: Escape_Mapper,
         supra_builder: Supra_Builder,
         categories: Map< string, {graphemes:string[], weights:number[]} >,
@@ -23,7 +23,7 @@ class Word_Builder {
         optionals_weight: number,
         debug: boolean,
     ) {
-        this.logger = logger;
+        //this.logger = logger;
 
         this.escape_mapper = escape_mapper;
         this.supra_builder = supra_builder

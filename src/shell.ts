@@ -1,7 +1,7 @@
 // @ts-ignore
 import MyWorker from './worker?worker';
 
-import { examples } from './examples.ts';
+import { examples } from './examples';
 
 const cm6 = (window as any).cm6; // This was global. Stops TS from complaining
 

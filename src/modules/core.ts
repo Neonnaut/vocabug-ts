@@ -7,7 +7,7 @@ import Escape_Mapper from './escape_mapper';
 import Supra_Builder from './supra_builder';
 import Transform_Resolver from './transform_resolver';
 import Nesca_Grammar_Stream from './nesca_grammar_stream';
-import { Generation_Mode } from './types'
+import type { Generation_Mode } from './types'
 
 type generate_options = {
   file: string;
@@ -69,7 +69,7 @@ function generate({
 
         if(r.debug) { r.create_record(); }
 
-        const word_builder = new Word_Builder( logger,
+        const word_builder = new Word_Builder(
             escape_mapper, r.supra_builder, r.categories, r.wordshapes,
             r.category_distribution, r.optionals_weight, r.debug
         );
@@ -79,7 +79,7 @@ function generate({
         );
 
         const text_builder = new Text_Builder(
-            logger, build_start, r.num_of_words, r.paragrapha, r.debug,
+            logger, build_start, r.num_of_words, r.paragrapha,
             r.remove_duplicates, r.force_word_limit, r.sort_words,
             r.capitalise_words, r.word_divider, r.alphabet, r.invisible
         );

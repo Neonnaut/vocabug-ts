@@ -9,7 +9,6 @@ class Text_Builder {
 
     private num_of_words: number;
     private paragrapha: boolean;
-    private debug: boolean;
     private remove_duplicates: boolean;
     private force_word_limit: boolean;
     private sort_words: boolean;
@@ -31,7 +30,6 @@ class Text_Builder {
 
         num_of_words: number,
         paragrapha: boolean,
-        debug: boolean,
         remove_duplicates: boolean,
         force_word_limit: boolean,
         sort_words: boolean,
@@ -45,7 +43,6 @@ class Text_Builder {
 
         this.num_of_words = num_of_words;
         this.paragrapha = paragrapha;
-        this.debug = debug;
         this.remove_duplicates = remove_duplicates;
         this.force_word_limit = force_word_limit;
         this.sort_words = sort_words;
