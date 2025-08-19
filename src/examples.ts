@@ -87,7 +87,7 @@ $Z = CV[{T*3}*10,{T*9}X] ; last syllable
 Σ = a,e,i,o,u,á,é,í,ó,ú
 
 BEGIN words:
-  aia iu $Y$Z $X$Y$Z $S$X$Y$Z
+  $Y$Z $X$Y$Z $S$X$Y$Z
 END
 
 BEGIN transform:
