@@ -74,7 +74,7 @@ END`,
 
 optionals-weight: 15 %
 
-C = ^ [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
+C = [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
 V = a i o u e
 F = n r l s m
 X = n r l s
