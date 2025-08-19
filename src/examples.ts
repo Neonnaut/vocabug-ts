@@ -106,10 +106,8 @@ i   ja je +  jo ju
 o   +  e  oj +  ju
 u   wa we wi wo +
 
-; qw[a,o,u] -> k[k]
-
-qwa qwo qwu qa qo qu -> kwa kwo kwu ka ko ku
-qwá qwó qwú qá qó qú -> kwá kwó kwú ká kó kú
+qw -> kw / _[a,o,á,ó]
+q -> k / _[a,o,á,ó]
 
 nj gj gn gl qw -> ň ň ň ʎ q
 jg jn jj jl ww -> ň ň j ʎ w
