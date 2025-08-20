@@ -382,11 +382,11 @@
       <p>By default, words are selected using the Zipf distribution. The first word-shape will be chosen the most often, then the second word-shape the second most often and so on. <a href="#vocDistributions">You can change this distribution</a>. Below is a very simple example that will generate words with one to three CV syllables:</p>
       <div class="prog-pre"><span class="catkey">C</span> <code class="link">=</code> t<code class="link">,</code> n<code class="link">,</code> k<code class="link">,</code> m<code class="link">,</code> l<code class="link">,</code> s<code class="link">,</code> r<code class="link">,</code> d<code class="link">,</code> h<code class="link">,</code> w<code class="link">,</code> b<code class="link">,</code> j<code class="link">,</code> p<code class="link">,</code> g
 <span class="catkey">V</span> <code class="link">=</code> a<code class="link">,</code> i<code class="link">,</code> o<code class="link">,</code> e<code class="link">,</code> u
-<span class="directive">words</span><span class="link">:</span> <span class="catkey">CV</span><code class="link">,</code> <span class="catkey">CVCV</span><code class="link">,</code> <span class="catkey">CVCVCV</span></div>
+<span class="directive">words</span><span class="link">:</span> <span class="catkey">CV</span><code class="link">,</code> <span class="catkey">CVCV</span><code class="link">,</code> <span class="catkey">CVCVCV</span><span class="link">,</span> <span class="catkey">V</span></div>
 
-        <p>Word-shapes may alternatively be declared in the <code class="example">BEGIN words:</code> block. Allowing word-shapes to be declared over multiple lines, and allowing the use of comments:</p>
-      <div class="prog-pre"><span class="directive">BEGIN words</span><span class="link">:</span> wordshape1<code class="link">,</code><br>  wordshape2<code class="link">,</code> wordshape3<code class="link">,</code>
-<span class="comment">; This is a comment</span><br>  wordshape4<br><span class="directive">END</span></div>
+        <p>Word-shapes may alternatively be declared in the <code class="example">BEGIN words:</code> block. Allowing word-shapes to be declared over multiple lines, and allowing the use of comments between word-shapes:</p>
+      <div class="prog-pre"><span class="directive">BEGIN words</span><span class="link">: </span><span class="catkey">CV</span><code class="link">,</code><br>  <span class="catkey">CVCV</span><code class="link">,</code> <span class="catkey">CVCVCV</span><code class="link">,</code>
+<span class="comment">; This is a comment</span><br>  <span class="catkey">V</span><br><span class="directive">END</span></div>
         <p>You must use the <code class="example">END</code> keyword on a new line to end the block.</p>
 
       <h3 id="vocSegments"><a class="head-num">6.2</a>Segments</h3>
@@ -396,7 +396,8 @@
         <li>Segments are not sets like categories are. <code class="example">$M = a, b, c</code> will not work as you might expect (because as already stated, segments are abbreviation for word-shapes). You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">$M = [a, b, c]</code></li>
       </ul>
       <p>For example you could write the last example like so:</p>
-      <div class="prog-pre"><span class="catkey">$S</span> <span class="link">=</span> <span class="catkey">CV</span>
+      <div class="prog-pre"><span class="catkey">C</span> <code class="link">=</code> t<code class="link">,</code> n<code class="link">,</code> k<code class="link">,</code> m<code class="link">,</code> l<code class="link">,</code> s<code class="link">,</code> r<code class="link">,</code> d<code class="link">,</code> h<code class="link">,</code> w<code class="link">,</code> b<code class="link">,</code> j<code class="link">,</code> p<code class="link">,</code> g
+<span class="catkey">V</span> <code class="link">=</code> a<code class="link">,</code> i<code class="link">,</code> o<code class="link">,</code> e<code class="link">,</code> u<br><span class="catkey">$S</span> <span class="link">=</span> <span class="catkey">CV</span>
 <span class="directive">words</span><span class="link">:</span> <span class="catkey">$S $S$S $S$S$S</span></div>
       <p>You can put segments inside segments.</p>
 
@@ -508,7 +509,7 @@
       <p>A shorthand version to <code class="example">^REJECT</code> is <code class="example">^R</code></p>
 
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
-      <p>Insertion requires a condition to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
+      <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
       <div class="prog-pre"><span class="comment">; insert /a/ in between /b/ and /t/</span>
   <span class="operator">^</span> <span class="link">-></span> a <span class="link">/</span> b<span class="link">_</span>t
 <span class="comment">; bt ==> bat</span></div>
@@ -551,7 +552,7 @@
       <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="catkey">B</span> <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xapay ==> apa</code></div>
 
       <p>If the category is part of a target, it MUST be inside an alternator set:</p>
-      <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="regexp">[</span><span class="catkey">B</span><span class="regexp">]</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvapay ==> apa</code></div>
+      <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="regexp">[</span><span class="catkey">B</span><span class="regexp">]</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvapay ==> apay</code></div>
 
       <h2 id="nescaAltAndOpt"><a class="head-num">17</a>Alternator and Optionalator</h2>
       <p>These are designed to be fussy, they cannot be nested, they cannot stand on their own.</p>
@@ -568,6 +569,7 @@
       <div class="prog-pre"><span class="comment">; Merge /x/ and /xw/ into /k/</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
       <p>Optional-set can also attach to an alternator-set:</p>
       <div class="prog-pre"><span class="comment">; Merge /x/, /xw/, /ħ/ and /ħw/ into /k/</span><br>  <span class="regexp">[</span>x<span class="link">,</span> ħ<span class="regexp">]</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
+      <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
 
       <h2 id="nescaClusterfield"><a class="head-num">18</a>Cluster-field</h2>
       <p>Cluster-field is a way to target sequences of graphemes and change them. They are laid out as tables, and start with <code class="example">%</code> followed by a space. The first part of a sequence is in the first column, and the second part is in the first row. For example:</p>
@@ -595,17 +597,18 @@ n mp <span class="operator">+</span>  <span class="operator">+</span>  nn <span 
       <p>The bounded quantifier matches as many times its digit(s), enclosed in <code class="example">+{</code> and <code class="example">}</code>, to the things to the left.</p>
       <div class="prog-pre"><span class="comment">; Change /o/ into /x/ only when preceded by three /r/s</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">+{</span>3<span class="regexp">}</span><span class="link">_</span>
 <code class="comment">; ororrro ==> ororrrx</code></div>
+
       <p>The digits in the quantifier can also be a range:</p>
-      <div class="prog-pre"><span class="comment">; Change a sequence of 2 to 4 /o/s into /x/</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">+{</span>2<span class="link">,</span> 4<span class="regexp">}</span><span class="link">_</span>
-<code class="comment">; toootooooo ==> txtxo</code></div>
+      <div class="prog-pre"><span class="comment">; Change a sequence of 2 to 4 /o/s into /x/</span><br>  o<span class="regexp">+{</span>2<span class="link">,</span>4<span class="regexp">}</span> <span class="link">-></span> x
+<code class="comment">; tootooooo ==> txtxo</code></div>
 
 
       <p>At the beginning of the list, <code class="example">,</code> represents all the possible numbers lower than the number to the right, not including zero.</p>
-      <div class="prog-pre"><span class="comment">; Change a sequence of 1 to 10 /o/s into /x/</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">+{</span><span class="link">,</span>10<span class="regexp">}</span><span class="link">_</span>
-<code class="comment"><span class="comment">; toootoooo ==> txtx</span></code></div>
+      <div class="prog-pre"><span class="comment">; Change a sequence of 1 to 4 /o/s into /x/</span><br>  o<span class="regexp">+{</span><span class="link">,</span>4<span class="regexp">}</span> <span class="link">-></span> x
+<code class="comment">; tootooooo ==> txtx</code></div>
 
       <p>And finally at the end of the list, <code class="example">,</code> represents all possible numbers larger than the number to the the left</p>
-        <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible /o/s into /x/</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">+{</span>4<span class="link">,</span><span class="regexp">}</span><span class="link">_</span>
+        <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible /o/s into /x/</span><br>  o<span class="regexp">+{</span>4<span class="regexp"><span class="link">,</span>}</span> <span class="link">-></span> x
 <code class="comment">; toootooooo ==> toootx</code></div>
 
       <h3 id="nescaGeminateMark"><a class="head-num">19.3</a>Geminate-mark</h3>
@@ -617,13 +620,13 @@ n mp <span class="operator">+</span>  <span class="operator">+</span>  nn <span 
       <div class="prog-pre">  a <span class="link">-></span> a<span class="regexp">:</span><br><code class="comment">; tat => taat</code></div>
 
       <h3 id="nescaKleeneStar"><a class="head-num">19.4</a>Kleene-star</h3>
-      <p>Occasionally, you may want to match a grapheme whether it exists, there is one of it, or there is multiple of it consecutively, known as a "Kleene-star". There is <b>no</b> dedicated character for a Kleene star. Instead, you wrap the content followed by a quantifier, in an optionalator.</p>
-      <div class="prog-pre">  o<span class="regexp">(</span>a<span class="regexp">+)</span> <span class="link">-></span> o<br><code class="comment">; roaroaaaaa ==> raro</code></div>
+      <p>Occasionally, you may want to match a grapheme whether it exists, there is one of it, or there is multiple of it consecutively, known as a "Kleene-star". There is <b>no</b> dedicated character for a Kleene star. Instead, you wrap the content followed by a quantifier, in an optionalator:</p>
+      <div class="prog-pre">  u<span class="regexp">(</span>a<span class="regexp">+)</span> <span class="link">-></span> o<br><code class="comment">; ruaruaaaaa ==> roro</code></div>
 
       <h3 id="nescaWildcard"><a class="head-num">19.5</a>Wildcard</h3>
-      <p>Wildcard using asterisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
-      <div class="prog-pre">  a <span class="link">-></span> e <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; apappap ==> apeppep</code></div>
-      <p>Wildcard can be placed by itself inside an <a href="#vocOptional">optional-set</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
+      <p>Wildcard, using asterisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
+      <div class="prog-pre"><code class="comment">; Any grapheme becomes /x/ when any grapheme follows it</code><br>  <span class="regexp">*</span> <span class="link">-></span> x <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; aomp ==> xxxp</code></div>
+      <p>Wildcard can be placed by itself inside an <a href="#nescaOptionalatorSet">optionalator</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">19.6</a>Anythings-mark</h3>
       <p>The anythings-mark uses tilde <code class="example">~</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
@@ -659,7 +662,7 @@ n mp <span class="operator">+</span>  <span class="operator">+</span>  nn <span 
       <p><b>The Generate button is greyed out</b></p>
       <p>This means Vocabug is busy generating words for you, and will eventually become clickable again. If you think this is taking too long, perhaps you have <code class="example">force word limit</code> accidentally on.</p>
 
-      <p><b>Invalid regular expression error on generation</b></p>
+      <p><b>I received the error "Invalid regular expression"</b></p>
       <p>This error occurs because you are using Vocabug in an old browser or old browser version that does not support lookbehind. <a href="https://caniuse.com/js-regexp-lookbehind">You can check if this applies to you here</a>.</p>
 
       <p><b>How do I target syllables or syllable division in transforms?</b></p>

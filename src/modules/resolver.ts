@@ -505,7 +505,7 @@ class Resolver {
             this.logger.validation_error(`No input`, this.file_line_num)
         }
 
-        const divided = input.split(/->|>|→/);
+        const divided = input.split(/>|->|→|=>|⇒/);
         if (divided.length === 1) {
             this.logger.validation_error(`No arrows in transform`, this.file_line_num)
         }

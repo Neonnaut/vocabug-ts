@@ -402,6 +402,7 @@ thead {
   border-right: solid var(--light-grey-border);
   border-right-width: 0.5px;
   font-weight: 400;
+  font-size: inherit;
   padding: 2px 5px 2px 5px;
   text-align: left;
 }

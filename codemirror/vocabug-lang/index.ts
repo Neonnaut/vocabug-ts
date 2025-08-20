@@ -50,7 +50,7 @@ const vocabugWordRules = [
 
 const vocabugTransformRules = [
   { token: "escape",   regex: /\\./ },
-  { token: "link",     regex: />|->|→|\/|!|\?|,|_/ },
+  { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
   { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|~/ }
 ];
