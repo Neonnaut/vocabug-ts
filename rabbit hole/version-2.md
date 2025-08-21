@@ -1,17 +1,6 @@
 # Version 2
 
-## 1. \[PRIORITY\] Backreference
-
-A backreference is a reference to the captured target. It can only be used in conditions or exceptions. This uses `<`.
-
-```
-  CV > ^REJECT / _<+{2,}
-; Reject a word when it has 3 or more duplicate CV syllables in a word
-```
-
-Other backreferences such as `<2`, `<3`, `<4` ... are used for metathesis.
-
-## 2. \[PRIORITY\] Named escapes
+## 1. \[PRIORITY\] Named escapes
 
 Named escapes, good, keep them in `{}`
 
@@ -29,20 +18,21 @@ Perhaps `@{Space}` would produce " ". `@{Acute}` makes the combining diacritic.
 | @{OverDot}        | U+0307 Combining Dot Above                 | ◌̇      |
 | @{Umlaut}         | U+0308 Combining Diaeresis                 | ◌̈      |
 | @{OverHook}       | U+0309 Combining Hook Above                | ◌̉      |
+| @{UnderDot}       | U+0323 Combining Dot Below                 | ◌̣      |
 | @{OverRing}       | U+030A Combining Ring Above                | ◌̊      |
 | @{DoubleAcute}    | U+030B Combining Double Acute Accent       | ◌̋      |
 | @{Caron}          | U+030C Combining Caron                     | ◌̌      |
 | @{DoubleGrave}    | U+030F Combining Double Grave Accent       | ◌̏      |
 | @{InvBreve}       | U+0311 Combining Inverted Breve            | ◌̑      |
 | @{Horn}           | U+031B Combining Horn                      | ◌̛      |
-| @{UnderDot}       | U+0323 Combining Dot Below                 | ◌̣      |
+
 | @{UnderUmlaut}    | U+0324 Combining Diaeresis Below           | ◌̤      |
 | @{UnderRing}      | U+0325 Combining Ring Below                | ◌̥      |
 | @{UnderComma}     | U+0326 Combining Comma Below               | ◌̦      |
 | @{Cedilla}        | U+0327 Combining Cedilla                   | ◌̧      |
 | @{Ogonek}         | U+0328 Combining Ogonek                    | ◌̨      |
 
-## 3. \[PRIORITY\] Metathesis
+## 2. \[PRIORITY\] Metathesis
 
 Metathesis in this program refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.
 
@@ -218,7 +208,7 @@ BEGIN features:
 END
 ```
 
-## 7. Word classes
+## 4. Word classes
 
 Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
 
@@ -226,7 +216,11 @@ Like the so called "categories" in lexifer.ts. I could put them in the Words: bl
 
 Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
 
-## 6. Positioner
+## 6. Support the ZSCA `/` thing.
+
+`//` would be an exception like `!`. `a / b` would be an alternative to `a -> b`
+
+## 7. Positioner
 
 Positioners, enclosed in `@{ and }`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
 
@@ -334,7 +328,3 @@ Currently, the interface uses StreamLanguage, instead of the significantly harde
 ## 16. "AI" generate a def file, like Gleb
 
 This would choose a word template, and syllable template, then populate the categories with suitable graphemes. Suitable small transforms would be chosen as well.
-
-## 17. Support the ZSCA `/` thing.
-
-`//` would be an exception like `!`. `a / b` would be an alternative to `a -> b`

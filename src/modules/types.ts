@@ -44,7 +44,13 @@ export type Token =
       base: string;
       min: number;
       max: number|typeof Infinity;
-    };
+    }
+  | {
+      type: "backreference";
+      base: string;
+      min: number;
+      max: number|typeof Infinity;
+  };
 
     export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 

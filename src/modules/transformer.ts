@@ -110,11 +110,31 @@ class Transformer {
         return [0, 0, []];
     }
 
+    result_former(
+        raw_result: Token[],
+        target_stream: string[]
+    ) : string[] {
+        let replacement_stream:string[] = []
+        for (let j = 0; j < raw_result.length; j++) {
+            const my_result_token:Token = raw_result[j];
+
+            if (my_result_token.type === "grapheme") {
+                replacement_stream.push(my_result_token.base);
+            } else if (my_result_token.type === "backreference") {
+                for (let k:number = 0; k <= target_stream.length; k++) {
+                    replacement_stream.push(target_stream[k]);
+                }
+            }
+        }
+        return replacement_stream;
+    }
+
     match_pattern_at(
         stream: string[],
         pattern: Token[],
         start: number,
-        max_end?: number
+        max_end?: number,
+        target_stream?: string[]
     ): MatchResult | null {
         let i = start;
         let j = 0;
@@ -125,7 +145,8 @@ class Transformer {
             if (
                 token.type !== 'grapheme' &&
                 token.type !== 'wildcard' &&
-                token.type !== 'anythings-mark'
+                token.type !== 'anythings-mark' &&
+                token.type !== 'backreference'
             ) {
                 j++;
                 continue;
@@ -152,9 +173,39 @@ class Transformer {
 
                 matched.push(...stream.slice(i, i + count));
                 i += count;
-            }
+            } else if (token.type === 'backreference') {
+                if (!target_stream || target_stream.length === 0) {
+                    throw new Error("Backreference requires a non-empty target_stream");
+                }
 
-            else if (token.type === 'wildcard') {
+                const unit = target_stream;
+                const unitLength = unit.length;
+                const min = token.min;
+                const max = token.max;
+
+                const max_available = max_end !== undefined
+                    ? Math.min(max, Math.floor((max_end - i) / unitLength))
+                    : max;
+
+                let repetitions = 0;
+
+                while (
+                    repetitions < max_available &&
+                    stream.slice(i + repetitions * unitLength, i + (repetitions + 1) * unitLength)
+                        .every((val, idx) => val === unit[idx])
+                ) {
+                    repetitions++;
+                }
+
+                if (repetitions < min) {
+                    return null;
+                }
+
+                const totalLength = repetitions * unitLength;
+                matched.push(...stream.slice(i, i + totalLength));
+                i += totalLength;
+                
+            } else if (token.type === 'wildcard') {
                 const available = Math.min(max_available, stream.length - i);
 
                 if (available < min) {
@@ -197,9 +248,9 @@ class Transformer {
         };
     }
 
-
     environment_match(
         word_stream: string[],
+        target_stream: string[],
         startIdx: number,
         raw_target: string[],
         before: Token[],
@@ -214,7 +265,7 @@ class Transformer {
         let before_matched = false;
 
         for (let i = 0; i <= startIdx; i++) {
-            const result = this.match_pattern_at(word_stream, before_tokens, i, startIdx);
+            const result = this.match_pattern_at(word_stream, before_tokens, i, startIdx, target_stream);
             if (result !== null && result.end === startIdx) {
                 if (has_boundary_before && result.start !== 0) continue;
                 before_matched = true;
@@ -229,7 +280,7 @@ class Transformer {
         const after_tokens = has_boundary_after ? after.slice(0, -1) : after;
         const after_start = startIdx + target_len;
 
-        const result = this.match_pattern_at(word_stream, after_tokens, after_start, word_stream.length);
+        const result = this.match_pattern_at(word_stream, after_tokens, after_start, word_stream.length, target_stream);
 
         if (result === null) return false;
 
@@ -238,6 +289,7 @@ class Transformer {
         return true;
     }
 
+    // Non destructively apply replacements
     replacementa(
         word_stream: string[],
         replacements: {
@@ -383,25 +435,15 @@ class Transformer {
 
             let mode: "deletion" | "insertion" | "reject" | "replacement" = "replacement";
 
-            let replacement_stream:string[] = [];
-
             // NOW, build-up REPLACEMENT STREAM from RESULT tokens.
             if (raw_result[0].type === "deletion") {
                 // DELETION
                 mode = "deletion";
-                replacement_stream = [];
             } else if (raw_result[0].type === "reject") {
                 // REJECT
                 mode = "reject";
             } else {
                 // NORMAL GRAPHEME STREAM
-                for (let j = 0; j < raw_result.length; j++) {
-                    const my_result_token:Token = raw_result[j];
-
-                    if (my_result_token.type === "grapheme") {
-                        replacement_stream.push(my_result_token.base);
-                    }
-                }
             }
 
             // NOW, Go through TARGET
@@ -415,20 +457,23 @@ class Transformer {
                 }
                 mode = "insertion";
                 for (let insert_index = 0; insert_index <= word_stream.length; insert_index++) {
+
+                    // CREATE REPLACEMENT STREAM
+                    const my_replacement_stream = this.result_former(raw_result, word_stream);
+
                     const passes = conditions.length === 0 || conditions.some(c =>
-                        this.environment_match(word_stream, insert_index, [], c.before, c.after)
+                        this.environment_match(word_stream, my_replacement_stream, insert_index, [], c.before, c.after)
                     );
                     const blocked = exceptions.some(e =>
-                        this.environment_match(word_stream, insert_index, [], e.before, e.after)
+                        this.environment_match(word_stream, my_replacement_stream, insert_index, [], e.before, e.after)
                     );
-
                     if (!passes || blocked) continue;
 
                     replacements.push({
                         index_span: insert_index,
                         length_span: 0,
                         target_stream: ["^"], // symbolic marker for insertion
-                        replacement_stream: replacement_stream
+                        replacement_stream: my_replacement_stream
                     });
                 }
 
@@ -451,10 +496,10 @@ class Transformer {
 
                     // Condition match and exception not match
                     const passes = conditions.length === 0 || conditions.some(c =>
-                        this.environment_match(word_stream, global_index, matched_stream, c.before, c.after)
+                        this.environment_match(word_stream, matched_stream, global_index, matched_stream, c.before, c.after)
                     );
                     const blocked = exceptions.some(e =>
-                        this.environment_match(word_stream, global_index, matched_stream, e.before, e.after)
+                        this.environment_match(word_stream, matched_stream, global_index, matched_stream, e.before, e.after)
                     );
                     if (!passes || blocked) {
                         cursor = global_index + 1; continue; // skip this match
@@ -477,11 +522,15 @@ class Transformer {
                             replacement_stream: []
                         });
                     } else {
+
+                        // CREATE REPLACEMENT STREAM
+                        const my_replacement_stream = this.result_former(raw_result, matched_stream);
+
                         replacements.push({
                             index_span:global_index,
                             length_span:match_length,
                             target_stream:matched_stream,
-                            replacement_stream:replacement_stream
+                            replacement_stream:my_replacement_stream
                         });
                     }
 

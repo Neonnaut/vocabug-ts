@@ -36,7 +36,7 @@
         <img src="img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
 
         <h1 style="margin-bottom: 10px;">Vocabug<br>docs</h1>
-        <b>Version 0.1.10</b>
+        <b>Version: 0.2.0</b>
       </div>
       <br>
 
@@ -138,6 +138,7 @@
           <li><a href="#nescaWildcard">Wildcard</a></li>
           <li><a href="#nescaAnythingsMark">Anythings-mark</a></li>
           <li><a href="#nescaBlocker">Blocked-anythings-mark</a></li>
+          <li><a href="#nescaBackreference">Backreference</a></li>
         </ol>
         </li>
 
@@ -150,7 +151,7 @@
       </ol>
 
       <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
-      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version 0.1.10</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
+      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version: 0.2.0</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
 
       <p>This word generator is designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find Vocabug's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. If you want a "modern" user interface, albeit with limited features, check out <a href="https://neonnaut.neocities.org/vocabug-lite">Vocabug-lite</a>.</p>
 
@@ -639,6 +640,19 @@ n mp <span class="operator">+</span>  <span class="operator">+</span>  nn <span 
       <p>Blocked-anythings-mark is designed to block the spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set of graphemes inside <code class="example"><span class="regexp">~{</span></code> and <code class="example">}</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       
       <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">~{</span>k<span class="link">,</span> g<span class="regexp">}</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
+
+      <h3 id="nescaBackreference"><a class="head-num">19.8</a>Backreference</h3>
+      <p>A backreference is a reference to the captured target. It cannot be used in <code class="example">TARGET</code>. This uses the less-than symbol <code class="example">&lt;</code>.</p>
+      <p>Here are some prime examples where backreference is employed:</p>
+      <p><b>Full reduplication</b>:</p>
+      <div class="prog-pre">  <span class="regexp">~</span> <span class="link">-></span> <span class="regexp">&lt;&lt;</span>
+<span class="comment">; malak ==&gt; malakmalak</span></div>
+      
+      <p>"<b>Haplology</b>":</p>
+      <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span><span class="regexp">[</span><span class="catkey">V</span><span class="regexp">]</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="regexp">&lt;</span>
+<span class="comment">; haplology ==> haplogy</span></div>
+      <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
+      <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">~{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">&lt;</span></div>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">20</a>Advanced rules</h2>
 

@@ -300,8 +300,8 @@ class Transform_Resolver {
                 const prev = input[i - 1] ?? '';
                 const next = input[i + 1] ?? '';
 
-                const isBoundaryBefore = i === 0 || ' ,([)'.includes(prev);
-                const isBoundaryAfter  = i === length - 1 || ' ,([)]'.includes(next);
+                const isBoundaryBefore = i === 0 || ' ,([{)}]'.includes(prev);
+                const isBoundaryAfter  = i === length - 1 || ' ,([{)}]'.includes(next);
 
                 if (isBoundaryBefore && isBoundaryAfter) {
                     const entry = this.categories.get(char)!;
@@ -309,7 +309,7 @@ class Transform_Resolver {
 
                 } else {
                     this.logger.validation_error(
-                        `Category key "${char}" is adjacent to other content at position ${i}`,
+                        `Category key "${char}" is adjacent to other content`,
                         this.line_num
                     );
                 }

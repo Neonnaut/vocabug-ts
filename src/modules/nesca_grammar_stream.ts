@@ -109,6 +109,13 @@ class Nesca_Grammar_Stream {
             tokens.push(new_token);
             i++;
             continue;
+         } else if (char === "<") {
+            if (mode === "TARGET") {
+               this.logger.validation_error(`Backreference not allowed in '${mode}'`, line_num);
+            }
+            new_token = { type: "backreference", base: char, min: 1, max: 1 };
+            i++;
+
          } else if (char === '#' || char === '+' || char === '{' || char === '}' || char === ':' || char == '*' || char == '~' || char === '…' ||  char === '|' || char === '∅' || char === '^') {
             this.logger.validation_error(`Unexpected syntax character '${char}' in ${mode}`, line_num);
 
