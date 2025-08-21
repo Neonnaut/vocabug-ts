@@ -1,17 +1,48 @@
 # Version 2
 
-## 1. \[PRIORITY\] Backrefernce
+## 1. \[PRIORITY\] Backreference
 
-A backreference is a reference to the captured target. It can only be used in conditions or exceptions. This uses `<1`.
+A backreference is a reference to the captured target. It can only be used in conditions or exceptions. This uses `<`.
 
 ```
-  CV > ^REJECT / _<1+{2,}
+  CV > ^REJECT / _<+{2,}
 ; Reject a word when it has 3 or more duplicate CV syllables in a word
 ```
 
 Other backreferences such as `<2`, `<3`, `<4` ... are used for metathesis.
 
-## 2. \[PRIORITY\] Metathesis
+## 2. \[PRIORITY\] Named escapes
+
+Named escapes, good, keep them in `{}`
+
+Perhaps `@{Space}` would produce " ". `@{Acute}` makes the combining diacritic.
+
+| Named Escape      | Unicode Description                        | Example |
+|-------------------|--------------------------------------------|---------|
+| @{Space}          | U+0020 ASCII Space                         |        |
+| @{Grave}          | U+0300 Combining Grave Accent              | ◌̀      |
+| @{Acute}          | U+0301 Combining Acute Accent              | ◌́      |
+| @{Circumflex}     | U+0302 Combining Circumflex Accent         | ◌̂      |
+| @{Tilde}          | U+0303 Combining Tilde                     | ◌̃      |
+| @{Macron}         | U+0304 Combining Macron                    | ◌̄      |
+| @{Breve}          | U+0306 Combining Breve                     | ◌̆      |
+| @{OverDot}        | U+0307 Combining Dot Above                 | ◌̇      |
+| @{Umlaut}         | U+0308 Combining Diaeresis                 | ◌̈      |
+| @{OverHook}       | U+0309 Combining Hook Above                | ◌̉      |
+| @{OverRing}       | U+030A Combining Ring Above                | ◌̊      |
+| @{DoubleAcute}    | U+030B Combining Double Acute Accent       | ◌̋      |
+| @{Caron}          | U+030C Combining Caron                     | ◌̌      |
+| @{DoubleGrave}    | U+030F Combining Double Grave Accent       | ◌̏      |
+| @{InvBreve}       | U+0311 Combining Inverted Breve            | ◌̑      |
+| @{Horn}           | U+031B Combining Horn                      | ◌̛      |
+| @{UnderDot}       | U+0323 Combining Dot Below                 | ◌̣      |
+| @{UnderUmlaut}    | U+0324 Combining Diaeresis Below           | ◌̤      |
+| @{UnderRing}      | U+0325 Combining Ring Below                | ◌̥      |
+| @{UnderComma}     | U+0326 Combining Comma Below               | ◌̦      |
+| @{Cedilla}        | U+0327 Combining Cedilla                   | ◌̧      |
+| @{Ogonek}         | U+0328 Combining Ogonek                    | ◌̨      |
+
+## 3. \[PRIORITY\] Metathesis
 
 Metathesis in this program refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.
 
@@ -90,17 +121,21 @@ In this rule, in `RESULT`, `{+voice}` has a symmetrical one-to-one change of gra
 A feature defined without a prepended plus or minus sign is a 'para-feature'. A para-feature is a pro-feature without a listed anti-feature counterpart. Instead, the graphemes marked as the anti-feature are the graphemes in the graphs: directive that are not not marked by the para-feature.
 
 Notice: If there is no graphs: directive in the definition-build, there will be zero anti-feature phonemes. If you define an anti-feature as the counterpart of a para-feature, your anti-feature will be ignored.
+
+```
 graphs: a, b, h, i, k, n, o, t
 
 BEGIN features:
   ~vowel = a, i, o
 END
 In the above example, the matrix {-vowel} captures the graphemes b, h, k, n, t
+```
 
 Combining features
 
 We can 'combine' features. Or to be more accurate, a feature's graphemes can mirror the graphemes of other features by defining a feature with features in it. The combined features must be a pro-feature or anti-feature:
 
+```
 BEGIN features:
   labial = p, b, m
   alveolar = t, d, s, l, n
@@ -109,17 +144,20 @@ BEGIN features:
   glottal = h
   consonant = +labial, +alveolar, +palatal, +velar, +glottal
 END
+```
+
 Feature-field
 Feature-fields allow graphemes to be easily marked by multiple features at the same time.
 
 The feature-field begins with a % followed by a para-feature. Think of this para-feature as the parent feature of the other features in that feature-cluster. The graphemes marked by this para-feature are listed in the first row. The graphemes marked by the anti-feature counterpart are the graphemes in the graphs: directive that are not not marked by the para-feature.
 The graphemes being marked by the features are listed on the first row
 The features are listed in the first column
-A + means to mark the grapheme by that feature's pro-feature
-A - means to mark the grapheme by that feature's anti-feature
-A . means to leave the grapheme unmarked by that feature
+A `+` means to mark the grapheme by that feature's pro-feature
+A `-` means to mark the grapheme by that feature's anti-feature
+A `.` means to leave the grapheme unmarked by that feature
 Here is an example of comprehensive features of consonants and vowels:
 
+```
 graphs: a, e, i, o, p, b, t, d, k, g, s, h, l, j, m, n
 BEGIN features:
   %consonant m n p b t d k g s h l j
@@ -142,15 +180,17 @@ BEGIN features:
   back   + - - +
   round  - - - +
 END
+```
 Here are some matrices of these features and which graphemes they would capture:
 
-{+plosive} captures the graphemes b, d, g, p, t, k
-{+voiced, +plosive} captures the graphemes b, d, g
-{+voiced, +labial, +plosive} captures the grapheme b
-{+vowel} captures the graphemes a, e, i, o
-{-vowel} captures the graphemes p, b, t, d, k, g, f, v, s, z, h, l, r, j
+`{+plosive}` captures the graphemes b, d, g, p, t, k
+`{+voiced, +plosive}` captures the graphemes b, d, g
+`{+voiced, +labial, +plosive}` captures the grapheme b
+`{+vowel}` captures the graphemes a, e, i, o
+`{-vowel}` captures the graphemes p, b, t, d, k, g, f, v, s, z, h, l, r, j
 Notice a problem that could occur with the above example? The above example has no overlapping features between consonants and vowels, which is fine. But the example below describes a language that has overlapping features between vowels and consonants, namely, syllabic consonants that carry tone. The solution here is to list all phonemes in just one feature-field:
 
+```
 BEGIN features:
   %phoneme   m n p b t d k g s h l j n̩ ń̩ ǹ̩ a á à e é è i í ὶ o ó ὸ
   syllabic   - - - - - - - - - - - - + + + + + + + + + + + + + + +
@@ -176,12 +216,11 @@ BEGIN features:
   velar      - - - - - - + + - - - - - - . . . . . . . . . . . . .
   glottal    - - - - - - - - - + - - - - . . . . . . . . . . . . .
 END
+```
 
-## 4. \[PRIORITY\] Named escapes
+## 7. Word classes
 
-Named escapes, good, keep them in `{}`
-
-Perhaps `@{Space}` would produce " ". `@{Acute}` makes the combining diacritic.
+Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
 
 ## 5. Long form category keys
 
@@ -203,10 +242,6 @@ If we want to match the last occurence of a grapheme in a word, use `-1`. For th
 ; sososo ==> sososx
 ```
 
-## 7. Word classes
-
-Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
-
 ## 8. If then else block
 
 If block
@@ -214,12 +249,13 @@ Using an If block, You can make transformations execute on a word if, or if not,
 
 It should feel familiar to anyone who knows a bit about programming languages
 
-BEGIN if: starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.
-then: is where you put transforms that will execute if the transformations in if: did apply
-else: is is where you put transforms that will execute if the transformations in if: did not meet a CONDITION or were blocked by an EXCEPTION
+`BEGIN if:` starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.
+`then:` is where you put transforms that will execute if the transformations in if: did apply
+`else:` is is where you put transforms that will execute if the transformations in if: did not meet a `CONDITION` or were blocked by an `EXCEPTION`
 END is the end of the block
 For example:
 
+```
 BEGIN if:
   ; Deletion of schwa before r
   ə -> ^ / _r
@@ -230,6 +266,8 @@ else:
   ; Schwa becomes e if the first rule did not apply
   ə -> e
 END
+```
+
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
 ## 9. Syllable dividers and capturing syllables
@@ -296,3 +334,7 @@ Currently, the interface uses StreamLanguage, instead of the significantly harde
 ## 16. "AI" generate a def file, like Gleb
 
 This would choose a word template, and syllable template, then populate the categories with suitable graphemes. Suitable small transforms would be chosen as well.
+
+## 17. Support the ZSCA `/` thing.
+
+`//` would be an exception like `!`. `a / b` would be an alternative to `a -> b`
