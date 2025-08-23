@@ -13,7 +13,7 @@ export type Token =
       max: number|typeof Infinity;
     }
   | {
-      type: "anythings-mark"; // ~
+      type: "anythings-mark"; // &
       base: "…";
       min: number;
       max: number|typeof Infinity;

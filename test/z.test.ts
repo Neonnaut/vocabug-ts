@@ -15,7 +15,7 @@ describe('vocabug', () => {
     const tokens = n.main_parser("#asdfg#", "BEFORE", 1);
     expect(tokens.length).toBeGreaterThan(0);
 
-    const tokens2 = n.main_parser("asd+{4}*fg::~{a,b,c}\\", "TARGET", 1);
+    const tokens2 = n.main_parser("asd+{4}*fg::&{a,b,c}\\", "TARGET", 1);
     expect(tokens2.length).toBeGreaterThan(0);;
   });
 });

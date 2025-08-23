@@ -78,6 +78,7 @@
 - [x] Wildcard
 - [x] Anythings-mark
 - [x] Blocked Anythings-mark
+- [x] Backreference
 
 - [x] Engine, decompose
 - [x] Engine, compose
@@ -87,6 +88,9 @@
 - [x] Engine, To-lower-case
 - [x] Engine, Xsampa-to-ipa
 - [x] Engine, Ipa-to-Xsampa
+
+- [] Named escape
+- [] Feature
 
 ## Collator
 

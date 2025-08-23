@@ -64,8 +64,14 @@ function generate({
         const z = new Transform_Resolver(
             logger, s, r.categories, r.transform_pending
         )
-
         r.set_transforms(z.resolve_transforms());
+
+        /*
+        const x = new Feature_Resolver(
+            logger, r.feature_pending, r.graphemes
+        )
+        r.set_features(x.resolve_features());
+        */
 
         if(r.debug) { r.create_record(); }
 

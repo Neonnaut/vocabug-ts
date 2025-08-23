@@ -24,36 +24,37 @@ const make_percentage = (input: string): number | null => {
   return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
 };
 
-function validate_cat_seg_name(str: string): [boolean, boolean] {
-
-    const regex = new RegExp(`^(${cappa}|\\$${cappa})$`, "u");
-
-    const has_dollar_sign = str.includes("$");
-
-    return [regex.test(str), has_dollar_sign];
-}
-
-function get_cat_seg(input: string): [string, string, boolean, boolean, boolean] {
+function get_cat_seg_fea(input: string): [string, string, 'category'|'segment'|'feature'|'trash'] {
     const divider = "=";
   
     if (input === "") {
-        return ['', '', false, false, false]; // Handle invalid inputs
+        return ['', '', 'trash']; // Handle invalid inputs
     }
-
     const divided = input.split(divider);
     if (divided.length !== 2) {
-        return ['', '', false, false, false]; // Ensure division results in exactly two parts
+        return [input, '', 'trash']; // Ensure division results in exactly two parts
     }
-
-    const word = divided[0].trim();
+    const key = divided[0].trim();
     const field = divided[1].trim();
-    if (word === "" || field === "") {
-        return ['', '', false, false, false]; // Handle empty parts
+    if (key === "" || field === "") {
+        return [input, '', 'trash']; // Handle empty parts
     }
 
-    const [is_valid, has_dollar_sign] = validate_cat_seg_name(word);
+    // Construct dynamic regexes using cappa
+    const categoryRegex = new RegExp(`^${cappa}$`);
+    const segmentRegex = new RegExp(`^\\$${cappa}$`);
+    const featureRegex = /^(\+|-)[a-z]+$/;
 
-    return [word, field, true, is_valid, has_dollar_sign]; // Return word, field, valid, isCapital, has_dollar_sign
+    if (categoryRegex.test(key)) {
+        return [key, field, 'category'];
+    }
+    if (segmentRegex.test(key)) {
+        return [key, field, 'segment'];
+    }
+    if (featureRegex.test(key)) {
+        return [key, field, 'feature'];
+    }
+    return [input, '', 'trash'];
 }
 
 function weighted_random_pick(items:string[], weights:number[]): string {
@@ -152,5 +153,5 @@ function get_distribution(n: number, default_distribution:string): number[] {
 export {
   get_last, capitalise, make_percentage, weighted_random_pick, get_distribution,
   supra_weighted_random_pick,
-  get_cat_seg, cappa
+  get_cat_seg_fea, cappa
 };

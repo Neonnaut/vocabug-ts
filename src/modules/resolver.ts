@@ -2,8 +2,7 @@ import type Escape_Mapper from './escape_mapper';
 import Logger from './logger';
 import Supra_Builder from './supra_builder';
 
-import { get_cat_seg, make_percentage, get_distribution
- } from './utilities'
+import { get_cat_seg_fea, make_percentage, get_distribution } from './utilities'
 import type { Token, Generation_Mode } from './types';
 
 class Resolver {
@@ -23,6 +22,9 @@ class Resolver {
     public category_distribution: string;
     private category_pending: Map<string, { content:string, line_num:number }>;
     public categories: Map<string, { graphemes:string[], weights:number[] }>;
+
+    public feature_pending: Map<string, { content:string, line_num:number }>;
+    public features: Map<string, { graphemes:string[], weights:number[] }>;
     
     public segments: Map<string, { content:string, line_num:number }>;
     public optionals_weight: number;
@@ -120,6 +122,9 @@ class Resolver {
         this.graphemes = [];
         this.transform_pending = [];
         this.transforms = [];
+
+        this.feature_pending = new Map;
+        this.features = new Map;
     }
 
     
@@ -132,15 +137,16 @@ class Resolver {
             let line = file_array[this.file_line_num];
             let line_value = '';
 
-            line = this.escape_mapper.escape_backslash_space(line);
-            line = line.replace(/(?<!\\);.*/u, '').trim(); // Remove comment unless escaped with backslash
+            line = this.escape_mapper.escape_backslash_pairs(line);
+            line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+            line = this.escape_mapper.escape_named_escape(line);
 
             if (line === '') { continue; } // Blank line !!
 
             if (transform_mode) { // Lets do transforms !!
                 line_value = line;
 
-                if (line_value.startsWith("END")) {
+                if (line_value === "END") {
                     transform_mode = false;
                     continue;
                 }
@@ -165,13 +171,14 @@ class Resolver {
                                 `|${engine}`, '\\', [], [], null, this.file_line_num
                             )
                         } else {
-                            this.logger.validation_error(`Trash engine '${engine}' found`, this.file_line_num);
+                            this.logger.validation_error(
+                                `Trash engine '${this.escape_mapper.restore_preserve_escaped_chars(engine)}' found`,
+                                this.file_line_num
+                            );
                         }
                     }
                     continue;
                 }
-
-                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
                 
                 let [target, result, conditions, exceptions, chance] = this.get_transform(line_value);
 
@@ -179,22 +186,22 @@ class Resolver {
                 continue;
             }
 
-            if (line.startsWith("BEGIN transform:")) {
+            if (line === "BEGIN transform:") {
                 transform_mode = true;
 
             } else if (line.startsWith("category-distribution:")) {
                 line_value = line.substring(22).trim().toLowerCase();
-
+                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
                 this.category_distribution = line_value;
 
             } else if (line.startsWith("wordshape-distribution:")) {
                 line_value = line.substring(23).trim().toLowerCase();
-
+                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
                 this.wordshape_distribution = line_value;
 
             } else if (line.startsWith("optionals-weight:")) {
                 line_value = line.substring(17).replace(/%/g, "").trim();
-
+                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
                 let optionals_weight = make_percentage(line_value);
                 if (optionals_weight == null) {
                     this.logger.warn(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
@@ -204,9 +211,11 @@ class Resolver {
 
             } else if (line.startsWith("alphabet:")) {
                 line_value = line.substring(9).trim();
-                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
 
                 let alphabet = line_value.split(/[,\s]+/).filter(Boolean);
+                for (let i = 0; i < alphabet.length; i++) {
+                    alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]);
+                }
 
                 if (alphabet.length == 0){
                     this.logger.warn(`'alphabet' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
@@ -215,9 +224,11 @@ class Resolver {
 
             } else if (line.startsWith("invisible:")) {
                 line_value = line.substring(10).trim();
-                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
 
                 let invisible = line_value.split(/[,\s]+/).filter(Boolean);
+                for (let i = 0; i < invisible.length; i++) {
+                    invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]);
+                }
 
                 if (invisible.length == 0){
                     this.logger.warn(`'invisible' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
@@ -226,9 +237,11 @@ class Resolver {
 
             } else if (line.startsWith("alphabet-and-graphemes:")) {
                 line_value = line.substring(23).trim();
-                line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
 
                 let a_g = line_value.split(/[,\s]+/).filter(Boolean);
+                for (let i = 0; i < a_g.length; i++) {
+                    a_g[i] = this.escape_mapper.restore_escaped_chars(a_g[i]);
+                }
 
                 if (a_g.length == 0){
                     this.logger.warn(`'alphabet-and-graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
@@ -238,9 +251,11 @@ class Resolver {
 
             } else if (line.startsWith("graphemes:")) {
                 line_value = line.substring(10).trim();
-                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
 
                 let graphemes = line_value.split(/[,\s]+/).filter(Boolean);
+                for (let i = 0; i < graphemes.length; i++) {
+                    graphemes[i] = this.escape_mapper.restore_escaped_chars(graphemes[i]);
+                }
                 if (graphemes.length == 0){
                     this.logger.warn(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
@@ -248,36 +263,37 @@ class Resolver {
 
             } else if (line.startsWith("words:")) {
                 line_value = line.substring(6).trim();
-                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
                 
                 if (line_value != "") {
                     this.wordshape_pending = line_value;
                 }
                 this.wordshape_line_num = this.file_line_num;
 
-            } else if (line.startsWith("BEGIN words:")) {
+            } else if (line === "BEGIN words:") {
                 this.parse_words_block(file_array);
 
             } else { // It's a category or segment
                 line_value = line;
-                line_value = this.escape_mapper.escape_backslash_pairs(line_value);
 
-                let [my_name, field, valid, is_capital, has_dollar_sign] = get_cat_seg(line_value);
-
-                if ( !valid || !is_capital ) {
+                const [key, field, mode] = get_cat_seg_fea(line_value);
+                if (mode === "trash") {
                     this.logger.warn(`Junk ignored -- expected a category, segment, directive, ..., etc`, this.file_line_num);
                     continue;
                 }
-                if (has_dollar_sign) {
+                if (mode === 'segment') {
                     // SEGMENTS !!!
-                    if (!this.validate_segment(field)) { this.logger.validation_error(`The segment '${my_name}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
+                    if (!this.validate_segment(field)) { this.logger.validation_error(`The segment '${key}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
                     if (!this.valid_words_brackets(field)) {
-                        this.logger.validation_error(`The segment '${name}' had missmatched brackets`, this.file_line_num);
+                        this.logger.validation_error(`The segment '${key}' had missmatched brackets`, this.file_line_num);
                     }
-                    this.segments.set(my_name, {content: field, line_num:this.file_line_num });
-                } else {
+                    this.segments.set(key, {content: field, line_num:this.file_line_num });
+                }
+                else if (mode === 'category') {
                     // CATEGORIES !!!
-                    this.category_pending.set(my_name, { content:field, line_num:this.file_line_num });
+                    this.category_pending.set(key, { content:field, line_num:this.file_line_num });
+                } else if (mode === 'feature') {
+                    // FEATURES !!!
+                    this.feature_pending.set(key, { content:field, line_num:this.file_line_num });
                 }
             }
         }
@@ -684,7 +700,11 @@ class Resolver {
 
     private parse_cluster(file_array:string[]) {
         let line = file_array[this.file_line_num];
+
+        line = this.escape_mapper.escape_backslash_pairs(line);
         line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+        line = this.escape_mapper.escape_named_escape(line);
+
         if (line === '') { return; } // Blank line. End clusterfield... early !!
         let top_row = line.split(/[,\s]+/).filter(Boolean);
         top_row.shift();
@@ -699,7 +719,11 @@ class Resolver {
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
             let line = file_array[this.file_line_num];
+            
+            line = this.escape_mapper.escape_backslash_pairs(line);
             line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+            line = this.escape_mapper.escape_named_escape(line);
+
             if (line === '') { break} // Blank line. End clusterfield !!
 
             if (line.startsWith('/') || line.startsWith('!')) {
@@ -1009,20 +1033,14 @@ class Resolver {
     }
 
     private parse_words_block(file_array:string[]) {
-        let line = file_array[this.file_line_num];
-        let line_value = line.substring(12).trim();
-        line_value = this.escape_mapper.escape_backslash_pairs(line_value);
-        line_value = line_value.replace(/;.*/u, '').trim(); // Remove comment!!
-        if (line_value === 'END') {return}
-        line_value = line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ") ? line_value : line_value + " ";
-
-        this.wordshape_pending += line_value;
+        let line_value = '';
         this.file_line_num ++;
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
             line_value = file_array[this.file_line_num];
             line_value = this.escape_mapper.escape_backslash_pairs(line_value);
             line_value = line_value.replace(/;.*/u, '').trim(); // Remove comment!!
+            line_value = this.escape_mapper.escape_named_escape(line_value);
             if (line_value === 'END') { break} // END !!
             line_value = line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ") ? line_value : line_value + " ";
 
@@ -1134,7 +1152,6 @@ class Resolver {
             `\nGraphemes: ` + this.graphemes.join(', ') +
             `\nAlphabet: ` + this.alphabet.join(', ') +
             `\nInvisible: ` + this.invisible.join(', ');
-        info = this.escape_mapper.restore_preserve_escaped_chars(info);
 
         this.logger.diagnostic(info);
     }

@@ -276,6 +276,10 @@ alphabet: a b c d e f ; A custom sort order if Sort words is turned on
 graphemes: ch sch ; For transforms
 alphabet-and-graphemes: a b ch ; Does both
 invisible: . |
+words: a, b, c
+BEGIN words:
+  a, b, c
+END
 
 ; CATEGORIES
   C = p, t, k

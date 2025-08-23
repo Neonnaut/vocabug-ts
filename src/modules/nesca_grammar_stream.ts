@@ -57,7 +57,7 @@ class Nesca_Grammar_Stream {
          }
 
          // Base token
-         if (char === "~" || char === "…") {
+         if (char === "&" || char === "…") {
             if (mode === "RESULT") {
                this.logger.validation_error(`Anythings-mark not allowed in '${mode}'`, line_num);
             }
@@ -116,7 +116,7 @@ class Nesca_Grammar_Stream {
             new_token = { type: "backreference", base: char, min: 1, max: 1 };
             i++;
 
-         } else if (char === '#' || char === '+' || char === '{' || char === '}' || char === ':' || char == '*' || char == '~' || char === '…' ||  char === '|' || char === '∅' || char === '^') {
+         } else if (char === '#' || char === '+' || char === '{' || char === '}' || char === ':' || char == '*' || char == '&' || char === '…' ||  char === '|' || char === '∅' || char === '^') {
             this.logger.validation_error(`Unexpected syntax character '${char}' in ${mode}`, line_num);
 
          // GRAPHEME match

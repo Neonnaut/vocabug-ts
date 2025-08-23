@@ -1,88 +1,6 @@
 # Version 2
 
-## 1. \[PRIORITY\] Named escapes
-
-Named escapes, good, keep them in `{}`
-
-Perhaps `@{Space}` would produce " ". `@{Acute}` makes the combining diacritic.
-
-| Named Escape      | Unicode Description                        | Example |
-|-------------------|--------------------------------------------|---------|
-| @{Space}          | U+0020 ASCII Space                         |        |
-| @{Grave}          | U+0300 Combining Grave Accent              | ◌̀      |
-| @{Acute}          | U+0301 Combining Acute Accent              | ◌́      |
-| @{Circumflex}     | U+0302 Combining Circumflex Accent         | ◌̂      |
-| @{Tilde}          | U+0303 Combining Tilde                     | ◌̃      |
-| @{Macron}         | U+0304 Combining Macron                    | ◌̄      |
-| @{Breve}          | U+0306 Combining Breve                     | ◌̆      |
-| @{OverDot}        | U+0307 Combining Dot Above                 | ◌̇      |
-| @{Umlaut}         | U+0308 Combining Diaeresis                 | ◌̈      |
-| @{OverHook}       | U+0309 Combining Hook Above                | ◌̉      |
-| @{UnderDot}       | U+0323 Combining Dot Below                 | ◌̣      |
-| @{OverRing}       | U+030A Combining Ring Above                | ◌̊      |
-| @{DoubleAcute}    | U+030B Combining Double Acute Accent       | ◌̋      |
-| @{Caron}          | U+030C Combining Caron                     | ◌̌      |
-| @{DoubleGrave}    | U+030F Combining Double Grave Accent       | ◌̏      |
-| @{InvBreve}       | U+0311 Combining Inverted Breve            | ◌̑      |
-| @{Horn}           | U+031B Combining Horn                      | ◌̛      |
-
-| @{UnderUmlaut}    | U+0324 Combining Diaeresis Below           | ◌̤      |
-| @{UnderRing}      | U+0325 Combining Ring Below                | ◌̥      |
-| @{UnderComma}     | U+0326 Combining Comma Below               | ◌̦      |
-| @{Cedilla}        | U+0327 Combining Cedilla                   | ◌̧      |
-| @{Ogonek}         | U+0328 Combining Ogonek                    | ◌̨      |
-
-## 2. \[PRIORITY\] Metathesis
-
-Metathesis in this program refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.
-
-To make a rule a metathesis rule, use these symbols:
-
-The ampersand `&` marks the content (if any) between the targets we want to reorder. You must use the same amount of `&`s in `TARGET` as in `RESULT`.
-
-Numbers in `RESULT` refer to the targets. Reordering these numbers, reorders the targets. It is possible to have up to nine
-
-Underscores `_` in a condition or exception, are references to the targets. Unlike a normal rule, we can have multiple
-Local metathesis
-
-### Local two-place metathesis:
-
-```
-; An intervocalic stop + nasal sequence becomes nasal + stop
-  [stop]&[nasal] -> <2&<1 / V<1<2V 
-; watna ==> wanta
-```
-
-### Long-distance metathesis
-
-The example below approximates metathesis that occured in Spanish:
-
-```
-r|l -> 2|1 / _(…)[plosive]_
-; parabla ==> palabra
-```
-
-### One-place metathesis
-
-To simulate one-place metathesis, move `|`s.
-
-The example below is metathesis where words beginning with stop + vowel will try and move an r in a stop + r cluster to form a word initial stop + r cluster:
-
-```
-{stop}|r -> 12| / #_{vowel}…{stop}_ 
-; kabatros ==> krabatos
-```
-
-### Metathesis madness
-
-Three or more items, to a maximum of 9, switching places, are possible, also with shuffling of any `|`:
-
-```
-  x|y|z -> ||321
-; xaayooz ==> aaoozyx
-```
-
-## 3. \[PRIORITY\] Features
+## 1. \[PRIORITY\] Features
 
 Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, `+high` and `+front`, and turn it into a phoneme marked with `+high` and `+back` features, perhaps /ɯ/. The features: directive block lets you do this:
 
@@ -116,7 +34,7 @@ Notice: If there is no graphs: directive in the definition-build, there will be 
 graphs: a, b, h, i, k, n, o, t
 
 BEGIN features:
-  ~vowel = a, i, o
+  +-vowel = a, i, o
 END
 In the above example, the matrix {-vowel} captures the graphemes b, h, k, n, t
 ```
@@ -208,19 +126,69 @@ BEGIN features:
 END
 ```
 
+## 2. \[PRIORITY\] Metathesis
+
+Metathesis in this program refers to the reordering of graphemes in a word. Metathesis in real-world diachronics is usually sporadic, but can be regular.
+
+To make a rule a metathesis rule, use these symbols:
+
+The ampersand `~` marks the content (if any) between the targets we want to reorder. You must use the same amount of `~`s in `TARGET` as in `RESULT`.
+
+Numbers in `RESULT` refer to the targets. Reordering these numbers, reorders the targets. It is possible to have up to nine
+
+Underscores `_` in a condition or exception, are references to the targets. Unlike a normal rule, we can have multiple
+Local metathesis
+
+### Local two-place metathesis:
+
+```
+; An intervocalic stop + nasal sequence becomes nasal + stop
+  [stop]~[nasal] -> <2~<1 / V<1<2V 
+; watna ==> wanta
+```
+
+### Long-distance metathesis
+
+The example below approximates metathesis that occured in Spanish:
+
+```
+r|l -> 2|1 / _(…)[plosive]_
+; parabla ==> palabra
+```
+
+### One-place metathesis
+
+To simulate one-place metathesis, move `|`s.
+
+The example below is metathesis where words beginning with stop + vowel will try and move an r in a stop + r cluster to form a word initial stop + r cluster:
+
+```
+{stop}|r -> 12| / #_{vowel}…{stop}_ 
+; kabatros ==> krabatos
+```
+
+### Metathesis madness
+
+Three or more items, to a maximum of 9, switching places, are possible, also with shuffling of any `|`:
+
+```
+  x|y|z -> ||321
+; xaayooz ==> aaoozyx
+```
+
+## 3. Long form category keys
+
+Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
+
 ## 4. Word classes
 
 Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
 
-## 5. Long form category keys
-
-Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
-
-## 6. Support the ZSCA `/` thing.
+## 5. Support the ZSCA `/` thing.
 
 `//` would be an exception like `!`. `a / b` would be an alternative to `a -> b`
 
-## 7. Positioner
+## 6. Positioner
 
 Positioners, enclosed in `@{ and }`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
 
@@ -236,7 +204,7 @@ If we want to match the last occurence of a grapheme in a word, use `-1`. For th
 ; sososo ==> sososx
 ```
 
-## 8. If then else block
+## 7. If then else block
 
 If block
 Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
@@ -264,11 +232,11 @@ END
 
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
-## 9. Syllable dividers and capturing syllables
+## 8. Syllable dividers and capturing syllables
 
-## 10. Chance for individual optionals
+## 9. Chance for individual optionals
 
-## 11. Alternative graphs
+## 10. Alternative graphs
 
 Tells what character + combining diacritic sequences to be treated as alternatives of another grapheme
 
@@ -280,7 +248,7 @@ graphemes: a <[á à ǎ â] b d e <[é è ě ê] f g h i <[í ì ǐ i
 
 now `a > o` will target `a` with an acute accent.
 
-## 12. Rule macro
+## 11. Rule macro
 
 Rule macro saves rules to be used later in the definition-build as many times as needed. The rules inside the define-rule-macro: block do not run until invoked using do-rule-macro:
 
@@ -299,7 +267,7 @@ END
 ```
 In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.
 
-## 13. Promises
+## 12. Promises
 
 This would ensure that if a the optional `y` appears, The only graphemes that would be in the pool for `V` would be `a,o,a`, avoiding a `yi` syllable inside generation.
 
@@ -309,7 +277,7 @@ This would also work backwards and forwards:
 
 This represents an almost idealist view on word generation
 
-## 14. Invisible graphemes EXTRA
+## 13. Invisible graphemes EXTRA
 
 This would "skip" graphemes in the TARGET, CONDITION and EXCEPTION, like so:
 
@@ -321,10 +289,10 @@ invisible-graphemes: .
 ; 'tt' becomes 'd'. Ignore any '.' between 't's
 ```
 
-## 15. Lezer grammar
+## 14. Lezer grammar
 
 Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
 
-## 16. "AI" generate a def file, like Gleb
+## 15. "AI" generate a def file, like Gleb
 
 This would choose a word template, and syllable template, then populate the categories with suitable graphemes. Suitable small transforms would be chosen as well.

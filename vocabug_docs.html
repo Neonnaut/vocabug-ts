@@ -339,16 +339,130 @@
             <td><a href="#nescaWildcard">Wildcard</a>, matches exactly 1 of any grapheme</td>
           </tr>
           <tr>
-            <td><code class="example">~</code> or <code class="example">…</code></td>
+            <td><code class="example">&</code> or <code class="example">…</code></td>
             <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches 1 or more of any grapheme. It is non-greedy</td>
           </tr>
           <tr>
-            <td><code class="example">~{</code> or <code class="example">…{</code> and <code class="example">}</code></td>
+            <td><code class="example">&{</code> or <code class="example">…{</code> and <code class="example">}</code></td>
             <td><a href="#nescaBlocker">Blocked-anythings-mark</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">&lt;</code></td>
+            <td><a href="#nescaBackreference">Backreference</a></td>
           </tr>
           <tr>
             <td><code class="example">|</code></td>
             <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <h4 id="vocEscapeTransform"><a class="head-num">4.2.3</a>Named escape</h4>
+
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Named escape</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+              <td><code class="example">@{Space}</code></td>
+              <td></td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Acute}</code></td>
+              <td>◌́</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{DoubleAcute}</code></td>
+              <td>◌̋</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Grave}</code></td>
+              <td>◌̀</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{DoubleGrave}</code></td>
+              <td>◌̏</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Circumflex}</code></td>
+              <td>◌̂</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Caron}</code></td>
+              <td>◌̌</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Breve}</code></td>
+              <td>◌̆</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{InvertedBreve}</code></td>
+              <td>◌̑</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Tilde}</code></td>
+              <td>◌̃</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{TildeBelow}</code></td>
+              <td>◌̰</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Macron}</code></td>
+              <td>◌̄</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Dot}</code></td>
+              <td>◌̇</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{DotBelow}</code></td>
+              <td>◌̣</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Diaeresis}</code></td>
+              <td>◌̈</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{DiaeresisBelow}</code></td>
+              <td>◌̤</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Ring}</code></td>
+              <td>◌̊</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{RingBelow}</code></td>
+              <td>◌̥</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Horn}</code></td>
+              <td>◌̛</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Hook}</code></td>
+              <td>◌̉</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Comma}</code></td>
+              <td>◌̓</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{CommaBelow}</code></td>
+              <td>◌̦</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Cedilla}</code></td>
+              <td>◌̧</td>
+          </tr>
+          <tr>
+              <td><code class="example">@{Ogonek}</code></td>
+              <td>◌̨</td>
           </tr>
         </tbody>
       </table>
@@ -630,29 +744,29 @@ n mp <span class="operator">+</span>  <span class="operator">+</span>  nn <span 
       <p>Wildcard can be placed by itself inside an <a href="#nescaOptionalatorSet">optionalator</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">19.6</a>Anythings-mark</h3>
-      <p>The anythings-mark uses tilde <code class="example">~</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
-      <div class="prog-pre">  b<span class="regexp">~</span>t <span class="link">-></span> x<br><code class="comment">; babitto => xto</code></div>
+      <p>The anythings-mark uses ampersand <code class="example">&</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
+      <div class="prog-pre">  b<span class="regexp">&</span>t <span class="link">-></span> x<br><code class="comment">; babitto => xto</code></div>
       <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="example">t</code> and beyond like <code class="example">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
       <p>The example below uses an optional anythings-mark in the condition:</p>
-      <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">~</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
+      <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">&</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
 
       <h3 id="nescaBlocker"><a class="head-num">19.7</a>Blocked-anythings-mark</h3>
-      <p>Blocked-anythings-mark is designed to block the spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set of graphemes inside <code class="example"><span class="regexp">~{</span></code> and <code class="example">}</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
+      <p>Blocked-anythings-mark is designed to block the spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set of graphemes inside <code class="example"><span class="regexp">&{</span></code> and <code class="example">}</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       
-      <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">~{</span>k<span class="link">,</span> g<span class="regexp">}</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
+      <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">&{</span>k<span class="link">,</span> g<span class="regexp">}</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
 
       <h3 id="nescaBackreference"><a class="head-num">19.8</a>Backreference</h3>
       <p>A backreference is a reference to the captured target. It cannot be used in <code class="example">TARGET</code>. This uses the less-than symbol <code class="example">&lt;</code>.</p>
       <p>Here are some prime examples where backreference is employed:</p>
       <p><b>Full reduplication</b>:</p>
-      <div class="prog-pre">  <span class="regexp">~</span> <span class="link">-></span> <span class="regexp">&lt;&lt;</span>
+      <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="regexp">&lt;&lt;</span>
 <span class="comment">; malak ==&gt; malakmalak</span></div>
       
       <p>"<b>Haplology</b>":</p>
       <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span><span class="regexp">[</span><span class="catkey">V</span><span class="regexp">]</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="regexp">&lt;</span>
 <span class="comment">; haplology ==> haplogy</span></div>
       <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
-      <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">~{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">&lt;</span></div>
+      <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">&lt;</span></div>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">20</a>Advanced rules</h2>
 

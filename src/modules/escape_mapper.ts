@@ -1,3 +1,30 @@
+  const escapeMap: Record<string, string> = {
+    "@{Space}": "\u0020",
+    "@{Acute}": "\u0301",
+    "@{DoubleAcute}": "\u030B",
+    "@{Grave}": "\u0300",
+    "@{DoubleGrave}": "\u030F",
+    "@{Circumflex}": "\u0302",
+    "@{Caron}": "\u030C",
+    "@{Breve}": "\u0306",
+    "@{InvertedBreve}": "\u0311",
+    "@{Tilde}": "\u0303",
+    "@{TildeBelow}": "\u0330",
+    "@{Macron}": "\u0304",
+    "@{Dot}": "\u0307",
+    "@{DotBelow}": "\u0323",
+    "@{Diaeresis}": "\u0308",
+    "@{DiaeresisBelow}": "\u0324",
+    "@{Ring}": "\u030A",
+    "@{RingBelow}": "\u0325",
+    "@{Horn}": "\u031B",
+    "@{Hook}": "\u0309",
+    "@{Comma}": "\u0313",
+    "@{CommaBelow}": "\u0326",
+    "@{Cedilla}": "\u0327",
+    "@{Ogonek}": "\u0328",
+  };
+
 class Escape_Mapper {
     private map: Map<string, string>;
     public counter: number;
@@ -44,10 +71,15 @@ class Escape_Mapper {
       return result;
     }
 
+    escape_named_escape(input: string): string {
+      return input.replace(/@\{[A-Za-z]+\}/g, match => escapeMap[match] ?? match);
+    }
+
     restore_escaped_chars(input: string): string {
       return input.split("").map(c => this.map.has(c) ? this.map.get(c)! : c).join("");
     }
 
+    // Restore but append a backslash before each character that was escaped
     restore_preserve_escaped_chars(input: string): string {
       return input
       .split("")
