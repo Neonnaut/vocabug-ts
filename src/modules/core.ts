@@ -57,22 +57,16 @@ function generate({
         r.expand_wordshape_segments();
         r.set_wordshapes();
 
-        const s = new Nesca_Grammar_Stream(
+        const nesca_grammar_stream = new Nesca_Grammar_Stream(
             logger, r.graphemes, escape_mapper
         );
-
-        const z = new Transform_Resolver(
-            logger, s, r.categories, r.transform_pending
+        const transform_resolver = new Transform_Resolver(
+            logger, nesca_grammar_stream, r.categories, r.transform_pending
         )
-        r.set_transforms(z.resolve_transforms());
+        r.set_transforms(transform_resolver.resolve_transforms());
 
-        /*
-        const x = new Feature_Resolver(
-            logger, r.feature_pending, r.graphemes
-        )
-        r.set_features(x.resolve_features());
-        */
-
+        r.resolve_features();
+        
         if(r.debug) { r.create_record(); }
 
         const word_builder = new Word_Builder(

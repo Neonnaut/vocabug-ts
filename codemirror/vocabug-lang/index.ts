@@ -51,7 +51,7 @@ const vocabugWordRules = [
 const vocabugTransformRules = [
   { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|Tilde|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|Comma|CommaBelow|Cedilla|Ogonek)\}/ },
   { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
-  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "operator", regex: /\^REJECT|\^R|\^|∅|~/ }, // > and ;
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&|</ }
 ];
 

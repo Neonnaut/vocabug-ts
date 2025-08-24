@@ -24,7 +24,7 @@ class Resolver {
     public categories: Map<string, { graphemes:string[], weights:number[] }>;
 
     public feature_pending: Map<string, { content:string, line_num:number }>;
-    public features: Map<string, { graphemes:string[], weights:number[] }>;
+    public features: Map<string, string[]>;
     
     public segments: Map<string, { content:string, line_num:number }>;
     public optionals_weight: number;
@@ -667,6 +667,10 @@ class Resolver {
             line_num:line_num} );
     }
 
+    set_features(new_features:Map<string, string[]>) {
+        this.features = new_features;
+    }
+
     set_concurrent_changes(target_result:string) {
         let result = [];
         let buffer = "";
@@ -809,6 +813,10 @@ class Resolver {
             const new_category_field: { graphemes:string[], weights:number[]} = this.resolve_nested_categories(value.content, this.category_distribution);
             this.categories.set(key, new_category_field);
         }
+    }
+
+    resolve_features() {
+
     }
 
     valid_category_brackets(str: string): boolean {

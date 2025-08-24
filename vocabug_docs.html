@@ -59,6 +59,7 @@
           <ol class="nice-list">
             <li><a href="#vocEscapeWord">Word creation character escape</a></li>
             <li><a href="#vocEscapeTransform">Transform character escape</a></li>
+            <li><a href="#vocNamedEscape">Named escape</a></li>
           </ol>
           </li>
           
@@ -103,6 +104,7 @@
           <li><a href="#nescaConcurrentChange">Concurrent change</a></li>
           <li><a href="#nescaMergingChange">Merging change</a></li>
           <li><a href="#nescaReject">Reject</a></li>
+          <li><a href="#nescaMetathesis">Metathesis</a></li>
         </ol>
         </li>
 
@@ -217,6 +219,10 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
+            <td><code class="example">@{</code> and <code class="example">}</code></td>
+            <td>Named escape</td>
+          </tr>
+          <tr>
             <td><code class="example">C</code>, <code class="example">D</code>, <code class="example">K</code>, ...</td>
             <td>Any one-length capital letter can refer to a <a href="#vocCategories">category</a></td>
           </tr>
@@ -275,6 +281,10 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
+            <td><code class="example">@{</code> and <code class="example">}</code></td>
+            <td>Named escape</td>
+          </tr>
+          <tr>
             <td><code class="example">&gt;</code>, <code class="example">-&gt;</code>, <code class="example">=&gt;</code>, <code class="example">⇒</code> or <code class="example">→</code></td>
             <td>Indicates <a href="#nescaTheChange">change</a></td>
           </tr>
@@ -301,6 +311,10 @@
           <tr>
             <td><code class="example">^REJECT</code> or <code class="example">^R</code></td>
             <td><a href="#nescaReject">Rejects</a> a word</td>
+          </tr>
+          <tr>
+            <td><code class="example">~</code></td>
+            <td>Indicates a <a href="#nescaMetathesis">metathesis</a> change</td>
           </tr>
           <tr>
             <td><code class="example">/</code></td>
@@ -358,7 +372,7 @@
       </table>
 
 
-      <h4 id="vocEscapeTransform"><a class="head-num">4.2.3</a>Named escape</h4>
+      <h4 id="vocNamedEscape"><a class="head-num">4.2.3</a>Named escape</h4>
 
       <table class="styled-table">
         <thead>
@@ -622,6 +636,8 @@
       <div class="prog-pre">a<span class="link">,</span> bi <span class="link">-></span> <span class="operator">^REJECT</span></div>
       <p>In the above example, any word that contains <code class="example">a</code> or <code class="example">bi</code> will be rejected.</p>
       <p>A shorthand version to <code class="example">^REJECT</code> is <code class="example">^R</code></p>
+
+      <h3 id="nescaMetathesis"><a class="head-num">12.4</a>Metathesis</h3>
 
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
       <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>

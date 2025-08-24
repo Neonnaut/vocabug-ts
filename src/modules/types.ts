@@ -32,6 +32,10 @@ export type Token =
       base: "^REJECT";
     }
   | {
+      type: "metathesis"; // ~
+      base: "~";
+    }
+  | {
       type: "word-boundary"; // #
       base: "#";
     }

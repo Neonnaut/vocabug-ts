@@ -89,7 +89,8 @@
 - [x] Engine, Xsampa-to-ipa
 - [x] Engine, Ipa-to-Xsampa
 
-- [] Named escape
+- [x] Named escape
+- [x] Metathesis
 - [] Feature
 
 ## Collator

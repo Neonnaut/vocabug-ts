@@ -1,5 +1,6 @@
 import Word from './word';
 import Logger from './logger';
+import { swap_first_two_items } from './utilities';
 import type { Token } from './types';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
@@ -433,7 +434,7 @@ class Transformer {
             let raw_target:Token[] = target[i]; // like 'abc' of 'abc, hij > y, z'
             let raw_result:Token[] = result[i]; // like 'y' of 'abc, hij > y, z'
 
-            let mode: "deletion" | "insertion" | "reject" | "replacement" = "replacement";
+            let mode: "deletion"|"insertion"|"reject"|"metathesis"|"replacement" = "replacement";
 
             // NOW, build-up REPLACEMENT STREAM from RESULT tokens.
             if (raw_result[0].type === "deletion") {
@@ -442,6 +443,8 @@ class Transformer {
             } else if (raw_result[0].type === "reject") {
                 // REJECT
                 mode = "reject";
+            } else if (raw_result[0].type === "metathesis") {
+                mode = "metathesis"
             } else {
                 // NORMAL GRAPHEME STREAM
             }
@@ -521,6 +524,14 @@ class Transformer {
                             target_stream: matched_stream,
                             replacement_stream: []
                         });
+                    } else if (mode === "metathesis") {
+                        const my_metathesis = swap_first_two_items(matched_stream)
+                        replacements.push({
+                            index_span: global_index,
+                            length_span: match_length,
+                            target_stream: matched_stream,
+                            replacement_stream: my_metathesis
+                        });                        
                     } else {
 
                         // CREATE REPLACEMENT STREAM

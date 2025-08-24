@@ -150,8 +150,18 @@ function get_distribution(n: number, default_distribution:string): number[] {
   return flat_distribution(n);
 }
 
+function swap_first_two_items(arr: any[]): any[] {
+  if (arr.length >= 2) {
+    const temp = arr[0];
+    arr[0] = arr[1];
+    arr[1] = temp;
+  }
+  return arr;
+}
+
+
 export {
   get_last, capitalise, make_percentage, weighted_random_pick, get_distribution,
   supra_weighted_random_pick,
-  get_cat_seg_fea, cappa
+  get_cat_seg_fea, cappa, swap_first_two_items
 };
