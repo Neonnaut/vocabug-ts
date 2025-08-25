@@ -28,20 +28,25 @@ const vocabugEngineRules = [
   { token: "operator",     regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-upper-case|to-lower-case|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/ }
 ];
 const vocabugListRules = [
-  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|Tilde|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|Comma|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
   { token: "link",     regex: /,/ }
 ];
 
 const vocabugCategoryRules = [
-  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|Tilde|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|Comma|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
   { token: "link",     regex: /,|=/ },
   { token: "operator", regex: /\^|∅/ },
   { token: "regexp",   regex: /\[|\]/ },
   { token: "strong",   regex: /(\*\d+(\.\d+)?)/ } // Weights
 ];
 
+const vocabugFeatureRules = [
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "link",     regex: /,|=/ }
+];
+
 const vocabugWordRules = [
-  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|Tilde|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|Comma|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
   { token: "link",     regex: /,|=/ },
   { token: "operator", regex: /\^|∅/ },
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}/ },
@@ -49,17 +54,24 @@ const vocabugWordRules = [
 ];
 
 const vocabugTransformRules = [
-  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|Tilde|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|Comma|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
   { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
   { token: "operator", regex: /\^REJECT|\^R|\^|∅|~/ }, // > and ;
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&|</ }
 ];
 
 const vocabugClusterRules = [
-  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|Tilde|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|Comma|CommaBelow|Cedilla|Ogonek)\}/ },
-  { token: "link",     regex: /,|\/|!|\?|,|_/ },
-  { token: "operator", regex: /\+|\-|\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "link",     regex: /,|\/|!|\?|_|\+/ },
+  { token: "operator", regex: /\-|\^REJECT|\^R|\^|∅/ }, // > and ;
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&/ }
+];
+
+const vocabugFeatureFieldRules = [
+  { token: "escape",   regex: /\\.|@\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
+  { token: "link",     regex: /,|\./ },
+  { token: "operator", regex: /\+/ },
+  { token : "regexp",   regex: /-/ }
 ];
 
 type State = {
@@ -69,6 +81,7 @@ type State = {
   blanko: boolean;
   classList: string[];
   classMacList: string[];
+  featureList: string[];
 };
 
 const vocabugParser: StreamParser<State> = {
@@ -80,10 +93,11 @@ const vocabugParser: StreamParser<State> = {
         doIndent: false,
         blanko: false,
         classList: [],
-        classMacList: []
+        classMacList: [],
+        featureList: []
     }},
     blankLine: function (state){
-        if (!state.blanko && state.mode == 'clusterBlock') {
+        if (!state.blanko && ( state.mode == 'clusterBlock' || state.mode == 'featureField') ) {
             state.blanko = true;
         };},
     token: function (stream, state) {
@@ -99,13 +113,13 @@ const vocabugParser: StreamParser<State> = {
         }
         if (stream.sol()) {
             // No more clusterblock we reached line with blankspaces
-            if (stream.string.trim() == "" && state.mode == 'clusterBlock') { 
+            if (stream.string.trim() == "" && ( state.mode == 'clusterBlock' || state.mode == 'featureField' )) { 
                 state.blanko = true;
             }
 
             if (state.mode == 'engine') {
                 state.mode = 'transform';
-            } else if (stream.string.trim() && state.mode != 'clusterBlock' && state.mode != 'transform' && state.mode != 'wordsBlock') {
+            } else if (stream.string.trim() && state.mode != 'clusterBlock' && state.mode != 'transform' && state.mode != 'wordsBlock' && state.mode != 'featureField') {
                 state.mode = 'none';
             }
 
@@ -113,6 +127,11 @@ const vocabugParser: StreamParser<State> = {
         if (state.blanko && state.mode == 'clusterBlock')  {
             // No more clusterblock we reached blank line
             state.mode = 'transform';
+            state.blanko = false;
+        }
+        if (state.blanko && state.mode == 'featureField')  {
+            // No more clusterblock we reached blank line
+            state.mode = 'none';
             state.blanko = false;
         }
 
@@ -161,6 +180,11 @@ const vocabugParser: StreamParser<State> = {
                     return "meta";
                 }
 
+                if (stream.match(/\+- /)) {
+                    state.mode = "featureField";
+                    return "meta";
+                }
+
                 const macroRegex = new RegExp(`(\\$${cappa})(?=\\s*=)`, "u");
                 let match = stream.match(macroRegex) as RegExpMatchArray;;
                 if (match) {
@@ -176,6 +200,14 @@ const vocabugParser: StreamParser<State> = {
                     state.classList.push(match[1]);
                     state.classMacList.push(match[1]);
                     state.mode = 'categoryLine';
+                    return "tagName";
+                }
+
+                // Feature
+                let Fmatch = stream.match(/[-+_][a-z]+(?=\s*=)/)
+                if (Fmatch) {
+                    state.featureList.push(Fmatch[0]);
+                    state.mode = 'featureLine';
                     return "tagName";
                 }
             }
@@ -195,6 +227,11 @@ const vocabugParser: StreamParser<State> = {
             }
             for (let classo of state.classMacList) {
                 if (stream.match(classo)) {
+                    return "tagName";
+                }
+            }
+            for (let featuro of state.featureList) {
+                if (stream.match(`@{${featuro}}`)) {
                     return "tagName";
                 }
             }
@@ -219,6 +256,12 @@ const vocabugParser: StreamParser<State> = {
 
             for (let classo of state.classList) {
                 if (stream.match(classo)) {
+                    return "tagName";
+                }
+            }
+
+            for (let featuro of state.featureList) {
+                if (stream.match(`@{${featuro}}`)) {
                     return "tagName";
                 }
             }
@@ -256,6 +299,11 @@ const vocabugParser: StreamParser<State> = {
                     return "tagName";
                 }
             }
+            for (let featuro of state.featureList) {
+                if (stream.match(`@{${featuro}}`)) {
+                    return "tagName";
+                }
+            }
         }
 
         if (state.mode == 'categoryLine') {
@@ -279,6 +327,44 @@ const vocabugParser: StreamParser<State> = {
                 }
             }
             for (let rule of vocabugWordRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+            for (let featuro of state.featureList) {
+                if (stream.match(`@{${featuro}}`)) {
+                    return "tagName";
+                }
+            }
+        }
+
+        if (state.mode == 'featureLine') {
+            for (let featuro of state.featureList) {
+                if (stream.match(featuro)) {
+                    return "tagName";
+                }
+            }
+            for (let rule of vocabugFeatureRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+        }
+
+        if (state.mode == 'featureField') { ////
+            // End Transform
+            if (stream.match(/END(?=\s*;|\s*$)/)) {
+                state.mode = 'none';
+                return "meta";
+            }
+
+            for (let featuro of state.featureList) {
+                if (stream.match(featuro)) {
+                    return "tagName";
+                }
+            }
+
+            for (let rule of vocabugFeatureFieldRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }

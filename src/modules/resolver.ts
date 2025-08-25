@@ -24,7 +24,7 @@ class Resolver {
     public categories: Map<string, { graphemes:string[], weights:number[] }>;
 
     public feature_pending: Map<string, { content:string, line_num:number }>;
-    public features: Map<string, string[]>;
+    public features: Map<string, { graphemes:string[] }>;
     
     public segments: Map<string, { content:string, line_num:number }>;
     public optionals_weight: number;
@@ -152,7 +152,7 @@ class Resolver {
                 }
                 
                 if (line.startsWith("% ")) { // Parse clusters
-                    this.parse_cluster(file_array);
+                    this.parse_clusterfield(file_array);
                     continue;
                 }
 
@@ -272,7 +272,10 @@ class Resolver {
             } else if (line === "BEGIN words:") {
                 this.parse_words_block(file_array);
 
-            } else { // It's a category or segment
+            } else if (line.startsWith("+- ")) {
+                this.parse_featurefield(file_array);
+                continue;
+            } else { // It's a category or segment or feature
                 line_value = line;
 
                 const [key, field, mode] = get_cat_seg_fea(line_value);
@@ -293,7 +296,12 @@ class Resolver {
                     this.category_pending.set(key, { content:field, line_num:this.file_line_num });
                 } else if (mode === 'feature') {
                     // FEATURES !!!
-                    this.feature_pending.set(key, { content:field, line_num:this.file_line_num });
+                    const graphemes = field.split(/[,\s]+/).filter(Boolean);
+                    if (graphemes.length == 0) {
+                        this.logger.validation_error(`Feature ${key} had no graphemes`, this.file_line_num);
+                    }
+
+                    this.feature_pending.set(key, { content:graphemes.join(","), line_num:this.file_line_num });
                 }
             }
         }
@@ -667,10 +675,6 @@ class Resolver {
             line_num:line_num} );
     }
 
-    set_features(new_features:Map<string, string[]>) {
-        this.features = new_features;
-    }
-
     set_concurrent_changes(target_result:string) {
         let result = [];
         let buffer = "";
@@ -702,7 +706,7 @@ class Resolver {
         return result;
     }
 
-    private parse_cluster(file_array:string[]) {
+    private parse_clusterfield(file_array:string[]) {
         let line = file_array[this.file_line_num];
 
         line = this.escape_mapper.escape_backslash_pairs(line);
@@ -742,9 +746,9 @@ class Resolver {
             row.shift();
 
             if (row.length > row_length) {
-                this.logger.validation_error(`Clusterfield row too long`, this.file_line_num);
+                this.logger.validation_error(`Cluster-field row too long`, this.file_line_num);
             } else if (row.length < row_length) {
-                this.logger.validation_error(`Clusterfield row too short`, this.file_line_num);
+                this.logger.validation_error(`Cluster-field row too short`, this.file_line_num);
             }
 
             for (let i = 0; i < row_length; ++i) {
@@ -761,6 +765,65 @@ class Resolver {
         }
         this.add_transform(concurrent_target.join(','), concurrent_result.join(','), 
             my_conditions, my_exceptions, null, this.file_line_num);
+    }
+
+    private parse_featurefield(file_array:string[]) {
+        let line = file_array[this.file_line_num];
+
+        line = this.escape_mapper.escape_backslash_pairs(line);
+        line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+        line = this.escape_mapper.escape_named_escape(line);
+
+        if (line === '') { return; } // Blank line. End clusterfield... early !!
+        let top_row = line.split(/[,\s]+/).filter(Boolean);
+        top_row.shift(); // Erase +-
+        const row_length = top_row.length;
+        this.file_line_num ++;
+
+        for (; this.file_line_num < file_array.length; ++this.file_line_num) {
+            let line = file_array[this.file_line_num];
+            
+            line = this.escape_mapper.escape_backslash_pairs(line);
+            line = line.replace(/;.*/u, '').trim(); // Remove comment!!
+            line = this.escape_mapper.escape_named_escape(line);
+
+            if (line === '') { break} // Blank line. End clusterfield !!
+
+            let row = line.split(/[,\s]+/).filter(Boolean);
+            let column = row[0];
+            row.shift();
+
+            const featureRegex = /^[a-z]+$/;
+
+            if (!featureRegex.test(column)) {
+                this.logger.validation_error(`A feature in a feature-field must be of lowercase letters only.`, this.file_line_num)
+            }
+
+            if (row.length > row_length) {
+                this.logger.validation_error(`Feature-field row too long`, this.file_line_num);
+            } else if (row.length < row_length) {
+                this.logger.validation_error(`Feature-field row too short`, this.file_line_num);
+            }
+
+            let my_pro_graphemes:string[] = [];
+            let my_anti_graphemes:string[] = [];
+
+            for (let i = 0; i < row_length; ++i) {
+                if (row[i] === '.') {
+                    continue;
+                } else if ( row[i] === "+") {
+                    my_pro_graphemes.push(top_row[i])
+                } else if (row[i] === '-') {
+                    my_anti_graphemes.push(top_row[i])
+                }
+            }
+            if (my_pro_graphemes.length > 0 ) {
+                this.feature_pending.set(`+${column}`, {content:my_pro_graphemes.join(","), line_num:this.file_line_num})
+            }
+            if (my_anti_graphemes.length > 0 ) {
+                this.feature_pending.set(`-${column}`, {content:my_anti_graphemes.join(","), line_num:this.file_line_num})
+            }
+        }
     }
 
     set_transforms(resolved_transforms: {  // From resolve_transforms !!
@@ -816,7 +879,24 @@ class Resolver {
     }
 
     resolve_features() {
+        for (const [key, value] of this.feature_pending) {
+            const expanded_content = this.recursive_expansion(value.content, this.feature_pending);
+            const unique_graphemes = Array.from(new Set(expanded_content.split(",")));
 
+            if (key.startsWith('_')) {
+                if (this.graphemes.length === 0) {
+                    this.logger.validation_error(`Para-feature '${key}' exists, but the 'graphemes:' directive was not used`, value.line_num);
+                }
+                const anti_graphemes = this.graphemes.filter(item => !unique_graphemes.includes(item));
+                const anti_key = key.replace(/^./, "-");
+                const pro_key = key.replace(/^./, "+");
+
+                this.features.set(anti_key, { graphemes:anti_graphemes });
+                this.features.set(pro_key, { graphemes:unique_graphemes });
+            } else {
+                this.features.set(key, { graphemes:unique_graphemes });
+            }
+        }
     }
 
     valid_category_brackets(str: string): boolean {
@@ -1135,6 +1215,11 @@ class Resolver {
             transforms.push(`  ⟨${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance}⟩:${my_transform.line_num}`);
         }
 
+        let features = [];
+        for (const [key, value] of this.features) {
+            features.push(`  ${key} = ${value.graphemes.join(', ')}`);
+        }
+
         let info:string =
             `~ OPTIONS ~\n` +
             `Num of words: ` + this.num_of_words + 
@@ -1155,6 +1240,8 @@ class Resolver {
 
             `\nWordshape-distribution: ` + this.wordshape_distribution +
             `\nWordshapes {\n` + wordshapes.join('\n') + `\n}` +
+
+            `\nFeatures {\n` + features.join('\n') + `\n}` +
 
             `\nTransforms {\n` + transforms.join('\n') + `\n}` +
             `\nGraphemes: ` + this.graphemes.join(', ') +

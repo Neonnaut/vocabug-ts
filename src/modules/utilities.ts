@@ -43,7 +43,7 @@ function get_cat_seg_fea(input: string): [string, string, 'category'|'segment'|'
     // Construct dynamic regexes using cappa
     const categoryRegex = new RegExp(`^${cappa}$`);
     const segmentRegex = new RegExp(`^\\$${cappa}$`);
-    const featureRegex = /^(\+|-)[a-z]+$/;
+    const featureRegex = /^(\+|-|_)[a-z]+$/;
 
     if (categoryRegex.test(key)) {
         return [key, field, 'category'];
@@ -150,18 +150,22 @@ function get_distribution(n: number, default_distribution:string): number[] {
   return flat_distribution(n);
 }
 
-function swap_first_two_items(arr: any[]): any[] {
-  if (arr.length >= 2) {
-    const temp = arr[0];
-    arr[0] = arr[1];
-    arr[1] = temp;
+function swap_first_last_items(array: any[]): any[] {
+  if (array.length >= 2) {
+    const firstItem = array[0];
+    const lastItemIndex = array.length - 1;
+    const lastItem = array[lastItemIndex];
+
+    array[0] = lastItem;
+    array[lastItemIndex] = firstItem;
   }
-  return arr;
+  return array;
 }
+
 
 
 export {
   get_last, capitalise, make_percentage, weighted_random_pick, get_distribution,
   supra_weighted_random_pick,
-  get_cat_seg_fea, cappa, swap_first_two_items
+  get_cat_seg_fea, cappa, swap_first_last_items
 };

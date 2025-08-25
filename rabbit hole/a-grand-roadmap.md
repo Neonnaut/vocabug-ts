@@ -69,7 +69,7 @@
 - [x] Multiple exceptions
 - [x] Chance
 - [x] Cluster-field
-- [x] Cluster field condition and exception
+- [x] Cluster-field condition and exception
 
 - [x] Quantifier
 - [x] Bound quantifier

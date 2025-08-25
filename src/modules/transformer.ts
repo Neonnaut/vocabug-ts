@@ -1,6 +1,6 @@
 import Word from './word';
 import Logger from './logger';
-import { swap_first_two_items } from './utilities';
+import { swap_first_last_items } from './utilities';
 import type { Token } from './types';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
@@ -525,7 +525,7 @@ class Transformer {
                             replacement_stream: []
                         });
                     } else if (mode === "metathesis") {
-                        const my_metathesis = swap_first_two_items(matched_stream)
+                        const my_metathesis = swap_first_last_items(matched_stream)
                         replacements.push({
                             index_span: global_index,
                             length_span: match_length,

@@ -57,15 +57,17 @@ function generate({
         r.expand_wordshape_segments();
         r.set_wordshapes();
 
+        r.resolve_features();
+
         const nesca_grammar_stream = new Nesca_Grammar_Stream(
             logger, r.graphemes, escape_mapper
         );
         const transform_resolver = new Transform_Resolver(
-            logger, nesca_grammar_stream, r.categories, r.transform_pending
+            logger, nesca_grammar_stream, r.categories, r.transform_pending, r.features
         )
         r.set_transforms(transform_resolver.resolve_transforms());
 
-        r.resolve_features();
+        
         
         if(r.debug) { r.create_record(); }
 

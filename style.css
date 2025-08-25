@@ -560,6 +560,7 @@ select {
   font-size: inherit;
 
   -webkit-appearance: none;
+  appearance: none;
   background-image: url(./img/apple-touch-icon.png);
   line-height: 16px; /*ios*/
   cursor: pointer;
@@ -601,6 +602,7 @@ textarea {
 .fake-textbox {
   -moz-appearance: textfield-multiline;
   -webkit-appearance: textarea;
+  appearance: textarea;
   resize: both;
   padding: 6px;
   font-family: monospace;

@@ -20,6 +20,8 @@ class Transform_Resolver {
         line_num:number
     }[] = [];
 
+    public features: Map<string, { graphemes:string[] }> = new Map();
+
     private line_num: number;
 
     constructor(
@@ -31,12 +33,14 @@ class Transform_Resolver {
             conditions:string[], exceptions:string[],
             chance:(number|null),
             line_num:number
-        }[]
+        }[],
+        features: Map<string, { graphemes:string[] }>
     ) {
         this.logger = logger;
         this.nesca_grammar_stream = nesca_grmmar_stream;
         this.categories = categories;
         this.transform_pending = transform_pending;
+        this.features = features;
         this.line_num = 0;
     }
 
@@ -50,14 +54,18 @@ class Transform_Resolver {
 
             // Replace category keys with category graphemes, must be item, or alone
             const target_with_cat = this.categories_into_transform(target);
+            // Replace feature matrix keys with feature matrix graphemes
+            const target_with_fea = this.features_into_transform(target_with_cat)
             // Resolve alternators or optionalators as array of arrays
-            const target_altors:string[][] = this.resolve_alt_opt(target_with_cat);
+            const target_altors:string[][] = this.resolve_alt_opt(target_with_fea);
             
             const result = this.transform_pending[i].result; // string
             // Replace category keys with category graphemes, must be item, or alone
             const result_with_cat = this.categories_into_transform(result);
+            // Replace feature matrix keys with feature matrix graphemes
+            const result_with_fea = this.features_into_transform(result_with_cat);
             // Resolve alternators or optionalators as array of arrays
-            const result_altors:string[][] = this.resolve_alt_opt(result_with_cat);
+            const result_altors:string[][] = this.resolve_alt_opt(result_with_fea);
 
             // Make sure lengths are good, and get merging change / sets
             const { result_array, target_array } = this.normaliseTransformLength(
@@ -90,6 +98,7 @@ class Transform_Resolver {
                 // CONDITIONS
                 let my_condition = this.transform_pending[i].conditions[j];
                 my_condition = this.categories_into_transform(my_condition);
+                my_condition = this.features_into_transform(my_condition)
                 // Validate brackets
                 if (!this.valid_transform_brackets(my_condition)) {
                     this.logger.validation_error(`Invalid brackets in condition "${my_condition}"`, this.line_num);
@@ -112,6 +121,7 @@ class Transform_Resolver {
                 // EXCEPTIONS
                 let my_exception = this.transform_pending[i].exceptions[j];
                 my_exception = this.categories_into_transform(my_exception);
+                my_exception = this.features_into_transform(my_exception)
                 // Validate brackets
                 if (!this.valid_transform_brackets(my_exception)) {
                     this.logger.validation_error(`Invalid brackets in exception "${my_exception}"`, this.line_num);
@@ -321,6 +331,69 @@ class Transform_Resolver {
         return output;
     }
     
+    features_into_transform(stream:string): string {
+
+        const output:string[] = [];
+        let feature_mode:boolean = false;
+        let feature_matrix = ''
+
+        for (let i:number = 0; i < stream.length; i++) {
+            if (feature_mode) {
+                if (stream[i] === "}") {
+                    feature_mode = false;
+                    if (feature_matrix.length != 0) {
+                        output.push(`[${this.get_graphemes_from_matrix(feature_matrix)}]`);
+                    }
+                    feature_matrix = '';
+                    continue;
+                }
+                feature_matrix += stream[i];
+                continue;
+            }
+            if (stream[i] === "@") {
+                i++;
+                if (stream[i] === "{") {
+                    feature_mode = true;
+                    continue;
+                } else {
+                    output.push("@");
+                    continue;
+                }
+            }
+            output.push(stream[i]); // push normal thing
+        }
+        if (feature_mode) {
+            this.logger.validation_error("Unclosed feature-matrix missing '}'", this.line_num);
+        }
+
+        return output.join(' ');
+    }
+
+    get_graphemes_from_matrix(feature_matrix: string): string {
+        const keys: string[] = feature_matrix.split(',').map(k => k.trim());
+        const graphemeSets: string[][] = [];
+
+        for (const key of keys) {
+            const entry = this.features.get(key);
+            if (!entry) {
+                this.logger.validation_error(`Unknown feature key "${key}"`, this.line_num);
+                continue;
+            }
+            graphemeSets.push(entry.graphemes);
+        }
+
+        if (graphemeSets.length === 0) return '';
+
+        const intersection = graphemeSets.slice(1).reduce(
+            (acc, set) => acc.filter(g => set.includes(g)),
+            graphemeSets[0]
+        );
+
+        return intersection.join(', ');
+    }
+
+
+
     normaliseTransformLength(target: string[][], result: string[][]): { target_array: string[][], result_array: string[][] } {
         // 🔁 Surface level: Broadcast result if only one entry
         if (result.length === 1 && target.length > 1) {
