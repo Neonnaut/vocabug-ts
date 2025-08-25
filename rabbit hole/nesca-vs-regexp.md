@@ -3,17 +3,17 @@ So... here we are, Nesca uses its own domain specific language (DSL) for matchin
 | REGEXP     | NeSCA    | Meaning                            |
 |------------|----------|------------------------------------|
 | \<, ^      | #_       | Start of word                      |
-| \\>, $      | _#       | End of word                        |
-|            | \\[SPACE] | Whitespace                         |
+| \\>, $     | _#       | End of word                        |
+|            |          | Whitespace                         |
 | ?=         | /_T      | Lookahead assertion                |
 | ?!         | !_T      | Negative lookahead                 |
 | ?<=        | /T_      | Lookbehind assertion               |
 | ?!= or ?<! | !T_      | Negative lookbehind                |
-| ?>         |          | Once-only Subexp­ression           |
+| ?>         |          | Once-only Subexp­ression            |
 | ?()        |          | Condition [if then]                |
 | ?()\|      |          | Condition [if then else]           |
 | ?#         | ;        | Comment                            |
-| \1         | <1       | Backreference                      |
+| \1         | <        | Backreference                      |
 |            | :        | Geminate                           |
 | *          | (T+)     | 0 or more                          |
 | +          | +        | 1 or more                          |

@@ -76,6 +76,7 @@ const vocabugFeatureFieldRules = [
 
 type State = {
   mode: string;
+  feature_matrix: boolean;
   transform: boolean;
   doIndent: boolean;
   blanko: boolean;
@@ -89,6 +90,7 @@ const vocabugParser: StreamParser<State> = {
     name: "Vocabug",
     startState: (i): State => { return {
         mode: 'none',
+        feature_matrix: false,
         transform: false,
         doIndent: false,
         blanko: false,
@@ -112,6 +114,7 @@ const vocabugParser: StreamParser<State> = {
             return "comment";
         }
         if (stream.sol()) {
+            state.feature_matrix = false;
             // No more clusterblock we reached line with blankspaces
             if (stream.string.trim() == "" && ( state.mode == 'clusterBlock' || state.mode == 'featureField' )) { 
                 state.blanko = true;
@@ -230,14 +233,32 @@ const vocabugParser: StreamParser<State> = {
                     return "tagName";
                 }
             }
-            for (let featuro of state.featureList) {
-                if (stream.match(`@{${featuro}}`)) {
-                    return "tagName";
-                }
-            }
         }
 
         if (state.mode == 'transform') {
+            // Inside Feature matrix
+            if (state.feature_matrix) {
+                for (let featuro of state.featureList) {
+                    if (stream.match(featuro)) {
+                        return "tagName";
+                    }
+                }
+                if (stream.match(/,/)) {
+                    return "link";
+                }
+                if (stream.match(/}/)) {
+                    state.feature_matrix = false;
+                    return "regexp"
+                }
+                
+            }
+
+            // Feature matrix
+            if (stream.match(/@{(?=\+|\-)/)) {
+                state.feature_matrix = true;
+                return "regexp";
+            }
+
             // End Transform
             if (stream.match(/END(?=\s*;|\s*$)/)) {
                 state.mode = 'none';
@@ -256,12 +277,6 @@ const vocabugParser: StreamParser<State> = {
 
             for (let classo of state.classList) {
                 if (stream.match(classo)) {
-                    return "tagName";
-                }
-            }
-
-            for (let featuro of state.featureList) {
-                if (stream.match(`@{${featuro}}`)) {
                     return "tagName";
                 }
             }
@@ -351,7 +366,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
-        if (state.mode == 'featureField') { ////
+        if (state.mode == 'featureField') {
             // End Transform
             if (stream.match(/END(?=\s*;|\s*$)/)) {
                 state.mode = 'none';

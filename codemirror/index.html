@@ -26,7 +26,23 @@
     <!-- CodeMirror 6 -->
     
     <script>
-                choice = `words: {C*s} {v*3}*4
+                choice = `
++voice = b d g m n
+-voice = p t k
++labial = b
+
+graphemes: x,l,w,h
+
+BEGIN words:
+
+tba
+
+END
+
+BEGIN transform: 
+@{+voice, +labial} > v
+
+words: {C*s} {v*3}*4
                 ; This is a comment.
 abcdefg ; And this is a comment following junk.
 

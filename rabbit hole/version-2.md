@@ -4,15 +4,13 @@
 
 Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
 
+They're not that useful here as you can just comment out a line in the words: block
+
 ## 2. Long form category keys
 
 Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
 
-## 3. Support the ZSCA `/` thing.
-
-`//` would be an exception like `!`. `a / b` would be an alternative to `a -> b`
-
-## 4. Positioner
+## 3. Positioner
 
 Positioners, enclosed in `={ and }`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
 
@@ -28,7 +26,7 @@ If we want to match the last occurence of a grapheme in a word, use `-1`. For th
 ; sososo ==> sososx
 ```
 
-## 5. If then else block
+## 4. If then else block
 
 If block
 Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
@@ -56,23 +54,7 @@ END
 
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
-## 6. Syllable dividers and capturing syllables
-
-## 7. Chance for individual optionals
-
-## 8. Alternative graphs
-
-Tells what character + combining diacritic sequences to be treated as alternatives of another grapheme
-
-The left-most precomposed character is the thing being modified
-
-```
-graphemes: a <[á à ǎ â] b d e <[é è ě ê] f g h i <[í ì ǐ î] k l m n o <[ó ò ǒ ô] p r s t u <[ú ù ǔ û] w y
-```
-
-now `a > o` will target `a` with an acute accent.
-
-## 9. Rule macro
+## 5. Rule macro
 
 Rule macro saves rules to be used later in the definition-build as many times as needed. The rules inside the define-rule-macro: block do not run until invoked using do-rule-macro:
 
@@ -91,17 +73,19 @@ END
 ```
 In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.
 
-## 10. Promises
+## 6. Alternative graphs
 
-This would ensure that if a the optional `y` appears, The only graphemes that would be in the pool for `V` would be `a,o,a`, avoiding a `yi` syllable inside generation.
+Tells what character + combining diacritic sequences to be treated as alternatives of another grapheme
 
-This would also work backwards and forwards:
+The left-most precomposed character is the thing being modified
 
-`words: C(j->{u,o,a})V`, `C({p,b,t,d,k,g}<-r)a`
+```
+graphemes: a <[á à ǎ â] b d e <[é è ě ê] f g h i <[í ì ǐ î] k l m n o <[ó ò ǒ ô] p r s t u <[ú ù ǔ û] w y
+```
 
-This represents an almost idealist view on word generation
+now `a > o` will target `a` with an acute accent.
 
-## 11. Invisible graphemes EXTRA
+## 7. Invisible graphemes
 
 This would "skip" graphemes in the TARGET, CONDITION and EXCEPTION, like so:
 
@@ -113,10 +97,20 @@ invisible-graphemes: .
 ; 'tt' becomes 'd'. Ignore any '.' between 't's
 ```
 
-## 12. Lezer grammar
+## 8. Syllable dividers and capturing syllables
+
+## 9. Chance for individual optionals
+
+## 10. Promises
+
+This would ensure that if a the optional `y` appears, The only graphemes that would be in the pool for `V` would be `a,o,a`, avoiding a `yi` syllable inside generation.
+
+This would also work backwards and forwards:
+
+`words: C(j->{u,o,a})V`, `C({p,b,t,d,k,g}<-r)a`
+
+This represents an almost idealist view on word generation
+
+## 11. Lezer grammar
 
 Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
-
-## 13. "AI" generate a def file, like Gleb
-
-This would choose a word template, and syllable template, then populate the categories with suitable graphemes. Suitable small transforms would be chosen as well.

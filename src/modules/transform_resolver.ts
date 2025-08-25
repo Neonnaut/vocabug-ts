@@ -366,7 +366,7 @@ class Transform_Resolver {
             this.logger.validation_error("Unclosed feature-matrix missing '}'", this.line_num);
         }
 
-        return output.join(' ');
+        return output.join('');
     }
 
     get_graphemes_from_matrix(feature_matrix: string): string {

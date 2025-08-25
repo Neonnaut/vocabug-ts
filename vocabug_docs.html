@@ -695,9 +695,10 @@
       <p>In the above example, the transformation will execute only 30% of the time.</p>
 
       <h2 id="nescaTheException"><a class="head-num">15</a>The exception</h2>
-      <p>Exceptions are placed following a <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- when a transform has an exception, the target must meet the environment described in the exception to prevent execution:</p>
+      <p>Exceptions are placed following an exclamation mark <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- when a transform has an exception, the target must meet the environment described in the exception to prevent execution:</p>
       <div class="prog-pre">aa <span class="link">-></span> a <span class="link">!</span> <span class="link">_</span><span class="regexp">#</span></div>
       <p>In the above example, the transformation will not execute if <code class="example">aa</code> is at the end of the word.</p>
+      <p>An alternative to using an exclamation mark is to use two forward slashes <code class="example">//</code>.</p>
 
       <h2 id="nescaUsingCategories"><a class="head-num">16</a>Using categories</h2>
       <p>You can reference categories in transforms. The category will behave in the same way as an alternator set:</p>

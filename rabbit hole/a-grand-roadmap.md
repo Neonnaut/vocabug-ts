@@ -91,7 +91,7 @@
 
 - [x] Named escape
 - [x] Metathesis
-- [] Feature
+- [x] Feature
 
 ## Collator
 

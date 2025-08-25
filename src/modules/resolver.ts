@@ -529,6 +529,7 @@ class Resolver {
             this.logger.validation_error(`No input`, this.file_line_num)
         }
 
+        input = input.replace(/\/\//g, '!'); // Replace '//' with '!'
         const divided = input.split(/>|->|→|=>|⇒/);
         if (divided.length === 1) {
             this.logger.validation_error(`No arrows in transform`, this.file_line_num)
