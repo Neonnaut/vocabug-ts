@@ -14,7 +14,7 @@ function categories_into_transform(
         const interim = input.slice(lastIndex, index);
         const illegal = interim.match(/[A-Z]/g);
         if (illegal) {
-            throw new Error(`Invalid category usage: ${illegal.join(', ')}`);
+            this.logger.validation_error(`Invalid category usage: ${illegal.join(', ')}`);
         }
 
         const entry = categories.get(key);
@@ -30,7 +30,7 @@ function categories_into_transform(
     const trailing = input.slice(lastIndex);
     const illegal = trailing.match(/[A-Z]/g);
     if (illegal) {
-        throw new Error(`Invalid category usage: ${illegal.join(', ')}`);
+        this.logger.validation_error(`Invalid category usage: ${illegal.join(', ')}`);
     }
 
     output += trailing;

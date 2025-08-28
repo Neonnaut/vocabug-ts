@@ -3,7 +3,7 @@ import { get_last } from './utilities'
 class Word {
     static debug: boolean = false;
 
-    private transformations: string[];
+    public transformations: (string|null)[];
     private forms: string[];
     public rejected: boolean;
     private line_nums: (string)[];
@@ -27,8 +27,11 @@ class Word {
         let output: string | undefined = '';
         if (Word.debug) {
             for (let i = 0; i < this.forms.length; i++) {
-
-                output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} ➤ ⟨${this.forms[i]}⟩\n`;
+                if (this.transformations[i]) {
+                    output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} ➤ ⟨${this.forms[i]}⟩\n`;
+                } else {
+                    output += `⟨${this.forms[i]}⟩\n`;
+                }
             }
             return output;
         }
@@ -39,7 +42,7 @@ class Word {
         return output;
     }
 
-    record_transformation(rule:string, form:string, line_num:number|null = null): void {
+    record_transformation(rule:(string|null), form:string, line_num:number|null = null): void {
         this.transformations.push(rule);
         this.forms.push(form);
         let my_line_num = '';

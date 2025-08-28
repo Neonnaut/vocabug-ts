@@ -135,7 +135,7 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.comment, color: "#bee79d"}, 
 
   // Escape char / CREAM ON BLACK
-  { tag: t.escape, color: "#f0f0f0", backgroundColor:"#584747" }, 
+  { tag: t.escape, color: "#f0f0f0", backgroundColor:"#4f185fff" }, 
 
   // Directive / RED / words: alphabet: etc.
   { tag: [t.meta, t.name], color: "#ff7a7a" },

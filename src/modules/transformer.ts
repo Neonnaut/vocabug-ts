@@ -176,7 +176,7 @@ class Transformer {
                 i += count;
             } else if (token.type === 'backreference') {
                 if (!target_stream || target_stream.length === 0) {
-                    throw new Error("Backreference requires a non-empty target_stream");
+                    this.logger.validation_error("Backreference requires a non-empty target_stream");
                 }
 
                 const unit = target_stream;
@@ -573,11 +573,12 @@ class Transformer {
 
         let tokens = this.graphemosis(word.get_last_form());
 
-        if (this.debug) { word.record_transformation("graphemosis", `${tokens.join(" ")}`); }
-
         for (const t of this.transforms) {
             if (word.rejected) {
                 break;
+            }
+            if (t.target.length == 0) {
+                continue;
             }
             tokens = this.apply_transform(word, tokens, t);
             if (tokens.length == 0) {
@@ -587,7 +588,13 @@ class Transformer {
         }
 
         if (!word.rejected) {
-            word.record_transformation("retrographemosis", `${tokens.join("")}`);
+            if (this.debug) {
+                if (word.transformations.length > 1) {
+                    word.record_transformation(null, `${tokens.join("")}`);
+                }
+            } else {
+                word.record_transformation(null, `${tokens.join("")}`);
+            }
         }
 
         return word;

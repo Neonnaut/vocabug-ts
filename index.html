@@ -51,15 +51,15 @@
       <p>Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun. <a href="./vocabug_docs.html">Read the documentation here</a>.</p>
 
         <script src="./src/shell.ts" type="module"></script>
+  
+        <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea><br>
 
         <div class="switch-field">
           <input type="submit" id="generate-words" value="Generate">
           <input type="submit" id="output-words-copy" value="Copy">
           <input type="button" id="voc-clear-editor" value="Clear">
         </div>
-  
-        <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea><br>
-      
+        
         <div id='voc-output-message' style="border: 2px solid #000;"></div>
     
         <fieldset style="float: left;">

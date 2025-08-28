@@ -312,7 +312,7 @@ window.addEventListener("load", () => {
 });
 
 function clear_results(): void {
-    (document.getElementById('voc-output-message') as HTMLInputElement).innerHTML = "";
+    (document.getElementById('voc-output-message') as HTMLDivElement).innerHTML = "";
     (document.getElementById('voc-output-words-field') as HTMLInputElement).value = "";
 }
 

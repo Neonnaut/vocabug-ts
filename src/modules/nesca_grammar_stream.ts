@@ -121,7 +121,14 @@ class Nesca_Grammar_Stream {
             new_token = { type: "backreference", base: char, min: 1, max: 1 };
             i++;
 
-         } else if (char === '#' || char === '+' || char === '{' || char === '}' || char === ':' || char == '*' || char == '&' || char === '…' ||  char === '|' || char === '∅' || char === '^' || char === "~") {
+         } else if (
+            char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||
+            char == '[' || char == ']' || char == '(' || char == ')' || char == '<' ||
+            char === '∅' || char === '^' || char == '/' || char === '!' || char === "?" ||
+            char == '_' || char == '#' || char == '+' || char == ':' || char == '*' ||
+            char === '…' || char === '&' || char == '|' || char === "~" || char == '@'
+         
+         ) {
             this.logger.validation_error(`Unexpected syntax character '${char}' in ${mode}`, line_num);
 
          // GRAPHEME match
@@ -177,25 +184,31 @@ class Nesca_Grammar_Stream {
                   look_ahead++;
                }
                if (stream[look_ahead] !== "}") {
-                  throw new Error(`Unclosed quantifier block at position ${i}`);
+                  this.logger.validation_error(`Unclosed quantifier`, line_num);
                }
 
                const parts = quantifier.split(",");
                if (parts.length === 1) {
                   const n = parseInt(parts[0], 10);
-                  if (isNaN(n)) throw new Error(`Invalid quantifier value: "${parts[0]}"`);
+                  if (isNaN(n)) {
+                     this.logger.validation_error(`Invalid quantifier value: "${parts[0]}"`, line_num);
+                  }
                   new_token.min = n;
                   new_token.max = n;
                } else if (parts.length === 2) {
                   const [minStr, maxStr] = parts;
                   const min = minStr === "" ? 1 : parseInt(minStr, 10);
                   const max = maxStr === "" ? Infinity : parseInt(maxStr, 10);
-                  if (minStr !== "" && isNaN(min)) throw new Error(`Invalid min value: "${minStr}"`);
-                  if (maxStr !== "" && max !== null && isNaN(max)) throw new Error(`Invalid max value: "${maxStr}"`);
+                  if (minStr !== "" && isNaN(min)) {
+                     this.logger.validation_error(`Invalid min value: "${minStr}"`, line_num);
+                  }
+                  if (maxStr !== "" && max !== null && isNaN(max)) {
+                     this.logger.validation_error(`Invalid max value: "${maxStr}"`, line_num);
+                  }
                   new_token.min = min;
                   new_token.max = max;
                } else {
-                  throw new Error(`Invalid quantifier format: "${quantifier}"`);
+                  this.logger.validation_error(`Invalid quantifier format: "${quantifier}"`, line_num);
                }
 
                i = look_ahead + 1;

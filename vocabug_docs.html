@@ -104,7 +104,7 @@
           <li><a href="#nescaConcurrentChange">Concurrent change</a></li>
           <li><a href="#nescaMergingChange">Merging change</a></li>
           <li><a href="#nescaReject">Reject</a></li>
-          <li><a href="#nescaMetathesis">Metathesis</a></li>
+          
         </ol>
         </li>
 
@@ -124,6 +124,7 @@
 
         <li><a href="#nescaFeatures">Features</a>
         <ol class="nice-list">
+          <li><a href="#nescaUsingFeatures">Using features</a></li>
           <li><a href="#nescaFeatureField">Feature-field</a></li>
         </ol>
         </li>
@@ -146,13 +147,14 @@
           <li><a href="#nescaWildcard">Wildcard</a></li>
           <li><a href="#nescaAnythingsMark">Anythings-mark</a></li>
           <li><a href="#nescaBlocker">Blocked-anythings-mark</a></li>
-          <li><a href="#nescaBackreference">Backreference</a></li>
         </ol>
         </li>
 
         <li><a href="#nescaAdvancedRules">Advanced rules</a>
           <ol class="nice-list">
             <li><a href="#nescaEngine">Engine</a></li>
+            <li><a href="#nescaBackreference">Backreference</a></li>
+            <li><a href="#nescaMetathesisChange">Metathesis change</a></li>
         </ol>
         </li>
         <li><a href="#vocabugQuestionsAndAnswers">Questions and answers</a></li>
@@ -165,7 +167,7 @@
 
       <h2 id="vocInterface"><a class="head-num">2</a>Interface</h2>
       <ul class="paragraphian">
-        <li>The textbox at the top of the program is the <code class="example">definition-build editor</code>. A definition-build defines the graphemes, frequencies, word-shapes and transforms that generate the final words. There will already be a default definition-build in the definition-build editor, or the previous definition-build that generated words</li>
+        <li>The textbox at the bottom of the program is the <code class="example">definition-build editor</code>. A definition-build defines the graphemes, frequencies, word-shapes and transforms that generate the final words. There will already be a default definition-build in the definition-build editor, or the previous definition-build that generated words</li>
         <li>Use the <code class="example">Generate</code> button to see Vocabug produce words</li>
         <li>Use the <code class="example">Copy</code> button to copy the words to the clipboard</li>
         <li>Use the <code class="example">Clear</code> button to clear the definition-build editor and the generated words</li>
@@ -268,10 +270,6 @@
             <td><code class="example">^</code> or <code class="example">∅</code></td>
             <td>A null grapheme</td>
           </tr>
-          <tr>
-            <td><code class="example">\</code></td>
-            <td>Escapes a character after it</td>
-          </tr>
         </tbody>
       </table>
 
@@ -327,10 +325,6 @@
             <td><a href="#nescaReject">Rejects</a> a word</td>
           </tr>
           <tr>
-            <td><code class="example">~</code></td>
-            <td>Indicates a <a href="#nescaMetathesis">metathesis</a> change</td>
-          </tr>
-          <tr>
             <td><code class="example">/</code></td>
             <td>A <a href="#nescaTheCondition">condition</a> follows this character</td>
           </tr>
@@ -339,7 +333,7 @@
             <td>A <a href="#nescaChanceCondition"> chance condition</a> follows this character</td>
           </tr>
           <tr>
-            <td><code class="example">!</code></td>
+            <td><code class="example">!</code> or <code class="example">//</code></td>
             <td>An <a href="#nescaTheException">exception</a> follows this character</td>
           </tr>
           <tr>
@@ -360,7 +354,7 @@
           </tr>
           <tr>
             <td><code class="example">:</code></td>
-            <td><a href="#nescaGeminateMark">Geminate-mark</a>, matches exactly twice to the previous grapheme</td>
+            <td><a href="#nescaGeminateMark">Geminate-mark</a>, matches twice to the previous grapheme</td>
           </tr>
           <tr>
             <td><code class="example">*</code></td>
@@ -368,19 +362,23 @@
           </tr>
           <tr>
             <td><code class="example">&</code> or <code class="example">…</code></td>
-            <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches 1 or more of any grapheme. It is non-greedy</td>
+            <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches ungreedily 1 or more wildcards</td>
           </tr>
           <tr>
             <td><code class="example">&{</code> or <code class="example">…{</code> and <code class="example">}</code></td>
             <td><a href="#nescaBlocker">Blocked-anythings-mark</a></td>
           </tr>
           <tr>
+            <td><code class="example">|</code></td>
+            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
+          </tr>
+          <tr>
             <td><code class="example">&lt;</code></td>
             <td><a href="#nescaBackreference">Backreference</a></td>
           </tr>
           <tr>
-            <td><code class="example">|</code></td>
-            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
+            <td><code class="example">~</code></td>
+            <td>Indicates a <a href="#nescaMetathesisChange">metathesis</a> change</td>
           </tr>
         </tbody>
       </table>
@@ -508,7 +506,7 @@
 
       <p>By default, the graphemes' frequencies decrease as they go to the right, according to the Gusein-Zade distribution. <a href="#vocDistributions">You can change this distribution</a>. In the above example, when Vocabug needs to choose a <code class="example">V</code>, it will choose <code class="example">a</code> the most at 43%, <code class="example">i</code> the second-most at 26%, <code class="example">e</code> the third-most at 17%, <code class="example">u</code> the fourth-most at 10%, and <code class="example">o</code> the fifth most at 4%.</p>
       
-      <p>Need more than 26 categories? Vocabug supports the following additional characters as the key of a category or segment: <code class="example">Á Ć É Ǵ Í Ḱ Ĺ Ḿ Ń Ó Ṕ Ŕ Ś Ú Ẃ Ý Ź À È Ì Ǹ Ò Ù Ẁ Ỳ Ǎ Č Ď Ě Ǧ Ȟ Ǐ Ǩ Ľ Ň Ǒ Ř Š Ť Ǔ Ž Ä Ë Ḧ Ï Ö Ü Ẅ Ẍ Ÿ Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω</code></p>
+      <p>Need more than 26 categories? Vocabug supports the following additional characters as the key of a category or <a href="#vocSegments">segment</a>: <code class="example">Á Ć É Ǵ Í Ḱ Ĺ Ḿ Ń Ó Ṕ Ŕ Ś Ú Ẃ Ý Ź À È Ì Ǹ Ò Ù Ẁ Ỳ Ǎ Č Ď Ě Ǧ Ȟ Ǐ Ǩ Ľ Ň Ǒ Ř Š Ť Ǔ Ž Ä Ë Ḧ Ï Ö Ü Ẅ Ẍ Ÿ Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω</code></p>
         
       <h3 id="vocCategoryinCategory"><a class="head-num">5.1</a>Categories inside categories and set-categories</h3>
       <p>You can use categories inside categories, as long as the referenced category has previously been defined. For example:</p>
@@ -565,7 +563,7 @@
       <p>By default, an optional-set has a 10% chance of being included in the word. You can change this probability with the <code class="example">optionals-weight:</code> directive.</p>
 
       <h3 id="vocSupraSet"><a class="head-num">6.5</a>Supra-set</h3>
-      <p>A 'supra-set', is applied over the entire word, and there can only be one supra set. Curly brackets <code class="example">{</code> and <code class="example">}</code>, denotes each item in the supra-set and their location in the word. The items of a supra-set can only be a category, or the null grapheme <code class="example">^</code>. Only one item in the supra-set will be picked for that generated word.</p>
+      <p>A 'supra-set', is applied over the entire word, and there can only be one supra set. Curly braces <code class="example">{</code> and <code class="example">}</code>, denotes each item in the supra-set and their location in the word. The items of a supra-set can only be a category, or the null grapheme <code class="example">^</code>. Only one item in the supra-set will be picked for that generated word.</p>
       <p>Supra-set is a feature designed to help generate words with stress systems, pitch accent systems, or other word-based suprasegmentals. Here is an example where it is used for a stress system:</p>
       <div class="prog-pre"><span class="catkey">C</span> <span class="link">=</span> t<br><span class="catkey">V</span> <span class="link">=</span> a<br><span class="catkey">X</span> <span class="link">=</span> '<br><span class="directive">words</span><span class="link">:</span> <span class="regexp">({</span><span class="catkey">X</span><span class="regexp">}</span><span class="catkey">C</span><span class="catkey">V</span><span class="regexp">){</span><span class="catkey">X</span><span class="regexp">}</span><span class="catkey">CV</span></div>
       <p>This produces any of the following words: <code class="example">'ta</code>, <code class="example">ta'ta</code>, <code class="example">'tata</code>, never any words with more than one <code class="example">'</code>. Notice here that <code class="example">ta</code> is not possible -- A supra-set item is only chosen after dealing with any sets that the supra-set items are nested in.</p>
@@ -573,8 +571,8 @@
       
       <h4 id="vocSupraSetWeight"><a class="head-num">6.5.1</a>Supra-set weight</h4> 
       <p>You can set the weights of supra-set items like so:</p>
-      <div class="prog-pre"><span class="catkey">M</span> <span class="link">=</span> m<br><span class="catkey">N</span> <span class="link">=</span> n<br><span class="catkey">$X</span> <span class="link">=</span> ka<span class="regexp">{</span><span class="catkey">M</span><span class="weight">*8</span><span class="regexp">}</span><br><span class="catkey">$Y</span> <span class="link">=</span> te<span class="regexp">{</span><span class="catkey">N</span><span class="weight">*2</span><span class="regexp">}</span><br><span class="directive">words</span><span class="link">:</span> <span class="catkey">$X$Y</span></div>
-      <p>The above example has an 80% chance of generating <code class="example">kamte</code> and a 20% chance of generating <code class="example">katen</code>.</p>
+      <div class="prog-pre"><span class="catkey">R</span> <span class="link">=</span> r<br><span class="catkey">$X</span> <span class="link">=</span> o<span class="regexp">{</span><span class="catkey">R</span><span class="weight">*8</span><span class="regexp">}</span><br><span class="catkey">$Y</span> <span class="link">=</span> e<span class="regexp">{</span><span class="catkey">R</span><span class="weight">*2</span><span class="regexp">}</span><br><span class="directive">words</span><span class="link">:</span> <span class="catkey">$X$Y</span></div>
+      <p>The above example has an 80% chance of generating <code class="example">ore</code> and a 20% chance of generating <code class="example">oer</code>.</p>
       <p>Supra-set item weights support a sentinel value -- a 'super-heavy' value <code class="example">s</code>. This <code class="example">s</code> will ensure the supra-set item attached to this weight is always chosen over others. For example: <code class="example">{V*s}</code></p>
 
       <h2 id="vocDistributions"><a class="head-num">7</a>Default distributions</h2>
@@ -601,12 +599,12 @@
       <h2 id="vocAlphabetisation"><a class="head-num">9</a>Alphabetisation</h2>
       <p>The alphabet directive gives Vocabug a custom alphabetisation order for words, when the sort words checkbox is selected.</p>
       <div class="prog-pre"><span class="directive">alphabet</span><span class="link">:</span> a<span class="link">,</span> b<span class="link">,</span> c<span class="link">,</span> e<span class="link">,</span> f<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> l<span class="link">,</span> m<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> p<span class="link">,</span> p'<span class="link">,</span> r<span class="link">,</span> s<span class="link">,</span> t<span class="link">,</span> t'<span class="link">,</span> y</div>
-      <p>This would order generated words like so: <code class="example">cat chat cumin frog tray t'a yanny</code></p>
+      <p>This would order generated words like so: <code class="example">cat, chat, cumin, frog, tray, t'a, yanny</code></p>
 
       <h3 id="vocInvisibility"><a class="head-num">9.1</a>Invisibility</h3>
       <p>Sometimes you will want characters, such as syllable dividers, to be invisible to alphabetisation. You can do this by listing these characters in the invisible: directive.</p>
       <div class="prog-pre"><span class="directive">invisible</span><span class="link">:</span> .<span class="link">,</span> ˈ<br></div>
-      <p>This would order generated words <code class="example">ˈpa.ta ˈca.ta za.ˈta ca.ˈa</code> as   <code class="example">ca.ˈa, ˈca.ta, ˈpa.ta, za.ˈta</code></p>
+      <p>This would order generated words <code class="example">ˈpa.ta, ˈca.ta, za.ˈta, ca.ˈa</code> as   <code class="example">ca.ˈa, ˈca.ta, ˈpa.ta, za.ˈta</code></p>
 
       <h2 id="vocGraphemes"><a class="head-num">10</a>Defining graphemes</h2>
       <p>The <code class="example">graphemes:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nescaTransform">transformations</a>.</p>
@@ -654,12 +652,6 @@
       <p>In the above example, any word that contains <code class="example">a</code> or <code class="example">bi</code> will be rejected.</p>
       <p>A shorthand version to <code class="example">^REJECT</code> is <code class="example">^R</code></p>
 
-      <h3 id="nescaMetathesis"><a class="head-num">12.4</a>Metathesis</h3>
-      <p>Simple metathesis involves a tilde <code class="example">~</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
-  <span class="regexp">[</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">]</span><span class="regexp">[</span>m<span class="link">,</span> n<span class="regexp">]</span> <span class="link">-></span> <span class="operator">~</span><br><span class="comment">; apma ==> ampa</span></div>
-      
-
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
       <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
       <div class="prog-pre"><span class="comment">; insert /a/ in between /b/ and /t/</span>
@@ -674,6 +666,7 @@
       <p>Conditions follow <a href="#nescaTheChange">the change</a> and are placed after a forward slash. When a transform has a condition, the target must meet the environment described in the condition to execute.</p>
       <p>The format of a condition is <code class="example">/ BEFORE_AFTER</code></p>
       <ul class="paragraphian">
+        <li>A forward slash <code class="example">/</code> begins a condition</li>
         <li><code class="example">BEFORE</code> is anything in the word before the target</li>
         <li>The underscore <code class="example">_</code> is a reference to the target in a condition</li>
         <li><code class="example">AFTER</code> is anything in the word after the target</li>
@@ -686,7 +679,7 @@
       <div class="prog-pre"><span class="comment">; Change /o/ into /x/ only when it is between /p/s or /t/s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p <span class="link">/</span> t<span class="link">_</span>t<br><span class="comment">; opoptot ==> opxptxt</span></div>
       
       <h3 id="nescaWordBoundary"><a class="head-num">14.2</a>Word boundary</h3>
-      <p><code class="example">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="example">TARGET</code>, or the end of the word if it is in <code class="example">RESULT</code></p>
+      <p>Hash <code class="example">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="example">TARGET</code>, or the end of the word if it is in <code class="example">RESULT</code></p>
       <div class="prog-pre">  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<span class="regexp">#</span><br><span class="comment">; opoppop ==> opoppxp</span></div>
 
       <h3 id="nescaChanceCondition"><a class="head-num">14.3</a>The chance condition</h3>
@@ -730,9 +723,9 @@
 
       <p>'Where does this leave graphemes that are not marked by either the pro-feature or the anti-feature of a feature?', you might ask. Such graphemes are <em>unmarked</em> by that feature.</p>
 
-      <p><b>Using features in feature-matrices:</b></p>
+      <h3 id="nescaUsingFeatures"><a class="head-num">17.1</a>Using Features</h3>
 
-      <p>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' using curly braces <code class="example">@{</code> and <code class="example">}</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">@{+high, +back}</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">@{+high, +back, -round}</code> would capture <code class="example">ɯ</code> only.</p>
+      <p>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' surrounded by <code class="example">@{</code> and <code class="example">}</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">@{+high, +back}</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">@{+high, +back, -round}</code> would capture <code class="example">ɯ</code> only.</p>
       <p>The very simple example below is written to change all voiceless graphemes that have a voiced counterpart into their voiced counterparts:</p>
 
       <div class="prog-pre"><span class="catkey">-voice</span> <span class="link">=</span> p<span class="link">,</span> t<span class="link">,</span> k<span class="link">,</span> f<span class="link">,</span> s
@@ -745,7 +738,7 @@
 
       <p>In this rule, in <code class="example">RESULT</code>, <code class="example">@{+voice}</code> has a symmetrical one-to-one change of graphemes from the graphemes in <code class="example">@{-voice}</code> in <code class="example">TARGET</code>, leading to a concurrent change. Let's quickly imagine a scenario where the only <code class="example">@{+voice}</code> grapheme was <code class="example">b</code>. The result will be a merging of all <code class="example">-voice</code> graphemes into <code class="example">b</code>: <code class="example">tamepfa ==&gt; bamebba</code>.</p>
 
-      <h3 id="nescaFeatureField"><a class="head-num">17.1</a>Feature-field</h3>
+      <h3 id="nescaFeatureField"><a class="head-num">17.2</a>Feature-field</h3>
       <p>Feature-fields allow graphemes to be easily marked by multiple features in table format.</p>
       <p>The feature-field begins with a <code class="example">+-</code> and a space. The graphemes being marked by the features are listed on the first row. The features are listed in the first column.</p>
       <p>For example:</p>
@@ -866,7 +859,23 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       
       <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">&{</span>k<span class="link">,</span> g<span class="regexp">}</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
 
-      <h3 id="nescaBackreference"><a class="head-num">20.8</a>Backreference</h3>
+      <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced rules</h2>
+
+      <h3 id="nescaEngine"><a class="head-num">21.1</a>Engine</h3>
+      <p>The engine statement provides useful functions that you can call at any point in the transform block. You call these engines following a <code class="example">|</code> and a space on a new line. You can also call a list of these functions in one line. For example: <code class="example">| compose, capitalise</code></p>
+
+      <ul class="paragraphian">
+        <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, \u006E + \u0303</li>
+        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1</li>
+        <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
+        <li><code class="example">decapitalise</code> will convert the first character of a word to lowercase</li>
+        <li><code class="example">to-upper-case</code> will convert all characters of a word to uppercase</li>
+        <li><code class="example">to-lower-case</code> will convert all characters of a word to lowercase</li>
+        <li><code class="example">xsampa_to_ipa</code> will convert graphemes of a word written in X-SAMPA into IPA</li>
+        <li><code class="example">ipa_to_xsampa</code> will convert graphemes of a word written in IPA into X-SAMPA</li>
+      </ul>
+
+      <h3 id="nescaBackreference"><a class="head-num">21.2</a>Backreference</h3>
       <p>A backreference is a reference to the captured target. It cannot be used in <code class="example">TARGET</code>. This uses the less-than symbol <code class="example">&lt;</code>.</p>
       <p>Here are some examples where backreference is employed:</p>
       <p><b>Full reduplication</b>:</p>
@@ -879,21 +888,12 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
       <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">&lt;</span></div>
 
-      <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced rules</h2>
 
-      <h3 id="nescaEngine"><a class="head-num">21.1</a>Engine</h3>
-      <p>The engine statement provides useful functions that you can call at any point in the definition-build. You call these engines following a <code class="example">|</code> and a space on a new line. You can also call a list of these functions in one line. For example: <code class="example">| compose, capitalise</code></p>
-
-      <ul class="paragraphian">
-        <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, <code class="example">n</code> \u006E + <code class="example">◌̃ </code> \u0303</li>
-        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1</li>
-        <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
-        <li><code class="example">decapitalise</code> will convert the first character of a word to lowercase</li>
-        <li><code class="example">to-upper-case</code> will convert all characters of a word to uppercase</li>
-        <li><code class="example">to-lower-case</code> will convert all characters of a word to lowercase</li>
-        <li><code class="example">xsampa_to_ipa</code> will convert graphemes of a word written in X-SAMPA into IPA</li>
-        <li><code class="example">ipa_to_xsampa</code> will convert graphemes of a word written in IPA into X-SAMPA</li>
-      </ul>
+      <h3 id="nescaMetathesisChange"><a class="head-num">21.3</a>Metathesis change</h3>
+      <p>Simple metathesis involves a tilde <code class="example">~</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
+      <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
+  <span class="regexp">[</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">]</span><span class="regexp">[</span>m<span class="link">,</span> n<span class="regexp">]</span> <span class="link">-></span> <span class="operator">~</span><br><span class="comment">; apma ==> ampa</span></div>
+      
 
       <h2 id="vocabugQuestionsAndAnswers"><a class="head-num">22</a>Questions and answers</h2>
       <p>Here are some common questions and answers about Vocabug:</p>

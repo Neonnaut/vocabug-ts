@@ -11,8 +11,11 @@ class Resolver {
     public supra_builder: Supra_Builder
 
     public num_of_words: number;
+
+    public generation_mode: Generation_Mode;
     public debug: boolean;
     public paragrapha: boolean;
+
     public remove_duplicates: boolean;
     public force_word_limit: boolean;
     public sort_words: boolean;
@@ -57,7 +60,7 @@ class Resolver {
         supra_builder: Supra_Builder,
 
         num_of_words_string: number | string,
-        mode: Generation_Mode,
+        generation_mode: Generation_Mode,
         sort_words: boolean,
         capitalise_words: boolean,
         remove_duplicates: boolean,
@@ -85,8 +88,10 @@ class Resolver {
         }
         this.num_of_words = num_of_words;
 
-        this.debug = (mode === 'debug');
-        this.paragrapha = (mode === 'paragraph');
+        this.debug = (generation_mode === 'debug');
+        this.paragrapha = (generation_mode === 'paragraph');
+        this.generation_mode = generation_mode;
+
         this.sort_words = sort_words;
         this.capitalise_words = capitalise_words;
         this.remove_duplicates = remove_duplicates;
@@ -1224,8 +1229,7 @@ class Resolver {
         let info:string =
             `~ OPTIONS ~\n` +
             `Num of words: ` + this.num_of_words + 
-            `\nDebug: ` + this.debug + 
-            `\nParagrapha: ` + this.paragrapha +
+            `\nMode: ` + this.generation_mode +
             `\nRemove duplicates: ` + this.remove_duplicates +
             `\nForce word limit: ` + this.force_word_limit +
             `\nSort words: ` + this.sort_words +
