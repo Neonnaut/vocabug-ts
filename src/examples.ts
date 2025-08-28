@@ -190,7 +190,7 @@ END`,
 ; Australian looking. The glottal stop and lack of retroflex stops make it
 ; not an 'average' Australian language word list, but not unusual.
 
-; I use <R> for length and <@> for coda-matching.
+; I use <R> for length and <-> for coda-matching.
 ; <t̪  c ʔ n̪  ɲ  ŋ  r  ɻ ʎ  j> romanise as...
 ; <th j ꞌ nh ny ng rr r ly y> at the end.
 
@@ -218,7 +218,7 @@ W = a, i, u
 ; <l r ɻ n̪> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
 ; Disylabic words DON'T begin with a vowel. NO monosyllabic words.
 $I = IW
-$S = [C*12,@X*2,@Y,@Z]V
+$S = [C*12,-X*2,-Y,-Z]V
 $J = JV
 $Z = CW(F)
 
@@ -228,17 +228,17 @@ graphemes: a aR e eR i iR o oR u uR p t̪ t c k ʔ m n̪ n ɲ ŋ r ɻ j w l ʎ
 
 BEGIN transform:
 ; Restrict the occurance of <ai>.
-%  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  @
-ai aʔ ac aŋ aɲ aj aw aʎ aɻ a@
+%  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  -
+ai aʔ ac aŋ aɲ aj aw aʎ aɻ a-
 
 ; Long vowels become short before a consonant cluster or <ʔ>.
-R -> ^ / _@ / _ʔ
+R -> ^ / _- / _ʔ
 
 ; <ji>, <ʎi> and <wu> are rejected.
 ji ʎi wu jiR ʎiR wuR -> ^REJECT
 
 ; Romaniser:
-@ > ^
+- > ^
 oR eR iR uR aR -> oo ee ii uu aa
 r ɻ n̪ t̪ ʔ ɳ -> rr r nh th ꞌ n
 ɲ ʎ j c ʈ ŋ -> ny ly y j t ng

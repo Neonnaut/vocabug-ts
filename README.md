@@ -45,7 +45,7 @@ The input signature for `vocabug.generate()` is:
 type generate_options = {
     file: string; // Your definition file
     num_of_words?: number | string; // Number of words to generate
-    mode?: 'word-list'|'debug'|'paragraph'; // generation mode
+    generation_mode?: 'word-list'|'debug'|'paragraph'; // generation mode
     remove_duplicates?: boolean;
     force_word_limit?: boolean; // Force to the time limit
     sort_words?: boolean;
