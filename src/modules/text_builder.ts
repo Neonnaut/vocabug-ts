@@ -1,7 +1,7 @@
 import Word from './word';
 import Logger from './logger';
 import collator from './collator';
-import { capitalise } from './utilities';
+import { capitalise, final_sentence } from './utilities';
 
 class Text_Builder {
     private logger: Logger;
@@ -109,39 +109,31 @@ class Text_Builder {
         // Send some good info about the generation results
         let ms:any = Date.now() - this.build_start;
         const display = ms >= 1000 ? `${(ms / 1000).toFixed(ms % 1000 === 0 ? 0 : 1)} s` : `${ms} ms`;
-        let record:string = '';
+        
+        
+        let records:string[] = [];
         
         if (this.words.length == 1) {
-            record+= `1 word generated in ${display}`;
+            records.push(`1 word generated`);
         } else if (this.words.length > 1) {
-            record+= `${this.words.length} words generated in ${display}`;
+            records.push(`${this.words.length} words generated`);
         } else if (this.words.length == 0) {
-            record+= `Zero words generated in ${display}`;
+            records.push(`Zero words generated`); // How did that happen?
         }
 
         if (this.num_of_duplicates == 1) {
-            record+= ` -- with 1 duplicate word removed`;
-            if (this.num_of_rejects == 1) {
-                record+= `, and 1 word rejected`;
-            } else if (this.num_of_rejects > 1) {
-                record+= `, and ${this.num_of_rejects} words rejected`;
-            }
+            records.push(`1 duplicate word removed`);
         } else if (this.num_of_duplicates > 1) {
-            record+= ` -- with ${this.num_of_duplicates} duplicate words removed`;
-            if (this.num_of_rejects == 1) {
-                record+= `, and 1 word rejected`;
-            } else if (this.num_of_rejects > 1) {
-                record+= `, and ${this.num_of_rejects} words rejected`;
-            }
-        } else {
-            if (this.num_of_rejects == 1) {
-                record+= ` -- with 1 word rejected`;
-            } else if (this.num_of_rejects > 1) {
-                record+= ` -- with ${this.num_of_rejects} words rejected`;
-            }
+            records.push(`${this.num_of_duplicates} duplicate words removed`);
         }
 
-        this.logger.info(record);
+        if (this.num_of_rejects == 1) {
+            records.push(`1 word rejected`);
+        } else if (this.num_of_rejects > 1) {
+            records.push(`${this.num_of_rejects} words rejected`);
+        }
+        
+        this.logger.info(`${final_sentence(records)} -- in ${display}`);
     }
 
     make_text() {

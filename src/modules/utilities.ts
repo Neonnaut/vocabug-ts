@@ -162,10 +162,20 @@ function swap_first_last_items(array: any[]): any[] {
   return array;
 }
 
+function final_sentence(items: string[]): string {
+  const len = items.length;
 
+  if (len === 0) return '';
+  if (len === 1) return items[0];
+
+  const allButLast = items.slice(0, len - 1).join(', ');
+  const last = items[len - 1];
+
+  return `${allButLast} and ${last}`;
+}
 
 export {
   get_last, capitalise, make_percentage, weighted_random_pick, get_distribution,
   supra_weighted_random_pick,
-  get_cat_seg_fea, cappa, swap_first_last_items
+  get_cat_seg_fea, cappa, swap_first_last_items, final_sentence
 };
