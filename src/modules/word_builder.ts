@@ -49,7 +49,7 @@ class Word_Builder {
             const [ids, weights] = this.supra_builder.extract_letters_and_weights(stage_two);
             const chosen_id = supra_weighted_random_pick(ids, weights);
             stage_three = this.supra_builder.replace_letter_and_clean(stage_two, Number(chosen_id));
-        } 
+        }
 
         // Stage four looks like `tacan!`. ready to be transformed and added to text
         let stage_four:string = "";
@@ -66,8 +66,7 @@ class Word_Builder {
         }
 
         // Stage five, remove caret from word
-        let stage_five = stage_four.replace(/\^/g, ""); 
-        stage_five = stage_five.replace(/∅/g, ""); 
+        let stage_five = stage_four.replace(/\^/g, "").replace(/∅/g, ""); 
 
         if (this.escape_mapper.counter != 0) {
             stage_one = this.escape_mapper.restore_escaped_chars(stage_one);

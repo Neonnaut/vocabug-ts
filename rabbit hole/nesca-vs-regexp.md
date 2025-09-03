@@ -13,7 +13,7 @@ So... here we are, Nesca uses its own domain specific language (DSL) for matchin
 | ?()        |          | Condition [if then]                |
 | ?()\|      |          | Condition [if then else]           |
 | ?#         | ;        | Comment                            |
-| \1         | <        | Backreference                      |
+| \1         | <        | Target-reference                      |
 |            | :        | Geminate                           |
 | *          | (T+)     | 0 or more                          |
 | +          | +        | 1 or more                          |

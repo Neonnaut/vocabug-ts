@@ -43,7 +43,7 @@ function get_cat_seg_fea(input: string): [string, string, 'category'|'segment'|'
     // Construct dynamic regexes using cappa
     const categoryRegex = new RegExp(`^${cappa}$`);
     const segmentRegex = new RegExp(`^\\$${cappa}$`);
-    const featureRegex = /^(\+|-|_)[a-z]+$/;
+    const featureRegex = /^(\+|-|>)[a-zA-Z+-]+$/;
 
     if (categoryRegex.test(key)) {
         return [key, field, 'category'];

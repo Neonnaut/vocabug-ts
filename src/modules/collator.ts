@@ -7,7 +7,21 @@ function collator(
   invisible: string[] = []
 ): string[] {
   if (custom_alphabet.length === 0) {
-    return words.sort(Intl.Collator().compare);
+    if (invisible.length == 0) {
+      return words.sort(Intl.Collator().compare);
+    } else {
+      const invisible_set = new Set<string>(invisible);
+      const collator = Intl.Collator();
+
+      const stripped_words = words.map(w => ({
+        original: w,
+        stripped: strip_invisible(w, invisible_set)
+      }));
+
+      return stripped_words
+      .sort((a, b) => collator.compare(a.stripped, b.stripped))
+      .map(entry => entry.original);
+    }
   }
 
   custom_alphabet.push("�");
@@ -69,6 +83,30 @@ function collator(
 
     return 0;
   }
+
+  function strip_invisible(word: string, invisible_set: Set<string>): string {
+    const graphemes = Array.from(invisible_set).sort((a, b) => b.length - a.length);
+    let result = "";
+    let i = 0;
+
+    while (i < word.length) {
+      let matched = false;
+      for (const g of graphemes) {
+        if (word.startsWith(g, i)) {
+          i += g.length;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        result += word[i];
+        i += 1;
+      }
+    }
+
+    return result;
+  }
+
 
   const sorted = [...words].sort(custom_compare);
 

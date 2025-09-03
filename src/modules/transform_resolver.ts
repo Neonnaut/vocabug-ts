@@ -107,8 +107,8 @@ class Transform_Resolver {
                 for (let k = 0; k < alt_opt_condition[0].length; k++) {
                     let split_condition = alt_opt_condition[0][k].split('_');
                     // Grammar stream for condition before
-                    // Grammar stream for condition after
                     const before = this.nesca_grammar_stream.main_parser(split_condition[0], 'BEFORE', this.line_num);
+                    // Grammar stream for condition after
                     const after = this.nesca_grammar_stream.main_parser(split_condition[1], 'AFTER', this.line_num);
                     new_conditions.push({
                         before:before,
@@ -376,8 +376,7 @@ class Transform_Resolver {
         for (const key of keys) {
             const entry = this.features.get(key);
             if (!entry) {
-                this.logger.validation_error(`Unknown feature key "${key}"`, this.line_num);
-                continue;
+                this.logger.validation_error(`Unknown feature '${key}'`, this.line_num);
             }
             graphemeSets.push(entry.graphemes);
         }
@@ -391,8 +390,6 @@ class Transform_Resolver {
 
         return intersection.join(', ');
     }
-
-
 
     normaliseTransformLength(target: string[][], result: string[][]): { target_array: string[][], result_array: string[][] } {
         // 🔁 Surface level: Broadcast result if only one entry

@@ -111,6 +111,29 @@ This would also work backwards and forwards:
 
 This represents an almost idealist view on word generation
 
-## 11. Lezer grammar
+## 11. Named reference
+
+Named-reference is probably the most difficult to understand
+
+a<{=experiment}
+
+C = m, n, l
+[m,n,l]<{=identical}a -> C<{}
+
+Assertion
+
+
+a<{experiment} a<{+experiment}
+
+; Delete ʔ between identical vowels
+ʔ > ^ / V<{=identical}_V<{+indentical}
+
+; Insert an echo vowel at the end of consonant final words
+^ -> <{identical} / [V]<{=identical}[C]_#
+
+; 
+[C]<{=identical}e -> <{identical}e<{identical}
+
+## 12. Lezer grammar
 
 Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.

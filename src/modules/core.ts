@@ -52,6 +52,7 @@ function generate({
         );
 
         r.parse_file(file);
+        
         r.expand_categories();
         r.expand_segments();
         r.expand_wordshape_segments();

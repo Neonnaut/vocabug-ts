@@ -121,7 +121,7 @@ class Transformer {
 
             if (my_result_token.type === "grapheme") {
                 replacement_stream.push(my_result_token.base);
-            } else if (my_result_token.type === "backreference") {
+            } else if (my_result_token.type === "target-reference") {
                 for (let k:number = 0; k <= target_stream.length; k++) {
                     replacement_stream.push(target_stream[k]);
                 }
@@ -130,6 +130,7 @@ class Transformer {
         return replacement_stream;
     }
 
+    // BEFORE and AFTER and TARGET use this
     match_pattern_at(
         stream: string[],
         pattern: Token[],
@@ -147,7 +148,8 @@ class Transformer {
                 token.type !== 'grapheme' &&
                 token.type !== 'wildcard' &&
                 token.type !== 'anythings-mark' &&
-                token.type !== 'backreference'
+                token.type !== 'target-reference'
+                // token.type !== 'named-reference'
             ) {
                 j++;
                 continue;
@@ -174,9 +176,9 @@ class Transformer {
 
                 matched.push(...stream.slice(i, i + count));
                 i += count;
-            } else if (token.type === 'backreference') {
+            } else if (token.type === 'target-reference') {
                 if (!target_stream || target_stream.length === 0) {
-                    this.logger.validation_error("Backreference requires a non-empty target_stream");
+                    this.logger.validation_error("Target-reference requires a non-empty target_stream");
                 }
 
                 const unit = target_stream;
@@ -206,6 +208,14 @@ class Transformer {
                 matched.push(...stream.slice(i, i + totalLength));
                 i += totalLength;
                 
+            /*    
+            } else if (token.type === "named-reference") {
+                if (token.mode === 'assertion') {
+                    console.log(get_last(matched))
+                } else if (token.mode === 'insertion') {
+                    matched.push(...stream.slice(i, i + 0));
+                }
+            */
             } else if (token.type === 'wildcard') {
                 const available = Math.min(max_available, stream.length - i);
 
@@ -452,7 +462,7 @@ class Transformer {
             // NOW, Go through TARGET
             if (raw_target[0].type === "insertion") {
                 // INSERTION
-                if (mode === "deletion" || mode === "reject") {
+                if (mode === "deletion" || mode === "reject" || mode === "metathesis") {
                     this.logger.validation_error(`Deletion of ${mode} is not valid`, line_num);
                 }
                 if (conditions.length === 0) {

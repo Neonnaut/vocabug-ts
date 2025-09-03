@@ -50,11 +50,20 @@ export type Token =
       max: number|typeof Infinity;
     }
   | {
-      type: "backreference";
+      type: "target-reference";
       base: string;
       min: number;
       max: number|typeof Infinity;
-  };
+    }
+    /*
+  | {
+      type: "named-reference";
+      base: string;
+      name: string;
+      mode: 'assertion'|'declaration'|'insertion';
+      min: number;
+      max: number|typeof Infinity;
+    }*/;
 
     export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 

@@ -115,11 +115,51 @@ class Nesca_Grammar_Stream {
             i++;
             continue;
          } else if (char === "<") {
-            if (mode === "TARGET") {
-               this.logger.validation_error(`Backreference not allowed in '${mode}'`, line_num);
-            }
-            new_token = { type: "backreference", base: char, min: 1, max: 1 };
-            i++;
+
+            /*
+            let look_ahead = i + 1;
+            if (stream[look_ahead] === "{") {
+               // Its a named reference
+               look_ahead += 1;
+
+               let my_name = "";
+               let my_mode:'assertion'|'declaration'|'insertion' = 'insertion';
+
+               if (stream[look_ahead] === "=") {
+                  // Its a named reference declaration
+                  my_mode = 'declaration';
+                  look_ahead += 1;
+               } else if (stream[look_ahead] === "+") {
+                  // Its a named reference assertion
+                  my_mode = 'assertion';
+                  look_ahead += 1;
+               }
+
+               while (true) { // Get the name
+                  const char = stream[look_ahead];
+                  if (char === "}") break; i = look_ahead;
+                  if (look_ahead >= stream.length) {
+                     this.logger.validation_error(`Unclosed named-reference`, line_num);
+                  }
+                  my_name += char;
+                  look_ahead++;
+               }
+
+               new_token = {
+                  type: "named-reference", base: '<',
+                  name:my_name, mode:my_mode, min: 1, max: 1
+               };
+
+               i = look_ahead + 1; // Consume }
+
+            } else {*/
+               if (mode === "TARGET") {
+                  this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
+               }
+               new_token = { type: "target-reference", base: char, min: 1, max: 1 };
+               i++;
+            //}
+
 
          } else if (
             char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||

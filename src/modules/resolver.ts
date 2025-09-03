@@ -145,6 +145,9 @@ class Resolver {
             line = this.escape_mapper.escape_backslash_pairs(line);
             line = line.replace(/;.*/u, '').trim(); // Remove comment!!
             line = this.escape_mapper.escape_named_escape(line);
+            if (line.includes('"{')) {
+                this.logger.validation_error(`Invalid named escape`, this.file_line_num);
+            }
 
             if (line === '') { continue; } // Blank line !!
 
@@ -402,6 +405,7 @@ class Resolver {
             ')': '(',
             '>': '<',
             ']': '[',
+            '}': '{'
         };
         for (const char of str) {
             if (Object.values(bracket_pairs).includes(char)) {
@@ -880,28 +884,77 @@ class Resolver {
 
         for (const [key, value] of this.category_pending) {
             const new_category_field: { graphemes:string[], weights:number[]} = this.resolve_nested_categories(value.content, this.category_distribution);
+            
+            // Escape special chars in graphemes
+            for (let i = 0; i < new_category_field.graphemes.length; i++) {
+                new_category_field.graphemes[i] = this.escape_mapper.escape_special_chars(new_category_field.graphemes[i]);
+            }
+            
             this.categories.set(key, new_category_field);
         }
     }
 
     resolve_features() {
+        // Resolve parafeatures
+        for (const [key, value] of this.feature_pending) {
+            if (key.startsWith('>')) {
+                this.feature_pending.delete(key);
+                const to_delete = value.content.split(",").map(str => "^" + str);
+                const anti_graphemes = to_delete.join(",")+this.graphemes.join(",");
+
+                this.feature_pending.set(key.replace(">", "-"), {
+                    content: anti_graphemes, line_num: value.line_num }
+                );
+                this.feature_pending.set(key.replace(">", "+"), {
+                    content: value.content, line_num: value.line_num }
+                );
+            }
+        }
+
         for (const [key, value] of this.feature_pending) {
             const expanded_content = this.recursive_expansion(value.content, this.feature_pending);
-            const unique_graphemes = Array.from(new Set(expanded_content.split(",")));
+            this.feature_pending.set(key, {
+                content: expanded_content,
+                line_num: value.line_num, // Preserve original line_num
+            });
+        }
 
-            if (key.startsWith('_')) {
-                if (this.graphemes.length === 0) {
-                    this.logger.validation_error(`Para-feature '${key}' exists, but the 'graphemes:' directive was not used`, value.line_num);
+        for (const [key, value] of this.feature_pending) {
+            const unique_graphemes = Array.from(new Set(value.content.split(",")));
+            
+            const filtered_graphemes: string[] = [];
+            const graphemes_to_remove: string[] = [];
+
+            for (const item of unique_graphemes) {
+                if (item.startsWith('^') || item.startsWith('∅')) {
+                    const modified = item.slice(1);
+                    graphemes_to_remove.push(modified);
+                    continue;
                 }
-                const anti_graphemes = this.graphemes.filter(item => !unique_graphemes.includes(item));
-                const anti_key = key.replace(/^./, "-");
-                const pro_key = key.replace(/^./, "+");
-
-                this.features.set(anti_key, { graphemes:anti_graphemes });
-                this.features.set(pro_key, { graphemes:unique_graphemes });
-            } else {
-                this.features.set(key, { graphemes:unique_graphemes });
+                if (item.includes('^')) {
+                    this.logger.validation_error(`Invalid grapheme '${item}' has a misplaced caret`, value.line_num);
+                }
+                if (item.includes('∅')) {
+                    this.logger.validation_error(`Invalid grapheme '${item}' has a misplaced null character`, value.line_num);
+                }
+                if (item.startsWith('+') || item.startsWith('-') || item.startsWith('>')) {
+                    this.logger.validation_error(`Referenced feature '${item}' not found`, value.line_num);
+                }
+                filtered_graphemes.push(item);
             }
+
+            const x_filtered = filtered_graphemes.filter(item => !graphemes_to_remove.includes(item));
+
+            if (x_filtered.length === 0) {
+                this.logger.validation_error(`Feature '${key}' had zero graphemes`, value.line_num);
+            }
+
+            // Escape special chars in graphemes
+            for (let i = 0; i < x_filtered.length; i++) {
+                x_filtered[i] = this.escape_mapper.escape_special_chars(x_filtered[i]);
+            }
+
+            this.features.set(key, { graphemes:x_filtered });
         }
     }
 
@@ -1147,6 +1200,12 @@ class Resolver {
         return seq.map(t => {
             let s = t.base;
 
+            /*
+            if (t.type === "named-reference") {
+                const z = t.mode === "declaration" ? '=' : t.mode === "assertion" ? '+' : '';
+                s = `<{${z}${t.name}}`;
+            }
+            */
             if (t.type === "anythings-mark") {
                 if ('blocked_by' in t && t.blocked_by) {
                     s+= `{${t.blocked_by.join(", ")}}`

@@ -36,7 +36,7 @@
         <img src="img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
 
         <h1 style="margin-bottom: 10px;">Vocabug<br>docs</h1>
-        <b>Version: 0.3.1</b>
+        <b>Version: 0.3.2</b>
       </div>
       <br>
 
@@ -124,6 +124,10 @@
 
         <li><a href="#nescaFeatures">Features</a>
         <ol class="nice-list">
+          <li><a href="#nescaProFeature">Pro-feature</a></li>
+          <li><a href="#nescaAntiFeature">Anti-feature</a></li>
+          <li><a href="#nescaParaFeature">Para-feature</a></li>
+          <li><a href="#nescaFeatureInFeature">Referencing featues inside features</a></li>
           <li><a href="#nescaUsingFeatures">Using features</a></li>
           <li><a href="#nescaFeatureField">Feature-field</a></li>
         </ol>
@@ -153,7 +157,7 @@
         <li><a href="#nescaAdvancedRules">Advanced rules</a>
           <ol class="nice-list">
             <li><a href="#nescaEngine">Engine</a></li>
-            <li><a href="#nescaBackreference">Backreference</a></li>
+            <li><a href="#nescaTargetreference">Target-reference</a></li>
             <li><a href="#nescaMetathesisChange">Metathesis change</a></li>
         </ol>
         </li>
@@ -161,7 +165,7 @@
       </ol>
 
       <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
-      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version: 0.3.1</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
+      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version: 0.3.2</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
 
       <p>This word generator is designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find Vocabug's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. If you want a "modern" user interface, albeit with limited features, check out <a href="https://neonnaut.neocities.org/vocabug-lite">Vocabug-lite</a>.</p>
 
@@ -227,7 +231,7 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
-            <td><code class="example">@{</code> and <code class="example">}</code></td>
+            <td><code class="example">"{</code> and <code class="example">}</code></td>
             <td>Named escape</td>
           </tr>
           <tr>
@@ -293,8 +297,8 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
-            <td><code class="example">@{</code> and <code class="example">}</code></td>
-            <td>Named escape, or a <a href="#nescaFeatures">feature</a> matrix</td>
+            <td><code class="example">"{</code> and <code class="example">}</code></td>
+            <td>Named escape</td>
           </tr>
           <tr>
             <td><code class="example">&gt;</code>, <code class="example">-&gt;</code>, <code class="example">=&gt;</code>, <code class="example">⇒</code> or <code class="example">→</code></td>
@@ -315,6 +319,10 @@
           <tr>
             <td><code class="example">C</code>, <code class="example">D</code>, <code class="example">K</code>, ...</td>
             <td>Any one-length capital letter can refer to a <a href="#nescaUsingCategories">category</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">@{</code> and <code class="example">}</code></td>
+            <td><a href="#nescaUsingFeatures">Feature</a> matrix</td>
           </tr>
           <tr>
             <td><code class="example">^</code> or <code class="example">∅</code></td>
@@ -374,7 +382,7 @@
           </tr>
           <tr>
             <td><code class="example">&lt;</code></td>
-            <td><a href="#nescaBackreference">Backreference</a></td>
+            <td><a href="#nescaTargetreference">Target-reference</a></td>
           </tr>
           <tr>
             <td><code class="example">~</code></td>
@@ -385,7 +393,7 @@
 
 
       <h4 id="vocNamedEscape"><a class="head-num">4.2.3</a>Named escape</h4>
-      <p>Named escapes, enclosed in <code class="example">@{</code> and <code class="example">}</code> allow space and combining diacritics to be used without needing to insert these characters.</p>
+      <p>Named escapes, enclosed in <code class="example">"{</code> and <code class="example">}</code> allow space and combining diacritics to be used without needing to insert these characters.</p>
 
       <p>The supported characters are:</p>
       <table class="styled-table">
@@ -397,99 +405,99 @@
         </thead>
         <tbody>
           <tr>
-              <td><code class="example">@{Space}</code></td>
+              <td><code class="example">"{Space}</code></td>
               <td>&nbsp;</td>
           </tr>
           <tr>
-              <td><code class="example">@{Acute}</code></td>
+              <td><code class="example">"{Acute}</code></td>
               <td>◌́</td>
           </tr>
           <tr>
-              <td><code class="example">@{DoubleAcute}</code></td>
+              <td><code class="example">"{DoubleAcute}</code></td>
               <td>◌̋</td>
           </tr>
           <tr>
-              <td><code class="example">@{Grave}</code></td>
+              <td><code class="example">"{Grave}</code></td>
               <td>◌̀</td>
           </tr>
           <tr>
-              <td><code class="example">@{DoubleGrave}</code></td>
+              <td><code class="example">"{DoubleGrave}</code></td>
               <td>◌̏</td>
           </tr>
           <tr>
-              <td><code class="example">@{Circumflex}</code></td>
+              <td><code class="example">"{Circumflex}</code></td>
               <td>◌̂</td>
           </tr>
           <tr>
-              <td><code class="example">@{Caron}</code></td>
+              <td><code class="example">"{Caron}</code></td>
               <td>◌̌</td>
           </tr>
           <tr>
-              <td><code class="example">@{Breve}</code></td>
+              <td><code class="example">"{Breve}</code></td>
               <td>◌̆</td>
           </tr>
           <tr>
-              <td><code class="example">@{InvertedBreve}</code></td>
+              <td><code class="example">"{InvertedBreve}</code></td>
               <td>◌̑</td>
           </tr>
           <tr>
-              <td><code class="example">@{TildeAbove}</code></td>
+              <td><code class="example">"{TildeAbove}</code></td>
               <td>◌̃</td>
           </tr>
           <tr>
-              <td><code class="example">@{TildeBelow}</code></td>
+              <td><code class="example">"{TildeBelow}</code></td>
               <td>◌̰</td>
           </tr>
           <tr>
-              <td><code class="example">@{Macron}</code></td>
+              <td><code class="example">"{Macron}</code></td>
               <td>◌̄</td>
           </tr>
           <tr>
-              <td><code class="example">@{Dot}</code></td>
+              <td><code class="example">"{Dot}</code></td>
               <td>◌̇</td>
           </tr>
           <tr>
-              <td><code class="example">@{DotBelow}</code></td>
+              <td><code class="example">"{DotBelow}</code></td>
               <td>◌̣</td>
           </tr>
           <tr>
-              <td><code class="example">@{Diaeresis}</code></td>
+              <td><code class="example">"{Diaeresis}</code></td>
               <td>◌̈</td>
           </tr>
           <tr>
-              <td><code class="example">@{DiaeresisBelow}</code></td>
+              <td><code class="example">"{DiaeresisBelow}</code></td>
               <td>◌̤</td>
           </tr>
           <tr>
-              <td><code class="example">@{Ring}</code></td>
+              <td><code class="example">"{Ring}</code></td>
               <td>◌̊</td>
           </tr>
           <tr>
-              <td><code class="example">@{RingBelow}</code></td>
+              <td><code class="example">"{RingBelow}</code></td>
               <td>◌̥</td>
           </tr>
           <tr>
-              <td><code class="example">@{Horn}</code></td>
+              <td><code class="example">"{Horn}</code></td>
               <td>◌̛</td>
           </tr>
           <tr>
-              <td><code class="example">@{Hook}</code></td>
+              <td><code class="example">"{Hook}</code></td>
               <td>◌̉</td>
           </tr>
           <tr>
-              <td><code class="example">@{CommaAbove}</code></td>
+              <td><code class="example">"{CommaAbove}</code></td>
               <td>◌̓</td>
           </tr>
           <tr>
-              <td><code class="example">@{CommaBelow}</code></td>
+              <td><code class="example">"{CommaBelow}</code></td>
               <td>◌̦</td>
           </tr>
           <tr>
-              <td><code class="example">@{Cedilla}</code></td>
+              <td><code class="example">"{Cedilla}</code></td>
               <td>◌̧</td>
           </tr>
           <tr>
-              <td><code class="example">@{Ogonek}</code></td>
+              <td><code class="example">"{Ogonek}</code></td>
               <td>◌̨</td>
           </tr>
         </tbody>
@@ -599,17 +607,20 @@
       <h2 id="vocAlphabetisation"><a class="head-num">9</a>Alphabetisation</h2>
       <p>The alphabet directive gives Vocabug a custom alphabetisation order for words, when the sort words checkbox is selected.</p>
       <div class="prog-pre"><span class="directive">alphabet</span><span class="link">:</span> a<span class="link">,</span> b<span class="link">,</span> c<span class="link">,</span> e<span class="link">,</span> f<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> l<span class="link">,</span> m<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> p<span class="link">,</span> p'<span class="link">,</span> r<span class="link">,</span> s<span class="link">,</span> t<span class="link">,</span> t'<span class="link">,</span> y</div>
-      <p>This would order generated words like so: <code class="example">cat, chat, cumin, frog, tray, t'a, yanny</code></p>
+
+      <p>This would order generated words like so: <code class="example">cat</code>, <code class="example">chat</code>, <code class="example">cumin</code>, <code class="example">frog</code>, <code class="example">tray</code>, <code class="example">t'a</code>, <code class="example">yanny</code></p>
 
       <h3 id="vocInvisibility"><a class="head-num">9.1</a>Invisibility</h3>
       <p>Sometimes you will want characters, such as syllable dividers, to be invisible to alphabetisation. You can do this by listing these characters in the invisible: directive.</p>
       <div class="prog-pre"><span class="directive">invisible</span><span class="link">:</span> .<span class="link">,</span> ˈ<br></div>
-      <p>This would order generated words <code class="example">ˈpa.ta, ˈca.ta, za.ˈta, ca.ˈa</code> as   <code class="example">ca.ˈa, ˈca.ta, ˈpa.ta, za.ˈta</code></p>
+      <p> This will make these generated words: <code class="example">za'ta</code>, <code class="example">'ba.ta</code>, <code class="example">'za.ta</code> be reorderd into: <code class="example">'ba.ta</code>, <code class="example">za'ta</code>, <code class="example">'za.ta</code></p>
 
       <h2 id="vocGraphemes"><a class="head-num">10</a>Defining graphemes</h2>
       <p>The <code class="example">graphemes:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nescaTransform">transformations</a>.</p>
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">:</span> a<span class="link">,</span> b<span class="link">,</span> c<span class="link">,</span> ch<span class="link">,</span> e<span class="link">,</span> f<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> l<span class="link">,</span> m<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> p<span class="link">,</span> p'<span class="link">,</span> r<span class="link">,</span> s<span class="link">,</span> t<span class="link">,</span> t'<span class="link">,</span> y</div>
       <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
+
+      <p>'But the order of letters stated in my <code class="example">alphabet:</code> directive is the same as my graphemes in my <code class="example">graphemes:</code> directive, do I have to list them twice?' You might ask. You can list both using the <code class="example">alphabet-and-graphemes:</code> directive.</p>
 
       <h2 id="nescaTransform"><a class="head-num">11</a>Transform</h2>
       <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of the transform block, which implements the <a href="./nesca.html">NeSCA program</a>.</p>
@@ -702,28 +713,34 @@
 
       <h2 id="nescaFeatures"><a class="head-num">17</a>Features</h2>
       <p>Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, <code class="example">+high</code> and <code class="example">+front</code>, and turn it into a phoneme marked with <code class="example">+high</code> and <code class="example">+back</code> features, perhaps /ɯ/. The <code class="example">features:</code> directive block lets you do this.</p>
-      <p>The key of all features must consist of lowercase letters a to z.</p>
-      <p>A feature prepended with a plus sign <code class="example">+</code> is a 'pro-feature'. For example <code class="example">+voice</code>. We can define a set of graphemes that are marked by this feature by using this pro-feature. For example:</p>
+      <p>The key of all features must consist of lowercase letters a to z, uppercase letters a to z, <code class="example">.</code>, <code class="example">-</code> or <code class="example">+</code></p>
 
+      <h3 id="nescaProFeature"><a class="head-num">17.1</a>Pro-feature</h3>
+      <p>A feature prepended with a plus sign <code class="example">+</code> is a 'pro-feature'. For example <code class="example">+voice</code>. We can define a set of graphemes that are marked by this feature by using this pro-feature. For example:</p>
       <div class="prog-pre"><span class="catkey">+voice</span> <span class="link">=</span> b<span class="link">,</span> d<span class="link">,</span> g<span class="link">,</span> v<span class="link">,</span> z</div>
 
+      <h3 id="nescaAntiFeature"><a class="head-num">17.2</a>Anti-feature</h3>
       <p>A feature prepended with a minus sign <code class="example">-</code> is an 'anti-feature'. For example <code class="example">-voice</code>. We can define a set of graphemes that are marked by a lack of this feature by using this anti-feature. For example:</p>
-
       <div class="prog-pre"><span class="catkey">-voice</span> <span class="link">=</span> p<span class="link">,</span> t<span class="link">,</span> k<span class="link">,</span> f<span class="link">,</span> s</div>
 
-      <p>A feature prepended with an underscore <code class="example">_</code> is a 'para-feature'. A para-feature is simply a pro-feature where the graphemes marked as the anti-feature of this feature are the graphemes in the <code class="example">graphemes:</code> directive that are not not marked by this para-feature:</p>
-
-      <div class="prog-pre"><span class="directive">graphemes</span><span class="link">:</span> a<span class="link">,</span> b<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> t<br><span class="catkey">_voice</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o</div>
-
+      <h3 id="nescaParaFeature"><a class="head-num">17.3</a>Para-feature</h3>
+      <p>A feature prepended with a greater-than-sign <code class="example">&gt;</code> is a 'para-feature'. A para-feature is simply a pro-feature where the graphemes marked as the anti-feature of this feature are the graphemes in the <code class="example">graphemes:</code> directive that are not not marked by this para-feature:</p>
+      <div class="prog-pre"><span class="directive">graphemes</span><span class="link">:</span> a<span class="link">,</span> b<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> t<br><span class="catkey">&gt;voice</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o</div>
       <p>Is equivalent to the below example:</p>
-
       <div class="prog-pre"><span class="catkey">+vowel</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o<br><span class="catkey">-vowel</span> <span class="link">=</span> b<span class="link">,</span> h<span class="link">,</span> k<span class="link">,</span> n<span class="link">,</span> t</div>
-
-      <p>You can reference features inside features.</p>
 
       <p>'Where does this leave graphemes that are not marked by either the pro-feature or the anti-feature of a feature?', you might ask. Such graphemes are <em>unmarked</em> by that feature.</p>
 
-      <h3 id="nescaUsingFeatures"><a class="head-num">17.1</a>Using Features</h3>
+      <h3 id="nescaFeatureInFeature"><a class="head-num">17.4</a>Referencing features inside features</h3>
+
+      <p>Features can be referenced inside features. For example:</p>
+      <div class="prog-pre"><span class="catkey">+vowel</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o<br><span class="catkey">+non-yod</span> <span class="link">=</span> <span class="catkey">+vowel</span><span class="link">,</span> <span class="operator">^</span>i</div>
+
+      <p>Use a caret in front of a grapheme to ensure that that grapheme is not part of the pro/anti/para-feature. In the example above, the pro-feature '<code class="example">+non-yod</code>' is composed of the graphemes <code class="example">a</code> and <code class="example">o</code> -- the grapheme <code class="example">i</code> is not part of this pro-feature. Due to the recursive nature of nested features, this removed grapheme will be removed... aggressively. For example, If <code class="example">+non-yod</code> were to be referenced in a different feature, that feature would always not have <code class="example">i</code> as a grapheme.</p>
+
+
+
+      <h3 id="nescaUsingFeatures"><a class="head-num">17.5</a>Using Features</h3>
 
       <p>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' surrounded by <code class="example">@{</code> and <code class="example">}</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">@{+high, +back}</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">@{+high, +back, -round}</code> would capture <code class="example">ɯ</code> only.</p>
       <p>The very simple example below is written to change all voiceless graphemes that have a voiced counterpart into their voiced counterparts:</p>
@@ -738,7 +755,7 @@
 
       <p>In this rule, in <code class="example">RESULT</code>, <code class="example">@{+voice}</code> has a symmetrical one-to-one change of graphemes from the graphemes in <code class="example">@{-voice}</code> in <code class="example">TARGET</code>, leading to a concurrent change. Let's quickly imagine a scenario where the only <code class="example">@{+voice}</code> grapheme was <code class="example">b</code>. The result will be a merging of all <code class="example">-voice</code> graphemes into <code class="example">b</code>: <code class="example">tamepfa ==&gt; bamebba</code>.</p>
 
-      <h3 id="nescaFeatureField"><a class="head-num">17.2</a>Feature-field</h3>
+      <h3 id="nescaFeatureField"><a class="head-num">17.6</a>Feature-field</h3>
       <p>Feature-fields allow graphemes to be easily marked by multiple features in table format.</p>
       <p>The feature-field begins with a <code class="example">+-</code> and a space. The graphemes being marked by the features are listed on the first row. The features are listed in the first column.</p>
       <p>For example:</p>
@@ -875,9 +892,9 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         <li><code class="example">ipa_to_xsampa</code> will convert graphemes of a word written in IPA into X-SAMPA</li>
       </ul>
 
-      <h3 id="nescaBackreference"><a class="head-num">21.2</a>Backreference</h3>
-      <p>A backreference is a reference to the captured target. It cannot be used in <code class="example">TARGET</code>. This uses the less-than symbol <code class="example">&lt;</code>.</p>
-      <p>Here are some examples where backreference is employed:</p>
+      <h3 id="nescaTargetreference"><a class="head-num">21.2</a>Target-reference</h3>
+      <p>A target-reference is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses the less-than symbol <code class="example">&lt;</code>.</p>
+      <p>Here are some examples where target-reference is employed:</p>
       <p><b>Full reduplication</b>:</p>
       <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="regexp">&lt;&lt;</span>
 <span class="comment">; malak ==&gt; malakmalak</span></div>
