@@ -3,6 +3,7 @@ import Word from './word';
 import Escape_Mapper from './escape_mapper';
 import Supra_Builder from './supra_builder';
 import { weighted_random_pick, supra_weighted_random_pick, get_distribution } from './utilities'
+import type { Output_Mode } from './types';
 
 class Word_Builder {
     //private logger: Logger;
@@ -21,7 +22,7 @@ class Word_Builder {
         wordshapes: {items:string[], weights:number[]},
         category_distribution: string,
         optionals_weight: number,
-        debug: boolean,
+        output_mode:Output_Mode
     ) {
         //this.logger = logger;
 
@@ -33,7 +34,7 @@ class Word_Builder {
         this.category_distribution = category_distribution;
         this.optionals_weight = optionals_weight;
 
-        Word.debug = debug;
+        Word.debug = (output_mode === 'debug');
     }
 
     make_word() : Word {

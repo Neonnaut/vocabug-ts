@@ -1,18 +1,22 @@
-import Resolver from './resolver';
+import Parser from './parser';
 import Word_Builder from './word_builder';
 import Transformer from './transformer';
 import Text_Builder from './text_builder';
 import Logger from './logger';
 import Escape_Mapper from './escape_mapper'; 
 import Supra_Builder from './supra_builder';
-import Transform_Resolver from './transform_resolver';
-import Nesca_Grammar_Stream from './nesca_grammar_stream';
-import type { Generation_Mode } from './types'
+import Transform_Resolver from './resolvers/transform_resolver';
+import Nesca_Grammar_Stream from './resolvers/nesca_grammar_stream';
+import type { Output_Mode } from './types'
+
+import CategoryResolver from './resolvers/category_resolver';
+import GenerationResolver from './resolvers/generation_resolver';
+import FeatureResolver from './resolvers/feature_resolver';
 
 type generate_options = {
   file: string;
   num_of_words?: number | string;
-  mode?: Generation_Mode;
+  mode?: Output_Mode;
   remove_duplicates?: boolean;
   force_word_limit?: boolean;
   sort_words?: boolean;
@@ -45,46 +49,47 @@ function generate({
         const escape_mapper = new Escape_Mapper();
         const supra_builder = new Supra_Builder(logger);
 
-        const r = new Resolver(
+        const p = new Parser(
             logger, escape_mapper, supra_builder,
             num_of_words, mode, sort_words, capitalise_words,
             remove_duplicates, force_word_limit, word_divider
         );
+        p.parse_file(file);
 
-        r.parse_file(file);
-        
-        r.expand_categories();
-        r.expand_segments();
-        r.expand_wordshape_segments();
-        r.set_wordshapes();
+        const category_resolver = new CategoryResolver(
+            logger, p.output_mode, escape_mapper,  p.category_distribution, p.category_pending,);
 
-        r.resolve_features();
+        const generation_resolver = new GenerationResolver(
+            logger, p.output_mode, supra_builder, p.wordshape_distribution,
+            p.segments, p.wordshape_pending, p.optionals_weight);
+
+        const feature_resolver = new FeatureResolver(
+            logger, p.output_mode, escape_mapper, p.feature_pending, p.graphemes);
 
         const nesca_grammar_stream = new Nesca_Grammar_Stream(
-            logger, r.graphemes, escape_mapper
-        );
-        const transform_resolver = new Transform_Resolver(
-            logger, nesca_grammar_stream, r.categories, r.transform_pending, r.features
-        )
-        r.set_transforms(transform_resolver.resolve_transforms());
+            logger, p.graphemes, escape_mapper);
 
+        const transform_resolver = new Transform_Resolver(
+            logger, p.output_mode, nesca_grammar_stream, category_resolver.trans_categories,
+            p.transform_pending, feature_resolver.features);
         
-        
-        if(r.debug) { r.create_record(); }
+        // Phew! done resolving things
 
         const word_builder = new Word_Builder(
-            escape_mapper, r.supra_builder, r.categories, r.wordshapes,
-            r.category_distribution, r.optionals_weight, r.debug
+            escape_mapper, supra_builder, category_resolver.categories,
+            generation_resolver.wordshapes,
+            category_resolver.category_distribution,
+            generation_resolver.optionals_weight, p.output_mode
         );
 
         const transformer = new Transformer( logger,
-            r.graphemes, r.transforms, r.debug
+            p.graphemes, transform_resolver.transforms, p.output_mode
         );
 
         const text_builder = new Text_Builder(
-            logger, build_start, r.num_of_words, r.paragrapha,
-            r.remove_duplicates, r.force_word_limit, r.sort_words,
-            r.capitalise_words, r.word_divider, r.alphabet, r.invisible
+            logger, build_start, p.num_of_words, p.output_mode,
+            p.remove_duplicates, p.force_word_limit, p.sort_words,
+            p.capitalise_words, p.word_divider, p.alphabet, p.invisible
         );
 
         // Yo! this is where we generate da words !!

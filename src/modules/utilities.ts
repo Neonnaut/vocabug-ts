@@ -152,12 +152,12 @@ function get_distribution(n: number, default_distribution:string): number[] {
 
 function swap_first_last_items(array: any[]): any[] {
   if (array.length >= 2) {
-    const firstItem = array[0];
-    const lastItemIndex = array.length - 1;
-    const lastItem = array[lastItemIndex];
+    const first_item = array[0];
+    const last_item_index = array.length - 1;
+    const last_item = array[last_item_index];
 
-    array[0] = lastItem;
-    array[lastItemIndex] = firstItem;
+    array[0] = last_item;
+    array[last_item_index] = first_item;
   }
   return array;
 }
@@ -168,14 +168,51 @@ function final_sentence(items: string[]): string {
   if (len === 0) return '';
   if (len === 1) return items[0];
 
-  const allButLast = items.slice(0, len - 1).join(', ');
+  const all_but_last = items.slice(0, len - 1).join(', ');
   const last = items[len - 1];
 
-  return `${allButLast} and ${last}`;
+  return `${all_but_last} and ${last}`;
+}
+
+function recursive_expansion(
+   input: string,
+   mappings: Map<string, { content: string, line_num: number }>,
+   enclose_in_brackets: boolean = false
+): string {
+   const mapping_keys = [...mappings.keys()].sort((a, b) => b.length - a.length);
+
+   const resolve_mapping = (str: string, history: string[] = []): string => {
+      let result = '', i = 0;
+
+      while (i < str.length) {
+            let matched = false;
+
+            for (const key of mapping_keys) {
+               if (str.startsWith(key, i)) {
+                  if (history.includes(key)) {
+                        result += '�';
+                  } else {
+                        const entry = mappings.get(key);
+                        const resolved = resolve_mapping(entry?.content || '', [...history, key]);
+                        result += enclose_in_brackets ? `[${resolved}]` : resolved;
+                  }
+                  i += key.length;
+                  matched = true;
+                  break;
+               }
+            }
+
+            if (!matched) result += str[i++];
+      }
+
+      return result;
+   };
+
+   return resolve_mapping(input);
 }
 
 export {
   get_last, capitalise, make_percentage, weighted_random_pick, get_distribution,
-  supra_weighted_random_pick,
+  supra_weighted_random_pick, recursive_expansion,
   get_cat_seg_fea, cappa, swap_first_last_items, final_sentence
 };

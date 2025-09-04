@@ -1,4 +1,4 @@
-import Nesca_Grammar_Stream from "../src/modules/nesca_grammar_stream";
+import Nesca_Grammar_Stream from "../src/modules/resolvers/nesca_grammar_stream";
 
 
 import { describe, it, expect } from 'vitest';

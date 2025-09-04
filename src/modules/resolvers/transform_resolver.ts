@@ -1,12 +1,14 @@
 // Yikes, there is so much of this that I needed to put it in a separate file to resolver.
-import Logger from './logger';
+import Logger from '../logger';
 import Nesca_Grammar_Stream from './nesca_grammar_stream';
-import type { Token } from './types';
+import type { Token, Output_Mode } from '../types';
 
 class Transform_Resolver {
     private logger: Logger;
-    private nesca_grammar_stream: Nesca_Grammar_Stream;
-    public categories: Map<string, { graphemes:string[], weights:number[] }>;
+    private output_mode: Output_Mode;
+
+    public nesca_grammar_stream: Nesca_Grammar_Stream;
+    public categories: Map<string, string[]>;
     public transform_pending: {
         target:string, result:string,
         conditions:string[], exceptions:string[],
@@ -25,9 +27,8 @@ class Transform_Resolver {
     private line_num: number;
 
     constructor(
-        logger:Logger,
-        nesca_grmmar_stream:Nesca_Grammar_Stream, categories: Map<string,
-        { graphemes:string[], weights:number[] }>,
+        logger:Logger, output_mode: Output_Mode,
+        nesca_grmmar_stream:Nesca_Grammar_Stream, categories: Map<string,string[]>,
         transform_pending: {
             target:string, result:string,
             conditions:string[], exceptions:string[],
@@ -37,11 +38,16 @@ class Transform_Resolver {
         features: Map<string, { graphemes:string[] }>
     ) {
         this.logger = logger;
+        this.output_mode = output_mode;
+
         this.nesca_grammar_stream = nesca_grmmar_stream;
         this.categories = categories;
         this.transform_pending = transform_pending;
         this.features = features;
         this.line_num = 0;
+
+        this.resolve_transforms();
+        if (this.output_mode === 'debug'){ this.show_debug(); }
     }
 
     resolve_transforms() {
@@ -151,7 +157,7 @@ class Transform_Resolver {
     }
     
     // 🧱 Internal: Split input into top-level chunks
-    splitTopLevel(str: string): string[] {
+    split_top_level(str: string): string[] {
         const chunks: string[] = [];
         let depth = 0;
         let buffer = '';
@@ -176,55 +182,53 @@ class Transform_Resolver {
         return chunks;
     }
 
+    check_grammar_rules(str: string): void {
+        const stack: { char: string; index: number }[] = [];
 
-    checkGrammarRules(str: string): void {
-    const stack: { char: string; index: number }[] = [];
+        for (let i = 0; i < str.length; i++) {
+            const char = str[i];
 
-    for (let i = 0; i < str.length; i++) {
-        const char = str[i];
-
-        if (char === '[' || char === '(') {
-            if (stack.length >= 1) {
-                this.logger.validation_error("Nested alternator / optionalator not allowed", this.line_num);
+            if (char === '[' || char === '(') {
+                if (stack.length >= 1) {
+                    this.logger.validation_error("Nested alternator / optionalator not allowed", this.line_num);
+                }
+                stack.push({ char, index: i });
             }
-            stack.push({ char, index: i });
+
+            if (char === ']' || char === ')') {
+                if (stack.length === 0) {
+                    this.logger.validation_error("Mismatched closing bracket", this.line_num);
+                }
+
+                const { char: open_char, index: open_index } = stack.pop()!;
+                const is_matching = (open_char === '[' && char === ']') || (open_char === '(' && char === ')');
+                if (!is_matching) {
+                    this.logger.validation_error("Mismatched bracket types", this.line_num);
+                }
+
+                // Check for empty bracket content
+                const inner = str.slice(open_index + 1, i).trim();
+                if (!/[^\s,]/.test(inner)) {
+                    this.logger.validation_error("Alternator / optionalator must not be empty", this.line_num);
+                }
+
+                // Optional: check if bracket is part of a larger token
+                const before = str.slice(0, open_index).trim();
+                const after = str.slice(i + 1).trim();
+                const has_outside_content = /[^\s,]/.test(before) || /[^\s,]/.test(after);
+                if (!has_outside_content && char===")") {
+                    this.logger.validation_error("Optionalator must be part of a larger token", this.line_num);
+                }
+            }
         }
-
-        if (char === ']' || char === ')') {
-            if (stack.length === 0) {
-                this.logger.validation_error("Mismatched closing bracket", this.line_num);
-            }
-
-            const { char: openChar, index: openIndex } = stack.pop()!;
-            const isMatching = (openChar === '[' && char === ']') || (openChar === '(' && char === ')');
-            if (!isMatching) {
-                this.logger.validation_error("Mismatched bracket types", this.line_num);
-            }
-
-            // Check for empty bracket content
-            const inner = str.slice(openIndex + 1, i).trim();
-            if (!/[^\s,]/.test(inner)) {
-                this.logger.validation_error("Alternator / optionalator must not be empty", this.line_num);
-            }
-
-            // Optional: check if bracket is part of a larger token
-            const before = str.slice(0, openIndex).trim();
-            const after = str.slice(i + 1).trim();
-            const hasOutsideContent = /[^\s,]/.test(before) || /[^\s,]/.test(after);
-            if (!hasOutsideContent && char===")") {
-                this.logger.validation_error("Optionalator must be part of a larger token", this.line_num);
-            }
+        if (stack.length !== 0) {
+            this.logger.validation_error("Unclosed bracket", this.line_num);
         }
     }
-
-    if (stack.length !== 0) {
-        this.logger.validation_error("Unclosed bracket", this.line_num);
-    }
-}
     
     // 🔄 Internal: Expand a single chunk
-    expandChunk(chunk: string): string[] {
-        this.checkGrammarRules(chunk);
+    expand_chunk(chunk: string): string[] {
+        this.check_grammar_rules(chunk);
 
         const regex = /([^\[\(\]\)]+)|(\[[^\]]+\])|(\([^\)]+\))/g;
         const parts = [...chunk.matchAll(regex)].map(m => m[0]);
@@ -255,8 +259,8 @@ class Transform_Resolver {
         // ⚙️ Internal: Check for bracket rules
 
         // 🎯 Final: Resolve full input
-        const chunks = this.splitTopLevel(input);
-        return chunks.map(chunk => this.expandChunk(chunk));
+        const chunks = this.split_top_level(input);
+        return chunks.map(chunk => this.expand_chunk(chunk));
     }
     
     getTransformLengths(target: any[][], result: any[][]): any[][] {
@@ -271,16 +275,16 @@ class Transform_Resolver {
         }
 
         return result.map((resItem, i) => {
-            const targetItem = target[i];
+            const target_item = target[i];
 
             // 🔁 Nested level: Broadcast if only one element
-            if (resItem.length === 1 && targetItem.length > 1) {
-            resItem = Array(targetItem.length).fill(resItem[0]);
+            if (resItem.length === 1 && target_item.length > 1) {
+            resItem = Array(target_item.length).fill(resItem[0]);
             }
 
             // ❌ Nested length mismatch
-            if (resItem.length !== targetItem.length) {
-                this.logger.validation_error(`Alternator / optionalator length mismatch at index ${i}: target has ${targetItem.length}, result has ${resItem.length}`, this.line_num);
+            if (resItem.length !== target_item.length) {
+                this.logger.validation_error(`Alternator / optionalator length mismatch at index ${i}: target has ${target_item.length}, result has ${resItem.length}`, this.line_num);
             }
 
             return resItem;
@@ -298,9 +302,9 @@ class Transform_Resolver {
             if (char === '^') {
                 const slice = input.slice(i, i + 8); // Enough to cover "^REJECT"
                 if (slice.startsWith('^R')) {
-                    const rejectMatch = slice.startsWith('^REJECT') ? '^REJECT' : '^R';
-                    output += rejectMatch;
-                    i += rejectMatch.length - 1;
+                    const reject_match = slice.startsWith('^REJECT') ? '^REJECT' : '^R';
+                    output += reject_match;
+                    i += reject_match.length - 1;
                     continue; // ✅ Prevent further processing of this sequence
                 }
             }
@@ -310,12 +314,12 @@ class Transform_Resolver {
                 const prev = input[i - 1] ?? '';
                 const next = input[i + 1] ?? '';
 
-                const isBoundaryBefore = i === 0 || ' ,([{)}]'.includes(prev);
-                const isBoundaryAfter  = i === length - 1 || ' ,([{)}]'.includes(next);
+                const is_boundary_before = i === 0 || ' ,([{)}]'.includes(prev);
+                const is_boundary_after  = i === length - 1 || ' ,([{)}]'.includes(next);
 
-                if (isBoundaryBefore && isBoundaryAfter) {
+                if (is_boundary_before && is_boundary_after) {
                     const entry = this.categories.get(char)!;
-                    output += entry.graphemes.filter(g => !['^','∅'].some(b => g.includes(b))).join(', ');
+                    output += entry.filter(g => !['^','∅'].some(b => g.includes(b))).join(', ');
 
                 } else {
                     this.logger.validation_error(
@@ -327,12 +331,10 @@ class Transform_Resolver {
                 output += char;
             }
         }
-
         return output;
     }
     
     features_into_transform(stream:string): string {
-
         const output:string[] = [];
         let feature_mode:boolean = false;
         let feature_matrix = ''
@@ -371,21 +373,21 @@ class Transform_Resolver {
 
     get_graphemes_from_matrix(feature_matrix: string): string {
         const keys: string[] = feature_matrix.split(',').map(k => k.trim());
-        const graphemeSets: string[][] = [];
+        const grapheme_sets: string[][] = [];
 
         for (const key of keys) {
             const entry = this.features.get(key);
             if (!entry) {
                 this.logger.validation_error(`Unknown feature '${key}'`, this.line_num);
             }
-            graphemeSets.push(entry.graphemes);
+            grapheme_sets.push(entry.graphemes);
         }
 
-        if (graphemeSets.length === 0) return '';
+        if (grapheme_sets.length === 0) return '';
 
-        const intersection = graphemeSets.slice(1).reduce(
+        const intersection = grapheme_sets.slice(1).reduce(
             (acc, set) => acc.filter(g => set.includes(g)),
-            graphemeSets[0]
+            grapheme_sets[0]
         );
 
         return intersection.join(', ');
@@ -403,16 +405,16 @@ class Transform_Resolver {
         }
 
         result = result.map((resItem, i) => {
-            const targetItem = target[i];
+            const target_item = target[i];
 
             // 🔁 Nested level: Broadcast if only one element
-            if (resItem.length === 1 && targetItem.length > 1) {
-                resItem = Array(targetItem.length).fill(resItem[0]);
+            if (resItem.length === 1 && target_item.length > 1) {
+                resItem = Array(target_item.length).fill(resItem[0]);
             }
 
             // ❌ Nested length mismatch
-            if (resItem.length !== targetItem.length) {   
-                this.logger.validation_error(`An alternator / optionalator length mismatch occured: target has ${targetItem.length}, result has ${resItem.length}`, this.line_num);
+            if (resItem.length !== target_item.length) {   
+                this.logger.validation_error(`An alternator / optionalator length mismatch occured: target has ${target_item.length}, result has ${resItem.length}`, this.line_num);
             }
 
             return resItem;
@@ -438,6 +440,83 @@ class Transform_Resolver {
             }
         }
         return stack.length === 0; // Stack should be empty if balanced
+    }
+
+    format_tokens(seq: Token[]): string {
+        // Formatting for making the record
+        return seq.map(t => {
+            let s = t.base;
+
+            /*
+            if (t.type === "named-reference") {
+                const z = t.mode === "declaration" ? '=' : t.mode === "assertion" ? '+' : '';
+                s = `<{${z}${t.name}}`;
+            }
+            */
+            if (t.type === "anythings-mark") {
+                if ('blocked_by' in t && t.blocked_by) {
+                    s+= `{${t.blocked_by.join(", ")}}`
+                }
+            }
+
+            if ('escaped' in t && t.escaped) {
+                s = '\\' + s;
+            }
+            if ('min' in t && t.min === 1 && t.max === Infinity) {
+                s += `+`;
+            } else if ('min' in t  && t.max === Infinity) {
+                s += `+{${t.min},}`;
+            } else if ('min' in t && t.min == t.max) {
+                if (t.min == 1){
+                    // min 1 and max 1
+                } else {
+                    s += `+{${t.min}}`;
+                }
+            } else if ('min' in t) {
+                s += `+{${t.min}${t.max !== Infinity ? ',' + t.max : ''}}`;
+            }
+            return s;
+        }).join('');
+    }
+
+    show_debug(): void {
+        let transforms = [];
+        for (let i = 0; i < this.transforms.length; i++) {
+            const my_transform = this.transforms[i];
+
+            let my_target = [];
+            for (let j = 0; j < my_transform.target.length; j++) {
+                my_target.push(this.format_tokens(my_transform.target[j]));
+            }
+            let my_result = [];
+            for (let j = 0; j < my_transform.result.length; j++) {
+                my_result.push(this.format_tokens(my_transform.result[j]));
+            }
+
+            let chance = my_transform.chance ? ` ? ${my_transform.chance}` : '';
+            let exceptions = '';
+            for (let j = 0; j < my_transform.exceptions.length; j++) {
+                exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
+            }
+            let conditions = '';
+            for (let j = 0; j < my_transform.conditions.length    ; j++) {
+                conditions += ` / ${this.format_tokens(my_transform.conditions[j].before)}_${this.format_tokens(my_transform.conditions[j].after)}`;
+            }
+
+            transforms.push(`  ⟨${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance}⟩:${my_transform.line_num}`);
+        }
+
+        let features = [];
+        for (const [key, value] of this.features) {
+            features.push(`  ${key} = ${value.graphemes.join(', ')}`);
+        }
+
+        let info:string =
+            `~ TRANSFORMS ~\n` +
+            `\nGraphemes: ` + this.nesca_grammar_stream.graphemes.join(', ') +
+            `\nFeatures {\n` + features.join('\n') + `\n}` +
+            `\nTransforms {\n` + transforms.join('\n') + `\n}`
+        this.logger.diagnostic(info);
     }
 }
 

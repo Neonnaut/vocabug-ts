@@ -31,8 +31,8 @@ const Darky = EditorView.theme({
     minWidth: "100%"
   },
   ".cm-activeLineGutter": {
-    backgroundColor: "#00000050",
-    color: "#cccccc"
+    backgroundColor: "#ffffff14",
+    color: "#dddddd"
   },
   "&.cm-editor": {
     colorScheme: "dark;",
@@ -115,8 +115,8 @@ const Lighty = EditorView.theme({
     minWidth: "100%"
   },
   ".cm-activeLineGutter": {
-    backgroundColor: "#ffffff70",
-    color: "#000000"
+    backgroundColor: "#ffffff",
+    color: "#666666"
   },
   "&.cm-editor": {
     border: "1px solid #aaaaaa;",

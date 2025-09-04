@@ -2,13 +2,14 @@ import Word from './word';
 import Logger from './logger';
 import collator from './collator';
 import { capitalise, final_sentence } from './utilities';
+import type { Output_Mode } from './types';
 
 class Text_Builder {
     private logger: Logger;
     private build_start: number;
 
     private num_of_words: number;
-    private paragrapha: boolean;
+    private output_mode: Output_Mode;
     private remove_duplicates: boolean;
     private force_word_limit: boolean;
     private sort_words: boolean;
@@ -29,7 +30,7 @@ class Text_Builder {
         logger: Logger, build_start: number,
 
         num_of_words: number,
-        paragrapha: boolean,
+        output_mode:Output_Mode,
         remove_duplicates: boolean,
         force_word_limit: boolean,
         sort_words: boolean,
@@ -42,7 +43,7 @@ class Text_Builder {
         this.build_start = build_start;
 
         this.num_of_words = num_of_words;
-        this.paragrapha = paragrapha;
+        this.output_mode = output_mode
         this.remove_duplicates = remove_duplicates;
         this.force_word_limit = force_word_limit;
         this.sort_words = sort_words;
@@ -62,6 +63,7 @@ class Text_Builder {
         if (this.upper_gen_limit > 1000000) {
             this.upper_gen_limit = 1000000;
         }
+        if (this.output_mode === 'debug'){ this.show_debug(); }
     }
 
     add_word(word:Word) {
@@ -145,7 +147,7 @@ class Text_Builder {
                 this.words[i] = capitalise(this.words[i]);
             }
         }
-        if (this.paragrapha){
+        if (this.output_mode === 'paragraph'){
             return this.paragraphify(this.words);
         }
 
@@ -198,6 +200,21 @@ class Text_Builder {
         if (roll < 0.03) return '!';     // 2% chance of exclamation
         if (roll < 0.08) return '?';     // 5% chance of question
         return '.';                      // 93% chance of full stop
+    }
+
+    show_debug(): void {
+        let info:string =
+            `~ CREATING TEXT ~\n` +
+            `\nNum of words: ` + this.num_of_words + 
+            `\nMode: ` + this.output_mode +
+            `\nRemove duplicates: ` + this.remove_duplicates +
+            `\nForce word limit: ` + this.force_word_limit +
+            `\nSort words: ` + this.sort_words +
+            `\nCapitalise words: ` + this.capitalise_words +
+            `\nWord divider: "` + this.word_divider + `"` +
+            `\nAlphabet: ` + this.alphabet.join(', ') +
+            `\nInvisible: ` + this.invisible.join(', ');
+        this.logger.diagnostic(info);
     }
 }
 

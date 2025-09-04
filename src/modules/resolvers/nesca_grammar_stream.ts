@@ -4,14 +4,14 @@
 // CONDITION_BEFORE, CONDITION_AFTER
 // GET LIST OF TOKENS
 
-import Logger from './logger.js';
-import Escape_Mapper from './escape_mapper.js';
-import type { Token } from './types';
-import type { Token_Stream_Mode } from './types';
+import Logger from '../logger.js';
+import Escape_Mapper from '../escape_mapper.js';
+import type { Token } from '../types.js';
+import type { Token_Stream_Mode } from '../types.js';
 
 class Nesca_Grammar_Stream {
    public logger: Logger;
-   private graphemes: string[];
+   public graphemes: string[];
    private escape_mapper: Escape_Mapper;
    
    constructor(

@@ -1,11 +1,11 @@
 import Word from './word';
 import Logger from './logger';
 import { swap_first_last_items } from './utilities';
-import type { Token } from './types';
+import type { Token, Output_Mode } from './types';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
 
-type MatchResult = {
+type Match_Result = {
     start: number; // actual match start
     end: number;   // exclusive end index
     matched: string[]; // matched tokens
@@ -35,12 +35,12 @@ class Transformer {
             chance:(number|null),
             line_num:number
         }[],
-        debug: boolean
+        output_mode:Output_Mode
     ) {
         this.logger = logger;
         this.graphemes = graphemes;
         this.transforms = transforms;
-        this.debug = debug;
+        this.debug = (output_mode === 'debug');
     }
 
     graphemosis(input: string): string[] {
@@ -61,7 +61,6 @@ class Transformer {
                 i++;
             }
         }
-
         return tokens;
     }
 
@@ -137,7 +136,7 @@ class Transformer {
         start: number,
         max_end?: number,
         target_stream?: string[]
-    ): MatchResult | null {
+    ): Match_Result | null {
         let i = start;
         let j = 0;
         const matched: string[] = [];
@@ -154,7 +153,6 @@ class Transformer {
                 j++;
                 continue;
             }
-
             const min = token.min;
             const max = token.max;
             const max_available = max_end !== undefined
@@ -169,7 +167,6 @@ class Transformer {
                 ) {
                     count++;
                 }
-
                 if (count < min) {;
                     return null;
                 }
@@ -182,19 +179,19 @@ class Transformer {
                 }
 
                 const unit = target_stream;
-                const unitLength = unit.length;
+                const unit_length = unit.length;
                 const min = token.min;
                 const max = token.max;
 
                 const max_available = max_end !== undefined
-                    ? Math.min(max, Math.floor((max_end - i) / unitLength))
+                    ? Math.min(max, Math.floor((max_end - i) / unit_length))
                     : max;
 
                 let repetitions = 0;
 
                 while (
                     repetitions < max_available &&
-                    stream.slice(i + repetitions * unitLength, i + (repetitions + 1) * unitLength)
+                    stream.slice(i + repetitions * unit_length, i + (repetitions + 1) * unit_length)
                         .every((val, idx) => val === unit[idx])
                 ) {
                     repetitions++;
@@ -204,9 +201,9 @@ class Transformer {
                     return null;
                 }
 
-                const totalLength = repetitions * unitLength;
-                matched.push(...stream.slice(i, i + totalLength));
-                i += totalLength;
+                const total_length = repetitions * unit_length;
+                matched.push(...stream.slice(i, i + total_length));
+                i += total_length;
                 
             /*    
             } else if (token.type === "named-reference") {
@@ -229,14 +226,14 @@ class Transformer {
 
             else if (token.type === 'anythings-mark') {
                 const blocked = token.blocked_by ?? [];
-                const nextToken = pattern[j + 1];
+                const next_token = pattern[j + 1];
 
                 let count = 0;
                 while (
                     count < max_available &&
                     stream[i + count] !== undefined &&
                     !blocked.includes(stream[i + count]) &&
-                    !(nextToken?.type === 'grapheme' && stream[i + count] === nextToken.base)
+                    !(next_token?.type === 'grapheme' && stream[i + count] === next_token.base)
                 ) {
                     count++;
                 }
@@ -248,10 +245,8 @@ class Transformer {
                 matched.push(...stream.slice(i, i + count));
                 i += count;
             }
-
             j++;
         }
-
         return {
             start,
             end: i,
@@ -410,7 +405,6 @@ class Transformer {
                 line_num
             );
         }
-
         return normalized;
     }
 
@@ -554,12 +548,10 @@ class Transformer {
                             replacement_stream:my_replacement_stream
                         });
                     }
-
                     cursor = global_index + match_length;
                 }
             }
         }
-
         word_stream = this.replacementa(
             word_stream,
             replacements,
@@ -570,7 +562,6 @@ class Transformer {
         )
         return word_stream;
     }
-
 
     do_transforms(
         word: Word,

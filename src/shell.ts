@@ -235,7 +235,6 @@ window.addEventListener("load", () => {
                         insert: file_text
                     }
                 });
-
                 localStorage.setItem("vocabug", JSON.stringify([file_text, filename]));
             };
         };
@@ -279,7 +278,6 @@ window.addEventListener("load", () => {
                     }
                 });
             }
-
             set_filename('');
             clear_results();
         });

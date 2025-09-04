@@ -67,4 +67,6 @@ export type Token =
 
     export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 
-    export type Generation_Mode = "word-list" | "debug" | "paragraph"
+    export type Output_Mode = "word-list" | "debug" | "paragraph"
+
+    export type Distribution = "gusein-zade" | "zipfian" | "shallow" | "flat"
