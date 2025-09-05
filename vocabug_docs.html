@@ -239,7 +239,7 @@
             <td>Any one-length capital letter can refer to a <a href="#vocCategories">category</a></td>
           </tr>
           <tr>
-            <td><code class="example">+</code> or <code class="example">-</code> or <code class="example">_</code>... </td>
+            <td><code class="example">+</code> or <code class="example">-</code> or <code class="example">&gt;</code>... </td>
             <td>A <a href="#nescaFeatures">feature</a></td>
           </tr>
           <tr>
@@ -712,7 +712,7 @@
       <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="regexp">[</span><span class="catkey">B</span><span class="regexp">]</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvapay ==> apay</code></div>
 
       <h2 id="nescaFeatures"><a class="head-num">17</a>Features</h2>
-      <p>Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, <code class="example">+high</code> and <code class="example">+front</code>, and turn it into a phoneme marked with <code class="example">+high</code> and <code class="example">+back</code> features, perhaps /ɯ/. The <code class="example">features:</code> directive block lets you do this.</p>
+      <p>Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, <code class="example">+high</code> and <code class="example">+front</code>, and turn it into a phoneme marked with <code class="example">+high</code> and <code class="example">+back</code> features, perhaps /ɯ/. Features let you do this.</p>
       <p>The key of all features must consist of lowercase letters a to z, uppercase letters a to z, <code class="example">.</code>, <code class="example">-</code> or <code class="example">+</code></p>
 
       <h3 id="nescaProFeature"><a class="head-num">17.1</a>Pro-feature</h3>
