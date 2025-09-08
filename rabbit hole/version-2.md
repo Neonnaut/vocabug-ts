@@ -1,5 +1,15 @@
 # Version 2
 
+## IPA to hangeul
+
+## Cyrillic
+
+## Vulgar remover
+
+r\*pe, n\*gg\*r, 
+
+## IPA featurefield set
+
 ## 1. Word classes
 
 Like the so called "categories" in lexifer.ts. I could put them in the Words: block.

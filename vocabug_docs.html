@@ -142,7 +142,7 @@
 
         <li><a href="#nescaClusterfield">Cluster-field</a></li>
 
-        <li><a href="#nescaWildcardAndPositioning">Wildcard, repetition and positioning</a>
+        <li><a href="#nescaWildcardsAndQuantifiers">Wildcards and quantifiers</a>
         <ol class="nice-list">
           <li><a href="#nescaQuantifier">Quantifier</a></li>
           <li><a href="#nescaBoundedQuantifier">Bounded quantifier</a></li>
@@ -665,11 +665,11 @@
 
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
       <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
-      <div class="prog-pre"><span class="comment">; insert /a/ in between /b/ and /t/</span>
+      <div class="prog-pre"><span class="comment">; Insert /a/ in between /b/ and /t/</span>
   <span class="operator">^</span> <span class="link">-></span> a <span class="link">/</span> b<span class="link">_</span>t
 <span class="comment">; bt ==> bat</span></div>
       <p>Deletion happens when <code class="example">^</code> is present in <code class="example">RESULT</code>:</p>
-      <div class="prog-pre"><span class="comment">; delete every /b/</span>
+      <div class="prog-pre"><span class="comment">; Delete every /b/</span>
   b <span class="link">-></span> <span class="operator">^</span>
 <span class="comment">; bubda ==> uda</span></div>
 
@@ -816,13 +816,13 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <ul class="paragraphian">
         <li>In this example, <code class="example">np</code> becomes <i>mp</i> and <code class="example">mt</code> becomes <i>nt</i></li>
         <li><code class="example">+</code> means to not change the target cluster at all</li>
-        <li><code class="example">-</code> means to reject the word if it contained that sequence</li>
+        <li>Cluster-fields can use <code class="example">^R</code> or <code class="example">^REJECT</code> to reject the word if it contains that sequence</li>
         <li>Cluster-fields can use <code class="example">^</code> or <code class="example">∅</code> to delete the target sequence</li>
         <li>These are executed concurrently just like concurrent changes. Their order does not matter</li>
         <li>Cluster-fields can also use conditions and exceptions, just put them on their own line</li>
       </ul>
 
-      <h2 id="nescaWildcardAndPositioning"><a class="head-num">20</a>Wildcards, repetition and positioning</h2>
+      <h2 id="nescaWildcardsAndQuantifiers"><a class="head-num">20</a>Wildcards and quantifiers</h2>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
 
       <h3 id="nescaQuantifier"><a class="head-num">20.1</a>Quantifier</h3>
@@ -868,7 +868,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>The anythings-mark uses ampersand <code class="example">&</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
       <div class="prog-pre">  b<span class="regexp">&</span>t <span class="link">-></span> x<br><code class="comment">; babitto => xto</code></div>
       <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="example">t</code> and beyond like <code class="example">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
-      <p>The example below uses an optional anythings-mark in the condition:</p>
+      <p>The example below uses an anythings-mark in the condition:</p>
       <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">&</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
 
       <h3 id="nescaBlocker"><a class="head-num">20.7</a>Blocked-anythings-mark</h3>
@@ -879,15 +879,15 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced rules</h2>
 
       <h3 id="nescaEngine"><a class="head-num">21.1</a>Engine</h3>
-      <p>The engine statement provides useful functions that you can call at any point in the transform block. You call these engines following a <code class="example">|</code> and a space on a new line. You can also call a list of these functions in one line. For example: <code class="example">| compose, capitalise</code></p>
+      <p>The engine statement provides useful functions that you can call at any point in the transform block. You call an engine following a <code class="example">|</code> and a space on a new line.</p>
 
       <ul class="paragraphian">
         <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, \u006E + \u0303</li>
         <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1</li>
         <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
         <li><code class="example">decapitalise</code> will convert the first character of a word to lowercase</li>
-        <li><code class="example">to-upper-case</code> will convert all characters of a word to uppercase</li>
-        <li><code class="example">to-lower-case</code> will convert all characters of a word to lowercase</li>
+        <li><code class="example">to-uppercase</code> will convert all characters of a word to uppercase</li>
+        <li><code class="example">to-lowercase</code> will convert all characters of a word to lowercase</li>
         <li><code class="example">xsampa_to_ipa</code> will convert graphemes of a word written in X-SAMPA into IPA</li>
         <li><code class="example">ipa_to_xsampa</code> will convert graphemes of a word written in IPA into X-SAMPA</li>
       </ul>

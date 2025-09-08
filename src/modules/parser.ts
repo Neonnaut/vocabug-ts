@@ -149,25 +149,24 @@ class Parser {
                 if (line.startsWith("| ")) { // Engine
                     line_value = line.substring(2).trim().toLowerCase();
 
-                    line_value = line_value.replace(/\bcapitalize\b/g, 'capitalise')
+                    const engine = line_value.replace(/\bcapitalize\b/g, 'capitalise')
 
-                    for (const engine of line_value.split(/\s+/)) {
-                        if (engine == "decompose"||engine == "compose" ||
-                            engine == "capitalise" || engine == "decapitalise" ||
-                            engine == "to-upper-case" || engine == "to-lower-case" ||
-                            engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa"
-                        ) {
-                            this.transform_pending.push( {
-                            target:`|${engine}`, result:'\\',
-                            conditions:[], exceptions:[],
-                            chance:null, line_num:this.file_line_num} );
-                        } else {
-                            this.logger.validation_error(
-                                `Trash engine '${this.escape_mapper.restore_preserve_escaped_chars(engine)}' found`,
-                                this.file_line_num
-                            );
-                        }
+                    if (engine == "decompose"||engine == "compose" ||
+                        engine == "capitalise" || engine == "decapitalise" ||
+                        engine == "to-uppercase" || engine == "to-lowercase" ||
+                        engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa"
+                    ) {
+                        this.transform_pending.push( {
+                        target:`|${engine}`, result:'\\',
+                        conditions:[], exceptions:[],
+                        chance:null, line_num:this.file_line_num} );
+                    } else {
+                        this.logger.validation_error(
+                            `Trash engine '${this.escape_mapper.restore_preserve_escaped_chars(engine)}' found`,
+                            this.file_line_num
+                        );
                     }
+                    
                     continue;
                 }
                 
@@ -608,9 +607,6 @@ class Parser {
             for (let i = 0; i < row_length; ++i) {
                 if (row[i] === '+') {
                     continue;
-                } else if (row[i] === '-') {
-                    concurrent_target.push(column + top_row[i]!);
-                    concurrent_result.push('^REJECT')
                 } else {
                     concurrent_target.push(column + top_row[i]!);
                     concurrent_result.push(row[i]!);

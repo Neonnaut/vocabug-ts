@@ -77,9 +77,9 @@ class Transformer {
                 modified_word = full_word.charAt(0).toUpperCase() + full_word.slice(1); break;
             case "decapitalise":
                 modified_word = full_word.charAt(0).toLowerCase() + full_word.slice(1); break;
-            case "to-upper-case":
+            case "to-uppercase":
                 modified_word = full_word.toUpperCase(); break;
-            case "to-lower-case":
+            case "to-lowercase":
                 modified_word = full_word.toLowerCase(); break;
             case "xsampa-to-ipa":
                 modified_word = xsampa_to_ipa(full_word); break;
@@ -88,12 +88,9 @@ class Transformer {
             default:
                 this.logger.validation_error("This should not have happened");
         }
-
-        if (this.debug) {
-            word.record_transformation(
-                `| ${engine}`, modified_word, line_num
-            );
-        }
+        word.record_transformation(
+            `| ${engine}`, modified_word, line_num
+        );
         return this.graphemosis(modified_word);
     }
 
@@ -515,11 +512,9 @@ class Transformer {
                     if (mode === "reject") {
                         word.rejected = true;
 
-                        if (this.debug) {
-                            word.record_transformation(
-                                `${matched_stream.join("")} → ^REJECT`, "∅", line_num
-                            );
-                        }
+                        word.record_transformation(
+                            `${matched_stream.join("")} → ^REJECT`, "∅", line_num
+                        );
                         return word_stream;
                     } else if (mode === "deletion") {
                         replacements.push({

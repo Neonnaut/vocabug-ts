@@ -310,6 +310,7 @@ class Transform_Resolver {
             }
 
             // ✅ Category key expansion
+            // THIS THING
             if (this.categories.has(char)) {
                 const prev = input[i - 1] ?? '';
                 const next = input[i + 1] ?? '';
@@ -344,6 +345,7 @@ class Transform_Resolver {
                 if (stream[i] === "}") {
                     feature_mode = false;
                     if (feature_matrix.length != 0) {
+                        // THIS THING
                         output.push(`[${this.get_graphemes_from_matrix(feature_matrix)}]`);
                     }
                     feature_matrix = '';

@@ -69,7 +69,7 @@ class Text_Builder {
     add_word(word:Word) {
         let do_it:boolean = false;
 
-        if (word.rejected && !Word.debug) {
+        if (word.rejected && Word.output_mode !== 'debug') {
             this.num_of_rejects ++;
             this.num_of_duds ++; // Record num of reject
         } else if (this.remove_duplicates){

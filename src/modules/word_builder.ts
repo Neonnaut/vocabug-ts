@@ -34,7 +34,7 @@ class Word_Builder {
         this.category_distribution = category_distribution;
         this.optionals_weight = optionals_weight;
 
-        Word.debug = (output_mode === 'debug');
+        Word.output_mode = output_mode
     }
 
     make_word() : Word {

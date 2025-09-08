@@ -25,7 +25,10 @@ const vocabugDistroRules = [
   { token: "operator",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
 ];
 const vocabugEngineRules = [
-  { token: "operator",     regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-upper-case|to-lower-case|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/ }
+  {
+    token: "operator",
+    regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/
+  }
 ];
 const vocabugListRules = [
   { token: "escape",   regex: /\\.|"\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
@@ -64,8 +67,8 @@ const vocabugTransformRules = [
 const vocabugClusterRules = [
   { token: "escape",   regex: /\\.|"\{(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\}/ },
   { token: "link",     regex: /,|\/|!|\?|_|\+/ },
-  { token: "operator", regex: /\-|\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&/ }
+  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\*|:|…|&/ }
 ];
 
 const vocabugFeatureFieldRules = [
@@ -222,6 +225,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // WORDS BLOCK
         if (state.mode == 'wordsBlock') {
             //End
             if (stream.match(/END(?=\s*;|\s*$)/)) {
@@ -241,6 +245,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        //TRANSFORM
         if (state.mode == 'transform') {
             // Inside Feature matrix
             if (state.feature_matrix) {
@@ -293,14 +298,18 @@ const vocabugParser: StreamParser<State> = {
                 }
             }
         }
+
+        // DEFAULT DISTRIBUTION
         if (state.mode == 'distroLine') {
             for (let rule of vocabugDistroRules) {
                 if (stream.match(rule.regex)) {
+                    state.mode = 'none';
                     return rule.token;
                 }
             }
         }
 
+        // LISTS
         if (state.mode == 'listLine') {
             for (let rule of vocabugListRules) {
                 if (stream.match(rule.regex)) {
@@ -309,6 +318,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // WORDS DECLARATION
         if (state.mode == 'wordLine') {
             for (let rule of vocabugWordRules) {
                 if (stream.match(rule.regex)) {
@@ -327,6 +337,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // CATEGORY
         if (state.mode == 'categoryLine') {
             for (let classo of state.classList) {
                 if (stream.match(classo)) {
@@ -341,6 +352,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // SEGMENT
         if (state.mode == 'segmentLine') {
             for (let classo of state.classMacList) {
                 if (stream.match(classo)) {
@@ -359,6 +371,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // FEATURE DECLARATION
         if (state.mode == 'featureLine') {
             for (let featuro of state.featureList) {
                 if (stream.match(featuro)) {
@@ -372,6 +385,7 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // FEATUREFIELD
         if (state.mode == 'featureField') {
             // End Transform
             if (stream.match(/END(?=\s*;|\s*$)/)) {
@@ -392,15 +406,18 @@ const vocabugParser: StreamParser<State> = {
             }
         }
 
+        // ENGINE
         if (state.mode == 'engine') {
+            state.mode = 'transform';
             for (let rule of vocabugEngineRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
-            state.mode = 'transform';
+            return null;
         }
 
+        // CLUSTER-FIELD
         if (state.mode == 'clusterBlock') {
             // End Transform
             if (stream.match(/END(?=\s*;|\s*$)/)) {

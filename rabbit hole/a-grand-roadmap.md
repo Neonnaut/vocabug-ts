@@ -98,9 +98,3 @@
 - [x] Alphabet directive
 - [x] Invisible directive
 
-- [] curly bracket missmatch
-- [] Get if not valid named escape
-- [] Put separate word, feature resolver
-
-- Hangeul
-
