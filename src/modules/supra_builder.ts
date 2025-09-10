@@ -15,14 +15,14 @@ export class Supra_Builder {
     }
 
     process_string(input: string, wordshape_line_num:number): string {
-        const token_regex = /\{([^}]*)\}/g;
+        const token_regex = /\<([^>]*)\>/g;
         const valid_content_regex = new RegExp(
         `^(\\^|∅|${cappa})(?:\\*((\\d+(?:\\.\\d+)?)|s))?$` );
 
         return input.replace(token_regex, (fullMatch, content) => {
             const match = valid_content_regex.exec(content);
             if (!match) {
-                this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '{A}', '{^}' or '{A*2}'`, wordshape_line_num);
+                this.logger.validation_error(`Invalid supra-set item '${fullMatch}' -- expected all supra-set items to look like '<A>', '<^>' or '<A*2>'`, wordshape_line_num);
             }
 
             const letter = match[1];
@@ -33,13 +33,13 @@ export class Supra_Builder {
             this.weights[id] = weight;
             this.letters[id] = letter;
 
-            return `{${id}}`;
+            return `<${id}>`;
 
         });
     }
 
     extract_letters_and_weights(input: string): [string[], (number|'s')[]] {
-        const id_regex = /\{(\d+)\}/g;
+        const id_regex = /\<(\d+)\>/g;
         const ids: string[] = [];
         const weights: (number|'s')[] = [];
 
@@ -59,7 +59,7 @@ export class Supra_Builder {
     }
 
     replace_letter_and_clean(input: string, target_ID: number): string {
-        const id_regex = /\{(\d+)\}/g;
+        const id_regex = /\<(\d+)\>/g;
 
         return input.replace(id_regex, (_match, id_str) => {
             const id = Number(id_str);

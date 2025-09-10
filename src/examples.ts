@@ -1,7 +1,7 @@
 const examples: { [key: string]: string } = {
   basic: 
 `; These are 'categories', categories are groups of graphemes.
-C = [t*9, tr] n [k*13, kr] m r s [p*12, pr] ch h w y
+C = {t*9, tr} n {k*13, kr} m r s {p*12, pr} ch h w y
 L = ee oo aa ii uu
 V = a i e o u L
 F = n r s
@@ -27,8 +27,8 @@ yi -> ^REJECT
 END`,
   tonal:
 `; A somewhat Yoruba-like tonal language
-I = k t ^ [p,f] n r b m s l d c ç ş h y w g [kp,gb]
-C = t k [f,p] n r b m s d h l ŋ g c ş ç l y w [mb,nd,ŋg] [kp,gb,ŋgb]
+I = k t ^ {p,f} n r b m s l d c ç ş h y w g {kp,gb}
+C = t k {f,p} n r b m s d h l ŋ g c ş ç l y w {mb,nd,ŋg} {kp,gb,ŋgb}
 V = a i e o u
 W = a i ẹ ọ u
 T = ^*3.7 \`*3 '*3.3 ; Gives mid-tone, low-tone, high-tone
@@ -74,15 +74,15 @@ END`,
 
 optionals-weight: 15 %
 
-C = [t*9,tr] s ^ [k*12,kr*2,kl] [d*12,dr] n [p*12,pr*2,pl] l m r [b*9,br*2,bl] q g h [č*12 f z]
+C = {t*9,tr} s ^ {k*12,kr*2,kl} {d*12,dr} n {p*12,pr*2,pl} l m r {b*9,br*2,bl} q g h {č*12 f z}
 V = a i o u e
 F = n r l s m
 X = n r l s
 T = '
 $S = CV(F)
-$X = CV[{T*1}*9,{T*3}F] ; 3rd last syllable
-$Y = CV[{^*80}*9,{^*95}F] ; 2nd last syllable
-$Z = CV[{T*3}*10,{T*9}X] ; last syllable
+$X = CV{<T*1>*9,<T*3>F} ; 3rd last syllable
+$Y = CV{<^*80>*9,<^*95>F} ; 2nd last syllable
+$Z = CV{<T*3>*10,<T*9>X} ; last syllable
 
 Σ = a,e,i,o,u,á,é,í,ó,ú
 
@@ -94,9 +94,9 @@ BEGIN transform:
 
 a',e',i',o',u' -> á,é,í,ó,ú ; Get stressed vowel
 u:+, u'u> o, e / _# ; /u/ final vowels should be less prominant
-[a,e,i,o,u]:+ -> [a,e,i,o,u] ; Vowels of 2+ length become 1
+{a,e,i,o,u}:+ -> {a,e,i,o,u} ; Vowels of 2+ length become 1
 áa,ée,íi,óo,úu -> á,é,í,ó,ú
-[a,e,o,u,á,é,í,ó,ú][Σ] > ^REJECT / #_#
+{a,e,o,u,á,é,í,ó,ú}{Σ} > ^REJECT / #_#
 
 ; Enlace y Hiato
 %   a  e  i  o  u
@@ -106,8 +106,8 @@ i   ja je +  jo ju
 o   +  e  oj +  ju
 u   wa we wi wo +
 
-qw -> kw / _[a,o,á,ó]
-q -> k / _[a,o,á,ó]
+qw -> kw / _{a,o,á,ó}
+q -> k / _{a,o,á,ó}
 
 nj gj gn gl qw -> ň ň ň ʎ q
 jg jn jj jl ww -> ň ň j ʎ w
@@ -122,7 +122,7 @@ s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z
 ; Taco-taco, burrito-burrito
 k q č h ň ʎ j w > c qu ch j ñ ll i u
 
-i > y / #_[Σ] / [Σ]_[Σ]
+i > y / #_{Σ} / {Σ}_{Σ}
 
 END`,
   japanese: 
@@ -134,13 +134,13 @@ END`,
 
 I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
 C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
-V = a, i, u, o, e, [oR, aR, iR, eR, uR, yu, yo, ya, [yoR, yuR, yaR]]
+V = a, i, u, o, e, {oR, aR, iR, eR, uR, yu, yo, ya, {yoR, yuR, yaR}}
 F = N, Q
 
 $A = IV(F) ; First syllable of slightly different consonant distribution.
 $S = CV(F) ; Gives type C(y)V(R)(N,Q).
 
-; Where light syllable is (C)V, and heavy is (C)[VF,VR(F)].
+; Where light syllable is (C)V, and heavy is (C){VF,VR(F)}.
 ; The final two syllables are least likely to be light + heavy...
 
 words: $A$S$S $A$S$S$S $A $A$S$S$S$S $A$S
@@ -149,8 +149,8 @@ graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 BEGIN transform:
 
-[a,e,i,o,u]+ > ^ / R_
-[a,e,i,o,u]+{3,} > [a,e,i,o,u]: ; Sequence of 3+ vowels becomes 2
+{a,e,i,o,u}+ > ^ / R_
+{a,e,i,o,u}+[3,] > {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
 %  i   u   e   o   ya   yu   yo
@@ -204,21 +204,21 @@ END`,
 I = k, p, m, w, ^, c, ŋ, j, t, ɲ, n, ʎ, t̪
 J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, t̪ ; For disyllabic words
 ; Medials
-C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, t̪, w, j, [n̪*5, ʎ*5, ʔ]
+C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, t̪, w, j, {n̪*5, ʎ*5, ʔ}
 ; Clusters
 X = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp
 Y = lŋ rŋ ɻŋ nt ɻʈ n̪t̪ lt̪ ln̪ n̪ʔ t̪ʔ
 Z = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc ln̪t̪ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
 F = n l r ɻ 
 ; VOWELS: <a aa i ii u uu ee oo> and diphthong <ai>
-V = a, i, u, [oR, eR, aR, iR, uR, ai]
+V = a, i, u, {oR, eR, aR, iR, uR, ai}
 W = a, i, u
 
 ; Syllable shapes: (C)V(F), CVFNCV. (C is optional ONLY word initially).
 ; <l r ɻ n̪> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
 ; Disylabic words DON'T begin with a vowel. NO monosyllabic words.
 $I = IW
-$S = [C*12,-X*2,-Y,-Z]V
+$S = {C*12,-X*2,-Y,-Z}V
 $J = JV
 $Z = CW(F)
 
@@ -263,7 +263,7 @@ END`,
 `; This is a comment.
 abcdefg ; And this is a comment following junk.
 
-() [] {} ; <- These should self close.
+() {} {} ; <- These should self close.
 "" ''   ; <- These should not self close.
 ; This should say it is the 6th line.
   ; Tab should indent by 2 spaces
@@ -285,10 +285,10 @@ END
   C = p, t, k
 
   ; Category set and category-in-category
-  V = a, i, o, e, u, [aa, ee, ii, oo, uu], C
+  V = a, i, o, e, u, {aa, ee, ii, oo, uu}, C
 
   ; escape characters
-  C = \\^, \\[, \\]
+  C = \\^, \\{, \\}
 
   ; Weights
   C = p*7, t*6, k*4
@@ -303,7 +303,7 @@ END
   $H = $S
 
   ; Escape characters
-  $C = \\^, \\[, \\]
+  $C = \\^, \\{, \\}
 
   ; Weights
   $C = p*7, t*6, k*4
@@ -312,7 +312,7 @@ END
   $C = ^
 
   ; Pick-ones
-  $C = p[t, k, s]
+  $C = p{t, k, s}
   ; ==> pt, pk, ps
 
   ; Optionals
@@ -324,7 +324,7 @@ END
   ; ==> pe'ta, peta'
 
 ; BUILDING WORDS
-  words* $S*5, $SsC*5 $S, $S$S, [foo, bar]
+  words* $S*5, $SsC*5 $S, $S$S, {foo, bar}
 
 ; TRANSFORM:
 BEGIN transform:
@@ -333,7 +333,7 @@ BEGIN transform:
     o -> x ; bodido ==> bxdidx
 
   ; Concurrent set:
-  ; Switch [o] and [e] around
+  ; Switch {o} and {e} around
     o a -> a o ; boda ==> bado
 
   ; CLUSTERFIELD
@@ -348,15 +348,15 @@ BEGIN transform:
     o -> x ; bodido ==> bxdidx
 
   ; Concurrent set:
-  ; Switch [o] and [e] around
+  ; Switch {o} and {e} around
     o a -> a o ; boda ==> bado
 
   ; Merging set:
   ; Three phonemes becoming two phonemes
-    [ʃ,z] dz -> s, d ; zeʃadzas ==> sesadas
+    {ʃ,z} dz -> s, d ; zeʃadzas ==> sesadas
 
   ; Optional set:
-  ; Merge [xw] and [x] into [h]
+  ; Merge {xw} and {x} into {h}
     {x ħ}(w j) > {s h}(w j) ; xwaxaħa ==> hahaħa
 
 ; CONDTION
@@ -387,13 +387,13 @@ BEGIN transform:
 ; FEATURESET
   ; Used for engine filters and for features
     feature-set: ipa
-    [nasal -labial] -> n
+    {nasal -labial} -> n
   ; amaŋaɲ > amanan
     feature-set: ansx-sampa
-    [nasal]
+    {nasal}
   ; amaNaJ -> amanan
     feature-set: digraphian
-    [nasal]
+    {nasal}
   ; amaNaJ -> amanan
 
 ; CARDS
@@ -406,7 +406,7 @@ BEGIN transform:
   ; rarra > rarre
 
   ; Multituder
-    a > e / r<[3]_
+    a > e / r<{3}_
   ; rrrarra > rrrerra
 
   ; Greedy wildcard:
@@ -414,7 +414,7 @@ BEGIN transform:
   ; apappap > apappep
 
   ; Positioning
-    a@[2] > o / b@[2]_
+    a@{2} > o / b@{2}_
   ; baba > babo
 
 ; GEMINATION:
@@ -468,7 +468,7 @@ BEGIN transform:
 ; MORE TESTS
   ; Compensatory Lengthening
 
-  ; Rhotacism: [z] goes to [r] between vowels or glides
+  ; Rhotacism: {z} goes to {r} between vowels or glides
 
   ; Haplology, repeated sequence is deleted
 

@@ -38,7 +38,7 @@ class Word_Builder {
     }
 
     make_word() : Word {
-        // Stage one looks like `CV(@, !)CVF[@, !]`
+        // Stage one looks like `CV(@, !)CVF{@, !}`
         let stage_one:string = weighted_random_pick(this.wordshapes.items, this.wordshapes.weights);
 
         // Stage two looks like `CVCVF!`
@@ -82,7 +82,7 @@ class Word_Builder {
         distribution: string,
         optionals_weight: number // percentage chance to include optionals (0–100)
     ): string {
-        const square_pattern = /\[[^\[\]]*\]/g;
+        const curly_pattern = /\{[^\{\}]*\}/g;
         const round_pattern = /\([^\(\)]*\)/g;
         let matches: RegExpMatchArray | null;
 
@@ -119,7 +119,7 @@ class Word_Builder {
         }
 
         // Resolve nested sets in square brackets
-        while ((matches = input_list.match(square_pattern)) !== null) {
+        while ((matches = input_list.match(curly_pattern)) !== null) {
             const most_nested = matches[matches.length - 1];
             items = most_nested.slice(1, -1).split(/[,\s]+/).filter(Boolean);
 

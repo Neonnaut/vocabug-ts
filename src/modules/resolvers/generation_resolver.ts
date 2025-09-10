@@ -63,9 +63,9 @@ class Generation_Resolver {
         for (let i = 0; i < this.wordshape_pending.content.length; i++) {
             const char = this.wordshape_pending.content[i];
 
-            if (char === '[' || char === '(') {
+            if (char === '{' || char === '(') {
                 inside_brackets++;
-            } else if (char === ']' || char === ')') {
+            } else if (char === '}' || char === ')') {
                 inside_brackets--;
             }
 
@@ -95,7 +95,6 @@ class Generation_Resolver {
         const bracket_pairs: Record<string, string> = {
             ')': '(',
             '>': '<',
-            ']': '[',
             '}': '{'
         };
         for (const char of str) {
@@ -127,8 +126,8 @@ class Generation_Resolver {
                 const char = str[i];
                 buffer += char;
 
-                if (char === '[') bracket_depth++;
-                if (char === ']') bracket_depth--;
+                if (char === '{') bracket_depth++;
+                if (char === '}') bracket_depth--;
                 if (char === '(') paren_depth++;
                 if (char === ')') paren_depth--;
 
@@ -144,14 +143,13 @@ class Generation_Resolver {
                     buffer = '';
                 }
             }
-
             return chunks;
         };
 
         const all_parts = input_list.flatMap(combine_adjacent_chunks);
 
         const all_default_weights = all_parts.every(part =>
-            !/^(?:\[.*\]|[^*]+)\*[\d.]+$/.test(part)
+            !/^(?:\{.*\}|[^*]+)\*[\d.]+$/.test(part)
         );
 
         if (all_default_weights) {
@@ -167,15 +165,14 @@ class Generation_Resolver {
         return [my_values, my_weights];
         }
 
-
         for (const part of all_parts) {
             const trimmed = part.trim();
             const match = trimmed.match(/^(.*)\*([\d.]+)$/);
 
-            if (match && !/\[.*\*.*\]$/.test(match[1])) {
+            if (match && !/\{.*\*.*\}$/.test(match[1])) {
                 my_values.push(match[1]);
                 my_weights.push(parseFloat(match[2]));
-            } else if (/^\[.*\]\*[\d.]+$/.test(trimmed)) {
+            } else if (/^\{.*\}\*[\d.]+$/.test(trimmed)) {
                 const i = trimmed.lastIndexOf("*");
                 my_values.push(trimmed.slice(0, i));
                 my_weights.push(parseFloat(trimmed.slice(i + 1)));

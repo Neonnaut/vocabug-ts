@@ -1,33 +1,34 @@
 const escapeMap: Record<string, string> = {
-  '"{Space}': '\u0020',
-  '"{Acute}': '\u0301',
-  '"{DoubleAcute}': '\u030B',
-  '"{Grave}': '\u0300',
-  '"{DoubleGrave}': '\u030F',
-  '"{Circumflex}': '\u0302',
-  '"{Caron}': '\u030C',
-  '"{Breve}': '\u0306',
-  '"{InvertedBreve}': '\u0311',
-  '"{TildeAbove}': '\u0303',
-  '"{TildeBelow}': '\u0330',
-  '"{Macron}': '\u0304',
-  '"{Dot}': '\u0307',
-  '"{DotBelow}': '\u0323',
-  '"{Diaeresis}': '\u0308',
-  '"{DiaeresisBelow}': '\u0324',
-  '"{Ring}': '\u030A',
-  '"{RingBelow}': '\u0325',
-  '"{Horn}': '\u031B',
-  '"{Hook}': '\u0309',
-  '"{CommaAbove}': '\u0313',
-  '"{CommaBelow}': '\u0326',
-  '"{Cedilla}': '\u0327',
-  '"{Ogonek}': '\u0328',
+  '[@Space]': '\u0020',
+  '[@Acute]': '\u0301',
+  '[@DoubleAcute]': '\u030B',
+  '[@Grave]': '\u0300',
+  '[@DoubleGrave]': '\u030F',
+  '[@Circumflex]': '\u0302',
+  '[@Caron]': '\u030C',
+  '[@Breve]': '\u0306',
+  '[@InvertedBreve]': '\u0311',
+  '[@TildeAbove]': '\u0303',
+  '[@TildeBelow]': '\u0330',
+  '[@Macron]': '\u0304',
+  '[@Dot]': '\u0307',
+  '[@DotBelow]': '\u0323',
+  '[@Diaeresis]': '\u0308',
+  '[@DiaeresisBelow]': '\u0324',
+  '[@Ring]': '\u030A',
+  '[@RingBelow]': '\u0325',
+  '[@Horn]': '\u031B',
+  '[@Hook]': '\u0309',
+  '[@CommaAbove]': '\u0313',
+  '[@CommaBelow]': '\u0326',
+  '[@Cedilla]': '\u0327',
+  '[@Ogonek]': '\u0328',
 };
 
 const transform_syntax_chars = [
-    '@','>','⇒','→','[',']','{','}','(',')', '/', '?',
-    '!', '_', '#', '+', ':', '*', '&', '…', '|', '<', '~'
+    '[',']','{','}','(',')',
+    '@','>','⇒','→', '/', '?', '!', '_',
+    '#', '+', ':', '*', '&', '…', '|', '<', '~'
 ];
 
 class Escape_Mapper {
@@ -81,7 +82,7 @@ class Escape_Mapper {
 
 
     escape_named_escape(input: string): string {
-      return input.replace(/"\{[A-Za-z]+\}/g, match => escapeMap[match] ?? match);
+      return input.replace(/\[@[A-Za-z]+\]/g, match => escapeMap[match] ?? match);
     }
 
     restore_escaped_chars(input: string): string {

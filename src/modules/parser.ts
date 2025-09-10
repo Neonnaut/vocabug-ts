@@ -127,7 +127,7 @@ class Parser {
             line = this.escape_mapper.escape_backslash_pairs(line);
             line = line.replace(/;.*/u, '').trim(); // Remove comment!!
             line = this.escape_mapper.escape_named_escape(line);
-            if (line.includes('"{')) {
+            if (line.includes('[@')) {
                 this.logger.validation_error(`Invalid named escape`, this.file_line_num);
             }
 
@@ -351,8 +351,8 @@ class Parser {
         for (let i = 0; i < str.length; i++) {
             const char = str[i];
 
-            if (char === "[") inside_square = true;
-            else if (char === "]") inside_square = false;
+            if (char === "{") inside_square = true;
+            else if (char === "}") inside_square = false;
 
             else if (char === "(") inside_paren = true;
             else if (char === ")") inside_paren = false;
@@ -393,7 +393,6 @@ class Parser {
         const bracket_pairs: Record<string, string> = {
             ')': '(',
             '>': '<',
-            ']': '[',
             '}': '{'
         };
         for (const char of str) {

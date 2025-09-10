@@ -1,12 +1,12 @@
 
 let e = " \
-a   ɛ   ɔ   e   o   i   u    ú   ya   yɛ   yɔ   ye   yo   yú   wa   wɛ   we   wɔ   we   wi        ui      \
-ㅏ  ㅐ  ㅓ  ㅔ  ㅗ   ㅣ  ㅡ   ㅜ  ㅑ    ㅒ   ㅕ   ㅖ   ㅛ    ㅠ   ㅘ   ㅙ   ㅚ   ㅝ   ㅞ   ㅟ        ㅢ      ";
+a   ɛ   ɔ   e   o   i   u    ú   ya   yɛ   yɔ   ye   yo   yú   wa   wɛ   wɔ   we   wi   úy   uy      \
+ㅏ  ㅐ  ㅓ  ㅔ  ㅗ   ㅣ  ㅡ   ㅜ  ㅑ    ㅒ   ㅕ   ㅖ   ㅛ    ㅠ   ㅘ   ㅙ   ㅝ   ㅞ   ㅚ   ㅟ    ㅢ ";
 
 let v = " \
 Hangul	ㄱ   ㄲ   ㄴ   ㄷ   ㄸ   ㄹ   ㅁ   ㅂ   ㅃ   ㅅ   ㅆ   ㅇ   ㅈ   ㅉ   ㅊ   ㅋ   ㅌ   ㅍ   ㅎ \
-Initial k    gk   n    t   dt   r    m    p    bp   s    zs       c    jc   c'   k'   t'  p'   h \
-Final   k    gk   n    d        r    m    p         s    zs  gn   c         c'   k'   t'  p'   h";
+Initial k    gk   n    t   dt   r    m    p    bp   s    zs       c    jc   ch   kh   th  ph   x \
+Final   k    gk   n    t        r    m    p         s    zs  gn   c         ch   kh   th  ph   x";
 
 
 function combine_jamo(initial: number, medial: number, final: number): string {

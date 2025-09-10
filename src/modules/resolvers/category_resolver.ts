@@ -74,7 +74,7 @@ class Category_Resolver {
 
    private valid_category_brackets(str: string): boolean {
       const stack: string[] = [];
-      const bracket_pairs: Record<string, string> = { ']': '[' };
+      const bracket_pairs: Record<string, string> = { '}': '{' };
       for (const char of str) {
          if (Object.values(bracket_pairs).includes(char)) {
             stack.push(char); // Push opening brackets onto stack
@@ -95,7 +95,7 @@ class Category_Resolver {
       const asterisk_at_start = /^\*/; // Returns false if follows rule
 
       // Rule 3: asterisk must not be preceded by space or comma
-      const asterisk_after_space_or_comma = /[ ,\[\]]\*/g; // Returns false if follows rule
+      const asterisk_after_space_or_comma = /[ ,\{\}]\*/g; // Returns false if follows rule
 
       // Rule 4: asterisk-number (int or decimal) pair
       // must be followed by space, comma, ], or end of string
@@ -128,7 +128,7 @@ class Category_Resolver {
          // console.log(`🔍 Tokenizing expression: "${expr}"`);
 
          while (i < expr.length) {
-            if (expr[i] === '[') {
+            if (expr[i] === '{') {
                if (buffer.trim()) {
                   // console.log(`🔹 Found literal token: "${buffer.trim()}"`);
                   tokens.push(buffer.trim());
@@ -136,8 +136,8 @@ class Category_Resolver {
                }
             let depth = 1, j = i + 1;
             while (j < expr.length && depth > 0) {
-               if (expr[j] === '[') depth++;
-               else if (expr[j] === ']') depth--;
+               if (expr[j] === '{') depth++;
+               else if (expr[j] === '}') depth--;
                j++;
             }
 

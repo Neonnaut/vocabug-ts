@@ -70,14 +70,14 @@ class Nesca_Grammar_Stream {
             new_token = { type: "anythings-mark", base: "…", min: 1, max: Infinity };
             let look_ahead = i + 1;
 
-            if (stream[look_ahead] === "{") {
+            if (stream[look_ahead] === "[") {
                look_ahead++;
                let blocked_stream = "";
 
                while (true) {
                   const char = stream[look_ahead];
 
-                  if (char === "}") break;
+                  if (char === "]") break;
 
                   if (look_ahead >= stream.length) {
                      this.logger.validation_error(`Unclosed blocker`, line_num);
@@ -212,18 +212,18 @@ class Nesca_Grammar_Stream {
                this.logger.validation_error(`Quantifier not allowed in '${mode}'`, line_num);
             }
             let look_ahead = i + 1;
-            if (stream[look_ahead] !== "{") {
+            if (stream[look_ahead] !== "[") {
                new_token.min = 1;
                new_token.max = Infinity; // Default quantifier
                i++;
             } else {
                look_ahead += 1;
                let quantifier = "";
-               while (look_ahead < stream.length && stream[look_ahead] !== "}") {
+               while (look_ahead < stream.length && stream[look_ahead] !== "]") {
                   quantifier += stream[look_ahead];
                   look_ahead++;
                }
-               if (stream[look_ahead] !== "}") {
+               if (stream[look_ahead] !== "]") {
                   this.logger.validation_error(`Unclosed quantifier`, line_num);
                }
 

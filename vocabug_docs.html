@@ -231,7 +231,7 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
-            <td><code class="example">"{</code> and <code class="example">}</code></td>
+            <td><code class="example">[@</code> and <code class="example">]</code></td>
             <td>Named escape</td>
           </tr>
           <tr>
@@ -259,7 +259,7 @@
             <td>Gives <a href="#vocAssigningWeights">weight</a> to an item</td>
           </tr>
           <tr>
-            <td><code class="example">[</code> and <code class="example">]</code></td>
+            <td><code class="example">{</code> and <code class="example">}</code></td>
             <td><a href="#vocPickOne">Pick-one-set</a></td>
           </tr>
           <tr>
@@ -267,7 +267,7 @@
             <td><a href="#vocOptional">Optional-set</a></td>
           </tr>
           <tr>
-            <td><code class="example">{</code> and <code class="example">}</code></td>
+            <td><code class="example">&lt;</code> and <code class="example">&gt;</code></td>
             <td><a href="#vocSupraSet">Supra-set item</a></td>
           </tr>
           <tr>
@@ -297,7 +297,7 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
-            <td><code class="example">"{</code> and <code class="example">}</code></td>
+            <td><code class="example">[@</code> and <code class="example">]</code></td>
             <td>Named escape</td>
           </tr>
           <tr>
@@ -309,7 +309,7 @@
             <td>Separates choices</td>
           </tr>
           <tr>
-            <td><code class="example">[</code> and <code class="example">]</code></td>
+            <td><code class="example">{</code> and <code class="example">}</code></td>
             <td><a href="#nescaAlternatorSet">Alternator-set</a></td>
           </tr>
           <tr>
@@ -321,7 +321,7 @@
             <td>Any one-length capital letter can refer to a <a href="#nescaUsingCategories">category</a></td>
           </tr>
           <tr>
-            <td><code class="example">@{</code> and <code class="example">}</code></td>
+            <td><code class="example">[+</code> or <code class="example">[-</code> and <code class="example">]</code></td>
             <td><a href="#nescaUsingFeatures">Feature</a> matrix</td>
           </tr>
           <tr>
@@ -357,7 +357,7 @@
             <td><a href="#nescaQuantifier">Quantifier</a>, matches as 1 or more of the previous grapheme</td>
           </tr>
           <tr>
-            <td><code class="example">+{</code> and <code class="example">}</code></td>
+            <td><code class="example">+[</code> and <code class="example">]</code></td>
             <td><a href="#nescaBoundedQuantifier">Bounded quantifier</a></td>
           </tr>
           <tr>
@@ -373,7 +373,7 @@
             <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches ungreedily 1 or more wildcards</td>
           </tr>
           <tr>
-            <td><code class="example">&{</code> or <code class="example">…{</code> and <code class="example">}</code></td>
+            <td><code class="example">&[</code> or <code class="example">…[</code> and <code class="example">]</code></td>
             <td><a href="#nescaBlocker">Blocked-anythings-mark</a></td>
           </tr>
           <tr>
@@ -393,7 +393,7 @@
 
 
       <h4 id="vocNamedEscape"><a class="head-num">4.2.3</a>Named escape</h4>
-      <p>Named escapes, enclosed in <code class="example">"{</code> and <code class="example">}</code> allow space and combining diacritics to be used without needing to insert these characters.</p>
+      <p>Named escapes, enclosed in <code class="example">[@</code> and <code class="example">]</code> allow space and combining diacritics to be used without needing to insert these characters.</p>
 
       <p>The supported characters are:</p>
       <table class="styled-table">
@@ -405,99 +405,99 @@
         </thead>
         <tbody>
           <tr>
-              <td><code class="example">"{Space}</code></td>
+              <td><code class="example">[@Space]</code></td>
               <td>&nbsp;</td>
           </tr>
           <tr>
-              <td><code class="example">"{Acute}</code></td>
+              <td><code class="example">[@Acute]</code></td>
               <td>◌́</td>
           </tr>
           <tr>
-              <td><code class="example">"{DoubleAcute}</code></td>
+              <td><code class="example">[@DoubleAcute]</code></td>
               <td>◌̋</td>
           </tr>
           <tr>
-              <td><code class="example">"{Grave}</code></td>
+              <td><code class="example">[@Grave]</code></td>
               <td>◌̀</td>
           </tr>
           <tr>
-              <td><code class="example">"{DoubleGrave}</code></td>
+              <td><code class="example">[@DoubleGrave]</code></td>
               <td>◌̏</td>
           </tr>
           <tr>
-              <td><code class="example">"{Circumflex}</code></td>
+              <td><code class="example">[@Circumflex]</code></td>
               <td>◌̂</td>
           </tr>
           <tr>
-              <td><code class="example">"{Caron}</code></td>
+              <td><code class="example">[@Caron]</code></td>
               <td>◌̌</td>
           </tr>
           <tr>
-              <td><code class="example">"{Breve}</code></td>
+              <td><code class="example">[@Breve]</code></td>
               <td>◌̆</td>
           </tr>
           <tr>
-              <td><code class="example">"{InvertedBreve}</code></td>
+              <td><code class="example">[@InvertedBreve]</code></td>
               <td>◌̑</td>
           </tr>
           <tr>
-              <td><code class="example">"{TildeAbove}</code></td>
+              <td><code class="example">[@TildeAbove]</code></td>
               <td>◌̃</td>
           </tr>
           <tr>
-              <td><code class="example">"{TildeBelow}</code></td>
+              <td><code class="example">[@TildeBelow]</code></td>
               <td>◌̰</td>
           </tr>
           <tr>
-              <td><code class="example">"{Macron}</code></td>
+              <td><code class="example">[@Macron]</code></td>
               <td>◌̄</td>
           </tr>
           <tr>
-              <td><code class="example">"{Dot}</code></td>
+              <td><code class="example">[@Dot]</code></td>
               <td>◌̇</td>
           </tr>
           <tr>
-              <td><code class="example">"{DotBelow}</code></td>
+              <td><code class="example">[@DotBelow]</code></td>
               <td>◌̣</td>
           </tr>
           <tr>
-              <td><code class="example">"{Diaeresis}</code></td>
+              <td><code class="example">[@Diaeresis]</code></td>
               <td>◌̈</td>
           </tr>
           <tr>
-              <td><code class="example">"{DiaeresisBelow}</code></td>
+              <td><code class="example">[@DiaeresisBelow]</code></td>
               <td>◌̤</td>
           </tr>
           <tr>
-              <td><code class="example">"{Ring}</code></td>
+              <td><code class="example">[@Ring]</code></td>
               <td>◌̊</td>
           </tr>
           <tr>
-              <td><code class="example">"{RingBelow}</code></td>
+              <td><code class="example">[@RingBelow]</code></td>
               <td>◌̥</td>
           </tr>
           <tr>
-              <td><code class="example">"{Horn}</code></td>
+              <td><code class="example">[@Horn]</code></td>
               <td>◌̛</td>
           </tr>
           <tr>
-              <td><code class="example">"{Hook}</code></td>
+              <td><code class="example">[@Hook]</code></td>
               <td>◌̉</td>
           </tr>
           <tr>
-              <td><code class="example">"{CommaAbove}</code></td>
+              <td><code class="example">[@CommaAbove]</code></td>
               <td>◌̓</td>
           </tr>
           <tr>
-              <td><code class="example">"{CommaBelow}</code></td>
+              <td><code class="example">[@CommaBelow]</code></td>
               <td>◌̦</td>
           </tr>
           <tr>
-              <td><code class="example">"{Cedilla}</code></td>
+              <td><code class="example">[@Cedilla]</code></td>
               <td>◌̧</td>
           </tr>
           <tr>
-              <td><code class="example">"{Ogonek}</code></td>
+              <td><code class="example">[@Ogonek]</code></td>
               <td>◌̨</td>
           </tr>
         </tbody>
@@ -522,10 +522,10 @@
 <span class="catkey">L</span> <span class="link">=</span> aa<span class="link">,</span> ii<span class="link">,</span> ee<span class="link">,</span> oo
 <span class="catkey">V</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> e<span class="link">,</span> o<span class="link">,</span> <span class="catkey">L</span></div>
       <p>In the example above, <code class="example">V</code> has a 20% chance of being a long vowel.</p>
-      <p>You can also enclose a set of graphemes in square brackets <code class="example">[</code> and <code class="example">]</code>. This is called a 'set-category'. This set will be treated as if it were a reference to a category in terms of frequency. For example, we could write the same example as this:</p>
-      <div class="prog-pre"><span class="directive">category-distribution</span><span class="link">:</span> <span class="directive">flat</span><br><span class="catkey">V</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> e<span class="link">,</span> o<span class="link">,</span> <span class="cm-matchingBracket"><span class="regexp">[</span></span>aa<span class="link">,</span> ii<span class="link">,</span> ee<span class="link">,</span> oo<span class="cm-matchingBracket"><span class="regexp">]</span></span></div>
+      <p>You can also enclose a set of graphemes in curly braces <code class="example">{</code> and <code class="example">}</code>. This is called a 'set-category'. This set will be treated as if it were a reference to a category in terms of frequency. For example, we could write the same example as this:</p>
+      <div class="prog-pre"><span class="directive">category-distribution</span><span class="link">:</span> <span class="directive">flat</span><br><span class="catkey">V</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> e<span class="link">,</span> o<span class="link">,</span> <span class="cm-matchingBracket"><span class="regexp">{</span></span>aa<span class="link">,</span> ii<span class="link">,</span> ee<span class="link">,</span> oo<span class="cm-matchingBracket"><span class="regexp">}</span></span></div>
       <p>Assigning weights to categories in categories and set-categories is possible.</p>
-      <p>Categories inside categories and set-categories CANNOT be a part of any sequence. for example <code class="example">C = Xz</code> or <code class="example">C = x[c, d]</code> or <code class="example">C = [a, b][c, d]</code> will not give the results you might want. To get sequence-like behaviour like that, you will need to use <a href="#vocSegments">segments</a>.</p>
+      <p>Categories inside categories and set-categories CANNOT be a part of any sequence. for example <code class="example">C = Xz</code> or <code class="example">C = x{c, d}</code> or <code class="example">C = {a, b}{c, d}</code> will not give the results you might want. To get sequence-like behaviour like that, you will need to use <a href="#vocSegments">segments</a>.</p>
 
       <h2 id="vocBuildingWords"><a class="head-num">6</a>Building words</h2>
 
@@ -545,7 +545,7 @@
       <p>Segments are a system that provides an abbreviation of parts of a <a href="#vocWords">word-shape</a>. Typically you would use it to define the shape of a syllable. Segments are defined similarly to categories, but with several important differences:</p>
       <ul class="paragraphian">
         <li>Every segment's key starts with <code class="example">$</code>. <code class="example">S = s</code> is a <a href="#vocCategories">category</a>; <code class="example">$S = s</code> is a segment.</li>
-        <li>Segments are not sets like categories are. <code class="example">$M = a, b, c</code> will not work as you might expect (because as already stated, segments are abbreviation for word-shapes). You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">$M = [a, b, c]</code></li>
+        <li>Segments are not sets like categories are. <code class="example">$M = a, b, c</code> will not work as you might expect (because as already stated, segments are abbreviation for word-shapes). You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">$M = {a, b, c}</code></li>
       </ul>
       <p>For example you could write the last example like so:</p>
       <div class="prog-pre"><span class="catkey">C</span> <code class="link">=</code> t<code class="link">,</code> n<code class="link">,</code> k<code class="link">,</code> m<code class="link">,</code> l<code class="link">,</code> s<code class="link">,</code> r<code class="link">,</code> d<code class="link">,</code> h<code class="link">,</code> w<code class="link">,</code> b<code class="link">,</code> j<code class="link">,</code> p<code class="link">,</code> g
@@ -554,13 +554,13 @@
       <p>You can put segments inside segments.</p>
 
       <h3 id="vocPickOne"><a class="head-num">6.3</a>Pick-one-set</h3>
-      <p>A pick-one-set is a group of graphemes and categories separated by spaces or commas, enclosed in square brackets <code class="example">[</code> and <code class="example">]</code>. Vocabug will pick an option from that pick-one just like it would from a segment. For example:</p>
+      <p>A pick-one-set is a group of graphemes and categories separated by spaces or commas, enclosed in curly braces <code class="example">{</code> and <code class="example">}</code>. Vocabug will pick an option from that pick-one just like it would from a segment. For example:</p>
       <div class="prog-pre"><span class="catkey">V</span> <span class="link">=</span> a<span class="link">,</span> u
-<span class="directive">words</span><span class="link">:</span> t<span class="regexp">[</span><span class="catkey">V</span><span class="link">,</span> x<span class="regexp">]</span></div>
+<span class="directive">words</span><span class="link">:</span> t<span class="regexp">{</span><span class="catkey">V</span><span class="link">,</span> x<span class="regexp">}</span></div>
       <p>This will produce either <code class="example">ta</code>, <code class="example">tu</code> or <code class="example">tx</code>.</p>
       <p>Pick-one-sets can be nested inside each other.</p>
       <p>Anything inside the pick-one can be assigned a weight, and a pick-one itself can be assigned a weight as well if it is nested inside another set:</p>
-      <div class="prog-pre"><span class="directive">words</span><span class="link">:</span> <code class="regexp">[</code>a<code class="weight">*1</code><span class="link">,</span> b<code class="weight">*2</code><span class="link">,</span> <code class="regexp">[</code>c<span class="link">,</span> d<code class="regexp">]</code><code class="weight">*2</code><code class="regexp">]</code></div>
+      <div class="prog-pre"><span class="directive">words</span><span class="link">:</span> <code class="regexp">{</code>a<code class="weight">*1</code><span class="link">,</span> b<code class="weight">*2</code><span class="link">,</span> <code class="regexp">{</code>c<span class="link">,</span> d<code class="regexp">}</code><code class="weight">*2</code><code class="regexp">}</code></div>
 
       <h3 id="vocOptional"><a class="head-num">6.4</a>Optional-set</h3>
       <p>Using round brackets, <code class="example">(</code> and <code class="example">)</code>, optional-set works the same way as <a href="#vocPickOne">pick-one-set</a>, the only difference is that what's inside them can either appear in the word or not. The probability of each of these variants is 10% by default.</p>
@@ -571,17 +571,17 @@
       <p>By default, an optional-set has a 10% chance of being included in the word. You can change this probability with the <code class="example">optionals-weight:</code> directive.</p>
 
       <h3 id="vocSupraSet"><a class="head-num">6.5</a>Supra-set</h3>
-      <p>A 'supra-set', is applied over the entire word, and there can only be one supra set. Curly braces <code class="example">{</code> and <code class="example">}</code>, denotes each item in the supra-set and their location in the word. The items of a supra-set can only be a category, or the null grapheme <code class="example">^</code>. Only one item in the supra-set will be picked for that generated word.</p>
+      <p>A 'supra-set', is applied over the entire word, and there can only be one supra set. less than and greater sign <code class="example">&lt;</code> and <code class="example">&gt;</code>, denotes each item in the supra-set and their location in the word. The items of a supra-set can only be a category, or the null grapheme <code class="example">^</code>. Only one item in the supra-set will be picked for that generated word.</p>
       <p>Supra-set is a feature designed to help generate words with stress systems, pitch accent systems, or other word-based suprasegmentals. Here is an example where it is used for a stress system:</p>
-      <div class="prog-pre"><span class="catkey">C</span> <span class="link">=</span> t<br><span class="catkey">V</span> <span class="link">=</span> a<br><span class="catkey">X</span> <span class="link">=</span> '<br><span class="directive">words</span><span class="link">:</span> <span class="regexp">({</span><span class="catkey">X</span><span class="regexp">}</span><span class="catkey">C</span><span class="catkey">V</span><span class="regexp">){</span><span class="catkey">X</span><span class="regexp">}</span><span class="catkey">CV</span></div>
+      <div class="prog-pre"><span class="catkey">C</span> <span class="link">=</span> t<br><span class="catkey">V</span> <span class="link">=</span> a<br><span class="catkey">X</span> <span class="link">=</span> '<br><span class="directive">words</span><span class="link">:</span> <span class="regexp">(&lt;</span><span class="catkey">X</span><span class="regexp">&gt;</span><span class="catkey">C</span><span class="catkey">V</span><span class="regexp">)&lt;</span><span class="catkey">X</span><span class="regexp">&gt;</span><span class="catkey">CV</span></div>
       <p>This produces any of the following words: <code class="example">'ta</code>, <code class="example">ta'ta</code>, <code class="example">'tata</code>, never any words with more than one <code class="example">'</code>. Notice here that <code class="example">ta</code> is not possible -- A supra-set item is only chosen after dealing with any sets that the supra-set items are nested in.</p>
       <p>See the "Romance-like" example for a language that uses supra-set for its stress system.</p>
       
       <h4 id="vocSupraSetWeight"><a class="head-num">6.5.1</a>Supra-set weight</h4> 
       <p>You can set the weights of supra-set items like so:</p>
-      <div class="prog-pre"><span class="catkey">R</span> <span class="link">=</span> r<br><span class="catkey">$X</span> <span class="link">=</span> o<span class="regexp">{</span><span class="catkey">R</span><span class="weight">*8</span><span class="regexp">}</span><br><span class="catkey">$Y</span> <span class="link">=</span> e<span class="regexp">{</span><span class="catkey">R</span><span class="weight">*2</span><span class="regexp">}</span><br><span class="directive">words</span><span class="link">:</span> <span class="catkey">$X$Y</span></div>
+      <div class="prog-pre"><span class="catkey">R</span> <span class="link">=</span> r<br><span class="catkey">$X</span> <span class="link">=</span> o<span class="regexp">&lt;</span><span class="catkey">R</span><span class="weight">*8</span><span class="regexp">&gt;</span><br><span class="catkey">$Y</span> <span class="link">=</span> e<span class="regexp">&lt;</span><span class="catkey">R</span><span class="weight">*2</span><span class="regexp">&gt;</span><br><span class="directive">words</span><span class="link">:</span> <span class="catkey">$X$Y</span></div>
       <p>The above example has an 80% chance of generating <code class="example">ore</code> and a 20% chance of generating <code class="example">oer</code>.</p>
-      <p>Supra-set item weights support a sentinel value -- a 'super-heavy' value <code class="example">s</code>. This <code class="example">s</code> will ensure the supra-set item attached to this weight is always chosen over others. For example: <code class="example">{V*s}</code></p>
+      <p>Supra-set item weights support a sentinel value -- a 'super-heavy' value <code class="example">s</code>. This <code class="example">s</code> will ensure the supra-set item attached to this weight is always chosen over others. For example: <code class="example">&lt;V*s&gt;</code></p>
 
       <h2 id="vocDistributions"><a class="head-num">7</a>Default distributions</h2>
       <p><b>The ordering of items matters</b> in <a href="#vocCategories">categories</a>, <a href="#vocSegments">segments</a> and <a href="#vocWords">word-shapes</a>. The first item will be chosen the most often, the second grapheme the second most often, and so on.</p>
@@ -599,7 +599,7 @@
       <h2 id="vocAssigningWeights"><a class="head-num">8</a>Assigning weights</h2>
       <p>If you want to set your own frequency for graphemes in a <a href="#vocCategories">category</a> or category-set, items in a <a href="#vocPickOne">pick-one-set</a>, or <a href="#vocOptional">optional-set</a>, or <a href="#vocWords">word-shapes</a> in the <code class="example">words:</code> directive, you can use an asterisk <code class="example">*</code> to specify the weight for each item, like so:</p>
       <div class="prog-pre"><span class="catkey">V</span> <span class="link">=</span> a<span class="weight">*5</span><span class="link">,</span> e<span class="weight">*4</span><span class="link">,</span> i<span class="weight">*3</span><span class="link">,</span> o<span class="weight">*2</span><span class="link">,</span> u<span class="weight">*1</span>
-<span class="catkey">$S</span> <span class="link">=</span> <span class="regexp">[</span><span class="catkey">V</span><span class="weight">*8</span><span class="link">,</span> x<span class="weight">*2</span><span class="regexp">]</span>
+<span class="catkey">$S</span> <span class="link">=</span> <span class="regexp">{</span><span class="catkey">V</span><span class="weight">*8</span><span class="link">,</span> x<span class="weight">*2</span><span class="regexp">}</span>
 <span class="directive">words</span><span class="link">:</span> <span class="catkey">$S</span><span class="weight">*2</span> y</div>
       <p><code class="example">V</code> has approximately the following probabilities: a: 33%, e: 27%, i: 20%, o: 13%, u: 7%. The <a href="#vocPickOne">pick-one-set</a> in the <code class="example">$S</code> segment has an 80% chance of producing a V category over the x grapheme. And the first word-shape in the <code class="example">words:</code> directive has twice the chance of being chosen over the next word-shape.</p>
       <p>As you might have noticed in the example above, in a sequence that has at least one weighted option, it overwrites any default distributions. Also important to note is that any other option that you had not given a weight (inside that set, or on the surface level), is given a weight of 1.</p>
@@ -641,21 +641,21 @@
         <li><code class="example">RESULT</code> is what <code class="example">TARGET</code> is changing into, or in other words, replacing</li>
       </ul>
       <p>Let's look at a simple unconditional rule:</p>
-      <div class="prog-pre"><span class="comment">; Replace every /o/ with /x/</span><br>  o <span class="link">-></span> x<br><span class="comment">; bodido ==> bxdidx</span></div>
+      <div class="prog-pre"><span class="comment">; Replace every [o] with [x]</span><br>  o <span class="link">-></span> x<br><span class="comment">; bodido ==> bxdidx</span></div>
       <p>In this rule, we see every instance of <code class="example">o</code> become <code class="example">x</code>.</p>
 
       <h3 id="nescaConcurrentChange"><a class="head-num">12.1</a>Concurrent change</h3>
       <p>Concurrent change is achieved by listing multiple graphemes in <code class="example">TARGET</code> separated by commas, and listing the same amount of resultant graphemes in <code class="example">RESULT</code> separated by commas. Changes in a concurrent change execute at the same time:</p>
-      <div class="prog-pre"><span class="comment">; Switch /o/ and /a/ around</span><br>  o<span class="link">,</span> a <span class="link">-></span> a<span class="link">,</span> o<br><span class="comment">; boda ==> bado</span></div>
+      <div class="prog-pre"><span class="comment">; Switch [o] and [a] around</span><br>  o<span class="link">,</span> a <span class="link">-></span> a<span class="link">,</span> o<br><span class="comment">; boda ==> bado</span></div>
       <p>Notice that the above example is different to the example below:</p>
       <div class="prog-pre">  o <span class="link">-></span> a<br>  a <span class="link">-></span> o<br><span class="comment">; boda ==> bodo</span></div>
       <p>where each change is on its own line. We can see <code class="example">o</code> merge with <code class="example">a</code>, then <code class="example">a</code> becomes <code class="example">o</code>.</p>
 
       <h3 id="nescaMergingChange"><a class="head-num">12.2</a>Merging change</h3>
       <p>Instead of listing each <code class="example">RESULT</code> in a concurrent change, we can instead list just one that all the <code class="example">TARGET</code>s will merge into:</p>
-      <div class="prog-pre"><span class="comment">; Merge /o/ and /a/ into x</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<br><span class="comment">; boda ==> bxdx</span></div>
+      <div class="prog-pre"><span class="comment">; Merge [o] and [a] into [x]</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<br><span class="comment">; boda ==> bxdx</span></div>
       <p>This is equivalent to:</p>
-      <div class="prog-pre"><span class="comment">; Merge /o/ and /a/ into x</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<span class="link">,</span> x<br><span class="comment">; boda ==> bxdx</span></div>
+      <div class="prog-pre"><span class="comment">; Merge [o] and [a] into [x]</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<span class="link">,</span> x<br><span class="comment">; boda ==> bxdx</span></div>
 
       <h3 id="nescaReject"><a class="head-num">12.3</a>Reject</h3>
       <p>To remove, or in other words, reject a word, you use the <code class="example">^REJECT</code> keyword in <code class="example">RESULT</code>:</p>
@@ -665,11 +665,11 @@
 
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
       <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
-      <div class="prog-pre"><span class="comment">; Insert /a/ in between /b/ and /t/</span>
+      <div class="prog-pre"><span class="comment">; Insert [a] in between [b] and [t]</span>
   <span class="operator">^</span> <span class="link">-></span> a <span class="link">/</span> b<span class="link">_</span>t
 <span class="comment">; bt ==> bat</span></div>
       <p>Deletion happens when <code class="example">^</code> is present in <code class="example">RESULT</code>:</p>
-      <div class="prog-pre"><span class="comment">; Delete every /b/</span>
+      <div class="prog-pre"><span class="comment">; Delete every [b]</span>
   b <span class="link">-></span> <span class="operator">^</span>
 <span class="comment">; bubda ==> uda</span></div>
 
@@ -683,11 +683,11 @@
         <li><code class="example">AFTER</code> is anything in the word after the target</li>
       </ul>
       <p>For example:</p>
-      <div class="prog-pre"><span class="comment">; Change /o/ into /x/ only when it is between /p/s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<br><span class="comment">; opoptot ==> opxptot</span></div>
+      <div class="prog-pre"><span class="comment">; Change [o] into [x] only when it is between [p]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<br><span class="comment">; opoptot ==> opxptot</span></div>
 
       <h3 id="nescaMultipleCondition"><a class="head-num">14.1</a>Multiple conditions in one rule</h3>
       <p>Multiple conditions for a single rule can be made by separating each condition with additional forward slashes. The change will happen if it meets either, or both of the conditions:</p>
-      <div class="prog-pre"><span class="comment">; Change /o/ into /x/ only when it is between /p/s or /t/s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p <span class="link">/</span> t<span class="link">_</span>t<br><span class="comment">; opoptot ==> opxptxt</span></div>
+      <div class="prog-pre"><span class="comment">; Change [o] into [x] only when it is between [p]s or [t]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p <span class="link">/</span> t<span class="link">_</span>t<br><span class="comment">; opoptot ==> opxptxt</span></div>
       
       <h3 id="nescaWordBoundary"><a class="head-num">14.2</a>Word boundary</h3>
       <p>Hash <code class="example">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="example">TARGET</code>, or the end of the word if it is in <code class="example">RESULT</code></p>
@@ -709,7 +709,7 @@
       <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="catkey">B</span> <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xapay ==> apa</code></div>
 
       <p>If the category is part of a target, it MUST be inside an alternator set:</p>
-      <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="regexp">[</span><span class="catkey">B</span><span class="regexp">]</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvapay ==> apay</code></div>
+      <div class="prog-pre">  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">BEGIN transform</span><span class="link">:</span><br>  <span class="regexp">{</span><span class="catkey">B</span><span class="regexp">}</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvapay ==> apay</code></div>
 
       <h2 id="nescaFeatures"><a class="head-num">17</a>Features</h2>
       <p>Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, <code class="example">+high</code> and <code class="example">+front</code>, and turn it into a phoneme marked with <code class="example">+high</code> and <code class="example">+back</code> features, perhaps /ɯ/. Features let you do this.</p>
@@ -742,18 +742,18 @@
 
       <h3 id="nescaUsingFeatures"><a class="head-num">17.5</a>Using Features</h3>
 
-      <p>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' surrounded by <code class="example">@{</code> and <code class="example">}</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">@{+high, +back}</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">@{+high, +back, -round}</code> would capture <code class="example">ɯ</code> only.</p>
+      <p>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' surrounded by <code class="example">[</code> and <code class="example">]</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">[+high, +back]</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">[+high, +back, -round]</code> would capture <code class="example">ɯ</code> only.</p>
       <p>The very simple example below is written to change all voiceless graphemes that have a voiced counterpart into their voiced counterparts:</p>
 
       <div class="prog-pre"><span class="catkey">-voice</span> <span class="link">=</span> p<span class="link">,</span> t<span class="link">,</span> k<span class="link">,</span> f<span class="link">,</span> s
 <span class="catkey">+voice</span> <span class="link">=</span> b<span class="link">,</span> d<span class="link">,</span> g<span class="link">,</span> v<span class="link">,</span> z
 
 <span class="directive">BEGIN transform</span><span class="link">:</span>
-  <span class="catkey">@{-voice}</span> <span class="link">-&gt;</span> <span class="catkey">@{+voice}</span>
+  <span class="catkey">[-voice]</span> <span class="link">-&gt;</span> <span class="catkey">[+voice]</span>
 <span class="comment">; tamefa ==&gt; dameva</span>
 <span class="directive">END</span></div>
 
-      <p>In this rule, in <code class="example">RESULT</code>, <code class="example">@{+voice}</code> has a symmetrical one-to-one change of graphemes from the graphemes in <code class="example">@{-voice}</code> in <code class="example">TARGET</code>, leading to a concurrent change. Let's quickly imagine a scenario where the only <code class="example">@{+voice}</code> grapheme was <code class="example">b</code>. The result will be a merging of all <code class="example">-voice</code> graphemes into <code class="example">b</code>: <code class="example">tamepfa ==&gt; bamebba</code>.</p>
+      <p>In this rule, in <code class="example">RESULT</code>, <code class="example">[+voice]</code> has a symmetrical one-to-one change of graphemes from the graphemes in <code class="example">[-voice]</code> in <code class="example">TARGET</code>, leading to a concurrent change. Let's quickly imagine a scenario where the only <code class="example">[+voice]</code> grapheme was <code class="example">b</code>. The result will be a merging of all <code class="example">-voice</code> graphemes into <code class="example">b</code>: <code class="example">tamepfa ==&gt; bamebba</code>.</p>
 
       <h3 id="nescaFeatureField"><a class="head-num">17.6</a>Feature-field</h3>
       <p>Feature-fields allow graphemes to be easily marked by multiple features in table format.</p>
@@ -785,26 +785,26 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
       </ul>
       <p>Here are some matrices of these features and which graphemes they would capture:</p>
       <ul>
-        <li><code class="example">@{+plosive}</code> captures the graphemes <code class="example">b, d, g, p, t, k</code></li>
-        <li><code class="example">@{+voiced, +plosive}</code> captures the graphemes <code class="example">b, d, g</code></li>
-        <li><code class="example">@{+voiced, +labial, +plosive}</code> captures the grapheme <code class="example">b</code></li>
+        <li><code class="example">[+plosive]</code> captures the graphemes <code class="example">b, d, g, p, t, k</code></li>
+        <li><code class="example">[+voiced, +plosive]</code> captures the graphemes <code class="example">b, d, g</code></li>
+        <li><code class="example">[+voiced, +labial, +plosive]</code> captures the grapheme <code class="example">b</code></li>
       </ul>
 
       <h2 id="nescaAltAndOpt"><a class="head-num">18</a>Alternator and Optionalator</h2>
       <p>These cannot be nested.</p>
 
       <h3 id="nescaAlternatorSet"><a class="head-num">18.1</a>Alternator-set</h3>
-      <p>Enclosed in square brackets, <code class="example">[</code> and <code class="example">]</code>, only one Item in an alternator set will be part of each sequence. For example:</p>
-      <div class="prog-pre">  p<span class="regexp">[</span>w<span class="link">,</span> j<span class="regexp">]</span> <span class="link">-></span> pp</div>
+      <p>Enclosed in curly braces, <code class="example">{</code> and <code class="example">}</code>, only one Item in an alternator set will be part of each sequence. For example:</p>
+      <div class="prog-pre">  p<span class="regexp">{</span>w<span class="link">,</span> j<span class="regexp">}</span> <span class="link">-></span> pp</div>
       <p>The above example is equivalent to:</p>
       <div class="prog-pre">  pw<span class="link">,</span> pj <span class="link">-></span> pp</div>
       <p>These can also be used in exceptions and conditions.</p>
 
       <h3 id="nescaOptionalatorSet"><a class="head-num">18.2</a>Optionalator-set</h3>
       <p>Items in an optionalator, enclosed in <code class="example">(</code> and <code class="example">)</code> can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Merge /x/ and /xw/ into /k/</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
+      <div class="prog-pre"><span class="comment">; Merge [x] and [xw] into [k]</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
       <p>Optional-set can also attach to an alternator-set:</p>
-      <div class="prog-pre"><span class="comment">; Merge /x/, /xw/, /ħ/ and /ħw/ into /k/</span><br>  <span class="regexp">[</span>x<span class="link">,</span> ħ<span class="regexp">]</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
+      <div class="prog-pre"><span class="comment">; Merge [x], [xw], [ħ] and [ħw] into [k]</span><br>  <span class="regexp">{</span>x<span class="link">,</span> ħ<span class="regexp">}</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
       <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
 
       <h2 id="nescaClusterfield"><a class="head-num">19</a>Cluster-field</h2>
@@ -830,21 +830,21 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre">  a<span class="regexp">+</span> <span class="link">-></span> o<br><code class="comment">; raraaaaa ==> roro</code></div>
 
       <h3 id="nescaBoundedQuantifier"><a class="head-num">20.2</a>Bounded quantifier</h3>
-      <p>The bounded quantifier matches as many times its digit(s), enclosed in <code class="example">+{</code> and <code class="example">}</code>, to the things to the left.</p>
-      <div class="prog-pre"><span class="comment">; Change /o/ into /x/ only when preceded by three /r/s</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">+{</span>3<span class="regexp">}</span><span class="link">_</span>
+      <p>The bounded quantifier matches as many times its digit(s), enclosed in <code class="example">+[</code> and <code class="example">]</code>, to the things to the left.</p>
+      <div class="prog-pre"><span class="comment">; Change [o] into [x] only when preceded by three [r]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">+[</span>3<span class="regexp">]</span><span class="link">_</span>
 <code class="comment">; ororrro ==> ororrrx</code></div>
 
       <p>The digits in the quantifier can also be a range:</p>
-      <div class="prog-pre"><span class="comment">; Change a sequence of 2 to 4 /o/s into /x/</span><br>  o<span class="regexp">+{</span>2<span class="link">,</span>4<span class="regexp">}</span> <span class="link">-></span> x
+      <div class="prog-pre"><span class="comment">; Change a sequence of 2 to 4 [o]s into [x]</span><br>  o<span class="regexp">+[</span>2<span class="link">,</span>4<span class="regexp">]</span> <span class="link">-></span> x
 <code class="comment">; tootooooo ==> txtxo</code></div>
 
 
       <p>At the beginning of the list, <code class="example">,</code> represents all the possible numbers lower than the number to the right, not including zero.</p>
-      <div class="prog-pre"><span class="comment">; Change a sequence of 1 to 4 /o/s into /x/</span><br>  o<span class="regexp">+{</span><span class="link">,</span>4<span class="regexp">}</span> <span class="link">-></span> x
+      <div class="prog-pre"><span class="comment">; Change a sequence of 1 to 4 [o]s into [x]</span><br>  o<span class="regexp">+[</span><span class="link">,</span>4<span class="regexp">]</span> <span class="link">-></span> x
 <code class="comment">; tootooooo ==> txtx</code></div>
 
       <p>And finally at the end of the list, <code class="example">,</code> represents all possible numbers larger than the number to the the left</p>
-        <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible /o/s into /x/</span><br>  o<span class="regexp">+{</span>4<span class="regexp"><span class="link">,</span>}</span> <span class="link">-></span> x
+        <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible [o]s into [x]</span><br>  o<span class="regexp">+[</span>4<span class="regexp"><span class="link">,</span>]</span> <span class="link">-></span> x
 <code class="comment">; toootooooo ==> toootx</code></div>
 
       <h3 id="nescaGeminateMark"><a class="head-num">20.3</a>Geminate-mark</h3>
@@ -861,7 +861,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 
       <h3 id="nescaWildcard"><a class="head-num">20.5</a>Wildcard</h3>
       <p>Wildcard, using asterisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">RESULT</code>:</p>
-      <div class="prog-pre"><code class="comment">; Any grapheme becomes /x/ when any grapheme follows it</code><br>  <span class="regexp">*</span> <span class="link">-></span> x <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; aomp ==> xxxp</code></div>
+      <div class="prog-pre"><code class="comment">; Any grapheme becomes [x] when any grapheme follows it</code><br>  <span class="regexp">*</span> <span class="link">-></span> x <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; aomp ==> xxxp</code></div>
       <p>Wildcard can be placed by itself inside an <a href="#nescaOptionalatorSet">optionalator</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">20.6</a>Anythings-mark</h3>
@@ -869,12 +869,12 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre">  b<span class="regexp">&</span>t <span class="link">-></span> x<br><code class="comment">; babitto => xto</code></div>
       <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="example">t</code> and beyond like <code class="example">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
       <p>The example below uses an anythings-mark in the condition:</p>
-      <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">&</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
+      <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">&</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
 
       <h3 id="nescaBlocker"><a class="head-num">20.7</a>Blocked-anythings-mark</h3>
-      <p>Blocked-anythings-mark is designed to block the spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set of graphemes inside <code class="example"><span class="regexp">&{</span></code> and <code class="example">}</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
+      <p>Blocked-anythings-mark is designed to block the spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set of graphemes inside <code class="example"><span class="regexp">&[</span></code> and <code class="example">]</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       
-      <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">[</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">]</span><span class="regexp">&{</span>k<span class="link">,</span> g<span class="regexp">}</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
+      <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">&[</span>k<span class="link">,</span> g<span class="regexp">]</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced rules</h2>
 
@@ -900,16 +900,16 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 <span class="comment">; malak ==&gt; malakmalak</span></div>
       
       <p>"<b>Haplology</b>":</p>
-      <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span><span class="regexp">[</span><span class="catkey">V</span><span class="regexp">]</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="regexp">&lt;</span>
+      <div class="prog-pre">  <span class="regexp">{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="regexp">&lt;</span>
 <span class="comment">; haplology ==> haplogy</span></div>
       <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
-      <div class="prog-pre">  <span class="regexp">[</span><span class="catkey">C</span><span class="regexp">]</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">&lt;</span></div>
+      <div class="prog-pre">  <span class="catkey">C</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&[</span><span class="catkey">C</span><span class="regexp">]</span><span class="regexp">&lt;</span></div>
 
 
       <h3 id="nescaMetathesisChange"><a class="head-num">21.3</a>Metathesis change</h3>
       <p>Simple metathesis involves a tilde <code class="example">~</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
       <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
-  <span class="regexp">[</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">]</span><span class="regexp">[</span>m<span class="link">,</span> n<span class="regexp">]</span> <span class="link">-></span> <span class="operator">~</span><br><span class="comment">; apma ==> ampa</span></div>
+  <span class="regexp">{</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">}</span><span class="regexp">{</span>m<span class="link">,</span> n<span class="regexp">}</span> <span class="link">-></span> <span class="operator">~</span><br><span class="comment">; apma ==> ampa</span></div>
       
 
       <h2 id="vocabugQuestionsAndAnswers"><a class="head-num">22</a>Questions and answers</h2>
@@ -932,7 +932,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
      
 
       <p><b>How do I weight an individual optional-set?</b></p>
-      <p>Using the <code class="example">Optionals-weight:</code> directive, affects the weight of all optional-sets. As of version 1, there is no direct way to weight an individual optional-set. You can however, use <code class="example">^</code> as an item in an alternator, like <code class="example">a[b, c, ^*3]</code></p>
+      <p>Using the <code class="example">Optionals-weight:</code> directive, affects the weight of all optional-sets. As of version 1, there is no direct way to weight an individual optional-set. You can however, use <code class="example">^</code> as an item in an alternator, like <code class="example">a{b, c, ^*3}</code></p>
 
     </section>
 

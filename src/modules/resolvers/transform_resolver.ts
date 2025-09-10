@@ -188,20 +188,20 @@ class Transform_Resolver {
         for (let i = 0; i < str.length; i++) {
             const char = str[i];
 
-            if (char === '[' || char === '(') {
+            if (char === '{' || char === '(') {
                 if (stack.length >= 1) {
                     this.logger.validation_error("Nested alternator / optionalator not allowed", this.line_num);
                 }
                 stack.push({ char, index: i });
             }
 
-            if (char === ']' || char === ')') {
+            if (char === '}' || char === ')') {
                 if (stack.length === 0) {
                     this.logger.validation_error("Mismatched closing bracket", this.line_num);
                 }
 
                 const { char: open_char, index: open_index } = stack.pop()!;
-                const is_matching = (open_char === '[' && char === ']') || (open_char === '(' && char === ')');
+                const is_matching = (open_char === '{' && char === '}') || (open_char === '(' && char === ')');
                 if (!is_matching) {
                     this.logger.validation_error("Mismatched bracket types", this.line_num);
                 }
@@ -230,11 +230,11 @@ class Transform_Resolver {
     expand_chunk(chunk: string): string[] {
         this.check_grammar_rules(chunk);
 
-        const regex = /([^\[\(\]\)]+)|(\[[^\]]+\])|(\([^\)]+\))/g;
+        const regex = /([^\{\(\}\)]+)|(\{[^\}]+\})|(\([^\)]+\))/g;
         const parts = [...chunk.matchAll(regex)].map(m => m[0]);
 
         const expansions: string[][] = parts.map(part => {
-            if (part.startsWith("[")) {
+            if (part.startsWith("{")) {
                 return part.slice(1, -1).split(/[\s,]+/);
             } else if (part.startsWith("(")) {
                 const val = part.slice(1, -1);
@@ -342,11 +342,11 @@ class Transform_Resolver {
 
         for (let i:number = 0; i < stream.length; i++) {
             if (feature_mode) {
-                if (stream[i] === "}") {
+                if (stream[i] === "]") {
                     feature_mode = false;
                     if (feature_matrix.length != 0) {
                         // THIS THING
-                        output.push(`[${this.get_graphemes_from_matrix(feature_matrix)}]`);
+                        output.push(`{${this.get_graphemes_from_matrix(feature_matrix)}}`);
                     }
                     feature_matrix = '';
                     continue;
@@ -354,13 +354,12 @@ class Transform_Resolver {
                 feature_matrix += stream[i];
                 continue;
             }
-            if (stream[i] === "@") {
-                i++;
-                if (stream[i] === "{") {
+            if (stream[i] === "[") {
+                if (stream[i+1] === "+" || stream[i+1] === "-") {
                     feature_mode = true;
                     continue;
                 } else {
-                    output.push("@");
+                    output.push("[");
                     continue;
                 }
             }
@@ -457,7 +456,7 @@ class Transform_Resolver {
             */
             if (t.type === "anythings-mark") {
                 if ('blocked_by' in t && t.blocked_by) {
-                    s+= `{${t.blocked_by.join(", ")}}`
+                    s+= `[${t.blocked_by.join(", ")}]`
                 }
             }
 
@@ -467,15 +466,15 @@ class Transform_Resolver {
             if ('min' in t && t.min === 1 && t.max === Infinity) {
                 s += `+`;
             } else if ('min' in t  && t.max === Infinity) {
-                s += `+{${t.min},}`;
+                s += `+[${t.min},]`;
             } else if ('min' in t && t.min == t.max) {
                 if (t.min == 1){
                     // min 1 and max 1
                 } else {
-                    s += `+{${t.min}}`;
+                    s += `+[${t.min}]`;
                 }
             } else if ('min' in t) {
-                s += `+{${t.min}${t.max !== Infinity ? ',' + t.max : ''}}`;
+                s += `+[${t.min}${t.max !== Infinity ? ',' + t.max : ''}]`;
             }
             return s;
         }).join('');

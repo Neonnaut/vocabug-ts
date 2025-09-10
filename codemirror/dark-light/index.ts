@@ -44,6 +44,9 @@ const Darky = EditorView.theme({
     outline: "none",
     border: "1px dotted #3295a8;"
   },
+  ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
+    backgroundColor: "#00be6845", // Optional highlight background
+  },
   "@media only screen and (max-width: 500px)": {
     ".cm-gutters": {
       display: "none!important"
@@ -126,6 +129,9 @@ const Lighty = EditorView.theme({
   "&.cm-editor.cm-focused": {
     outline: "none",
     border: "1px dotted #001299;"
+  },
+  ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
+    backgroundColor: "#00be6845", // Optional highlight background
   },
   "@media only screen and (max-width: 500px)": {
     ".cm-gutters": {
