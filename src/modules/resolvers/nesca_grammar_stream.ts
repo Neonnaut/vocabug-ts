@@ -8,6 +8,7 @@ import Logger from '../logger.js';
 import Escape_Mapper from '../escape_mapper.js';
 import type { Token } from '../types.js';
 import type { Token_Stream_Mode } from '../types.js';
+import { get_last } from '../utilities.js';
 
 class Nesca_Grammar_Stream {
    public logger: Logger;
@@ -45,11 +46,11 @@ class Nesca_Grammar_Stream {
             this.logger.validation_error(`Reject not allowed in '${mode}'`, line_num);
          }
          return [{ type: "reject", base: "^REJECT" }];
-      } else if (stream === "~") {
+      } else if (stream === "<") {
          if (mode !== "RESULT"){
             this.logger.validation_error(`Metathesis not allowed in '${mode}'`, line_num);
          }
-         return [{ type: "metathesis", base: "~" }];         
+         return [{ type: "metathesis", base: "<" }];         
       }
 
       while (i < stream.length) {
@@ -114,52 +115,71 @@ class Nesca_Grammar_Stream {
             tokens.push(new_token);
             i++;
             continue;
-         } else if (char === "<") {
-
-            /*
+         } else if (char == "$"){
+            if (mode === "TARGET") {
+               this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
+            }
+            new_token = { type: "target-reference", base: '$',
+               min: 1, max: 1 };
+            i++;
+            
+         } else if (char == "="){
             let look_ahead = i + 1;
-            if (stream[look_ahead] === "{") {
-               // Its a named reference
-               look_ahead += 1;
+            if (stream[look_ahead] === "[") {
+               // It's a binding
 
-               let my_name = "";
-               let my_mode:'assertion'|'declaration'|'insertion' = 'insertion';
-
-               if (stream[look_ahead] === "=") {
-                  // Its a named reference declaration
-                  my_mode = 'declaration';
-                  look_ahead += 1;
-               } else if (stream[look_ahead] === "+") {
-                  // Its a named reference assertion
-                  my_mode = 'assertion';
-                  look_ahead += 1;
+               const my_last_token = get_last(tokens);
+               ////
+               if (my_last_token === undefined) {
+                  this.logger.validation_error(`Named-capture in '${mode}' does not follow `, line_num);
+               }
+               if (get_last(tokens)?.type === "named-capture") {
+                  this.logger.validation_error(`Named-capture in '${mode}' does not follow `, line_num);
                }
 
+               look_ahead++;
+               let name_stream = "";
+               while (true) {
+                  const char = stream[look_ahead];
+
+                  if (char === "]") break;
+
+                  if (look_ahead >= stream.length) {
+                     this.logger.validation_error(`Unclosed binding`, line_num);
+                  }
+
+                  name_stream += char;
+                  look_ahead++;
+               }
+               new_token = { type: "named-capture", base: `=[${name_stream}]`,
+               name: name_stream, min: 1, max: 1 };
+               i = look_ahead + 1; // Consume ]
+            }
+            
+         } else if (char === "[") {
+            let look_ahead = i + 1;
+            if (stream[look_ahead] === "=") {
+               // Its a named reference
+               if (mode === "TARGET") {
+                  this.logger.validation_error(`Named-reference not allowed in '${mode}'`, line_num);
+               }
+               look_ahead += 1;
+               let my_name = "";
                while (true) { // Get the name
                   const char = stream[look_ahead];
-                  if (char === "}") break; i = look_ahead;
+                  if (char === "]") break; i = look_ahead;
                   if (look_ahead >= stream.length) {
                      this.logger.validation_error(`Unclosed named-reference`, line_num);
                   }
                   my_name += char;
                   look_ahead++;
                }
-
                new_token = {
-                  type: "named-reference", base: '<',
-                  name:my_name, mode:my_mode, min: 1, max: 1
+                  type: "named-reference", base: `[<${my_name}]`,
+                  name:my_name, min: 1, max: 1
                };
-
                i = look_ahead + 1; // Consume }
-
-            } else {*/
-               if (mode === "TARGET") {
-                  this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
-               }
-               new_token = { type: "target-reference", base: char, min: 1, max: 1 };
-               i++;
-            //}
-
+            }
 
          } else if (
             char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||

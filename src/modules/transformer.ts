@@ -1,9 +1,10 @@
 import Word from './word';
 import Logger from './logger';
-import { swap_first_last_items } from './utilities';
+import { swap_first_last_items, reverse_items } from './utilities';
 import type { Token, Output_Mode } from './types';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
+import { roman_to_hangul } from './hangul';
 
 type Match_Result = {
     start: number; // actual match start
@@ -81,10 +82,14 @@ class Transformer {
                 modified_word = full_word.toUpperCase(); break;
             case "to-lowercase":
                 modified_word = full_word.toLowerCase(); break;
+            case "reverse":
+                modified_word = reverse_items(word_stream).join(''); break;
             case "xsampa-to-ipa":
                 modified_word = xsampa_to_ipa(full_word); break;
             case "ipa-to-xsampa":
                 modified_word = ipa_to_xsampa(full_word); break;
+            case "roman-to-hangul":
+                modified_word = roman_to_hangul(full_word); break;
             default:
                 this.logger.validation_error("This should not have happened");
         }
@@ -144,8 +149,8 @@ class Transformer {
                 token.type !== 'grapheme' &&
                 token.type !== 'wildcard' &&
                 token.type !== 'anythings-mark' &&
-                token.type !== 'target-reference'
-                // token.type !== 'named-reference'
+                token.type !== 'target-reference' &&
+                token.type !== 'named-reference'
             ) {
                 j++;
                 continue;
@@ -202,14 +207,10 @@ class Transformer {
                 matched.push(...stream.slice(i, i + total_length));
                 i += total_length;
                 
-            /*    
+            
             } else if (token.type === "named-reference") {
-                if (token.mode === 'assertion') {
-                    console.log(get_last(matched))
-                } else if (token.mode === 'insertion') {
-                    matched.push(...stream.slice(i, i + 0));
-                }
-            */
+                matched.push(...stream.slice(i, i + 0));
+            
             } else if (token.type === 'wildcard') {
                 const available = Math.min(max_available, stream.length - i);
 
@@ -299,9 +300,9 @@ class Transformer {
             index_span: number;
             length_span: number;
             replacement_stream: string[];
+            matched_condition: { type: "condition"; before: Token[]; after: Token[] } | null;
         }[],
         word: Word,
-        conditions: { before: Token[]; after: Token[] }[],
         exceptions: { before: Token[]; after: Token[] }[],
         line_num: number
     ): string[] {
@@ -388,10 +389,12 @@ class Transformer {
             }
 
             let my_conditions = '';
-            for (const c of conditions) {
-                const my_before = c.before.map(t => t.base).join("");
-                const my_after = c.after.map(t => t.base).join("");
-                my_conditions += ` / ${my_before}_${my_after}`;
+            for (const r of replacements) {
+                if (r.matched_condition) {
+                    const before = r.matched_condition.before.map(t => t.base).join(' ');
+                    const after = r.matched_condition.after.map(t => t.base).join(' ');
+                    my_conditions += ` / ${before}_${after}`;
+                }
             }
 
             const transformation_str = `${applied_targets.join(", ")} → ${applied_results.join(", ")}`;
@@ -428,8 +431,14 @@ class Transformer {
             this.logger.validation_error("Mismatched target/result concurrent set lengths in a transform", line_num)
         } 
 
-        const replacements: {index_span:number; length_span:number;
-            target_stream:string[]; replacement_stream:string[] }[] = [];
+        const replacements: { index_span:number; length_span:number;
+            target_stream:string[]; replacement_stream:string[];
+            matched_condition: {
+                type: "condition";
+                before: Token[];
+                after: Token[];
+            } | null;
+        }[] = [];
 
         for (let i = 0; i < target.length; i++) {
             let raw_target:Token[] = target[i]; // like 'abc' of 'abc, hij > y, z'
@@ -437,7 +446,7 @@ class Transformer {
 
             let mode: "deletion"|"insertion"|"reject"|"metathesis"|"replacement" = "replacement";
 
-            // NOW, build-up REPLACEMENT STREAM from RESULT tokens.
+            // NOW, build-up REPLACEMENT STREAM named-references from RESULT tokens.
             if (raw_result[0].type === "deletion") {
                 // DELETION
                 mode = "deletion";
@@ -465,9 +474,17 @@ class Transformer {
                     // CREATE REPLACEMENT STREAM
                     const my_replacement_stream = this.result_former(raw_result, word_stream);
 
-                    const passes = conditions.length === 0 || conditions.some(c =>
-                        this.environment_match(word_stream, my_replacement_stream, insert_index, [], c.before, c.after)
-                    );
+                    // Get replacement bindings
+
+                    // Get environment bindings
+
+                    let matched_condition: typeof conditions[number] | null = null;
+
+                    const passes = conditions.length === 0 || conditions.some(c => {
+                        const result = this.environment_match(word_stream, my_replacement_stream, insert_index, [], c.before, c.after);
+                        if (result) matched_condition = c;
+                        return result;
+                    });
                     const blocked = exceptions.some(e =>
                         this.environment_match(word_stream, my_replacement_stream, insert_index, [], e.before, e.after)
                     );
@@ -477,7 +494,8 @@ class Transformer {
                         index_span: insert_index,
                         length_span: 0,
                         target_stream: ["^"], // symbolic marker for insertion
-                        replacement_stream: my_replacement_stream
+                        replacement_stream: my_replacement_stream,
+                        matched_condition: matched_condition
                     });
                 }
 
@@ -495,13 +513,26 @@ class Transformer {
                         cursor++;
                         continue;
                     }
+                    
 
                     const global_index = cursor + match_index;
 
                     // Condition match and exception not match
-                    const passes = conditions.length === 0 || conditions.some(c =>
-                        this.environment_match(word_stream, matched_stream, global_index, matched_stream, c.before, c.after)
-                    );
+                    let matched_condition: typeof conditions[number] | null = null;
+
+                    const passes = conditions.length === 0 || conditions.some(c => {
+                        const result = this.environment_match(
+                            word_stream,
+                            matched_stream,
+                            global_index,
+                            matched_stream,
+                            c.before,
+                            c.after
+                        );
+                        if (result && !matched_condition) matched_condition = c;
+                        return result;
+                    });
+
                     const blocked = exceptions.some(e =>
                         this.environment_match(word_stream, matched_stream, global_index, matched_stream, e.before, e.after)
                     );
@@ -521,7 +552,8 @@ class Transformer {
                             index_span: global_index,
                             length_span: match_length,
                             target_stream: matched_stream,
-                            replacement_stream: []
+                            replacement_stream: [],
+                            matched_condition: matched_condition
                         });
                     } else if (mode === "metathesis") {
                         const my_metathesis = swap_first_last_items(matched_stream)
@@ -529,9 +561,12 @@ class Transformer {
                             index_span: global_index,
                             length_span: match_length,
                             target_stream: matched_stream,
-                            replacement_stream: my_metathesis
+                            replacement_stream: my_metathesis,
+                            matched_condition: matched_condition
                         });                        
                     } else {
+
+                        // Get replacement bindings
 
                         // CREATE REPLACEMENT STREAM
                         const my_replacement_stream = this.result_former(raw_result, matched_stream);
@@ -540,7 +575,8 @@ class Transformer {
                             index_span:global_index,
                             length_span:match_length,
                             target_stream:matched_stream,
-                            replacement_stream:my_replacement_stream
+                            replacement_stream:my_replacement_stream,
+                            matched_condition: matched_condition
                         });
                     }
                     cursor = global_index + match_length;
@@ -549,9 +585,8 @@ class Transformer {
         }
         word_stream = this.replacementa(
             word_stream,
-            replacements,
+            replacements, ////
             word,
-            conditions,
             exceptions,
             line_num
         )

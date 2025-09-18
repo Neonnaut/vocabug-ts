@@ -21,58 +21,61 @@ const cappa = "[A-Z" +
 
     // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
     "\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]";
-const vocabugDistroRules = [
+
+const escapeRegex = /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek|VerticalLineBelow|VerticalLineAbove|DoubleVerticalLineBelow|PlusSignBelow|PlusSignStandalone|uptackBelow|UpTackStandalone|LeftTackBelow|rightTackBelow|DownTackBelow|DownTackStandalone|BreveBelow|InvertedBreveBelow|MacronBelow|MacronBelowStandalone|BridgeBelow|BridgeAbove|InvertedBridgeBelow|SquareBelow|SeagullBelow|LeftBracketBelow)\]/;
+
+const distroRules = [
   { token: "operator",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
 ];
-const vocabugEngineRules = [
+const engineRules = [
   {
     token: "operator",
-    regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa)(?!\S)/
+    regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|reverse)(?!\S)/
   }
 ];
-const vocabugListRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const listRules = [
+  { token: "escape",   regex: escapeRegex},
   { token: "link",     regex: /,/ }
 ];
 
-const vocabugCategoryRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const categoryRules = [
+  { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
   { token: "operator", regex: /\^|∅/ },
   { token: "regexp",   regex: /\{|\}/ },
   { token: "strong",   regex: /(\*\d+(\.\d+)?)/ } // Weights
 ];
 
-const vocabugFeatureRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const featureRules = [
+  { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
   { token: "operator", regex: /\^|∅/ }
 ];
 
-const vocabugWordRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const wordRules = [
+  { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
   { token: "operator", regex: /\^|∅/ },
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|\<|\>/ },
   { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
 ];
 
-const vocabugTransformRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const transformRules = [
+  { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
-  { token: "operator", regex: /\^REJECT|\^R|\^|∅|~/ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&|</ }
+  { token: "operator", regex: /\^REJECT|\^R|\^|∅|</ }, // > and ;
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&|\$/ }
 ];
 
-const vocabugClusterRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const clusterRules = [
+  { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\/|!|\?|_|\+/ },
   { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
   { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\*|:|…|&/ }
 ];
 
-const vocabugFeatureFieldRules = [
-  { token: "escape",   regex: /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek)\]/ },
+const featureFieldRules = [
+  { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\./ },
   { token: "operator", regex: /\+/ },
   { token : "regexp",   regex: /-/ }
@@ -80,7 +83,7 @@ const vocabugFeatureFieldRules = [
 
 type State = {
   mode: ('none'|'cluster-block'|'transform'|'feature-field'|'words-block'|'engine'|'distro-line'|
-    'list-line'|'word-line'|'segment-line'|'category-line'|'feature-line'
+    'list-line'|'word-line'|'segment-line'|'category-line'|'feature-line'|'graphemes-block'
   );
   feature_matrix: boolean;
   transform: boolean;
@@ -91,9 +94,9 @@ type State = {
   featureList: string[];
 };
 
-const vocabugParser: StreamParser<State> = {
+const parser: StreamParser<State> = {
 
-    name: "Vocabug",
+    name: "dsl",
     startState: (i): State => { return {
         mode: 'none',
         feature_matrix: false,
@@ -113,7 +116,7 @@ const vocabugParser: StreamParser<State> = {
         if (stream.match(/\s*;.*$/)) {
             if (state.mode == 'cluster-block'){
                 state.mode = 'transform';
-            } else if (state.mode != 'transform' && state.mode != 'words-block') {
+            } else if (state.mode != 'transform' && state.mode != 'words-block' && state.mode != 'graphemes-block') {
                 state.mode = 'none';
             }
             if (state.blanko) {state.blanko = false};
@@ -128,7 +131,7 @@ const vocabugParser: StreamParser<State> = {
 
             if (state.mode == 'engine') {
                 state.mode = 'transform';
-            } else if (stream.string.trim() && state.mode != 'cluster-block' && state.mode != 'transform' && state.mode != 'words-block' && state.mode != 'feature-field') {
+            } else if (stream.string.trim() && state.mode != 'cluster-block' && state.mode != 'transform' && state.mode != 'words-block' && state.mode != 'graphemes-block' && state.mode != 'feature-field') {
                 state.mode = 'none';
             }
 
@@ -179,6 +182,12 @@ const vocabugParser: StreamParser<State> = {
                 // Begin Words
                 if (stream.match(/BEGIN words(?=:\s*(?:;|$))/)) {
                     state.mode = 'words-block';
+                    state.doIndent = true;
+                    return "meta";
+                }
+                // Begin graphemes
+                if (stream.match(/BEGIN graphemes(?=:\s*(?:;|$))/)) {
+                    state.mode = 'graphemes-block';
                     state.doIndent = true;
                     return "meta";
                 }
@@ -233,7 +242,7 @@ const vocabugParser: StreamParser<State> = {
                 return "meta";
             }
 
-            for (let rule of vocabugWordRules) {
+            for (let rule of wordRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -241,6 +250,21 @@ const vocabugParser: StreamParser<State> = {
             for (let cato of state.catMacList) {
                 if (stream.match(cato)) {
                     return "tagName";
+                }
+            }
+        }
+
+        // graphemes BLOCK
+        if (state.mode == 'graphemes-block') {
+            //End
+            if (stream.match(/END(?=\s*;|\s*$)/)) {
+                state.mode = 'none';
+                return "meta";
+            }
+
+            for (let rule of listRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
                 }
             }
         }
@@ -293,7 +317,7 @@ const vocabugParser: StreamParser<State> = {
                 return "meta";
             }
 
-            for (let rule of vocabugTransformRules) {
+            for (let rule of transformRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -308,7 +332,7 @@ const vocabugParser: StreamParser<State> = {
 
         // DEFAULT DISTRIBUTION
         if (state.mode == 'distro-line') {
-            for (let rule of vocabugDistroRules) {
+            for (let rule of distroRules) {
                 if (stream.match(rule.regex)) {
                     state.mode = 'none';
                     return rule.token;
@@ -318,7 +342,7 @@ const vocabugParser: StreamParser<State> = {
 
         // LISTS
         if (state.mode == 'list-line') {
-            for (let rule of vocabugListRules) {
+            for (let rule of listRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -327,7 +351,7 @@ const vocabugParser: StreamParser<State> = {
 
         // WORDS DECLARATION
         if (state.mode == 'word-line') {
-            for (let rule of vocabugWordRules) {
+            for (let rule of wordRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -341,7 +365,7 @@ const vocabugParser: StreamParser<State> = {
 
         // CATEGORY
         if (state.mode == 'category-line') {
-            for (let rule of vocabugCategoryRules) {
+            for (let rule of categoryRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -355,7 +379,7 @@ const vocabugParser: StreamParser<State> = {
 
         // SEGMENT
         if (state.mode == 'segment-line') {
-            for (let rule of vocabugWordRules) {
+            for (let rule of wordRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -369,7 +393,7 @@ const vocabugParser: StreamParser<State> = {
 
         // FEATURE DECLARATION
         if (state.mode == 'feature-line') {
-            for (let rule of vocabugFeatureRules) {
+            for (let rule of featureRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -405,7 +429,7 @@ const vocabugParser: StreamParser<State> = {
                 }
             }
 
-            for (let rule of vocabugFeatureFieldRules) {
+            for (let rule of featureFieldRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -415,7 +439,7 @@ const vocabugParser: StreamParser<State> = {
         // ENGINE
         if (state.mode == 'engine') {
             state.mode = 'transform';
-            for (let rule of vocabugEngineRules) {
+            for (let rule of engineRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -431,7 +455,7 @@ const vocabugParser: StreamParser<State> = {
                 return "meta";
             }
 
-            for (let rule of vocabugClusterRules) {
+            for (let rule of clusterRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -442,6 +466,6 @@ const vocabugParser: StreamParser<State> = {
     }
 };
 
-const vocabugStream = StreamLanguage.define(vocabugParser);
+const stream = StreamLanguage.define(parser);
 
-export { vocabugStream };
+export { stream };

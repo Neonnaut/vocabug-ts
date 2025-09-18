@@ -79,6 +79,7 @@ class Logger {
     }
     diagnostic(diagnostic: string): void {
         this.diagnostics.push(diagnostic);
+        this.infos.push(('<pre><code>'+diagnostic+'</code></pre>'));
     }
 }
 

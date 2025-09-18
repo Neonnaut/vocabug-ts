@@ -98,3 +98,27 @@
 - [x] Alphabet directive
 - [x] Invisible directive
 
+## More
+
+- [x] graphemes block
+- [x] Make the met condition say so in debug
+
+- [ ] It says error for features as "alternator / option"
+- [ ] Features into opt, say not nested
+
+- [ ] Alternator optionalator as multi-grapheme group
+
+perhaps with tilde between them
+
+- [ ] Target binding
+- [ ] Result binding
+- [ ] Condition binding
+
+- [ ] Condition insertion
+- [ ] Result insertion
+
+
+
+
+
+

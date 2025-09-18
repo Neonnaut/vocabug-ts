@@ -244,12 +244,10 @@ class Generation_Resolver {
         }
 
         let info:string =
-            `~ WORD GENERATION ~\n` +
-            `\nWordshape-distribution: ` + this.wordshape_distribution +
+            `Wordshape-distribution: ` + this.wordshape_distribution +
+            `\nOptionals-weight: ` + this.optionals_weight +
             `\nSegments {\n` + segments.join('\n') + `\n}` +
-            `\nWordshapes {\n` + wordshapes.join('\n') + `\n}` +
-            `\nOptionals-weight: ` + this.optionals_weight
-
+            `\nWordshapes {\n` + wordshapes.join('\n') + `\n}`
         this.logger.diagnostic(info);
     }
 }

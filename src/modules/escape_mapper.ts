@@ -7,10 +7,14 @@ const escapeMap: Record<string, string> = {
   '[@Circumflex]': '\u0302',
   '[@Caron]': '\u030C',
   '[@Breve]': '\u0306',
+  '[@BreveBelow]': '\u032E', // ◌̮
   '[@InvertedBreve]': '\u0311',
+  '[@InvertedBreveBelow]': '\u032F', // ◌̯
   '[@TildeAbove]': '\u0303',
   '[@TildeBelow]': '\u0330',
   '[@Macron]': '\u0304',
+  '[@MacronBelow]': '\u0331', // ◌̠
+  '[@MacronBelowStandalone]': '\u02D7', // ˗
   '[@Dot]': '\u0307',
   '[@DotBelow]': '\u0323',
   '[@Diaeresis]': '\u0308',
@@ -23,6 +27,23 @@ const escapeMap: Record<string, string> = {
   '[@CommaBelow]': '\u0326',
   '[@Cedilla]': '\u0327',
   '[@Ogonek]': '\u0328',
+  '[@VerticalLineBelow]': '\u0329', // ◌̩
+  '[@VerticalLineAbove]': '\u030D', // ◌̍
+  '[@DoubleVerticalLineBelow]': '\u0348', // ◌͈
+  '[@PlusSignBelow]': '\u031F', // ◌̟
+  '[@PlusSignStandalone]': '\u02D6', // ˖
+  '[@uptackBelow]': '\u031D', // ◌̝
+  '[@UpTackStandalone]': '\u02D4', // ˔
+  '[@LeftTackBelow]': '\u0318', // ◌̘
+  '[@rightTackBelow]': '\u0319', // ◌̙
+  '[@DownTackBelow]':'\u031E', // ◌̞ 
+  '[@DownTackStandalone]': '\u02D5', // ˕
+  '[@BridgeBelow]': '\u032A', // ◌̪
+  '[@BridgeAbove]': '\u0346', // ◌͆
+  '[@InvertedBridgeBelow]': '\u033A', // ◌̺
+  '[@SquareBelow]': '\u033B', // ◌̻
+  '[@SeagullBelow]': '\u033C', // ◌̼
+  '[@LeftBracketBelow]': '\u0349', // ◌͉
 };
 
 const transform_syntax_chars = [

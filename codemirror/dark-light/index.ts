@@ -131,7 +131,7 @@ const Lighty = EditorView.theme({
     border: "1px dotted #001299;"
   },
   ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
-    backgroundColor: "#00be6845", // Optional highlight background
+    backgroundColor: "#00be681e", // Optional highlight background
   },
   "@media only screen and (max-width: 500px)": {
     ".cm-gutters": {

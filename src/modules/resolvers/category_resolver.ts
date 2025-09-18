@@ -240,8 +240,7 @@ class Category_Resolver {
       }
 
       let info:string =
-         `~ CATEGORIES ~\n` +
-         `\nCategory-distribution: ` + this.category_distribution +
+         `Category-distribution: ` + this.category_distribution +
          `\nCategories {\n` + categories.join('\n') + `\n}`
 
       this.logger.diagnostic(info);

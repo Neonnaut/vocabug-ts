@@ -156,9 +156,10 @@
 
         <li><a href="#nescaAdvancedRules">Advanced rules</a>
           <ol class="nice-list">
-            <li><a href="#nescaEngine">Engine</a></li>
-            <li><a href="#nescaTargetreference">Target-reference</a></li>
+            <li><a href="#nescaTargetReference">Target-reference</a></li>
+            <li><a href="#nescaNamedReference">Named-reference</a></li>
             <li><a href="#nescaMetathesisChange">Metathesis change</a></li>
+            <li><a href="#nescaEngine">Engine</a></li>
         </ol>
         </li>
         <li><a href="#vocabugQuestionsAndAnswers">Questions and answers</a></li>
@@ -377,16 +378,24 @@
             <td><a href="#nescaBlocker">Blocked-anythings-mark</a></td>
           </tr>
           <tr>
-            <td><code class="example">|</code></td>
-            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
+            <td><code class="example">$</code></td>
+            <td><a href="#nescaTargetReference">Target-reference</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">=[</code> and <code class="example">]</code></td>
+            <td><a href="#nescaNamedReference">Named-capture</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">[$</code> and <code class="example">]</code></td>
+            <td><a href="#nescaNamedReference">Named-reference</a></td>
           </tr>
           <tr>
             <td><code class="example">&lt;</code></td>
-            <td><a href="#nescaTargetreference">Target-reference</a></td>
+            <td>Indicates a <a href="#nescaMetathesisChange">metathesis</a> change</td>
           </tr>
           <tr>
-            <td><code class="example">~</code></td>
-            <td>Indicates a <a href="#nescaMetathesisChange">metathesis</a> change</td>
+            <td><code class="example">|</code></td>
+            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
           </tr>
         </tbody>
       </table>
@@ -396,112 +405,193 @@
       <p>Named escapes, enclosed in <code class="example">[@</code> and <code class="example">]</code> allow space and combining diacritics to be used without needing to insert these characters.</p>
 
       <p>The supported characters are:</p>
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>Named escape</th>
-            <th>Character</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-              <td><code class="example">[@Space]</code></td>
-              <td>&nbsp;</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Acute]</code></td>
-              <td>◌́</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@DoubleAcute]</code></td>
-              <td>◌̋</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Grave]</code></td>
-              <td>◌̀</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@DoubleGrave]</code></td>
-              <td>◌̏</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Circumflex]</code></td>
-              <td>◌̂</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Caron]</code></td>
-              <td>◌̌</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Breve]</code></td>
-              <td>◌̆</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@InvertedBreve]</code></td>
-              <td>◌̑</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@TildeAbove]</code></td>
-              <td>◌̃</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@TildeBelow]</code></td>
-              <td>◌̰</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Macron]</code></td>
-              <td>◌̄</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Dot]</code></td>
-              <td>◌̇</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@DotBelow]</code></td>
-              <td>◌̣</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Diaeresis]</code></td>
-              <td>◌̈</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@DiaeresisBelow]</code></td>
-              <td>◌̤</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Ring]</code></td>
-              <td>◌̊</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@RingBelow]</code></td>
-              <td>◌̥</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Horn]</code></td>
-              <td>◌̛</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Hook]</code></td>
-              <td>◌̉</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@CommaAbove]</code></td>
-              <td>◌̓</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@CommaBelow]</code></td>
-              <td>◌̦</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Cedilla]</code></td>
-              <td>◌̧</td>
-          </tr>
-          <tr>
-              <td><code class="example">[@Ogonek]</code></td>
-              <td>◌̨</td>
-          </tr>
-        </tbody>
-      </table>
+      <table class="styled-table"><thead><thead>
+        <tr>
+          <th>Escape Name</th>
+          <th>Unicode Character</th>
+        </tr></thead>
+      <tbody>
+        <tr>
+          <td><code class='example'>[@Space]</code></td>
+          <td> </td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Acute]</code></td>
+          <td>◌́</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DoubleAcute]</code></td>
+          <td>◌̋</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Grave]</code></td>
+          <td>◌̀</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DoubleGrave]</code></td>
+          <td>◌̏</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Circumflex]</code></td>
+          <td>◌̂</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Caron]</code></td>
+          <td>◌̌</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Breve]</code></td>
+          <td>◌̆</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@BreveBelow]</code></td>
+          <td>◌̮</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@InvertedBreve]</code></td>
+          <td>◌̑</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@InvertedBreveBelow]</code></td>
+          <td>◌̯</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@TildeAbove]</code></td>
+          <td>◌̃</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@TildeBelow]</code></td>
+          <td>◌̰</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Macron]</code></td>
+          <td>◌̄</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@MacronBelow]</code></td>
+          <td>◌̠</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@MacronBelowStandalone]</code></td>
+          <td>◌˗</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Dot]</code></td>
+          <td>◌̇</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DotBelow]</code></td>
+          <td>◌̣</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Diaeresis]</code></td>
+          <td>◌̈</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DiaeresisBelow]</code></td>
+          <td>◌̤</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Ring]</code></td>
+          <td>◌̊</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@RingBelow]</code></td>
+          <td>◌̥</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Horn]</code></td>
+          <td>◌̛</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Hook]</code></td>
+          <td>◌̉</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@CommaAbove]</code></td>
+          <td>◌̓</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@CommaBelow]</code></td>
+          <td>◌̦</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Cedilla]</code></td>
+          <td>◌̧</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@Ogonek]</code></td>
+          <td>◌̨</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@VerticalLineBelow]</code></td>
+          <td>◌̩</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@VerticalLineAbove]</code></td>
+          <td>◌̍</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DoubleVerticalLineBelow]</code></td>
+          <td>◌͈</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@PlusSignBelow]</code></td>
+          <td>◌̟</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@PlusSignStandalone]</code></td>
+          <td>◌˖</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@uptackBelow]</code></td>
+          <td>◌̝</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@UpTackStandalone]</code></td>
+          <td>◌˔</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@LeftTackBelow]</code></td>
+          <td>◌̘</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@rightTackBelow]</code></td>
+          <td>◌̙</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DownTackBelow]</code></td>
+          <td>◌̞</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@DownTackStandalone]</code></td>
+          <td>◌˕</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@BridgeBelow]</code></td>
+          <td>◌̪</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@BridgeAbove]</code></td>
+          <td>◌͆</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@InvertedBridgeBelow]</code></td>
+          <td>◌̺</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@SquareBelow]</code></td>
+          <td>◌̻</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@SeagullBelow]</code></td>
+          <td>◌̼</td>
+        </tr>
+        <tr>
+          <td><code class='example'>[@LeftBracketBelow]</code></td>
+          <td>◌͉</td>
+        </tr>
+      </tbody></table>
       <p>If you are using this, you should be very interested in the <a href="#nescaEngine">Compose engine</a>.</p>
 
       <h2 id="vocCategories"><a class="head-num">5</a>Categories</h2>
@@ -621,6 +711,8 @@
       <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
 
       <p>'But the order of letters stated in my <code class="example">alphabet:</code> directive is the same as my graphemes in my <code class="example">graphemes:</code> directive, do I have to list them twice?' You might ask. You can list both using the <code class="example">alphabet-and-graphemes:</code> directive.</p>
+
+      <p>Graphemes may alternatively be declared in the <code class="example">BEGIN graphemes:</code> block. Allowing graphemes to be declared over multiple lines, and allowing the use of comments between graphemes. You must use the <code class="example">END</code> keyword on a new line to end the block.</p>
 
       <h2 id="nescaTransform"><a class="head-num">11</a>Transform</h2>
       <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of the transform block, which implements the <a href="./nesca.html">NeSCA program</a>.</p>
@@ -878,7 +970,46 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 
       <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced rules</h2>
 
-      <h3 id="nescaEngine"><a class="head-num">21.1</a>Engine</h3>
+      <h3 id="nescaTargetReference"><a class="head-num">21.1</a>Target-reference</h3>
+      <p>A target-reference is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses the dollar sign <code class="example">$</code>.</p>
+      <p>Here are some examples where target-reference is employed:</p>
+      <p><b>Full reduplication</b>:</p>
+      <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="regexp">$$</span>
+<span class="comment">; malak ==&gt; malakmalak</span></div>
+      
+      <p>"<b>Haplology</b>":</p>
+      <div class="prog-pre">  <span class="regexp">{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="regexp">$</span>
+<span class="comment">; haplology ==> haplogy</span></div>
+      <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
+      <div class="prog-pre">  <span class="catkey">C</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&[</span><span class="catkey">C</span><span class="regexp">]</span><span class="regexp">$</span></div>
+
+      <h3 id="nescaNamedReference"><a class="head-num">21.2</a>Named-reference</h3>
+      <p>Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of named-reference.</p>
+
+      <p>Firstly, a grapheme is bound to a name with a 'named-capture', to the right of the grapheme. A named-capture looks like <code class='example'>=[</code> + the name + <code class='example'>]</code>. The name can only consist of lowercase letters a to z, <code class='example'>.</code>, <code class='example'>-</code>, or <code class='example'>+</code>.</p>
+
+      <p>The captured grapheme can then be copied, or rather, inserted, somewhere else in the transform with a 'named-reference', even before the named-capture. However, a named-reference may only be used in <code class="example">RESULT</code> or the <span class="regexp">CONDITION</span>, it cannot be used in <code class='example'>TARGET</code> or an exception. A named reference looks like <code class='example'>[$</code> + the-name + <code class='example'>]</code></p>
+
+      <p>Here are some examples:</p>
+      
+      <div class="prog-pre"><span class="comment">; Delete [ʔ] between identical vowels</span>
+  ʔ <span class="link">-&gt;</span> <span class="operator">^</span> <span class="regexp">/</span> [+vowel]=[identical]<span class="link">_</span>[$indentical]</div>
+
+      <p>In this rule, we are binding the <code class='example'>V</code> category to the name <code class='example'>identical</code>, by appending <code class='example'>=[</code> + <code class='example'>identical</code> + <code class='example'>]</code> to it. Whatever this grapheme is when the condition is met, is the value of <code class='example'>identical</code>.</p>
+
+      <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
+  <span class="operator">^</span> <span class="link">-&gt;</span> [$identical] <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span>=[identical]ʔ<span class="link">_</span><span class="regexp">#</span>
+<span class="comment">; foobaʔ ==&gt; foobaʔa</span></div>
+
+      <p>In this rule, we are binding the <code class='example'>V</code> category to the name <code class='example'>identical</code>, by appending <code class='example'>=[</code> + <code class='example'>identical</code> + <code class='example'>]</code> to it. Whatever this grapheme is when the condition is met is the value of <code class='example'>identical</code>.</p>
+      <p>Then the value of <code class='example'>identical</code> is inserted into <code class='example'>RESULT</code>.</p>
+
+      <h3 id="nescaMetathesisChange"><a class="head-num">21.3</a>Metathesis change</h3>
+      <p>Simple metathesis involves a less-than-sign <code class="example">&lt;</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
+      <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
+  <span class="regexp">{</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">}</span><span class="regexp">{</span>m<span class="link">,</span> n<span class="regexp">}</span> <span class="link">-></span> <span class="operator">&lt;</span><br><span class="comment">; apma ==> ampa</span></div>
+      
+      <h3 id="nescaEngine"><a class="head-num">21.4</a>Engine</h3>
       <p>The engine statement provides useful functions that you can call at any point in the transform block. You call an engine following a <code class="example">|</code> and a space on a new line.</p>
 
       <ul class="paragraphian">
@@ -890,27 +1021,9 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         <li><code class="example">to-lowercase</code> will convert all characters of a word to lowercase</li>
         <li><code class="example">xsampa_to_ipa</code> will convert graphemes of a word written in X-SAMPA into IPA</li>
         <li><code class="example">ipa_to_xsampa</code> will convert graphemes of a word written in IPA into X-SAMPA</li>
+        <li><code class="example">reverse</code> will reverse the order of graphemes in a word</li>
+        <li><code class="roman-to-hangul">roman-to-hangul</code> converts characters in an arbitrary romanisation to Hangul Jamo blocks.</li>
       </ul>
-
-      <h3 id="nescaTargetreference"><a class="head-num">21.2</a>Target-reference</h3>
-      <p>A target-reference is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses the less-than symbol <code class="example">&lt;</code>.</p>
-      <p>Here are some examples where target-reference is employed:</p>
-      <p><b>Full reduplication</b>:</p>
-      <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="regexp">&lt;&lt;</span>
-<span class="comment">; malak ==&gt; malakmalak</span></div>
-      
-      <p>"<b>Haplology</b>":</p>
-      <div class="prog-pre">  <span class="regexp">{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="regexp">&lt;</span>
-<span class="comment">; haplology ==> haplogy</span></div>
-      <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
-      <div class="prog-pre">  <span class="catkey">C</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&[</span><span class="catkey">C</span><span class="regexp">]</span><span class="regexp">&lt;</span></div>
-
-
-      <h3 id="nescaMetathesisChange"><a class="head-num">21.3</a>Metathesis change</h3>
-      <p>Simple metathesis involves a tilde <code class="example">~</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
-  <span class="regexp">{</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">}</span><span class="regexp">{</span>m<span class="link">,</span> n<span class="regexp">}</span> <span class="link">-></span> <span class="operator">~</span><br><span class="comment">; apma ==> ampa</span></div>
-      
 
       <h2 id="vocabugQuestionsAndAnswers"><a class="head-num">22</a>Questions and answers</h2>
       <p>Here are some common questions and answers about Vocabug:</p>

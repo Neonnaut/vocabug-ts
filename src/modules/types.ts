@@ -4,13 +4,15 @@ export type Token =
       base: string;
       min: number;
       max: number|typeof Infinity;
-      escaped?: boolean
+      escaped?: boolean;
+      named_reference_bind?: string;
     }
   | {
       type: "wildcard"; // *
       base: "*";
       min: number;
       max: number|typeof Infinity;
+      named_reference_bind?: string;
     }
   | {
       type: "anythings-mark"; // &
@@ -33,7 +35,7 @@ export type Token =
     }
   | {
       type: "metathesis"; // ~
-      base: "~";
+      base: "<";
     }
   | {
       type: "word-boundary"; // #
@@ -51,19 +53,24 @@ export type Token =
     }
   | {
       type: "target-reference";
-      base: string;
+      base: '$';
       min: number;
       max: number|typeof Infinity;
     }
-    /*
+  | {
+      type: "named-capture";
+      base: string;
+      name: string;
+      min: number;
+      max: number|typeof Infinity;
+    }
   | {
       type: "named-reference";
       base: string;
       name: string;
-      mode: 'assertion'|'declaration'|'insertion';
       min: number;
       max: number|typeof Infinity;
-    }*/;
+    };
 
     export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 

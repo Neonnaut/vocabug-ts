@@ -204,8 +204,7 @@ class Text_Builder {
 
     show_debug(): void {
         let info:string =
-            `~ CREATING TEXT ~\n` +
-            `\nNum of words: ` + this.num_of_words + 
+            `Num of words: ` + this.num_of_words + 
             `\nMode: ` + this.output_mode +
             `\nRemove duplicates: ` + this.remove_duplicates +
             `\nForce word limit: ` + this.force_word_limit +

@@ -24,15 +24,19 @@ const make_percentage = (input: string): number | null => {
 };
 
 function swap_first_last_items(array: any[]): any[] {
-  if (array.length >= 2) {
-    const first_item = array[0];
-    const last_item_index = array.length - 1;
-    const last_item = array[last_item_index];
+   if (array.length >= 2) {
+      const first_item = array[0];
+      const last_item_index = array.length - 1;
+      const last_item = array[last_item_index];
 
-    array[0] = last_item;
-    array[last_item_index] = first_item;
-  }
-  return array;
+      array[0] = last_item;
+      array[last_item_index] = first_item;
+   }
+   return array;
+}
+
+function reverse_items(array: any[]): any[] {
+   return array.slice().reverse();
 }
 
 function final_sentence(items: string[]): string {
@@ -87,5 +91,5 @@ function recursive_expansion(
 export {
     cappa,
     get_last, capitalise, make_percentage, swap_first_last_items, final_sentence,
-    recursive_expansion
+    recursive_expansion, reverse_items
 };

@@ -447,13 +447,7 @@ class Transform_Resolver {
         // Formatting for making the record
         return seq.map(t => {
             let s = t.base;
-
-            /*
-            if (t.type === "named-reference") {
-                const z = t.mode === "declaration" ? '=' : t.mode === "assertion" ? '+' : '';
-                s = `<{${z}${t.name}}`;
-            }
-            */
+            
             if (t.type === "anythings-mark") {
                 if ('blocked_by' in t && t.blocked_by) {
                     s+= `[${t.blocked_by.join(", ")}]`
@@ -513,8 +507,7 @@ class Transform_Resolver {
         }
 
         let info:string =
-            `~ TRANSFORMS ~\n` +
-            `\nGraphemes: ` + this.nesca_grammar_stream.graphemes.join(', ') +
+            `Graphemes: ` + this.nesca_grammar_stream.graphemes.join(', ') +
             `\nFeatures {\n` + features.join('\n') + `\n}` +
             `\nTransforms {\n` + transforms.join('\n') + `\n}`
         this.logger.diagnostic(info);

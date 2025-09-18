@@ -104,8 +104,7 @@ class Resolver {
         }
 
         let info:string =
-            `~ FEATURES ~\n` +
-            `\nFeatures {\n` + features.join('\n') + `\n}`
+            `Features {\n` + features.join('\n') + `\n}`
 
         this.logger.diagnostic(info);
     }

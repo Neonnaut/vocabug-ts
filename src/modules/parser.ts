@@ -154,7 +154,8 @@ class Parser {
                     if (engine == "decompose"||engine == "compose" ||
                         engine == "capitalise" || engine == "decapitalise" ||
                         engine == "to-uppercase" || engine == "to-lowercase" ||
-                        engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa"
+                        engine == "xsampa-to-ipa" || engine == "ipa-to-xsampa" ||
+                        engine == "roman-to-hangul" || engine == "reverse"
                     ) {
                         this.transform_pending.push( {
                         target:`|${engine}`, result:'\\',
@@ -240,7 +241,7 @@ class Parser {
                 if (alf_and_gra.length == 0){
                     this.logger.warn(`'alphabet-and-graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
-                this.graphemes = alf_and_gra;
+                this.graphemes = this.graphemes = Array.from(new Set(alf_and_gra));
                 this.alphabet = alf_and_gra;
 
             } else if (line.startsWith("graphemes:")) {
@@ -253,11 +254,13 @@ class Parser {
                 if (graphemes.length == 0){
                     this.logger.warn(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
-                this.graphemes = graphemes;
+                this.graphemes = this.graphemes = Array.from(new Set(graphemes));;
+
+            } else if (line.startsWith("BEGIN graphemes:")) {
+                this.parse_graphemes_block(file_array);
 
             } else if (line.startsWith("words:")) {
                 line_value = line.substring(6).trim();
-                
                 if (line_value != "") {
                     this.wordshape_pending = {
                         content:line_value, line_num:this.file_line_num
@@ -362,6 +365,31 @@ class Parser {
             }
         }
         return true;
+    }
+
+    private parse_graphemes_block(file_array:string[]) {
+        let line_value = '';
+        this.file_line_num ++;
+
+        let my_graphemes:string[] = [];
+
+        for (; this.file_line_num < file_array.length; ++this.file_line_num) {
+            line_value = file_array[this.file_line_num];
+            line_value = this.escape_mapper.escape_backslash_pairs(line_value);
+            line_value = line_value.replace(/;.*/u, '').trim(); // Remove comment!!
+            line_value = this.escape_mapper.escape_named_escape(line_value);
+            if (line_value === 'END') { break} // END !!
+
+            let line_graphemes = line_value.split(/[,\s]+/).filter(Boolean);
+            for (let i = 0; i < line_graphemes.length; i++) {
+                my_graphemes.push(this.escape_mapper.restore_escaped_chars(line_graphemes[i]));
+            }
+        }
+        ////
+        if (my_graphemes.length == 0){
+            this.logger.warn(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
+        }
+        this.graphemes = Array.from(new Set(my_graphemes));
     }
 
     private parse_words_block(file_array:string[]) {

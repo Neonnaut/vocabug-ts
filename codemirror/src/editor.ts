@@ -12,7 +12,7 @@ const themeConfig = new Compartment();
 const lineWrapConfig = new Compartment();
 
 // Language
-import { vocabugStream } from '../vocabug-lang/index';
+import { stream } from '../vocabug-lang/index';
 
 function createEditorState(initialContents:string, myTheme:string) {
     let extensions = [
@@ -32,7 +32,7 @@ function createEditorState(initialContents:string, myTheme:string) {
             ...defaultKeymap,
             ...historyKeymap,
         ]),
-        new LanguageSupport(vocabugStream),
+        new LanguageSupport(stream),
         themeConfig.of(themeIdentifier(myTheme)),
         lineWrapConfig.of([])
     ];
