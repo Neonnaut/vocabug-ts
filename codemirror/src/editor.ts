@@ -7,12 +7,15 @@ import { EditorView, keymap, lineNumbers,
     highlightActiveLineGutter, drawSelection, highlightActiveLine } from '@codemirror/view';
 
 // Themes
-import { xcodeLight, xcodeDark } from '../dark-light';
+import { xcodeLight, xcodeDark } from './dark-light';
 const themeConfig = new Compartment();
 const lineWrapConfig = new Compartment();
 
 // Language
-import { stream } from '../vocabug-lang/index';
+import { stream } from './language';
+
+// Panel
+import { toolbar } from './toolbar';
 
 function createEditorState(initialContents:string, myTheme:string) {
     let extensions = [
@@ -34,7 +37,8 @@ function createEditorState(initialContents:string, myTheme:string) {
         ]),
         new LanguageSupport(stream),
         themeConfig.of(themeIdentifier(myTheme)),
-        lineWrapConfig.of([])
+        lineWrapConfig.of([]),
+        toolbar
     ];
 
     return EditorState.create({

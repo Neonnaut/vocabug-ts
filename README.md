@@ -49,7 +49,6 @@ type generate_options = {
     remove_duplicates?: boolean;
     force_word_limit?: boolean; // Force to the time limit
     sort_words?: boolean;
-    capitalise_words?: boolean;
     word_divider?: string;
 };
 ```

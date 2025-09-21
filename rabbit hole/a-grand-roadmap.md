@@ -17,7 +17,6 @@
 - [x] Remove duplicates
 - [x] Force word limit
 - [x] Sort words
-- [x] Capitalise words
 - [x] Show keyboard
 - [x] Editor wrap lines
 - [x] Word divider

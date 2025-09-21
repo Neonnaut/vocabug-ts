@@ -151,3 +151,5 @@ This represents an almost idealist view on word generation
 ## 12. Lezer grammar
 
 Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
+
+Ability to give each transform a name

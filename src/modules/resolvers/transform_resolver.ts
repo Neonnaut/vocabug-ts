@@ -366,7 +366,7 @@ class Transform_Resolver {
             output.push(stream[i]); // push normal thing
         }
         if (feature_mode) {
-            this.logger.validation_error("Unclosed feature-matrix missing '}'", this.line_num);
+            this.logger.validation_error("Unclosed feature-matrix missing ']'", this.line_num);
         }
 
         return output.join('');

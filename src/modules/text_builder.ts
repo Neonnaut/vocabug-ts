@@ -13,7 +13,6 @@ class Text_Builder {
     private remove_duplicates: boolean;
     private force_word_limit: boolean;
     private sort_words: boolean;
-    private capitalise_words: boolean;
     private word_divider: string;
     private alphabet: string[];
     private invisible: string[];
@@ -34,7 +33,6 @@ class Text_Builder {
         remove_duplicates: boolean,
         force_word_limit: boolean,
         sort_words: boolean,
-        capitalise_words: boolean,
         word_divider: string,
         alphabet: string[],
         invisible: string[]
@@ -47,7 +45,6 @@ class Text_Builder {
         this.remove_duplicates = remove_duplicates;
         this.force_word_limit = force_word_limit;
         this.sort_words = sort_words;
-        this.capitalise_words = capitalise_words;
         this.word_divider = word_divider;
         this.alphabet = alphabet;
         this.invisible = invisible;
@@ -142,11 +139,6 @@ class Text_Builder {
         if (this.sort_words){
             this.words = collator( this.logger, this.words, this.alphabet, this.invisible );
         }
-        if (this.capitalise_words){
-            for (let i = 0; i < this.words.length; i++) {
-                this.words[i] = capitalise(this.words[i]);
-            }
-        }
         if (this.output_mode === 'paragraph'){
             return this.paragraphify(this.words);
         }
@@ -209,7 +201,6 @@ class Text_Builder {
             `\nRemove duplicates: ` + this.remove_duplicates +
             `\nForce word limit: ` + this.force_word_limit +
             `\nSort words: ` + this.sort_words +
-            `\nCapitalise words: ` + this.capitalise_words +
             `\nWord divider: "` + this.word_divider + `"` +
             `\nAlphabet: ` + this.alphabet.join(', ') +
             `\nInvisible: ` + this.invisible.join(', ');

@@ -150,7 +150,8 @@ class Transformer {
                 token.type !== 'wildcard' &&
                 token.type !== 'anythings-mark' &&
                 token.type !== 'target-reference' &&
-                token.type !== 'named-reference'
+                token.type !== 'named-reference' &&
+                token.type !== 'grapheme-stream'
             ) {
                 j++;
                 continue;
@@ -172,9 +173,36 @@ class Transformer {
                 if (count < min) {;
                     return null;
                 }
-
                 matched.push(...stream.slice(i, i + count));
                 i += count;
+
+            // Grapheme stream
+            } else if (token.type === 'grapheme-stream') {
+                const unit = token.base; // array of graphemes to match as a block
+                const unit_length = unit.length;
+
+                const max_available = max_end !== undefined
+                    ? Math.min(max, Math.floor((max_end - i) / unit_length))
+                    : max;
+
+                let repetitions = 0;
+
+                while (
+                    repetitions < max_available &&
+                    stream.slice(i + repetitions * unit_length, i + (repetitions + 1) * unit_length)
+                        .every((val, idx) => val === unit[idx])
+                ) {
+                    repetitions++;
+                }
+
+                if (repetitions < min) {
+                    return null;
+                }
+
+                const total_length = repetitions * unit_length;
+                matched.push(...stream.slice(i, i + total_length));
+                i += total_length;
+
             } else if (token.type === 'target-reference') {
                 if (!target_stream || target_stream.length === 0) {
                     this.logger.validation_error("Target-reference requires a non-empty target_stream");

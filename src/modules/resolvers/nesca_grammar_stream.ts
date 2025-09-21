@@ -115,6 +115,7 @@ class Nesca_Grammar_Stream {
             tokens.push(new_token);
             i++;
             continue;
+
          } else if (char == "$"){
             if (mode === "TARGET") {
                this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
@@ -218,6 +219,39 @@ class Nesca_Grammar_Stream {
 
          // ✅ Modifier parsing (applies to any token type except word-boundary, reject, deletion, insertion) 
          
+         if (stream[i] === "~") {
+            if (new_token.type !== "grapheme" && new_token.type !== "wildcard") {
+               this.logger.validation_error(`Grapheme-stream only allowed after grapheme or wildcard`, line_num);
+            }
+            // It's actually a grapheme stream
+            new_token = {
+               type: "grapheme-stream", base: new_token.base,
+               stream: [new_token.base],
+               min: 1, max: 1,
+            };
+            
+            // Build grapheme-stream
+            while (true) {
+               if (stream[i] !== "~") break;
+               i++;
+               const char = stream[i];
+
+            if (
+               char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||
+               char == '[' || char == ']' || char == '(' || char == ')' || char == '<' ||
+               char === '∅' || char === '^' || char == '/' || char === '!' || char === "?" ||
+               char == '_' || char == '#' || char == '+' || char == ':' || char == '*' ||
+               char === '…' || char === '&' || char == '|' || char === "~" || char == '@'
+            ) {
+               this.logger.validation_error(`Unexpected syntax character '${char}' in ${mode}`, line_num);
+            }
+
+            const escaped_stream = this.escape_mapper.restore_escaped_chars(stream);
+               
+            }
+            
+         }
+
          if (stream[i] === ":") {
             tokens.push({ ...new_token });
             let look_ahead = i + 1;

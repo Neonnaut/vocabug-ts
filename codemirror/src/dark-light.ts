@@ -47,7 +47,7 @@ const Darky = EditorView.theme({
   ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
     backgroundColor: "#00be6845", // Optional highlight background
   },
-  "@media only screen and (max-width: 500px)": {
+  "@media only screen and (max-width: 400px)": {
     ".cm-gutters": {
       display: "none!important"
     }
@@ -133,7 +133,7 @@ const Lighty = EditorView.theme({
   ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
     backgroundColor: "#00be681e", // Optional highlight background
   },
-  "@media only screen and (max-width: 500px)": {
+  "@media only screen and (max-width: 400px)": {
     ".cm-gutters": {
       display: "none!important"
     }

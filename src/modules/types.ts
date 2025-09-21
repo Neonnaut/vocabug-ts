@@ -8,6 +8,13 @@ export type Token =
       named_reference_bind?: string;
     }
   | {
+      type: "grapheme-stream";
+      base: string;
+      stream: string[];
+      min: number;
+      max: number|typeof Infinity;
+    }
+  | {
       type: "wildcard"; // *
       base: "*";
       min: number;

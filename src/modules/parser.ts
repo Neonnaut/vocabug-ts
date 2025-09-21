@@ -15,7 +15,6 @@ class Parser {
     public remove_duplicates: boolean;
     public force_word_limit: boolean;
     public sort_words: boolean;
-    public capitalise_words: boolean;
     public word_divider: string;
 
     public category_distribution: Distribution;
@@ -49,7 +48,6 @@ class Parser {
         num_of_words_string: number | string,
         output_mode: Output_Mode,
         sort_words: boolean,
-        capitalise_words: boolean,
         remove_duplicates: boolean,
         force_word_limit: boolean,
         word_divider: string
@@ -78,7 +76,6 @@ class Parser {
         this.output_mode = output_mode;
 
         this.sort_words = sort_words;
-        this.capitalise_words = capitalise_words;
         this.remove_duplicates = remove_duplicates;
         this.force_word_limit = force_word_limit;
         this.word_divider = word_divider === "" ? ' ' : word_divider;
@@ -86,13 +83,11 @@ class Parser {
 
         if (this.output_mode === 'paragraph') {
             this.sort_words = false;
-            this.capitalise_words = false;
             this.remove_duplicates = false;
             this.force_word_limit = false;
             this.word_divider = ' ';
         } else if (this.output_mode === 'debug') {
             this.sort_words = false;
-            this.capitalise_words = false;
             this.remove_duplicates = false;
             this.force_word_limit = false;
             this.word_divider = '\n';
@@ -199,7 +194,7 @@ class Parser {
                 line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
                 let optionals_weight = make_percentage(line_value);
                 if (optionals_weight == null) {
-                    this.logger.warn(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
+                    this.logger.validation_error(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
                     continue;
                 }
                 this.optionals_weight = optionals_weight;
@@ -213,7 +208,7 @@ class Parser {
                 }
 
                 if (alphabet.length == 0){
-                    this.logger.warn(`'alphabet' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
+                    this.logger.validation_error(`'alphabet' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.alphabet = alphabet;
 
@@ -226,7 +221,7 @@ class Parser {
                 }
 
                 if (invisible.length == 0){
-                    this.logger.warn(`'invisible' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
+                    this.logger.validation_error(`'invisible' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.invisible = invisible;
 
@@ -239,7 +234,7 @@ class Parser {
                 }
 
                 if (alf_and_gra.length == 0){
-                    this.logger.warn(`'alphabet-and-graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
+                    this.logger.validation_error(`'alphabet-and-graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.graphemes = this.graphemes = Array.from(new Set(alf_and_gra));
                 this.alphabet = alf_and_gra;
@@ -252,7 +247,7 @@ class Parser {
                     graphemes[i] = this.escape_mapper.restore_escaped_chars(graphemes[i]);
                 }
                 if (graphemes.length == 0){
-                    this.logger.warn(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
+                    this.logger.validation_error(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
                 }
                 this.graphemes = this.graphemes = Array.from(new Set(graphemes));;
 
@@ -278,7 +273,7 @@ class Parser {
 
                 const [key, field, mode] = this.get_cat_seg_fea(line_value);
                 if (mode === "trash") {
-                    this.logger.warn(`Junk ignored -- expected a category, segment, directive, ..., etc`, this.file_line_num);
+                    this.logger.validation_error(`${line_value} is not a category, segment, feature, etc`, this.file_line_num);
                 } else if (mode === 'segment') {
                     // SEGMENTS !!!
                     if (!this.validate_segment(field)) { this.logger.validation_error(`The segment '${key}' had separator(s) outside sets -- expected separators for segments to appear only in sets`, this.file_line_num)}
@@ -387,7 +382,7 @@ class Parser {
         }
         ////
         if (my_graphemes.length == 0){
-            this.logger.warn(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
+            this.logger.validation_error(`'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`, this.file_line_num);
         }
         this.graphemes = Array.from(new Set(my_graphemes));
     }

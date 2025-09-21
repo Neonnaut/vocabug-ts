@@ -18,6 +18,7 @@ html {
   --error-text: #ff7a7a;
   --warning-text: #ffc078;
   --info-text: #7fff9b;
+  --grey-text: #9c9c9c;
   --hover-text: #fff;
   --hover-bg: #00A4BD;
 
@@ -40,6 +41,7 @@ html {
 
   --disabled-button-bg: #3e3e3e;
   --disabled-button-text: #a2a2a2;
+  --delete-button-bg: #a31313;
 
   --textbox-bg: #111;
   --textbox-text: #fefefe;
@@ -93,6 +95,7 @@ html {
   --error-text: #8b0000;
   --warning-text: #864700;
   --info-text: #005d14;
+  --grey-text: #818181;
   --hover-text: #fff;
   --hover-bg: #00A4BD;
 
@@ -113,6 +116,7 @@ html {
 
   --disabled-button-bg: #eee;
   --disabled-button-text: #6c6c6c;
+  --delete-button-bg: #ffc7d9;
 
   --textbox-bg: #fff;
   --textbox-text: #000;
@@ -166,6 +170,7 @@ html {
   --error-text: #8b0000;
   --warning-text: #864700;
   --info-text: #005d14;
+  --grey-text: #7d7d7d;
   --hover-text: #000;
   --hover-bg: #ffdd00;
 
@@ -186,6 +191,7 @@ html {
 
   --disabled-button-bg: #dadada;
   --disabled-button-text: #6c6c6c;
+  --delete-button-bg: #ffc7d9;
 
   --textbox-bg: #f0f0f0;
   --textbox-text: #073642;
@@ -235,9 +241,6 @@ nav, footer {
   max-width: 800px;
   margin: 0 auto;
   padding: 2px 0;
-}
-nav button, footer button{
-  margin:0;
 }
 .breadcrumbs {
   font-size:1em;
@@ -644,8 +647,7 @@ textarea {
   color: var(--select-text);
   background: var(--select-bg);
 }
-button, input[type="submit"], input[type="button"], input[type="reset"], input[type="disabled"],
-.dropdown-btn {
+.styled-button, .dropdown-btn, #main_menu {
   -webkit-appearance: none; -moz-appearance: none;
   appearance: none;
   background: var(--button-bg);
@@ -657,37 +659,37 @@ button, input[type="submit"], input[type="button"], input[type="reset"], input[t
   font-weight: 500;
   line-height: 1;
   margin: 2px 0 2px 0;
-  padding: 8px 10px 6px 10px;
+  padding: 7px 10px 5px 10px;
   text-align: center;
   transition: all 0.1s ease-in-out;
   -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
   user-select: none;
-}
-input[type="disabled"], input:disabled {
-  background: var(--disabled-button-bg);
-  color: var(--disabled-button-text);
-}
-
-
-button:hover:not(:disabled), input[type="submit"]:hover:not(:disabled), input[type="button"]:hover:not(:disabled), input[type="reset"]:hover:not(:disabled),
-.dropdown-btn:hover {
-  box-shadow: inset 0 1px 3px rgba(140,140,140,0.5), 0 1px rgba(140,140,140,0.2);
   cursor: pointer;
 }
-
-button[type="disabled"], button:disabled {
+.styled-button[type="disabled"], .styled-button:disabled {
   background: var(--disabled-button-bg);
   color: var(--disabled-button-text);
 }
-table:not(.ipa-table) button:active:not(:disabled), input[type="submit"]:active:not(:disabled),
-input[type="button"]:active:not(:disabled), input[type="reset"]:active:not(:disabled),
-input[type="disabled"]:active:not(:disabled),
+
+
+.styled-button:hover:not(:disabled), #main_menu:hover, .dropdown-btn:hover {
+  box-shadow: inset 0 1px 3px rgba(140,140,140,0.5), 0 1px rgba(140,140,140,0.2);
+}
+
+.styled-button[type="disabled"], .styled-button:disabled,
+input:disabled {
+  background: var(--disabled-button-bg);
+  color: var(--disabled-button-text);
+}
+
+.styled-button:active:not(:disabled), 
 .dropdown-btn:active:not(:disabled) {
   color: var(--select-text);
   background: var(--select-bg);
 }
-button, input[type="submit"], input[type="button"], input[type="reset"], input[type="disabled"], fieldset, textarea .fake-textbox,
-.dropdown-btn {
+
+.styled-button, fieldset, textarea .fake-textbox,
+.dropdown-btn, #main_menu {
   border-radius: 3px;
 }
 textarea:disabled {
@@ -784,6 +786,9 @@ div .gll {
 #voc-output-message .info-message {
   color: var(--info-text);
 }
+#voc-output-message .grey-message {
+  color: var(--grey-text);
+}
 #voc-output-message {
   margin: 6px 0;
 }
@@ -811,7 +816,6 @@ div .gll {
 }
 
 #editor {
-  height: 570px;
   margin-top: 10px;
 }
 
@@ -865,6 +869,8 @@ div .gll {
   height: 100%;
   border: none;
   border-radius: 0;
+
+  font-size: 1em;
 
   box-shadow: inset 0 1px 3px rgba(88,88,88,0.4), 0 1px rgb(88 88 88 / 10%);
   -webkit-box-shadow: inset 0 1px 3px rgba(88,88,88,0.4), 0 1px rgb(88 88 88 / 10%);
@@ -1105,12 +1111,18 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 .voc-ipa-table button {
   color: #000;
 
+  cursor: pointer;
+
+  border: none;
+  font-size: 1.3em;
+
+  line-height: 1.4em;
+
   border-radius: 0;
 
   font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
   width: 28px;
   
-  padding: 5px 0;
   margin: 0;
 
   box-shadow: inset 0 1px 3px rgba(88,88,88,0.4), 0 1px rgb(88 88 88 / 10%);
@@ -1126,4 +1138,47 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 .voc-ipa-table button:active {
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+
+.cm-toolbar button {
+  
+    padding: 5px 7px 3px 7px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+}
+
+.cm-toolbar #generate-words {
+  
+    color: var(--info-text);
+
+}
+.cm-toolbar button:hover {
+  background: #8080803a;
+}
+.cm-toolbar input[type="number"] {
+  
+    padding: 2px;
+    width: 60px;
+
+}
+
+.cm-toolbar label {
+  font-size: 0.7em;
+  margin: 0 2px 0 1px;
+}
+
+
+.voca-delete {
+    border: 1px solid rgba(0,0,0,0.4);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 50%), 0 1px rgb(0 0 0 / 20%);
+  background: var(--delete-button-bg);
+  padding: 6px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.voca-delete:hover {
+  box-shadow: inset 0 1px 3px rgba(140,140,140,0.5), 0 1px rgba(140, 140, 140, 0.274);
 }

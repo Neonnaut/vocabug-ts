@@ -73,18 +73,19 @@ window.addEventListener("load", () => {
                 force_word_limit: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
                 
                 sort_words: (document.getElementById('sort-words') as HTMLInputElement)?.checked || false,
-                capitalise_words: (document.getElementById('capitalise-words') as HTMLInputElement)?.checked || false,
                 word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
             });
             w.onerror = function (e: ErrorEvent) {
                 generate_button.disabled = false;
                 output_message.innerHTML = `<p class='error-message'>${e.message}</p>`;
+                output_message.focus();
             };
 
         } catch (e) {
             generate_button.disabled = false;
             const error_message = e instanceof Error ? e.message : String(e);
             output_message.innerHTML = `<p class='error-message'>${error_message}</p>`;
+            output_message.focus();
         }
     });
 
@@ -157,7 +158,7 @@ window.addEventListener("load", () => {
     });
 
     // Clear button
-    const clear_button = document.getElementById("voc-clear-editor") as HTMLButtonElement | null;
+    const clear_button = document.getElementById("clear-editor") as HTMLButtonElement | null;
     clear_button?.addEventListener("click", () => {
         const confirmed = window.confirm("Clear EDITOR TEXT and GENERATED WORDS?");
         if (confirmed) {
@@ -188,19 +189,17 @@ window.addEventListener("load", () => {
         element.addEventListener("click", () => {
             const word_list_mode = document.getElementById("word-list-mode") as HTMLInputElement;
             const sort_words = document.getElementById("sort-words") as HTMLInputElement;
-            const capitalise_words = document.getElementById("capitalise-words") as HTMLInputElement;
             const remove_duplicates = document.getElementById("remove-duplicates") as HTMLInputElement;
             const word_divider = document.getElementById("word-divider") as HTMLInputElement;
             const force_words = document.getElementById("force-words") as HTMLInputElement;
 
             if (word_list_mode?.checked) {
                 if (sort_words) sort_words.disabled = false;
-                if (capitalise_words) capitalise_words.disabled = false;
                 if (remove_duplicates) remove_duplicates.disabled = false;
                 if (word_divider) word_divider.disabled = false;
                 if (force_words) force_words.disabled = false;
             } else {
-                [sort_words, capitalise_words, remove_duplicates, word_divider, force_words].forEach(element => {
+                [sort_words, remove_duplicates, word_divider, force_words].forEach(element => {
                     if (element) element.disabled = true;
                 });
             }

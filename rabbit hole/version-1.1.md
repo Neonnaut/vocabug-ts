@@ -34,36 +34,17 @@ Like the so called "categories" in lexifer.ts. I could put them in the Words: bl
 
 They're not that useful here as you can just comment out a line in the words: block
 
+`:verbs:`
 
-## 3. Then
+## 3. Gloss for word in nesca
 
-If block
-Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
 
-It should feel familiar to anyone who knows a bit about programming languages
+## 4. Grapheme stream
 
-`BEGIN if:` starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.
-`then:` is where you put transforms that will execute if the transformations in if: did apply
-`else:` is is where you put transforms that will execute if the transformations in if: did not meet a `CONDITION` or were blocked by an `EXCEPTION`
-END is the end of the block
-For example:
+Uses tilde `~` between graphemes
 
-```
-BEGIN if:
-  ; Deletion of schwa before r
-  ə -> ^ / _r
-then:
-  ; Then do metathesis of r and l
-  r|l -> 2|1 / _|[plosive]_
-else:
-  ; Schwa becomes e if the first rule did not apply
-  ə -> e
-END
-```
 
-Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
-
-## 4. Else
+## 5. Then
 
 If block
 Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
@@ -91,26 +72,35 @@ END
 
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
-## 4. Rule macro
+## 6. Else
 
-Rule macro saves rules to be used later in the definition-build as many times as needed. The rules inside the define-rule-macro: block do not run until invoked using do-rule-macro:
+If block
+Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
+
+It should feel familiar to anyone who knows a bit about programming languages
+
+`BEGIN if:` starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.
+`then:` is where you put transforms that will execute if the transformations in if: did apply
+`else:` is is where you put transforms that will execute if the transformations in if: did not meet a `CONDITION` or were blocked by an `EXCEPTION`
+END is the end of the block
+For example:
 
 ```
-BEGIN def-rule-macro resyllabify:
-  i -> j / _[a,e,o,u]
-  u -> w / _[a,e,i,o]
+BEGIN if:
+  ; Deletion of schwa before r
+  ə -> ^ / _r
+then:
+  ; Then do metathesis of r and l
+  r|l -> 2|1 / _|[plosive]_
+else:
+  ; Schwa becomes e if the first rule did not apply
+  ə -> e
 END
 ```
 
-```
-  do-rule-macro: resyllabify
-  ʔ -> ^
-  do-rule-macro: resyllabify
-; iaruʔitua ==> jaruʔitwa ==> jaruitwa  ==> jarwitwa
-```
-In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.
+Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
-## 5. Alternative graphs
+## 7. Alternative graphs
 
 Tells what character + combining diacritic sequences to be treated as alternatives of another grapheme
 
@@ -122,20 +112,4 @@ graphemes: a <[á à ǎ â] b d e <[é è ě ê] f g h i <[í ì ǐ i
 
 now `a > o` will target `a` with an acute accent.
 
-## 6. Invisible graphemes
 
-This would "skip" graphemes in the TARGET, CONDITION and EXCEPTION, like so:
-
-```
-invisible-graphemes: .
-
-  tt > d
-  bat.ta > ba.da
-; 'tt' becomes 'd'. Ignore any '.' between 't's
-```
-
-## 7. Grapheme stream
-
-Uses tilde `~` between graphemes
-
-## 8. Gloss for word in nesca

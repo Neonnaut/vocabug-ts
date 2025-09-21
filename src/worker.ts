@@ -10,7 +10,6 @@ onmessage = function (event) {
         force_word_limit: event.data.force_word_limit,
 
         sort_words: event.data.sort_words,
-        capitalise_words: event.data.capitalise_words,
         word_divider: event.data.word_divider
     });
 

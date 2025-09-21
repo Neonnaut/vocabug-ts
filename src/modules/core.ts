@@ -20,7 +20,6 @@ type generate_options = {
   remove_duplicates?: boolean;
   force_word_limit?: boolean;
   sort_words?: boolean;
-  capitalise_words?: boolean;
   word_divider?: string;
 };
 
@@ -31,7 +30,6 @@ function generate({
     remove_duplicates = true,
     force_word_limit = false,
     sort_words = true,
-    capitalise_words = false,
     word_divider = ' '
 }: generate_options): {
     text: string;
@@ -51,7 +49,7 @@ function generate({
 
         const p = new Parser(
             logger, escape_mapper, supra_builder,
-            num_of_words, mode, sort_words, capitalise_words,
+            num_of_words, mode, sort_words,
             remove_duplicates, force_word_limit, word_divider
         );
         p.parse_file(file);
@@ -89,7 +87,7 @@ function generate({
         const text_builder = new Text_Builder(
             logger, build_start, p.num_of_words, p.output_mode,
             p.remove_duplicates, p.force_word_limit, p.sort_words,
-            p.capitalise_words, p.word_divider, p.alphabet, p.invisible
+            p.word_divider, p.alphabet, p.invisible
         );
 
         // Yo! this is where we generate da words !!
