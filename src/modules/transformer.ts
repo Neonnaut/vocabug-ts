@@ -123,8 +123,13 @@ class Transformer {
             if (my_result_token.type === "grapheme") {
                 replacement_stream.push(my_result_token.base);
             } else if (my_result_token.type === "target-reference") {
-                for (let k:number = 0; k <= target_stream.length; k++) {
+                for (let k:number = 0; k < target_stream.length; k++) {
                     replacement_stream.push(target_stream[k]);
+                }
+            } else if (my_result_token.type === "metathesis-reference") {
+                const my_metathesis_graphemes = swap_first_last_items([...target_stream]);
+                for (let k:number = 0; k < my_metathesis_graphemes.length; k++) {
+                    replacement_stream.push(my_metathesis_graphemes[k]);
                 }
             }
         }
@@ -149,9 +154,12 @@ class Transformer {
                 token.type !== 'grapheme' &&
                 token.type !== 'wildcard' &&
                 token.type !== 'anythings-mark' &&
+                token.type !== 'syllable-mark' &&
                 token.type !== 'target-reference' &&
-                token.type !== 'named-reference' &&
-                token.type !== 'grapheme-stream'
+                token.type !== 'metathesis-reference' &&
+                //token.type !== 'backreference' &&
+                token.type !== 'syllable-boundary' &&
+                token.type !== 'word-boundary'
             ) {
                 j++;
                 continue;
@@ -175,33 +183,6 @@ class Transformer {
                 }
                 matched.push(...stream.slice(i, i + count));
                 i += count;
-
-            // Grapheme stream
-            } else if (token.type === 'grapheme-stream') {
-                const unit = token.base; // array of graphemes to match as a block
-                const unit_length = unit.length;
-
-                const max_available = max_end !== undefined
-                    ? Math.min(max, Math.floor((max_end - i) / unit_length))
-                    : max;
-
-                let repetitions = 0;
-
-                while (
-                    repetitions < max_available &&
-                    stream.slice(i + repetitions * unit_length, i + (repetitions + 1) * unit_length)
-                        .every((val, idx) => val === unit[idx])
-                ) {
-                    repetitions++;
-                }
-
-                if (repetitions < min) {
-                    return null;
-                }
-
-                const total_length = repetitions * unit_length;
-                matched.push(...stream.slice(i, i + total_length));
-                i += total_length;
 
             } else if (token.type === 'target-reference') {
                 if (!target_stream || target_stream.length === 0) {
@@ -235,9 +216,37 @@ class Transformer {
                 matched.push(...stream.slice(i, i + total_length));
                 i += total_length;
                 
-            
-            } else if (token.type === "named-reference") {
-                matched.push(...stream.slice(i, i + 0));
+            } else if (token.type === 'metathesis-reference') {
+                if (!target_stream || target_stream.length === 0) {
+                    this.logger.validation_error("Metathesis-reference requires a non-empty target_stream");
+                }
+
+                const unit = swap_first_last_items([...target_stream]);
+                const unit_length = unit.length;
+                const min = token.min;
+                const max = token.max;
+
+                const max_available = max_end !== undefined
+                    ? Math.min(max, Math.floor((max_end - i) / unit_length))
+                    : max;
+
+                let repetitions = 0;
+
+                while (
+                    repetitions < max_available &&
+                    stream.slice(i + repetitions * unit_length, i + (repetitions + 1) * unit_length)
+                        .every((val, idx) => val === unit[idx])
+                ) {
+                    repetitions++;
+                }
+
+                if (repetitions < min) {
+                    return null;
+                }
+
+                const total_length = repetitions * unit_length;
+                matched.push(...stream.slice(i, i + total_length));
+                i += total_length;
             
             } else if (token.type === 'wildcard') {
                 const available = Math.min(max_available, stream.length - i);
@@ -248,10 +257,44 @@ class Transformer {
 
                 matched.push(...stream.slice(i, i + available));
                 i += available;
-            }
+            } else if (token.type === 'syllable-boundary') {
+                let count = 0;
 
-            else if (token.type === 'anythings-mark') {
-                const blocked = token.blocked_by ?? [];
+                if (stream[i] === '.') {
+                    // syllable-boundary in pattern represents a '.'
+                    while (
+                        count < max_available &&
+                        stream[i + count] === '.'
+                    ) {
+                        count++;
+                    }
+                    if (count < min) {
+                        return null;
+                    }
+                    matched.push(...stream.slice(i, i + count));
+                    i += count;
+
+                } else if (i === 0 || i === stream.length) {
+                    // syllable-boundary in pattern represents a word boundary
+                    // doesn't consume stream characters, just validates position
+                    if (min > 1) return null;
+                    matched.push('$'); // symbolic trace marker (optional)
+                    // no increment to i
+                } else {
+                    return null; // neither '.' nor word boundary
+                }
+
+            } else if (token.type === 'word-boundary') {
+                if (i === 0 || i === stream.length) {
+                    // valid word boundary position
+                    if (min > 1) return null;
+                    matched.push('#'); // symbolic trace marker (optional)
+                    // no increment to i
+                } else {
+                    return null; // not a word boundary
+                }
+            } else if (token.type === 'syllable-mark') {
+                const blocked = '.';
                 const next_token = pattern[j + 1];
 
                 let count = 0;
@@ -262,6 +305,40 @@ class Transformer {
                     !(next_token?.type === 'grapheme' && stream[i + count] === next_token.base)
                 ) {
                     count++;
+                }
+
+                if (count < min) {
+                    return null;
+                }
+
+                matched.push(...stream.slice(i, i + count));
+                i += count;
+            } else if (token.type === 'anythings-mark') {
+                const blocked = token.blocked_by ?? [[]];
+                const next_token = pattern[j + 1];
+
+                let count = 0;
+
+                outer: while (
+                    count < max_available &&
+                    stream[i + count] !== undefined
+                ) {
+                    // Check if any blocked group matches exactly at stream[i + count]
+                    for (const group of blocked) {
+                    const group_len = group.length;
+                    const slice = stream.slice(i + count, i + count + group_len);
+
+                    if (slice.length === group_len && slice.every((val, idx) => val === group[idx])) {
+                        break outer; // full sequence match → block
+                    }
+                }
+
+                // Check if next token is a grapheme and matches current stream char
+                if (next_token?.type === 'grapheme' && stream[i + count] === next_token.base) {
+                    break;
+                }
+                count++;
+                
                 }
 
                 if (count < min) {
@@ -291,33 +368,43 @@ class Transformer {
         const target_len = raw_target.length;
 
         // BEFORE logic
-        const has_boundary_before = before.length > 0 && before[0].type === 'word-boundary';
-        const before_tokens = has_boundary_before ? before.slice(1) : before;
+        
+        let has_word_boundary_before = false;
+        let has_syllable_boundary_before = false;
+
+        if (before.length > 0) {
+            if (before[0].type === 'word-boundary') {
+                has_word_boundary_before = true;
+            }
+            if (before[0].type === 'syllable-boundary') {
+                if (word_stream[0] === '.') {
+                    // '$' represents a word-initial dot
+                    has_syllable_boundary_before = true;
+                } else {
+                    // '$' represents a word boundary
+                    has_word_boundary_before = true;
+                }
+            }
+        }
+        const before_tokens =  before;
 
         let before_matched = false;
-
         for (let i = 0; i <= startIdx; i++) {
             const result = this.match_pattern_at(word_stream, before_tokens, i, startIdx, target_stream);
             if (result !== null && result.end === startIdx) {
-                if (has_boundary_before && result.start !== 0) continue;
                 before_matched = true;
                 break;
             }
         }
-
         if (!before_matched) return false;
 
         // AFTER logic
-        const has_boundary_after = after.length > 0 && after[after.length - 1].type === 'word-boundary';
-        const after_tokens = has_boundary_after ? after.slice(0, -1) : after;
+        const after_tokens =  after;
         const after_start = startIdx + target_len;
 
         const result = this.match_pattern_at(word_stream, after_tokens, after_start, word_stream.length, target_stream);
 
         if (result === null) return false;
-
-        if (has_boundary_after && result.end !== word_stream.length) return false;
-
         return true;
     }
 
@@ -472,7 +559,7 @@ class Transformer {
             let raw_target:Token[] = target[i]; // like 'abc' of 'abc, hij > y, z'
             let raw_result:Token[] = result[i]; // like 'y' of 'abc, hij > y, z'
 
-            let mode: "deletion"|"insertion"|"reject"|"metathesis"|"replacement" = "replacement";
+            let mode: "deletion"|"insertion"|"reject"|"replacement" = "replacement";
 
             // NOW, build-up REPLACEMENT STREAM named-references from RESULT tokens.
             if (raw_result[0].type === "deletion") {
@@ -481,8 +568,6 @@ class Transformer {
             } else if (raw_result[0].type === "reject") {
                 // REJECT
                 mode = "reject";
-            } else if (raw_result[0].type === "metathesis") {
-                mode = "metathesis"
             } else {
                 // NORMAL GRAPHEME STREAM
             }
@@ -490,8 +575,8 @@ class Transformer {
             // NOW, Go through TARGET
             if (raw_target[0].type === "insertion") {
                 // INSERTION
-                if (mode === "deletion" || mode === "reject" || mode === "metathesis") {
-                    this.logger.validation_error(`Deletion of ${mode} is not valid`, line_num);
+                if (mode === "deletion" || mode === "reject") {
+                    this.logger.validation_error(`Inserion of ${mode} is not valid`, line_num);
                 }
                 if (conditions.length === 0) {
                     this.logger.validation_error("Insertion without a condition is not valid", line_num);
@@ -526,9 +611,8 @@ class Transformer {
                         matched_condition: matched_condition
                     });
                 }
-
             } else {
-                // TARGET is normal stream of grapheme, wildcard, anythings-mark
+                // TARGET is normal stream of grapheme, wildcard, anythings-mark, syllable ...
                 let cursor = 0;
 
                 while (cursor <= word_stream.length - raw_target.length) {
@@ -583,15 +667,6 @@ class Transformer {
                             replacement_stream: [],
                             matched_condition: matched_condition
                         });
-                    } else if (mode === "metathesis") {
-                        const my_metathesis = swap_first_last_items(matched_stream)
-                        replacements.push({
-                            index_span: global_index,
-                            length_span: match_length,
-                            target_stream: matched_stream,
-                            replacement_stream: my_metathesis,
-                            matched_condition: matched_condition
-                        });                        
                     } else {
 
                         // Get replacement bindings

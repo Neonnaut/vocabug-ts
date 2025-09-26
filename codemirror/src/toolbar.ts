@@ -59,7 +59,6 @@ function toolbar_func(view: EditorView) {
         top: false
     };
 }
-
-const toolbar = showPanel.of(toolbar_func)
+const toolbar = showPanel.of(toolbar_func);
 
 export { toolbar };

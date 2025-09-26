@@ -19,6 +19,25 @@ const initials: Record<string, number> = {
   "x": 18     // ㅎ
 };
 
+const finals: Record<string, number> = {
+  "gk": 2,    // ㄲ
+  "gn": 21,   // ㅇ
+  "ch": 23,   // ㅊ
+  "kh": 24,   // ㅋ
+  "th": 25,   // ㅌ
+  "ph": 26,   // ㅍ
+  "k": 1,     // ㄱ
+  "n": 4,     // ㄴ
+  "t": 7,     // ㄷ
+  "r": 8,     // ㄹ
+  "m": 16,    // ㅁ
+  "p": 17,    // ㅂ
+  "s": 19,    // ㅅ
+  "z": 20,    // ㅆ
+  "c": 22,    // ㅈ
+  "x": 27     // ㅎ
+};
+
 const medials: Record<string, number> = {
   "uí": 16,   // ㅟ
   "ùí": 19,   // ㅢ
@@ -41,26 +60,6 @@ const medials: Record<string, number> = {
   "e": 5,     // ㅔ
   "ù": 18,    // ㅡ
   "i": 20     // ㅣ
-};
-
-
-const finals: Record<string, number> = {
-  "gk": 2,    // ㄲ
-  "gn": 21,   // ㅇ
-  "ch": 23,   // ㅊ
-  "kh": 24,   // ㅋ
-  "th": 25,   // ㅌ
-  "ph": 26,   // ㅍ
-  "k": 1,     // ㄱ
-  "n": 4,     // ㄴ
-  "t": 7,     // ㄷ
-  "r": 8,     // ㄹ
-  "m": 16,    // ㅁ
-  "p": 17,    // ㅂ
-  "s": 19,    // ㅅ
-  "z": 20,    // ㅆ
-  "c": 22,    // ㅈ
-  "x": 27     // ㅎ
 };
 
 const compatibility_jamos = [

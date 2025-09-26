@@ -52,6 +52,7 @@ const Darky = EditorView.theme({
       display: "none!important"
     }
   }
+
 }, { dark: true });
 
 export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
@@ -180,6 +181,99 @@ export function xcodeLightInit(options?: Partial<CreateThemeOptions>) {
   });
 }
 
+export const defaultSettingsXcodeWarm: CreateThemeOptions["settings"] = {
+  background: "#f5f5f5ff",
+  foreground: "#3d3d3d",
+  selection: "#d6ecffff",
+  selectionMatch: "#fae098",
+  gutterBackground: "#eae8e4ff",
+  gutterForeground: "#afafaf",
+  lineHighlight: "transparent",
+};
+
+const Warmy = EditorView.theme({
+  "&": {
+    fontSize: "12pt",
+    color: "#323d41ff;"
+  },
+  ".cm-gutters": {
+    color: "#8f8f8fff",
+    minWidth: "25.6px",
+    userSelect: "none"
+  },
+  ".cm-gutter": {
+    minWidth: "100%"
+  },
+  ".cm-activeLineGutter": {
+    backgroundColor: "#ffffff",
+    color: "#666666"
+  },
+  "&.cm-editor": {
+    border: "1px solid #aaaaaa;",
+    height: "100%;",
+    width: "100%;"
+  },
+  "&.cm-editor.cm-focused": {
+    outline: "none",
+    border: "1px dotted #001299;"
+  },
+  ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
+    backgroundColor: "#00be681e", // Optional highlight background
+  },
+  "@media only screen and (max-width: 400px)": {
+    ".cm-gutters": {
+      display: "none!important"
+    }
+  },
+
+  ".cm-panel": {
+      backgroundColor: "#faf7f4ff"
+  }
+
+});
+
+export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
+  { tag: t.variableName, color: "#000000" },
+
+  // Comment / GREEN / #
+  { tag: t.comment, color: "#338f2cff"},
+
+  // Escape char / CREAM ON BLACK
+  { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
+
+  // Directive / RED / words: alphabet: etc.
+  { tag: [t.meta, t.name], color: "#a11c08ff" },
+
+  // LIGHT BLUE / commas, equals sign, colon
+  { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, 
+
+  // CYAN / ^REJECT, ->, +, -
+  { tag: t.operator, color: "#024bba", fontWeight: "bold"}, 
+
+  // PINK / #, +, *, (, {, [
+  { tag: t.regexp, color: "#b8009fff" },
+
+  // ORANGE / Categories
+  { tag: t.tagName, color: "#b07c0bff" },
+
+  // RED ITALIC / Weights
+  { tag: t.strong, color: "#a11c08ff", fontWeight: "italic" }
+];
+
+export function xcodeWarmInit(options?: Partial<CreateThemeOptions>) {
+  const { theme = "light", settings = {}, styles = [] } = options || {};
+  return createTheme({
+    theme: theme,
+    settings: {
+      ...defaultSettingsXcodeWarm,
+      ...settings,
+    },
+    styles: [...xcodeWarmStyle, ...styles],
+  });
+}
+
 export const xcodeLight = [Lighty, xcodeLightInit()];
 
 export const xcodeDark = [Darky, xcodeDarkInit()];
+
+export const xcodeWarm = [Warmy, xcodeWarmInit()];

@@ -45,14 +45,79 @@ window.addEventListener("load", () => {
         selection: { anchor: editor.state.doc.length }
     })
 
+    const defaultButton = document.getElementById("system-mode");
+    switch (storedScheme) {
+        case "light-mode":
+            colourSchemeButtons(document.getElementById("light-mode")!);
+            cm6.changeEditorTheme(editor, "light");
+            break;
+        case "dark-mode":
+            colourSchemeButtons(document.getElementById("dark-mode")!);
+            cm6.changeEditorTheme(editor, "dark");
+            break;
+        case "warm-mode":
+            colourSchemeButtons(document.getElementById("warm-mode")!);
+            cm6.changeEditorTheme(editor, "warm");
+            break;
+        default:
+            if (defaultButton) colourSchemeButtons(defaultButton);
+            break;
+    }
+
+    const themeButtons: NodeListOf<HTMLElement> = document.querySelectorAll("[name='changeThemeButton']");
+    themeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const myID = button.id;
+
+            switch (myID) {
+                case "light-mode":
+                    localStorage.setItem("colourScheme", "light-mode");
+                    assignSchemeClass("light-mode");
+                    cm6.changeEditorTheme(editor, "light");
+                    break;
+                case "dark-mode":
+                    localStorage.setItem("colourScheme", "dark-mode");
+                    assignSchemeClass("dark-mode");
+                    cm6.changeEditorTheme(editor, "dark");
+                    break;
+                case "warm-mode":
+                    localStorage.setItem("colourScheme", "warm-mode");
+                    assignSchemeClass("warm-mode");
+                    cm6.changeEditorTheme(editor, "warm");
+                    break;
+                default:
+                    localStorage.removeItem("colourScheme");
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                        assignSchemeClass("light-mode");
+                        cm6.changeEditorTheme(editor, "light");
+                    } else {
+                        assignSchemeClass("dark-mode");
+                        cm6.changeEditorTheme(editor, "dark");
+                    }
+                    break;
+            }
+
+            colourSchemeButtons(button);
+        });
+    });
+
+    const mainMenu = document.getElementById("main_menu");
+    if (mainMenu) {
+        mainMenu.addEventListener('click', () => {
+            window.location.href = './index.html';
+        });
+    }
+
     // Watch for dark / light change in system settings for system theme people
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
         if (!localStorage.hasOwnProperty('colourScheme')) {
             let scheme = event.matches ? "dark" : "light";
             if (scheme == "dark") {
                 cm6.changeEditorTheme(editor, "dark");
+                document.getElementById("colour-target")?.classList.remove("light-mode");
             } else if (scheme == "light") {
                 cm6.changeEditorTheme(editor, "light");
+                document.getElementById("colour-target")?.classList.add("light-mode");
             }
         }
     });
@@ -283,9 +348,9 @@ window.addEventListener("load", () => {
     });    
 
     // Show keyboard toggle
-    document.getElementById("show-keyboard")?.addEventListener("click", () => {
-        const keyboard_table = document.getElementById("voc-keyboard-table") as HTMLDivElement;
-        const checkbox = document.getElementById('show-keyboard') as HTMLInputElement;
+    document.getElementById("show-keyboard-section")?.addEventListener("click", () => {
+        const keyboard_table = document.getElementById("select-keyboard-section") as HTMLDivElement;
+        const checkbox = document.getElementById('show-keyboard-section') as HTMLInputElement;
         
         if (keyboard_table && checkbox) {
             keyboard_table.style.display = checkbox.checked ? "block" : "none";
@@ -293,17 +358,21 @@ window.addEventListener("load", () => {
     });
 
     // IPA buttons
-    document.querySelectorAll(".ipa-button").forEach((button) => {
-        button.addEventListener("mousedown", (e) => {
-            e.preventDefault();
+    document.querySelectorAll(".keyboard-button").forEach((button) => {
+    const el = button as HTMLButtonElement; // or HTMLElement if more generic
+    el.addEventListener("mousedown", (e) => {
+        const mouse = e as MouseEvent;
+        if (mouse.button === 0) {
+            mouse.preventDefault();
             editor.dispatch({
                 changes: {
-                    from: editor.state.selection.main.head,
-                    insert: button.getAttribute("value")
+                from: editor.state.selection.main.head,
+                insert: el.getAttribute("value") ?? "",
                 },
                 selection: { anchor: editor.state.selection.main.head + 1 },
                 scrollIntoView: true,
-            })
+            });
+            }
         });
     });
 });
@@ -316,3 +385,38 @@ function clear_results(): void {
 function set_filename(filename: string): void {
     (document.getElementById('file-name') as HTMLInputElement).value = filename;
 }
+
+
+
+
+function colourSchemeButtons(clickedElement: HTMLElement): void {
+    const selection: NodeListOf<HTMLAnchorElement> = document.querySelectorAll("#colour-switch-field a");
+    selection.forEach(el => el.classList.remove('checked'));
+    clickedElement.classList.add("checked");
+}
+function assignSchemeClass(scheme: string): void {
+    const mySchemes: string[] = ["light-mode", "dark-mode", "warm-mode"];
+    const target = document.getElementById("colour-target");
+
+    if (!target) return;
+
+    mySchemes.forEach(mode => {
+        if (scheme !== mode) {
+            target.classList.remove(mode);
+        } else {
+            target.classList.add(mode);
+        }
+    });
+}
+
+// Initial scheme assignment
+const storedScheme = localStorage.getItem('colourScheme');
+if (storedScheme) {
+    assignSchemeClass(storedScheme);
+} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    assignSchemeClass('light-mode');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+
+});

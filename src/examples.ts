@@ -53,7 +53,7 @@ graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
 
 ; Mark vowels with a tone mark
 BEGIN transform:
-% a e ẹ i o ọ u
+< a e ẹ i o ọ u
 ' á é ẹ́ í ó ọ́ ú
 \` à è ẹ̀ ì ò ọ̀ ù
 
@@ -80,9 +80,9 @@ F = n r l s m
 X = n r l s
 T = '
 $S = CV(F)
-$X = CV{<T*1>*9,<T*3>F} ; 3rd last syllable
-$Y = CV{<^*80>*9,<^*95>F} ; 2nd last syllable
-$Z = CV{<T*3>*10,<T*9>X} ; last syllable
+$X = CV{[T*1]*9,[T*3]F} ; 3rd last syllable
+$Y = CV{[^*80]*9,[^*95]F} ; 2nd last syllable
+$Z = CV{[T*3]*10,[T*9]X} ; last syllable
 
 Σ = a,e,i,o,u,á,é,í,ó,ú
 
@@ -99,7 +99,7 @@ u:+, u'u> o, e / _# ; /u/ final vowels should be less prominant
 {a,e,o,u,á,é,í,ó,ú}{Σ} > ^REJECT / #_#
 
 ; Enlace y Hiato
-%   a  e  i  o  u
+<   a  e  i  o  u
 a   +  aj aj o  aw
 e   +  +  ej +  ew
 i   ja je +  jo ju
@@ -112,7 +112,7 @@ q -> k / _{a,o,á,ó}
 nj gj gn gl qw -> ň ň ň ʎ q
 jg jn jj jl ww -> ň ň j ʎ w
 
-%  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  z  
+<  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  z  
 m  +  nk nq ng nč nd nf h  nl m  ň  +  r  +  nt nz 
 n  mb +  +  +  +  +  +  h  l  ň  ň  mp +  +  +  +  
 r  +  +  +  +  +  +  +  h  l  +  +  +  +  +  +  z  
@@ -153,7 +153,7 @@ BEGIN transform:
 {a,e,i,o,u}+[3,] > {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
-%  i   u   e   o   ya   yu   yo
+<  i   u   e   o   ya   yu   yo
 s  shi +   +   +   sha  shu  sho
 z  ji  +   +   +   ja   ju   jo 
 t  chi tsu +   +   cha  chu  cho
@@ -163,14 +163,14 @@ w  i   yu  yo  yo  ya   yu   yo
 N  n'a n'u n'e n'o n'ya n'yu n'yo
 
 ; <N> assimilation, and <Q> gemination.
-% ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
+< ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
 Q Qtch Qshsh Qtts j  Qkk g  Qss z  Qtt d  n  Qpp b  Qpp m  r  l  Qpp Qpp
 N nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
 
 RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
 
 ; Vowel sequences:
-%  a   i   u   e  o
+<  a   i   u   e  o
 a  ai  +   oR  +  +
 i  ya  ui  yuR +  yo
 u  uR  +   ui  ai ai
@@ -228,7 +228,7 @@ graphemes: a aR e eR i iR o oR u uR p t̪ t c k ʔ m n̪ n ɲ ŋ r ɻ j w l ʎ
 
 BEGIN transform:
 ; Restrict the occurance of <ai>.
-%  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  -
+<  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  -
 ai aʔ ac aŋ aɲ aj aw aʎ aɻ a-
 
 ; Long vowels become short before a consonant cluster or <ʔ>.

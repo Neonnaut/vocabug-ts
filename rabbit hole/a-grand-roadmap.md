@@ -101,22 +101,26 @@
 
 - [x] graphemes block
 - [x] Make the met condition say so in debug
+- [x] Deal with metathesis-reference as `<M`
+- [x] Deal with target-reference as `<T`
+- [x] Add `%` as syllable-mark
+- [x] Add `$` as syllable-boundary
 
-- [ ] It says error for features as "alternator / option"
-- [ ] Features into opt, say not nested
+- [x] `~` tilde in blocked anythings mark
 
-- [ ] Alternator optionalator as multi-grapheme group
+- [ ] Alternative graphemes
 
-perhaps with tilde between them
+--------------
 
-- [ ] Target binding
-- [ ] Result binding
-- [ ] Condition binding
+- [ ] Target capture
+- [ ] Result capture
+- [ ] Condition capture
 
 - [ ] Condition insertion
 - [ ] Result insertion
 
-
+- [ ] Backreference kebab as `~`
+- [ ] Backreference
 
 
 

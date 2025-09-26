@@ -4,36 +4,6 @@
 
 ## IPA featurefield set
 
-## 11. Named-reference
-
-Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of named-reference.
-
-Firstly, a grapheme is bound to a name with a 'named-capture', to the right of the grapheme. A named-capture looks like `=[` + the name + `]`. The name can only consist of lowercase letters a to z, `.`, `-`, or `+`.
-
-The bound grapheme can then be copied, or rather, inserted, somewhere else in the transform with a 'named-reference', even before the named-capture. However, a named-reference cannot be used in `TARGET`. A named reference looks like `[<` + the-name + `]`
-
-Here are some examples:
-
-```
-; Delete [ʔ] between identical vowels
-ʔ > ^ / [+vowel]=[identical]_[<indentical]
-```
-
-In this rule, we are binding the `V` category to the name `identical`, by appending `=[` + `identical` + `]` to it. Whatever this grapheme is when the condition is met, is the value of `identical`.
-
-```
-; Insert an 'echo vowel' at the end of [ʔ] final words
-  ^ -> [<identical] / {V}=[identical]ʔ_#
-; foobaʔ ==> foobaʔa
-```
-
-In this rule, we are binding the `V` category to the name `identical`, by appending `=[` + `identical` + `]` to it. Whatever this grapheme is when the condition is met is the value of `identical`.
-
-Then the value of `identical` is inserted into `RESULT`.
-
-
-
-
 
 ## 1. Word classes
 
@@ -47,17 +17,17 @@ Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
 
 ## 3. Positioner
 
-Positioners, enclosed in `={ and }`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
+Positioners, enclosed in `@[` and `]`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
 
 ```
 ; Change the second /o/ in a word to /x/ after the second /s/
-  o@{2} -> x / s@{2}_
+  o@[2] -> x / s@[2]_
 ; sososo ==> sosxso
 ```
 If we want to match the last occurence of a grapheme in a word, use `-1`. For the second last occurence of a grapheme in a word, use `-2`, and so forth:
 ```
 ; Change the last /o/ in a word to /x/
-  o@{-1} -> x
+  o@[-1] -> x
 ; sososo ==> sososx
 ```
 
@@ -131,8 +101,6 @@ invisible-graphemes: .
   bat.ta > ba.da
 ; 'tt' becomes 'd'. Ignore any '.' between 't's
 ```
-
-## 8. Syllable dividers and capturing syllables
 
 ## 9. Chance for individual optionals
 

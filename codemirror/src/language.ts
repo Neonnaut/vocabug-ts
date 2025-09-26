@@ -56,15 +56,16 @@ const wordRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
   { token: "operator", regex: /\^|∅/ },
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|\<|\>/ },
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}/ },
   { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
 ];
 
 const transformRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
-  { token: "operator", regex: /\^REJECT|\^R|\^|∅|</ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\+|\*|:|…|&|\$/ }
+  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|…|&|~|%|=1|=2|=3|=4|=5|=6|=7|=8|=9/ },
+  { token: "tagName",  regex: /0|1|2|3|4|5|6|7|8|9|<T|<M/ }
 ];
 
 const clusterRules = [
@@ -271,6 +272,25 @@ const parser: StreamParser<State> = {
 
         //TRANSFORM
         if (state.mode == 'transform') {
+
+            if (stream.sol()) {
+                // End Transform
+                if (stream.match(/END(?=\s*;|\s*$)/)) {
+                    state.mode = 'none';
+                    return "meta";
+                }
+                // Clusterfield
+                if (stream.match(/<\s/)) {
+                    state.mode = 'cluster-block';
+                    return "meta";
+                }
+                // Engine
+                if (stream.match(/\|(?= )/)) {
+                    state.mode = 'engine';
+                    return "meta";
+                }
+            }
+
             // Inside Feature matrix
             if (state.feature_matrix) {
                 for (let featuro of state.featureList) {
@@ -301,28 +321,14 @@ const parser: StreamParser<State> = {
                 return "regexp";
             }
 
-            // End Transform
-            if (stream.match(/END(?=\s*;|\s*$)/)) {
-                state.mode = 'none';
-                return "meta";
-            }
-            // Clusterfield
-            if (stream.match(/%\s/)) {
-                state.mode = 'cluster-block';
-                return "meta";
-            }
-            // Engine
-            if (stream.match(/\|(?= )/)) {
-                state.mode = 'engine';
-                return "meta";
-            }
-
+            // Syntax etc.
             for (let rule of transformRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
 
+            // Categories into transforms
             for (let cato of state.catList) {
                 if (stream.match(cato)) {
                     return "tagName";

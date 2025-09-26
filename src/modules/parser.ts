@@ -136,7 +136,7 @@ class Parser {
                     continue;
                 }
                 
-                if (line.startsWith("% ")) { // Parse clusterfield
+                if (line.startsWith("< ")) { // Parse clusterfield
                     this.parse_clusterfield(file_array);
                     continue;
                 }

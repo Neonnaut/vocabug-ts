@@ -12,7 +12,6 @@
   <!-- Scripts and stylings -->
   <link href="style.css" rel="stylesheet" type="text/css" media="all">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="src/theme-picker.js"></script>
 
   <script src="codemirror/dist/cm6.bundle.js"></script>
 
@@ -42,13 +41,13 @@
         <h1 style="margin: 15px 0 10px 0; padding-top: 10px;">Vocabug</h1>
 
         <div style="padding-left: 5px;">
-          <b>Version: 0.3.3</b><br>
+          <b>Version: 0.4.0</b><br>
           <a href="./vocabug_docs.html">Read the documentation here</a>
         </div>
       </div>
 
       <br>
-      <p>Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun. <a href="./vocabug_docs.html">Read the documentation here</a>.</p>
+      <p>Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
 
       <!-- Da-na-na-naaah! -->
       <div id="editor"></div>
@@ -102,8 +101,18 @@
             <input type="checkbox" id="editor-wrap-lines">
             <label for="editor-wrap-lines">Editor wrap lines</label><br>
 
-            <input type="checkbox" id="show-keyboard">
-            <label for="show-keyboard">Show keyboard</label><br>
+            <input type="checkbox" id="show-keyboard-section">
+            <label for="show-keyboard-section">Show keyboard</label><br>
+
+            <details class="dropdown-group" id="colour-switch-field">
+              <summary class="dropdown-btn">Themes</summary>
+              <a type="submit" id="light-mode" value="Light" name="changeThemeButton">Light</a>
+              <a type="submit" id="warm-mode" value="Warm" name="changeThemeButton">Warm</a>
+              <a type="submit" id="dark-mode" value="Dark" name="changeThemeButton">Dark</a>
+              <br>
+              <a type="submit" id="system-mode" value="System*" name="changeThemeButton">System</a>
+            </details>
+
         </fieldset>
         <br style="clear: left;">
   
@@ -131,274 +140,253 @@
       </section>
 
 
-    <section id="voc-keyboard-table" style="display: none;">
+    <section id="select-keyboard-section" style="display: none;">
       <h2>Keyboard</h2>
-      <div class="voc-ipa-table">
-          
-            <button class="vowel" title="near-open front unrounded vowel" value="&#x00E6;">&#x00E6;</button>
-            <button class="vowel" title="near-open central (unrounded) vowel" value="&#x0250;">&#x0250;</button>
-            <button class="vowel" title="open-mid back unrounded vowel" value="&#x028C;">&#x028C;</button>
-            <button class="vowel" title="open back unrounded vowel" value="&#x0251;">&#x0251;</button>
-            <button class="vowel" title="open back rounded vowel" value="&#x0252;">&#x0252;</button>
-            <button class="vowelX" title="a with acute" value="&#x00E1;">&#x00E1;</button>
-            <button class="vowelX" title="a with grave" value="&#x00E0;">&#x00E0;</button>
-            <button class="vowelX" title="a with macron" value="&#x0101;">&#x0101;</button>
-            <button class="vowelX" title="a with tilde" value="&#x00E3;">&#x00E3;</button>
-            <button class="vowelX" title="a with ogonek" value="&#x0105;">&#x0105;</button>
-            <button class="vowelX" title="a with underdot" value="&#x1EA1;">&#x1EA1;</button>
-            <button class="vowelX" title="a with diaeresis" value="&#x00E4;">&#x00E4;</button>
-            <button class="vowelX" title="a with ring" value="&#x00E5;">&#x00E5;</button>
-            <button class="cons" title="voiced bilabial fricative" value="&#x03B2;">&#x03B2;</button>
-            <button class="cons" title="voiced bilabial implosive" value="&#x0253;">&#x0253;</button>
-            <button class="cons" title="voiceless palatal fricative" value="&#x00E7;">&#x00E7;</button>
-            <button class="cons" title="voiceless alveolo-palatal fricative" value="&#x0255;">&#x0255;</button>
-            <button class="consN" title="c with acute" value="&#x0107;">&#x0107;</button>
-            <button class="consN" title="c with caron" value="&#x010D;">&#x010D;</button>
-            <button class="cons" title="voiced dental fricative" value="&#x00F0;">&#x00F0;</button>
-            <button class="cons" title="voiced retroflex plosive" value="&#x0256;">&#x0256;</button>
-            <button class="cons" title="voiced alveolar implosive" value="&#x0257;">&#x0257;</button>
-            <button class="cons" title="voiced retroflex implosive" value="&#x1D91;">&#x1D91;</button>
-            <button class="consN" title="d with underdot" value="&#x1E0D;">&#x1E0D;</button>
-          
-            <button class="consN" title="d with stroke" value="&#x0111;">&#x0111;</button>
-            <button class="vowel" title="open-mid front unrounded vowel" value="&#x025B;">&#x025B;</button>
-            <button class="vowel" title="mid central (unrounded) vowel (schwa)" value='&#601;'>&#601;</button>
-            <button class="vowel" title="close-mid central unrounded vowel" value="&#x0258;">&#x0258;</button>
-            <button class="vowel" title="open-mid central unrounded vowel" value="&#x025C;">&#x025C;</button>
-            <button class="vowelX" title="e with acute" value="&#x00E9;">&#x00E9;</button>
-            <button class="vowelX" title="e with grave" value="&#x00E8;">&#x00E8;</button>
-            <button class="vowelX" title="e with macron" value="&#x0113;">&#x0113;</button>
-            <button class="vowelX" title="e with tilde" value="&#x1EBD;">&#x1EBD;</button>
-            <button class="vowelX" title="e with ogonek" value="&#x0119;">&#x0119;</button>
-            <button class="vowelX" title="e with underdot" value="&#x1EB9;">&#x1EB9;</button>
-            <button class="vowelX" title="e with diaeresis" value="&#x00EB;">&#x00EB;</button>
-            <button class="cons" title="voiced velar implosive" value="&#x0260;">&#x0260;</button>
-            <button class="cons" title="voiced uvular plosive" value="&#x0262;">&#x0262;</button>
-            <button class="cons" title="voiced uvular implosive" value="&#x029B;">&#x029B;</button>
-            <button class="consN" title="g with caron" value="&#x01E7;">&#x01E7;</button>
-            <button class="cons" title="aspiration" value='&#688;'>&#9676;&#688;</button>
-            <button class="cons" title="voiceless pharyngeal fricative" value="&#x0127;">&#x0127;</button>
-            <button class="cons" title="voiced glottal fricative" value="&#x0266;">&#x0266;</button>
-            <button class="cons" title="breathy voice" value='&#689;'>&#9676;&#689;</button>
-            <button class="cons" title="voiceless epiglottal trill" value='&#668;'>&#668;</button>
-            
-            <button class="consN" title="h with underdot" value="&#x1E25;">&#x1E25;</button>
-            <button class="vowel" title="near-close near-front unrounded vowel" value="&#x026A;">&#x026A;</button>
-            <button class="vowel" title="close central unrounded vowel" value="&#x0268;">&#x0268;</button>
-          
-          
-            <button class="vowelX" title="i with acute" value="&#x00ED;">&#x00ED;</button>
-            <button class="vowelX" title="i with grave" value="&#x00EC;">&#x00EC;</button>
-            <button class="vowelX" title="i with macron" value="&#x012B;">&#x012B;</button>
-            <button class="vowelX" title="i with tilde" value="&#x0129;">&#x0129;</button>
-            <button class="vowelX" title="i with ogonek" value="&#x012F;">&#x012F;</button>
-            <button class="vowelX" title="dotless i" value="&#x0131;">&#x0131;</button>
-            <button class="vowelX" title="i with diaeresis" value="&#x00EF;">&#x00EF;</button>
-            <button class="cons" title="palatalized" value="&#x02B2;">&#9676;&#x02B2;</button>
-            <button class="cons" title="voiced palatal fricative" value="&#x029D;">&#x029D;</button>
-            <button class="cons" title="voiced palatal plosive" value="&#x025F;">&#x025F;</button>
-            <button class="cons" title="voiced palatal implosive" value="&#x0284;">&#x0284;</button>
-            <button class="cons" title="velarized alveolar lateral approximant" value="&#x026B;">&#x026B;</button>
-            <button class="cons" title="voiced alveolar lateral flap" value='&#634;'>&#634;</button>
-            <button class="cons" title="voiced retroflex lateral approximant" value="&#x026D;">&#x026D;</button>
-            <button class="cons" title="voiceless alveolar lateral fricative" value="&#x026C;">&#x026C;</button>
-            <button class="cons" title="voiced velar lateral approximant" value="&#x029F;">&#x029F;</button>
-            <button class="cons" title="voiced alveolar lateral fricative" value="&#x026E;">&#x026E;</button>
-            <button class="consN" title="barred l" value="&#x019B;">&#x019B;</button>
-            <button class="consN" title="l with underdot" value="&#x1E37;">&#x1E37;</button>
-            <button class="consN" title="l with stroke" value="&#x0142;">&#x0142;</button>
-            <button class="cons" title="voiced bilabial nasal (superscript)" value="&#x1D50;">&#9676;&#x1D50;</button>
-            <button class="cons" title="voiced alveolar nasal (superscript)" value="&#x207F;">&#9676;&#x207F;</button>
-            <button class="cons" title="voiced retroflex nasal" value='&#627;'>&#627;</button>
-            <button class="cons" title="voiced retroflex nasal (superscript)" value='ᶯ'>&#9676;ᶯ</button>
-          
-
-          
-            <button class="cons" title="voiced palatal nasal" value="&#x0272;">&#x0272;</button>
-            <button class="cons" title="voiced palatal nasal (superscript)" value="ᶮ">&#9676;ᶮ</button>
-            <button class="cons" title="voiced velar nasal" value="&#x014B;">&#x014B;</button>
-            <button class="cons" title="voiced velar nasal (superscript)" value="&#x1D51;">&#9676;&#x1D51;</button>
-            <button class="cons" title="voiced uvular nasal" value='&#628;'>&#628;</button>
-            
-            <button class="cons" title="voiced uvular nasal (superscript)" value='ᶰ'>&#9676;ᶰ</button>
-            <button class="consN" title="n with caron" value="&#x0148;">&#x0148;</button>
-            <button class="consN" title="n with tilde" value="&#x00F1;">&#x00F1;</button>
-            <button class="consN" title="n with underdot" value="&#x1E47;">&#x1E47;</button>
-            <button class="consN" title="n with acute" value="&#x0144;">&#x0144;</button>
-            <button class="vowel" title="close-mid front rounded vowel" value="&#x00F8;">&#x00F8;</button>
-            <button class="vowel" title="open-mid front rounded vowel" value="&#x0153;">&#x0153;</button>
-            <button class="vowel" title="close-mid central rounded vowel" value="&#x0275;">&#x0275;</button>
-            <button class="vowel" title="open-mid back rounded vowel" value="&#x0254;">&#x0254;</button>
-            <button class="vowelX" title="o with acute" value="&#x00F3;">&#x00F3;</button>
-            <button class="vowelX" title="o with grave" value="&#x00F2;">&#x00F2;</button>
-            <button class="vowelX" title="o with macron" value="&#x014D;">&#x014D;</button>
-            <button class="vowelX" title="o with tilde" value="&#x00F5;">&#x00F5;</button>
-            <button class="vowelX" title="o with ogonek" value="&#x01EB;">&#x01EB;</button>
-            <button class="vowelX" title="o with underdot" value="&#x1ECD;">&#x1ECD;</button>
-            <button class="vowelX" title="o with diaeresis" value="&#x04E7;">&#x04E7;</button>
-            <button class="vowelX" title="o with hook" value="&#x01A1;">&#x01A1;</button>
-            <button class="cons" title="voiced alveolar tap" value="&#x027E;">&#x027E;</button>
-            <button class="cons" title="voiced alveolar approximant" value="&#x0279;">&#x0279;</button>
-          
-
-          
-            <button class="cons" title="voiced uvular fricative" value="&#x0281;">&#x0281;</button>
-            <button class="cons" title="voiced uvular trill" value="&#x0280;">&#x0280;</button>
-            <button class="cons" title="voiced retroflex approximant" value="&#x027B;">&#x027B;</button>
-            <button class="cons" title="voiced retroflex flap" value="&#x027D;">&#x027D;</button>
-            <button class="consN" title="r with caron" value="&#x0159;">&#x0159;</button>
-            <button class="consN" title="r with underdot" value="&#x1E5B;">&#x1E5B;</button>
-            <button class="cons" title="voiceless palatoalveolar fricative" value="&#x0283;">&#x0283;</button>
-            <button class="cons" title="voiceless retroflex fricative" value="&#x0282;">&#x0282;</button>
-            <button class="consN" title="s with caron" value="&#x0161;">&#x0161;</button>
-            <button class="consN" title="s with underdot" value="&#x1E61;">&#x1E61;</button>
-            <button class="consN" title="s with acute" value="&#x015B;">&#x015B;</button>
-
-            <button class="consN" title="s with cedilla" value="&#x15F;">&#x15F;</button>
-
-            
-            <button class="cons" title="voiceless retroflex plosive" value="&#x0288;">&#x0288;</button>
-            <button class="consN" title="t with underdot" value="&#x1E6D;">&#x1E6D;</button>
-            <button class="consN" title="t with stroke" value="&#x0167;">&#x0167;</button>
-            <button class="vowel" title="near-close near-back rounded vowel" value="&#x028A;">&#x028A;</button>
-            <button class="vowel" title="close central rounded vowel" value="&#x0289;">&#x0289;</button>
-            <button class="vowel" title="close back unrounded vowel" value="&#x026F;">&#x026F;</button>
-            <button class="vowelX" title="u with acute" value="&#x00FA;">&#x00FA;</button>
-            <button class="vowelX" title="u with grave" value="&#x00F9;">&#x00F9;</button>
-            <button class="vowelX" title="u with macron" value="&#x016B;">&#x016B;</button>
-            <button class="vowelX" title="u with tilde" value="&#x0169;">&#x0169;</button>
-            <button class="vowelX" title="u with ogonek" value="&#x0173;">&#x0173;</button>
-            <button class="vowelX" title="u with diaeresis" value="&#x00FC;">&#x00FC;</button>
-            
-          
-
-          
-            <button class="vowelX" title="u with hook" value="&#x01B0;">&#x01B0;</button>
-            <button class="cons" title="voiced labiodental flap" value="&#x2C71;">&#x2C71;</button>
-            <button class="cons" title="voiced labiodental approximant" value="&#x028B;">&#x028B;</button>
-            <button class="cons" title="labialized" value="&#x02B7;">&#9676;&#x02B7;</button>
-            <button class="cons" title="voiced velar approximant" value="&#x0270;">&#x0270;</button>
-            <button class="cons" title="voiceless labial-velar approximant" value="&#x028D;">&#x028D;</button>
-            <button class="cons" title="voiceless uvular fricative" value="&#x03C7;">&#x03C7;</button>
-            <button class="vowel" title="near-close near-front rounded vowel" value="&#x028F;">&#x028F;</button>
-            <button class="vowel" title="close-mid back unrounded vowel" value="&#x0264;">&#x0264;</button>
-            <button class="vowelX" title="y with acute" value="&#x00FD;">&#x00FD;</button>
-            <button class="vowelX" title="y with grave" value="&#x1EF3;">&#x1EF3;</button>
-            <button class="vowelX" title="y with macron" value="&#x0233;">&#x0233;</button>
-            <button class="vowelX" title="y with tilde" value="&#x1EF9;">&#x1EF9;</button>
-            <button class="vowelX" title="y with ogonek" value="&#x0079;&#x0328;">&#x0079;&#x0328;</button>
-            <button class="vowelX" title="y with diaeresis" value="&#x00FF;">&#x00FF;</button>
-            <button class="cons" title="voiced palatal lateral approximant" value="&#x028E;">&#x028E;</button>
-            <button class="cons" title="voiced velar fricative" value="&#x0263;">&#x0263;</button>
-            <button class="cons" title="velarized" value="&#x02E0;">&#9676;&#x02E0;</button>
-            <button class="cons" title="voiced labial-palatal approximant" value="&#x0265;">&#x0265;</button>
-            <button class="cons" title="labial-palatalized" value="&#x1DA3;">&#9676;&#x1DA3;</button>
-            <button class="cons" title="voiced palatoalveolar fricative" value="&#x0292;">&#x0292;</button>
-            <button class="cons" title="voiced retroflex fricative" value="&#x0290;">&#x0290;</button>
-            <button class="cons" title="voiced alveolo-palatal fricative" value="&#x0291;">&#x0291;</button>
-            <button class="consN" title="z with caron" value="&#x017E;">&#x017E;</button>
-            
-
-          
-
-          
-            <button class="consN" title="z with underdot" value="&#x1E93;">&#x1E93;</button>
-            <button class="consN" title="z with acute" value="&#x017A;">&#x017A;</button>
-            <button class="cons" title="ejective" value="&#x02BC;">&#9676;&#x02BC;</button>
-            <button class="consN" title="ʻOkina" value="&#x02BB;">&#x02BB;</button>
-            <button class="consN" title="Saltilo" value="&#xA78C;">&#xA78C;</button>
-            <button class="cons" title="voiceless glottal plosive" value="&#x0294;">&#x0294;</button>
-            <button class="cons" title="glottalized" value="&#x02C0;">&#9676;&#x02C0;</button>
-            <button class="cons" title="voiced epiglottal trill" value='&#674;'>&#674;</button>
-            <button class="cons" title="voiceless epiglottal plosive" value="&#x02A1;">&#x02A1;</button>
-            <button class="cons" title="voiced pharyngeal fricative" value="&#x0295;">&#x0295;</button>
-            <button class="cons" title="pharyngealized" value="&#x02E4;">&#9676;&#x02E4;</button>
-            <button class="cons" title="bilabial click" value="&#x0298;">&#x0298;</button>
-            <button class="cons" title="dental click" value="&#x01C0;">&#x01C0;</button>
-            <button class="cons" title="alveolar lateral click" value="&#x01C1;">&#x01C1;</button>
-            <button class="cons" title="palatoalveolar click" value="&#x01C2;">&#x01C2;</button>
-            <button class="cons" title="retroflex click" value="&#x203C;&#xFE0E;">&#x203C;&#xFE0E;</button>
-            <button class="cons" title="voiceless bilabial fricative" value="&#x0278;">&#x0278;</button>
-            <button class="cons" title="voiceless dental fricative" value="&#x03B8;">&#x03B8;</button>
-
-            <button class="consN" title="thorn" value="&#x00FE;">&#x00FE;</button>
-            
-            <button class="consN special-button" title="ellipsis" value="&#x2026;">&#x2026;</button>
-            <button class="consN special-button" title="backtick" value="&#x0060;">&#x0060;</button>
-            <button class="consN special-button" title="tilde" value="&#x007E;">&#x007E;</button>
-            <button class="consN" title="zero (nonIPA)" value="&#x2205;">&#x2205;</button>
-            <button class="consN" title="rightwards arrow (nonIPA)" value="&#x2192;">&#x2192;</button>
-            
-          
-
-          
-            <button class="consN" title="superscript 1 (nonIPA)" value="&#x00B9;">&#9676;&#x00B9;</button>
-            <button class="consN" title="superscript 2 (nonIPA)" value="&#x00B2;">&#9676;&#x00B2;</button>
-
-            <button class="cons" title="primary stress" value="&#x02C8;">&#x02C8;&#9676;</button>
-            <button class="cons" title="secondary stress" value="&#x02CC;">&#x02CC;&#9676;</button>
-            <button class="cons" title="long" value="&#x02D0;">&#9676;&#x02D0;</button>
-            <button class="cons" title="half-long" value='&#721;'>&#9676;&#721;</button>
-            <button class="cons" title="extra-short" value='&#774;'>&#9676;&#774;</button>
-            <button class="cons" title="tie above" value="&#x0361;">&#9676;&#x0361;&#9676;</button>
-            <button class="cons" title="tie below" value='&#860;'>&#9676;&#860;&#9676;</button>
-
-            <button class="cons" title="upstep" value='&#42779;'>&#42779;</button>
-            <button class="cons" title="downstep" value='&#42780;'>&#42780;</button>
-            <button class="cons" title="extra high tone" value="&#x030B;">&#9676;&#x030B;</button>
-            <button class="cons" title="high tone" value="&#x0301;">&#9676;&#x0301;</button>
-            <button class="cons" title="mid tone" value="&#x0304;">&#9676;&#x0304;</button>
-            <button class="cons" title="low tone" value="&#x0300;">&#9676;&#x0300;</button>
-            <button class="cons" title="extra low tone" value="&#x030F;">&#9676;&#x030F;</button>
-            <button class="cons" title="rising tone" value="&#x030C;">&#9676;&#x030C;</button>
-            <button class="cons" title="falling tone" value="&#x0302;">&#9676;&#x0302;</button>
-            <button class="cons" title="high rising tone" value='&#7620;'>&#9676;&#7620;</button>
-            <button class="cons" title="low rising tone" value='&#7622;'>&#9676;&#7622;</button>
-            <button class="cons" title="rising-falling tone" value='&#7624;'>&#9676;&#7624;</button>
-            
-            <button class="cons" title="nasalized" value='&#771;'>&#9676;&#771;</button>
-            <button class="cons" title="creaky voiced" value='&#816;'>&#9676;&#816;</button>
-
-            <button class="cons" title="breathy voiced" value='&#804;'>&#9676;&#804;</button> 
+      
+      <div class="select-keyboard-div">
+        
+      <button class="vowel keyboard-button" title="near-open front unrounded vowel" value="&#x00E6;">&#x00E6;</button>
+      <button class="vowel keyboard-button" title="near-open central (unrounded) vowel" value="&#x0250;">&#x0250;</button>
+      <button class="vowel keyboard-button" title="open-mid back unrounded vowel" value="&#x028C;">&#x028C;</button>
+      <button class="vowel keyboard-button" title="open back unrounded vowel" value="&#x0251;">&#x0251;</button>
+      <button class="vowel keyboard-button" title="open back rounded vowel" value="&#x0252;">&#x0252;</button>
+      <button class="vowelX keyboard-button" title="a with acute" value="&#x00E1;">&#x00E1;</button>
+      <button class="vowelX keyboard-button" title="a with grave" value="&#x00E0;">&#x00E0;</button>
+      <button class="vowelX keyboard-button" title="a with macron" value="&#x0101;">&#x0101;</button>
+      <button class="vowelX keyboard-button" title="a with tilde" value="&#x00E3;">&#x00E3;</button>
+      <button class="vowelX keyboard-button" title="a with ogonek" value="&#x0105;">&#x0105;</button>
+      <button class="vowelX keyboard-button" title="a with underdot" value="&#x1EA1;">&#x1EA1;</button>
+      <button class="vowelX keyboard-button" title="a with diaeresis" value="&#x00E4;">&#x00E4;</button>
+      <button class="vowelX keyboard-button" title="a with ring" value="&#x00E5;">&#x00E5;</button>
+      <button class="cons keyboard-button" title="voiced bilabial fricative" value="&#x03B2;">&#x03B2;</button>
+      <button class="cons keyboard-button" title="voiced bilabial implosive" value="&#x0253;">&#x0253;</button>
+      <button class="cons keyboard-button" title="voiceless palatal fricative" value="&#x00E7;">&#x00E7;</button>
+      <button class="cons keyboard-button" title="voiceless alveolo-palatal fricative" value="&#x0255;">&#x0255;</button>
+      <button class="consN keyboard-button" title="c with acute" value="&#x0107;">&#x0107;</button>
+      <button class="consN keyboard-button" title="c with caron" value="&#x010D;">&#x010D;</button>
+      <button class="cons keyboard-button" title="voiced dental fricative" value="&#x00F0;">&#x00F0;</button>
+      <button class="cons keyboard-button" title="voiced retroflex plosive" value="&#x0256;">&#x0256;</button>
+      <button class="cons keyboard-button" title="voiced alveolar implosive" value="&#x0257;">&#x0257;</button>
+      <button class="cons keyboard-button" title="voiced retroflex implosive" value="&#x1D91;">&#x1D91;</button>
+      <button class="consN keyboard-button" title="d with underdot" value="&#x1E0D;">&#x1E0D;</button>
     
-    
-      <button class="cons" title="centralized" value="&#x0308;">&#9676;&#x0308;</button>
-      <button class="cons" title="mid-centralized" value='&#829;'>&#9676;&#829;</button>
-
+      <button class="consN keyboard-button" title="d with stroke" value="&#x0111;">&#x0111;</button>
+      <button class="vowel keyboard-button" title="open-mid front unrounded vowel" value="&#x025B;">&#x025B;</button>
+      <button class="vowel keyboard-button" title="mid central (unrounded) vowel (schwa)" value='&#601;'>&#601;</button>
+      <button class="vowel keyboard-button" title="close-mid central unrounded vowel" value="&#x0258;">&#x0258;</button>
+      <button class="vowel keyboard-button" title="open-mid central unrounded vowel" value="&#x025C;">&#x025C;</button>
+      <button class="vowelX keyboard-button" title="e with acute" value="&#x00E9;">&#x00E9;</button>
+      <button class="vowelX keyboard-button" title="e with grave" value="&#x00E8;">&#x00E8;</button>
+      <button class="vowelX keyboard-button" title="e with macron" value="&#x0113;">&#x0113;</button>
+      <button class="vowelX keyboard-button" title="e with tilde" value="&#x1EBD;">&#x1EBD;</button>
+      <button class="vowelX keyboard-button" title="e with ogonek" value="&#x0119;">&#x0119;</button>
+      <button class="vowelX keyboard-button" title="e with underdot" value="&#x1EB9;">&#x1EB9;</button>
+      <button class="vowelX keyboard-button" title="e with diaeresis" value="&#x00EB;">&#x00EB;</button>
+      <button class="cons keyboard-button" title="voiced velar implosive" value="&#x0260;">&#x0260;</button>
+      <button class="cons keyboard-button" title="voiced uvular plosive" value="&#x0262;">&#x0262;</button>
+      <button class="cons keyboard-button" title="voiced uvular implosive" value="&#x029B;">&#x029B;</button>
+      <button class="consN keyboard-button" title="g with caron" value="&#x01E7;">&#x01E7;</button>
+      <button class="cons keyboard-button" title="aspiration" value='&#688;'>&#9676;&#688;</button>
+      <button class="cons keyboard-button" title="voiceless pharyngeal fricative" value="&#x0127;">&#x0127;</button>
+      <button class="cons keyboard-button" title="voiced glottal fricative" value="&#x0266;">&#x0266;</button>
+      <button class="cons keyboard-button" title="breathy voice" value='&#689;'>&#9676;&#689;</button>
+      <button class="cons keyboard-button" title="voiceless epiglottal trill" value='&#668;'>&#668;</button>
       
+      <button class="consN keyboard-button" title="h with underdot" value="&#x1E25;">&#x1E25;</button>
+      <button class="vowel keyboard-button" title="near-close near-front unrounded vowel" value="&#x026A;">&#x026A;</button>
+      <button class="vowel keyboard-button" title="close central unrounded vowel" value="&#x0268;">&#x0268;</button>
+    
+      <button class="vowelX keyboard-button" title="i with acute" value="&#x00ED;">&#x00ED;</button>
+      <button class="vowelX keyboard-button" title="i with grave" value="&#x00EC;">&#x00EC;</button>
+      <button class="vowelX keyboard-button" title="i with macron" value="&#x012B;">&#x012B;</button>
+      <button class="vowelX keyboard-button" title="i with tilde" value="&#x0129;">&#x0129;</button>
+      <button class="vowelX keyboard-button" title="i with ogonek" value="&#x012F;">&#x012F;</button>
+      <button class="vowelX keyboard-button" title="dotless i" value="&#x0131;">&#x0131;</button>
+      <button class="vowelX keyboard-button" title="i with diaeresis" value="&#x00EF;">&#x00EF;</button>
+      <button class="cons keyboard-button" title="palatalized" value="&#x02B2;">&#9676;&#x02B2;</button>
+      <button class="cons keyboard-button" title="voiced palatal fricative" value="&#x029D;">&#x029D;</button>
+      <button class="cons keyboard-button" title="voiced palatal plosive" value="&#x025F;">&#x025F;</button>
+      <button class="cons keyboard-button" title="voiced palatal implosive" value="&#x0284;">&#x0284;</button>
+      <button class="cons keyboard-button" title="velarized alveolar lateral approximant" value="&#x026B;">&#x026B;</button>
+      <button class="cons keyboard-button" title="voiced alveolar lateral flap" value='&#634;'>&#634;</button>
+      <button class="cons keyboard-button" title="voiced retroflex lateral approximant" value="&#x026D;">&#x026D;</button>
+      <button class="cons keyboard-button" title="voiceless alveolar lateral fricative" value="&#x026C;">&#x026C;</button>
+      <button class="cons keyboard-button" title="voiced velar lateral approximant" value="&#x029F;">&#x029F;</button>
+      <button class="cons keyboard-button" title="voiced alveolar lateral fricative" value="&#x026E;">&#x026E;</button>
+      <button class="consN keyboard-button" title="barred l" value="&#x019B;">&#x019B;</button>
+      <button class="consN keyboard-button" title="l with underdot" value="&#x1E37;">&#x1E37;</button>
+      <button class="consN keyboard-button" title="l with stroke" value="&#x0142;">&#x0142;</button>
+      <button class="cons keyboard-button" title="voiced bilabial nasal (superscript)" value="&#x1D50;">&#9676;&#x1D50;</button>
+      <button class="cons keyboard-button" title="voiced alveolar nasal (superscript)" value="&#x207F;">&#9676;&#x207F;</button>
+      <button class="cons keyboard-button" title="voiced retroflex nasal" value='&#627;'>&#627;</button>
+      <button class="cons keyboard-button" title="voiced retroflex nasal (superscript)" value='ᶯ'>&#9676;ᶯ</button>
+    
+      <button class="cons keyboard-button" title="voiced palatal nasal" value="&#x0272;">&#x0272;</button>
+      <button class="cons keyboard-button" title="voiced palatal nasal (superscript)" value="ᶮ">&#9676;ᶮ</button>
+      <button class="cons keyboard-button" title="voiced velar nasal" value="&#x014B;">&#x014B;</button>
+      <button class="cons keyboard-button" title="voiced velar nasal (superscript)" value="&#x1D51;">&#9676;&#x1D51;</button>
+      <button class="cons keyboard-button" title="voiced uvular nasal" value='&#628;'>&#628;</button>
+      
+      <button class="cons keyboard-button" title="voiced uvular nasal (superscript)" value='ᶰ'>&#9676;ᶰ</button>
+      <button class="consN keyboard-button" title="n with caron" value="&#x0148;">&#x0148;</button>
+      <button class="consN keyboard-button" title="n with tilde" value="&#x00F1;">&#x00F1;</button>
+      <button class="consN keyboard-button" title="n with underdot" value="&#x1E47;">&#x1E47;</button>
+      <button class="consN keyboard-button" title="n with acute" value="&#x0144;">&#x0144;</button>
+      <button class="vowel keyboard-button" title="close-mid front rounded vowel" value="&#x00F8;">&#x00F8;</button>
+      <button class="vowel keyboard-button" title="open-mid front rounded vowel" value="&#x0153;">&#x0153;</button>
+      <button class="vowel keyboard-button" title="close-mid central rounded vowel" value="&#x0275;">&#x0275;</button>
+      <button class="vowel keyboard-button" title="open-mid back rounded vowel" value="&#x0254;">&#x0254;</button>
+      <button class="vowelX keyboard-button" title="o with acute" value="&#x00F3;">&#x00F3;</button>
+      <button class="vowelX keyboard-button" title="o with grave" value="&#x00F2;">&#x00F2;</button>
+      <button class="vowelX keyboard-button" title="o with macron" value="&#x014D;">&#x014D;</button>
+      <button class="vowelX keyboard-button" title="o with tilde" value="&#x00F5;">&#x00F5;</button>
+      <button class="vowelX keyboard-button" title="o with ogonek" value="&#x01EB;">&#x01EB;</button>
+      <button class="vowelX keyboard-button" title="o with underdot" value="&#x1ECD;">&#x1ECD;</button>
+      <button class="vowelX keyboard-button" title="o with diaeresis" value="&#x04E7;">&#x04E7;</button>
+      <button class="vowelX keyboard-button" title="o with hook" value="&#x01A1;">&#x01A1;</button>
+      <button class="cons keyboard-button" title="voiced alveolar tap" value="&#x027E;">&#x027E;</button>
+      <button class="cons keyboard-button" title="voiced alveolar approximant" value="&#x0279;">&#x0279;</button>
+    
+      <button class="cons keyboard-button" title="voiced uvular fricative" value="&#x0281;">&#x0281;</button>
+      <button class="cons keyboard-button" title="voiced uvular trill" value="&#x0280;">&#x0280;</button>
+      <button class="cons keyboard-button" title="voiced retroflex approximant" value="&#x027B;">&#x027B;</button>
+      <button class="cons keyboard-button" title="voiced retroflex flap" value="&#x027D;">&#x027D;</button>
+      <button class="consN keyboard-button" title="r with caron" value="&#x0159;">&#x0159;</button>
+      <button class="consN keyboard-button" title="r with underdot" value="&#x1E5B;">&#x1E5B;</button>
+      <button class="cons keyboard-button" title="voiceless palatoalveolar fricative" value="&#x0283;">&#x0283;</button>
+      <button class="cons keyboard-button" title="voiceless retroflex fricative" value="&#x0282;">&#x0282;</button>
+      <button class="consN keyboard-button" title="s with caron" value="&#x0161;">&#x0161;</button>
+      <button class="consN keyboard-button" title="s with underdot" value="&#x1E61;">&#x1E61;</button>
+      <button class="consN keyboard-button" title="s with acute" value="&#x015B;">&#x015B;</button>
+
+      <button class="consN keyboard-button" title="s with cedilla" value="&#x15F;">&#x15F;</button>
+
+      <button class="cons keyboard-button" title="voiceless retroflex plosive" value="&#x0288;">&#x0288;</button>
+      <button class="consN keyboard-button" title="t with underdot" value="&#x1E6D;">&#x1E6D;</button>
+      <button class="consN keyboard-button" title="t with stroke" value="&#x0167;">&#x0167;</button>
+      <button class="vowel keyboard-button" title="near-close near-back rounded vowel" value="&#x028A;">&#x028A;</button>
+      <button class="vowel keyboard-button" title="close central rounded vowel" value="&#x0289;">&#x0289;</button>
+      <button class="vowel keyboard-button" title="close back unrounded vowel" value="&#x026F;">&#x026F;</button>
+      <button class="vowelX keyboard-button" title="u with acute" value="&#x00FA;">&#x00FA;</button>
+      <button class="vowelX keyboard-button" title="u with grave" value="&#x00F9;">&#x00F9;</button>
+      <button class="vowelX keyboard-button" title="u with macron" value="&#x016B;">&#x016B;</button>
+      <button class="vowelX keyboard-button" title="u with tilde" value="&#x0169;">&#x0169;</button>
+      <button class="vowelX keyboard-button" title="u with ogonek" value="&#x0173;">&#x0173;</button>
+      <button class="vowelX keyboard-button" title="u with diaeresis" value="&#x00FC;">&#x00FC;</button>
+          
+      <button class="vowelX keyboard-button" title="u with hook" value="&#x01B0;">&#x01B0;</button>
+      <button class="cons keyboard-button" title="voiced labiodental flap" value="&#x2C71;">&#x2C71;</button>
+      <button class="cons keyboard-button" title="voiced labiodental approximant" value="&#x028B;">&#x028B;</button>
+      <button class="cons keyboard-button" title="labialized" value="&#x02B7;">&#9676;&#x02B7;</button>
+      <button class="cons keyboard-button" title="voiced velar approximant" value="&#x0270;">&#x0270;</button>
+      <button class="cons keyboard-button" title="voiceless labial-velar approximant" value="&#x028D;">&#x028D;</button>
+      <button class="cons keyboard-button" title="voiceless uvular fricative" value="&#x03C7;">&#x03C7;</button>
+      <button class="vowel keyboard-button" title="near-close near-front rounded vowel" value="&#x028F;">&#x028F;</button>
+      <button class="vowel keyboard-button" title="close-mid back unrounded vowel" value="&#x0264;">&#x0264;</button>
+      <button class="vowelX keyboard-button" title="y with acute" value="&#x00FD;">&#x00FD;</button>
+      <button class="vowelX keyboard-button" title="y with grave" value="&#x1EF3;">&#x1EF3;</button>
+      <button class="vowelX keyboard-button" title="y with macron" value="&#x0233;">&#x0233;</button>
+      <button class="vowelX keyboard-button" title="y with tilde" value="&#x1EF9;">&#x1EF9;</button>
+      <button class="vowelX keyboard-button" title="y with ogonek" value="&#x0079;&#x0328;">&#x0079;&#x0328;</button>
+      <button class="vowelX keyboard-button" title="y with diaeresis" value="&#x00FF;">&#x00FF;</button>
+      <button class="cons keyboard-button" title="voiced palatal lateral approximant" value="&#x028E;">&#x028E;</button>
+      <button class="cons keyboard-button" title="voiced velar fricative" value="&#x0263;">&#x0263;</button>
+      <button class="cons keyboard-button" title="velarized" value="&#x02E0;">&#9676;&#x02E0;</button>
+      <button class="cons keyboard-button" title="voiced labial-palatal approximant" value="&#x0265;">&#x0265;</button>
+      <button class="cons keyboard-button" title="labial-palatalized" value="&#x1DA3;">&#9676;&#x1DA3;</button>
+      <button class="cons keyboard-button" title="voiced palatoalveolar fricative" value="&#x0292;">&#x0292;</button>
+      <button class="cons keyboard-button" title="voiced retroflex fricative" value="&#x0290;">&#x0290;</button>
+      <button class="cons keyboard-button" title="voiced alveolo-palatal fricative" value="&#x0291;">&#x0291;</button>
+      <button class="consN keyboard-button" title="z with caron" value="&#x017E;">&#x017E;</button>
+          
+      <button class="consN keyboard-button" title="z with underdot" value="&#x1E93;">&#x1E93;</button>
+      <button class="consN keyboard-button" title="z with acute" value="&#x017A;">&#x017A;</button>
+      <button class="cons keyboard-button" title="ejective" value="&#x02BC;">&#9676;&#x02BC;</button>
+      <button class="consN keyboard-button" title="ʻOkina" value="&#x02BB;">&#x02BB;</button>
+      <button class="consN keyboard-button" title="Saltilo" value="&#xA78C;">&#xA78C;</button>
+      <button class="cons keyboard-button" title="voiceless glottal plosive" value="&#x0294;">&#x0294;</button>
+      <button class="cons keyboard-button" title="glottalized" value="&#x02C0;">&#9676;&#x02C0;</button>
+      <button class="cons keyboard-button" title="voiced epiglottal trill" value='&#674;'>&#674;</button>
+      <button class="cons keyboard-button" title="voiceless epiglottal plosive" value="&#x02A1;">&#x02A1;</button>
+      <button class="cons keyboard-button" title="voiced pharyngeal fricative" value="&#x0295;">&#x0295;</button>
+      <button class="cons keyboard-button" title="pharyngealized" value="&#x02E4;">&#9676;&#x02E4;</button>
+      <button class="cons keyboard-button" title="bilabial click" value="&#x0298;">&#x0298;</button>
+      <button class="cons keyboard-button" title="dental click" value="&#x01C0;">&#x01C0;</button>
+      <button class="cons keyboard-button" title="alveolar lateral click" value="&#x01C1;">&#x01C1;</button>
+      <button class="cons keyboard-button" title="palatoalveolar click" value="&#x01C2;">&#x01C2;</button>
+      <button class="cons keyboard-button" title="retroflex click" value="&#x203C;&#xFE0E;">&#x203C;&#xFE0E;</button>
+      <button class="cons keyboard-button" title="voiceless bilabial fricative" value="&#x0278;">&#x0278;</button>
+      <button class="cons keyboard-button" title="voiceless dental fricative" value="&#x03B8;">&#x03B8;</button>
+
+      <button class="consN keyboard-button" title="thorn" value="&#x00FE;">&#x00FE;</button>
+      
+      <button class="consN special-button keyboard-button" title="ellipsis" value="&#x2026;">&#x2026;</button>
+      <button class="consN special-button keyboard-button" title="backtick" value="&#x0060;">&#x0060;</button>
+      <button class="consN special-button keyboard-button" title="tilde" value="&#x007E;">&#x007E;</button>
+      <button class="consN keyboard-button" title="zero (nonIPA)" value="&#x2205;">&#x2205;</button>
+      <button class="consN keyboard-button" title="rightwards arrow (nonIPA)" value="&#x2192;">&#x2192;</button>
             
-      <button class="cons" title="syllabic" value='&#809;'>&#9676;&#809;</button>
-      <button class="cons" title="non-syllabic" value='&#815;'>&#9676;&#815;</button>
+      <button class="consN keyboard-button" title="superscript 1 (nonIPA)" value="&#x00B9;">&#9676;&#x00B9;</button>
+      <button class="consN keyboard-button" title="superscript 2 (nonIPA)" value="&#x00B2;">&#9676;&#x00B2;</button>
 
-      <button class="cons" title="voiced" value='&#812;'>&#9676;&#812;</button>
-      <button class="cons" title="voiceless" value='&#805;'>&#9676;&#805;</button>
+      <button class="cons keyboard-button" title="primary stress" value="&#x02C8;">&#x02C8;&#9676;</button>
+      <button class="cons keyboard-button" title="secondary stress" value="&#x02CC;">&#x02CC;&#9676;</button>
+      <button class="cons keyboard-button" title="long" value="&#x02D0;">&#9676;&#x02D0;</button>
+      <button class="cons keyboard-button" title="half-long" value='&#721;'>&#9676;&#721;</button>
+      <button class="cons keyboard-button" title="extra-short" value='&#774;'>&#9676;&#774;</button>
+      <button class="cons keyboard-button" title="tie above" value="&#x0361;">&#9676;&#x0361;&#9676;</button>
+      <button class="cons keyboard-button" title="tie below" value='&#860;'>&#9676;&#860;&#9676;</button>
 
-            <button class="cons" title="advanced" value='&#799;'>&#9676;&#799;</button>
-            <button class="cons" title="retracted" value='&#800;'>&#9676;&#800;</button>
-            <button class="cons" title="raised" value='&#797;'>&#9676;&#797;</button>
-<button class="cons" title="lowered" value='&#798;'>&#9676;&#798;</button>
+      <button class="cons keyboard-button" title="upstep" value='&#42779;'>&#42779;</button>
+      <button class="cons keyboard-button" title="downstep" value='&#42780;'>&#42780;</button>
+      <button class="cons keyboard-button" title="extra high tone" value="&#x030B;">&#9676;&#x030B;</button>
+      <button class="cons keyboard-button" title="high tone" value="&#x0301;">&#9676;&#x0301;</button>
+      <button class="cons keyboard-button" title="mid tone" value="&#x0304;">&#9676;&#x0304;</button>
+      <button class="cons keyboard-button" title="low tone" value="&#x0300;">&#9676;&#x0300;</button>
+      <button class="cons keyboard-button" title="extra low tone" value="&#x030F;">&#9676;&#x030F;</button>
+      <button class="cons keyboard-button" title="rising tone" value="&#x030C;">&#9676;&#x030C;</button>
+      <button class="cons keyboard-button" title="falling tone" value="&#x0302;">&#9676;&#x0302;</button>
+      <button class="cons keyboard-button" title="high rising tone" value='&#7620;'>&#9676;&#7620;</button>
+      <button class="cons keyboard-button" title="low rising tone" value='&#7622;'>&#9676;&#7622;</button>
+      <button class="cons keyboard-button" title="rising-falling tone" value='&#7624;'>&#9676;&#7624;</button>
       
-      <button class="cons" title="advanced tongue root" value='&#792;'>&#9676;&#792;</button>
-      <button class="cons" title="retracted tongue root" value='&#793;'>&#9676;&#793;</button>
-      <button class="cons" title="more rounded" value='&#825;'>&#9676;&#825;</button>
-      
-      
-      <button class="cons" title="less rounded" value='&#796;'>&#9676;&#796;</button>
-      <button class="cons" title="dental" value='&#810;'>&#9676;&#810;</button>
-      <button class="cons" title="apical" value='&#826;'>&#9676;&#826;</button>
-      <button class="cons" title="laminal" value='&#827;'>&#9676;&#827;</button>
-      <button class="cons" title="linguolabial" value='&#828;'>&#9676;&#828;</button>
-      <button class="cons" title="rhoticity" value='&#734;'>&#9676;&#734;</button>
-      <button class="cons" title="no audible release" value='&#794;'>&#9676;&#794;</button>
-      <button class="cons" title="tenseness" value="&#840;">&#9676;&#840;</button>
-      <button class="cons" title="weak articulation" value="&#841;">&#9676;&#841;</button>
-      
-      
-      <button class="consN" title="hook above" value='&#x0309;'>&#9676;&#x0309;</button>
-      <button class="consN" title="comma above" value="&#x0313;">&#9676;&#x0313;</button>
+      <button class="cons keyboard-button" title="nasalized" value='&#771;'>&#9676;&#771;</button>
+      <button class="cons keyboard-button" title="creaky voiced" value='&#816;'>&#9676;&#816;</button>
 
+      <button class="cons keyboard-button" title="breathy voiced" value='&#804;'>&#9676;&#804;</button> 
     
+      <button class="cons keyboard-button" title="centralized" value="&#x0308;">&#9676;&#x0308;</button>
+      <button class="cons keyboard-button" title="mid-centralized" value='&#829;'>&#9676;&#829;</button>
+  
+      <button class="cons keyboard-button" title="syllabic" value='&#809;'>&#9676;&#809;</button>
+      <button class="cons keyboard-button" title="non-syllabic" value='&#815;'>&#9676;&#815;</button>
+
+      <button class="cons keyboard-button" title="voiced" value='&#812;'>&#9676;&#812;</button>
+      <button class="cons keyboard-button" title="voiceless" value='&#805;'>&#9676;&#805;</button>
+
+      <button class="cons keyboard-button" title="advanced" value='&#799;'>&#9676;&#799;</button>
+      <button class="cons keyboard-button" title="retracted" value='&#800;'>&#9676;&#800;</button>
+      <button class="cons keyboard-button" title="raised" value='&#797;'>&#9676;&#797;</button>
+      <button class="cons keyboard-button" title="lowered" value='&#798;'>&#9676;&#798;</button>
+      
+      <button class="cons keyboard-button" title="advanced tongue root" value='&#792;'>&#9676;&#792;</button>
+      <button class="cons keyboard-button" title="retracted tongue root" value='&#793;'>&#9676;&#793;</button>
+      <button class="cons keyboard-button" title="more rounded" value='&#825;'>&#9676;&#825;</button>
+      
+      <button class="cons keyboard-button" title="less rounded" value='&#796;'>&#9676;&#796;</button>
+      <button class="cons keyboard-button" title="dental" value='&#810;'>&#9676;&#810;</button>
+      <button class="cons keyboard-button" title="apical" value='&#826;'>&#9676;&#826;</button>
+      <button class="cons keyboard-button" title="laminal" value='&#827;'>&#9676;&#827;</button>
+      <button class="cons keyboard-button" title="linguolabial" value='&#828;'>&#9676;&#828;</button>
+      <button class="cons keyboard-button" title="rhoticity" value='&#734;'>&#9676;&#734;</button>
+      <button class="cons keyboard-button" title="no audible release" value='&#794;'>&#9676;&#794;</button>
+      <button class="cons keyboard-button" title="tenseness" value="&#840;">&#9676;&#840;</button>
+      <button class="cons keyboard-button" title="weak articulation" value="&#841;">&#9676;&#841;</button>
+      
+      <button class="consN keyboard-button" title="hook above" value='&#x0309;'>&#9676;&#x0309;</button>
+      <button class="consN keyboard-button" title="comma above" value="&#x0313;">&#9676;&#x0313;</button>
       </div>
+
     </section>
 
   </div>

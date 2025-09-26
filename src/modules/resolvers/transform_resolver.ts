@@ -336,9 +336,11 @@ class Transform_Resolver {
     }
     
     features_into_transform(stream:string): string {
+        const length = stream.length;
         const output:string[] = [];
         let feature_mode:boolean = false;
         let feature_matrix = ''
+        let feature_begin_index = 0;
 
         for (let i:number = 0; i < stream.length; i++) {
             if (feature_mode) {
@@ -346,7 +348,21 @@ class Transform_Resolver {
                     feature_mode = false;
                     if (feature_matrix.length != 0) {
                         // THIS THING
-                        output.push(`{${this.get_graphemes_from_matrix(feature_matrix)}}`);
+
+                        const prev = stream[feature_begin_index - 1] ?? '';
+                        const next = stream[i + 1] ?? '';
+
+                        const is_boundary_before = i === 0 || ' ,([{)}]'.includes(prev);
+                        const is_boundary_after  = i === length - 1 || ' ,([{)}]'.includes(next);
+
+                        if (is_boundary_before && is_boundary_after) {
+                            output.push(`${this.get_graphemes_from_matrix(feature_matrix)}`);
+                        } else {
+                            this.logger.validation_error(
+                                `Feature "[${feature_matrix}]" is adjacent to other content`,
+                                this.line_num
+                            );
+                        }
                     }
                     feature_matrix = '';
                     continue;
@@ -355,6 +371,7 @@ class Transform_Resolver {
                 continue;
             }
             if (stream[i] === "[") {
+                feature_begin_index = i
                 if (stream[i+1] === "+" || stream[i+1] === "-") {
                     feature_mode = true;
                     continue;
@@ -449,10 +466,14 @@ class Transform_Resolver {
             let s = t.base;
             
             if (t.type === "anythings-mark") {
-                if ('blocked_by' in t && t.blocked_by) {
-                    s+= `[${t.blocked_by.join(", ")}]`
-                }
+            if ("blocked_by" in t && t.blocked_by) {
+                const groups = t.blocked_by
+                .map(group => group.join("~")) // join inner items with ~
+                .join(", ");                   // join groups with ,
+                s += `[${groups}]`;
             }
+            }
+
 
             if ('escaped' in t && t.escaped) {
                 s = '\\' + s;

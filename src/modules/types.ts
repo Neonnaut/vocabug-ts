@@ -8,13 +8,6 @@ export type Token =
       named_reference_bind?: string;
     }
   | {
-      type: "grapheme-stream";
-      base: string;
-      stream: string[];
-      min: number;
-      max: number|typeof Infinity;
-    }
-  | {
       type: "wildcard"; // *
       base: "*";
       min: number;
@@ -23,10 +16,16 @@ export type Token =
     }
   | {
       type: "anythings-mark"; // &
-      base: "…";
+      base: "&";
       min: number;
       max: number|typeof Infinity;
-      blocked_by?: string[];
+      blocked_by?: string[][];
+    }
+  | {
+      type: "syllable-mark"; // %
+      base: "%";
+      min: number;
+      max: number|typeof Infinity;
     }
   | {
       type: "deletion"; // ∅
@@ -41,12 +40,16 @@ export type Token =
       base: "^REJECT";
     }
   | {
-      type: "metathesis"; // ~
-      base: "<";
-    }
-  | {
       type: "word-boundary"; // #
       base: "#";
+      min: number;
+      max: number|typeof Infinity;
+    }
+  | {
+      type: "syllable-boundary"; // #
+      base: "$";
+      min: number;
+      max: number|typeof Infinity;
     }
   | {
       type: "engine"; // $
@@ -60,20 +63,19 @@ export type Token =
     }
   | {
       type: "target-reference";
-      base: '$';
+      base: '<T';
+      min: number;
+      max: number|typeof Infinity;
+    }
+    | {
+      type: "metathesis-reference";
+      base: "<M";
       min: number;
       max: number|typeof Infinity;
     }
   | {
-      type: "named-capture";
-      base: string;
-      name: string;
-      min: number;
-      max: number|typeof Infinity;
-    }
-  | {
-      type: "named-reference";
-      base: string;
+      type: "backreference";
+      base: "1"|"2"|"3"|"4"|"4"|"5"|"6"|"7"|"8"|"9"|"0";
       name: string;
       min: number;
       max: number|typeof Infinity;

@@ -46,11 +46,6 @@ class Nesca_Grammar_Stream {
             this.logger.validation_error(`Reject not allowed in '${mode}'`, line_num);
          }
          return [{ type: "reject", base: "^REJECT" }];
-      } else if (stream === "<") {
-         if (mode !== "RESULT"){
-            this.logger.validation_error(`Metathesis not allowed in '${mode}'`, line_num);
-         }
-         return [{ type: "metathesis", base: "<" }];         
       }
 
       while (i < stream.length) {
@@ -68,7 +63,7 @@ class Nesca_Grammar_Stream {
                this.logger.validation_error(`Anythings-mark not allowed in '${mode}'`, line_num);
             }
 
-            new_token = { type: "anythings-mark", base: "…", min: 1, max: Infinity };
+            new_token = { type: "anythings-mark", base: "&", min: 1, max: Infinity };
             let look_ahead = i + 1;
 
             if (stream[look_ahead] === "[") {
@@ -89,15 +84,28 @@ class Nesca_Grammar_Stream {
                }
 
                const blocked_items = blocked_stream
-                  .split(/[,\s]+/)
-                  .filter(Boolean)
-                  .map(item => this.escape_mapper.restore_escaped_chars(item));
+               .split(",") // split into groups
+               .map(group =>
+                  group
+                     .split("~") // split each group into items
+                     .map(item => this.escape_mapper.restore_escaped_chars(item.trim()))
+                     .filter(Boolean)
+               )
+               .filter(group => group.length > 0);
 
                new_token.blocked_by = blocked_items;
                look_ahead++; // Consume }
             }
 
             i = look_ahead;
+         } else if (char === "%") {
+            if (mode === "RESULT") {
+               this.logger.validation_error(`Syllable-mark not allowed in '${mode}'`, line_num);
+            }
+
+            new_token = { type: "syllable-mark", base: "%", min: 1, max: Infinity };
+            i++
+
          } else if (char === "*") {
             if (mode  == "RESULT") {
                this.logger.validation_error(`Wildcard not allowed in '${mode}'`, line_num);
@@ -111,83 +119,48 @@ class Nesca_Grammar_Stream {
             if (i !== 0 && i +1 !== stream.length) {
                this.logger.validation_error(`Hash must be at the start or end of '${mode}'`, line_num);
             }
-            new_token = { type: "word-boundary", base: "#" };
+            new_token = { type: "word-boundary", base: "#", min: 1, max: 1 };
+            tokens.push(new_token);
+            i++;
+            continue;
+         } else if (char == "$") {
+            if (mode !== "BEFORE" && mode !== "AFTER") {
+               this.logger.validation_error(`Syllable-boundary not allowed in '${mode}'`, line_num);
+            }
+            new_token = { type: "syllable-boundary", base: "$", min: 1, max: 1 };
             tokens.push(new_token);
             i++;
             continue;
 
-         } else if (char == "$"){
-            if (mode === "TARGET") {
-               this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
-            }
-            new_token = { type: "target-reference", base: '$',
-               min: 1, max: 1 };
-            i++;
-            
-         } else if (char == "="){
+         } else if (char == "<"){
             let look_ahead = i + 1;
-            if (stream[look_ahead] === "[") {
-               // It's a binding
-
-               const my_last_token = get_last(tokens);
-               ////
-               if (my_last_token === undefined) {
-                  this.logger.validation_error(`Named-capture in '${mode}' does not follow `, line_num);
-               }
-               if (get_last(tokens)?.type === "named-capture") {
-                  this.logger.validation_error(`Named-capture in '${mode}' does not follow `, line_num);
-               }
-
-               look_ahead++;
-               let name_stream = "";
-               while (true) {
-                  const char = stream[look_ahead];
-
-                  if (char === "]") break;
-
-                  if (look_ahead >= stream.length) {
-                     this.logger.validation_error(`Unclosed binding`, line_num);
-                  }
-
-                  name_stream += char;
-                  look_ahead++;
-               }
-               new_token = { type: "named-capture", base: `=[${name_stream}]`,
-               name: name_stream, min: 1, max: 1 };
-               i = look_ahead + 1; // Consume ]
-            }
-            
-         } else if (char === "[") {
-            let look_ahead = i + 1;
-            if (stream[look_ahead] === "=") {
-               // Its a named reference
+            if (stream[look_ahead] === "T") {
                if (mode === "TARGET") {
-                  this.logger.validation_error(`Named-reference not allowed in '${mode}'`, line_num);
+                  this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
                }
-               look_ahead += 1;
-               let my_name = "";
-               while (true) { // Get the name
-                  const char = stream[look_ahead];
-                  if (char === "]") break; i = look_ahead;
-                  if (look_ahead >= stream.length) {
-                     this.logger.validation_error(`Unclosed named-reference`, line_num);
-                  }
-                  my_name += char;
-                  look_ahead++;
+               new_token = { type: "target-reference", base: '<T', min: 1, max: 1 };
+               i = look_ahead
+            } else if (stream[look_ahead] === "M") {
+               if (mode === "TARGET") {
+                  this.logger.validation_error(`Metathesis-reference not allowed in '${mode}'`, line_num);
                }
-               new_token = {
-                  type: "named-reference", base: `[<${my_name}]`,
-                  name:my_name, min: 1, max: 1
-               };
-               i = look_ahead + 1; // Consume }
+               new_token = { type: "metathesis-reference", base: '<M', min: 1, max: 1 };
+               i = look_ahead
+            } else {
+               this.logger.validation_error(`A 'T' or 'M' did not follow '<' in '${mode}'`, line_num);
             }
+
+            i++;
 
          } else if (
             char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||
             char == '[' || char == ']' || char == '(' || char == ')' || char == '<' ||
             char === '∅' || char === '^' || char == '/' || char === '!' || char === "?" ||
             char == '_' || char == '#' || char == '+' || char == ':' || char == '*' ||
-            char === '…' || char === '&' || char == '|' || char === "~" || char == '@'
+            char === '…' || char === '&' || char == '|' || char === "~" || char == '@'||
+            char === '=' || char === '1' || char === '2' || char === '3' || char === '4' ||
+            char === '5' || char === '6' || char === '7' || char === '8' || char === '9' ||
+            char === '0'
          
          ) {
             this.logger.validation_error(`Unexpected syntax character '${char}' in ${mode}`, line_num);
@@ -217,40 +190,7 @@ class Nesca_Grammar_Stream {
             }
          }
 
-         // ✅ Modifier parsing (applies to any token type except word-boundary, reject, deletion, insertion) 
-         
-         if (stream[i] === "~") {
-            if (new_token.type !== "grapheme" && new_token.type !== "wildcard") {
-               this.logger.validation_error(`Grapheme-stream only allowed after grapheme or wildcard`, line_num);
-            }
-            // It's actually a grapheme stream
-            new_token = {
-               type: "grapheme-stream", base: new_token.base,
-               stream: [new_token.base],
-               min: 1, max: 1,
-            };
-            
-            // Build grapheme-stream
-            while (true) {
-               if (stream[i] !== "~") break;
-               i++;
-               const char = stream[i];
-
-            if (
-               char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||
-               char == '[' || char == ']' || char == '(' || char == ')' || char == '<' ||
-               char === '∅' || char === '^' || char == '/' || char === '!' || char === "?" ||
-               char == '_' || char == '#' || char == '+' || char == ':' || char == '*' ||
-               char === '…' || char === '&' || char == '|' || char === "~" || char == '@'
-            ) {
-               this.logger.validation_error(`Unexpected syntax character '${char}' in ${mode}`, line_num);
-            }
-
-            const escaped_stream = this.escape_mapper.restore_escaped_chars(stream);
-               
-            }
-            
-         }
+         // ✅ Modifier parsing (applies to any token type except word-boundary, reject, deletion, insertion)
 
          if (stream[i] === ":") {
             tokens.push({ ...new_token });

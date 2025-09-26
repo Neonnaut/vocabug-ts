@@ -7,7 +7,7 @@ import { EditorView, keymap, lineNumbers,
     highlightActiveLineGutter, drawSelection, highlightActiveLine } from '@codemirror/view';
 
 // Themes
-import { xcodeLight, xcodeDark } from './dark-light';
+import { xcodeLight, xcodeDark, xcodeWarm } from './dark-light';
 const themeConfig = new Compartment();
 const lineWrapConfig = new Compartment();
 
@@ -38,7 +38,7 @@ function createEditorState(initialContents:string, myTheme:string) {
         new LanguageSupport(stream),
         themeConfig.of(themeIdentifier(myTheme)),
         lineWrapConfig.of([]),
-        toolbar
+        toolbar,
     ];
 
     return EditorState.create({
@@ -55,6 +55,7 @@ function themeIdentifier(myTheme:string) {
     switch (myTheme) {
         case 'light': return xcodeLight;
         case 'dark': return xcodeDark;
+        case 'warm': return xcodeWarm;
         default: return xcodeLight;
     }
 }
