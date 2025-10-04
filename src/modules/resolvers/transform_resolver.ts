@@ -298,17 +298,14 @@ class Transform_Resolver {
         for (let i = 0; i < length; i++) {
             const char = input[i];
 
-            // ⏭️ Skip "^R" or "^REJECT" sequences and preserve them
-            if (char === '^') {
-                const slice = input.slice(i, i + 8); // Enough to cover "^REJECT"
-                if (slice.startsWith('^R')) {
-                    const reject_match = slice.startsWith('^REJECT') ? '^REJECT' : '^R';
-                    output += reject_match;
-                    i += reject_match.length - 1;
-                    continue; // ✅ Prevent further processing of this sequence
+             if (char === '<') {
+                // Check if capital letter follows '<'
+                if (/^[A-Z]$/.test(input[i + 1])) {
+                    output += char + input[i + 1];
+                    i += 1; // Skip 'T' or 'M'
+                    continue;
                 }
             }
-
             // ✅ Category key expansion
             // THIS THING
             if (this.categories.has(char)) {

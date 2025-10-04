@@ -63,16 +63,17 @@ const wordRules = [
 const transformRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
-  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|…|&|~|%|=1|=2|=3|=4|=5|=6|=7|=8|=9/ },
-  { token: "tagName",  regex: /0|1|2|3|4|5|6|7|8|9|<T|<M/ }
+  { token: "operator", regex: /0|\^|∅/ }, 
+  { token: "regexp",   regex: /<=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|…|&|%|~/ },
+  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|<T|<M|<E/ }
 ];
 
 const clusterRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\/|!|\?|_|\+/ },
-  { token: "operator", regex: /\^REJECT|\^R|\^|∅/ }, // > and ;
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|#|\*|:|…|&/ }
+  { token: "operator", regex: /0|\^|∅/ },
+  { token: "regexp",   regex: /<=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|…|&|%|~/ },
+  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|<T|<M|<E/ }
 ];
 
 const featureFieldRules = [

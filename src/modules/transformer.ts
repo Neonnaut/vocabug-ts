@@ -1,6 +1,6 @@
 import Word from './word';
 import Logger from './logger';
-import { swap_first_last_items, reverse_items } from './utilities';
+import { swap_first_last_items, reverse_items, graphemosis } from './utilities';
 import type { Token, Output_Mode } from './types';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
@@ -44,27 +44,6 @@ class Transformer {
         this.debug = (output_mode === 'debug');
     }
 
-    graphemosis(input: string): string[] {
-        const tokens: string[] = [];
-        let i = 0;
-        while (i < input.length) {
-            let matched = false;
-            for (const g of this.graphemes.sort((a, b) => b.length - a.length)) {
-                if (input.startsWith(g, i)) {
-                    tokens.push(g);
-                    i += g.length;
-                    matched = true;
-                    break;
-                }
-            }
-            if (!matched) {
-                tokens.push(input[i]);
-                i++;
-            }
-        }
-        return tokens;
-    }
-
     run_engine(engine:string, word:Word, word_stream:string[], line_num:number) {
         const full_word = word_stream.join("");
 
@@ -96,7 +75,7 @@ class Transformer {
         word.record_transformation(
             `| ${engine}`, modified_word, line_num
         );
-        return this.graphemosis(modified_word);
+        return graphemosis(modified_word, this.graphemes);
     }
 
     target_to_word_match(
@@ -159,7 +138,8 @@ class Transformer {
                 token.type !== 'metathesis-reference' &&
                 //token.type !== 'backreference' &&
                 token.type !== 'syllable-boundary' &&
-                token.type !== 'word-boundary'
+                token.type !== 'word-boundary' &&
+                token.type !== 'empty-mark'
             ) {
                 j++;
                 continue;
@@ -247,7 +227,10 @@ class Transformer {
                 const total_length = repetitions * unit_length;
                 matched.push(...stream.slice(i, i + total_length));
                 i += total_length;
-            
+
+            } else if (token.type === 'empty-mark') {
+                matched.push(''); // matches nothing
+                i += 0
             } else if (token.type === 'wildcard') {
                 const available = Math.min(max_available, stream.length - i);
 
@@ -314,7 +297,7 @@ class Transformer {
                 matched.push(...stream.slice(i, i + count));
                 i += count;
             } else if (token.type === 'anythings-mark') {
-                const blocked = token.blocked_by ?? [[]];
+                const blocked = token.blocked_by ?? [];
                 const next_token = pattern[j + 1];
 
                 let count = 0;
@@ -368,24 +351,6 @@ class Transformer {
         const target_len = raw_target.length;
 
         // BEFORE logic
-        
-        let has_word_boundary_before = false;
-        let has_syllable_boundary_before = false;
-
-        if (before.length > 0) {
-            if (before[0].type === 'word-boundary') {
-                has_word_boundary_before = true;
-            }
-            if (before[0].type === 'syllable-boundary') {
-                if (word_stream[0] === '.') {
-                    // '$' represents a word-initial dot
-                    has_syllable_boundary_before = true;
-                } else {
-                    // '$' represents a word boundary
-                    has_word_boundary_before = true;
-                }
-            }
-        }
         const before_tokens =  before;
 
         let before_matched = false;
@@ -656,7 +621,7 @@ class Transformer {
                         word.rejected = true;
 
                         word.record_transformation(
-                            `${matched_stream.join("")} → ^REJECT`, "∅", line_num
+                            `${matched_stream.join("")} → 0`, "∅", line_num
                         );
                         return word_stream;
                     } else if (mode === "deletion") {
@@ -705,7 +670,7 @@ class Transformer {
         }
         if (this.transforms.length == 0) { return word; } // No transforms
 
-        let tokens = this.graphemosis(word.get_last_form());
+        let tokens = graphemosis(word.get_last_form(), this.graphemes);
 
         for (const t of this.transforms) {
             if (word.rejected) {
@@ -717,7 +682,7 @@ class Transformer {
             tokens = this.apply_transform(word, tokens, t);
             if (tokens.length == 0) {
                 word.rejected = true;
-                if (this.debug) { word.record_transformation(`^REJECT NULL WORD`, `∅`); }
+                if (this.debug) { word.record_transformation(`REJECT NULL WORD`, `∅`); }
             }
         }
 

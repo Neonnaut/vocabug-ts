@@ -587,6 +587,7 @@ class Parser {
         line = this.escape_mapper.escape_named_escape(line);
 
         if (line === '') { return; } // Blank line. End clusterfield... early !!
+        if (line === 'END') { return; } // END ... early !!
         let top_row = line.split(/[,\s]+/).filter(Boolean);
         top_row.shift();
         const row_length = top_row.length;
@@ -607,6 +608,8 @@ class Parser {
             line = this.escape_mapper.escape_named_escape(line);
 
             if (line === '') { break} // Blank line. End clusterfield !!
+            if (line === 'END') { break} // END !!
+            
 
             if (line.startsWith('/') || line.startsWith('!')) {
                 const { conditions, exceptions, chance } = this.get_environment(line);

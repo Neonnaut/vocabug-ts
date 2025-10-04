@@ -9,11 +9,12 @@ const w = new MyWorker();
 
 function create_file_editor() {
     // Work out content and theme of file editor
-    let content = ''; let theme = 'dark'; let filename = '';
+    let content = '';
+    let theme = 'dark';
     if (localStorage.hasOwnProperty('vocabug')) {
         try {
-            const got_LocalStorage = JSON.parse(localStorage.getItem('vocabug') || '[]') as [string, string];
-            content = got_LocalStorage[0]; filename = got_LocalStorage[1];
+            const got_LocalStorage = JSON.parse(localStorage.getItem('vocabug') || '[]') as [string, string, string, string, string];
+            content = got_LocalStorage[0];
         } catch {
             localStorage.removeItem("vocabug");
             content = examples.basic;
@@ -25,10 +26,8 @@ function create_file_editor() {
         if (localStorage.getItem('colourScheme') != 'dark-mode') {
             theme = 'light'
         }
-    }
-
-    if (filename) {
-        set_filename(filename);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        theme = 'light';
     }
 
     // Create file editor
@@ -40,6 +39,33 @@ function create_file_editor() {
 
 window.addEventListener("load", () => {
     const editor = create_file_editor();
+
+    if (localStorage.hasOwnProperty('vocabug')) {
+        try {
+            const got_LocalStorage = JSON.parse(localStorage.getItem('vocabug') || '[]') as [string, string, string, string, string];
+            let filename = got_LocalStorage[1];
+            set_filename(filename);
+
+            let numwords = got_LocalStorage[2];
+            (document.getElementById('num-of-words') as HTMLInputElement).value = numwords;
+
+            let mode = got_LocalStorage[3];
+            const my_mode = document.getElementById('my_mode') as HTMLSelectElement | null;
+            if (!my_mode) {throw new Error}
+            for (const option of Array.from(my_mode.options)) {
+                if (mode === option.value) {
+                    option.selected = true;
+                }
+            }
+            
+            let worddivider = got_LocalStorage[4] || " ";
+            (document.getElementById('word-divider') as HTMLInputElement).value = worddivider;
+
+            mode_buttons();
+        } catch {
+            localStorage.removeItem("vocabug");
+        }
+    }
 
     editor.dispatch({
         selection: { anchor: editor.state.doc.length }
@@ -125,15 +151,14 @@ window.addEventListener("load", () => {
     // Generate button
     document.getElementById("generate-words")?.addEventListener("click", function () {
         const generate_button = this as HTMLButtonElement;
-        const output_message = document.getElementById('voc-output-message') as HTMLDivElement;
+        const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
         generate_button.disabled = true;
 
         try {
             w.postMessage({
                 file: editor.state.doc.toString(),
                 num_of_words: (document.getElementById('num-of-words') as HTMLInputElement)?.value || "",
-                
-                mode: (document.querySelector('input[name="mode-type"]:checked') as HTMLInputElement)?.value || "",
+                mode: (document.getElementById("my_mode") as HTMLSelectElement)?.value || "",
                 remove_duplicates: (document.getElementById('remove-duplicates') as HTMLInputElement)?.checked || false,
                 force_word_limit: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
                 
@@ -157,8 +182,11 @@ window.addEventListener("load", () => {
     // After generating words 
     w.onmessage = (e: MessageEvent) => {
         const output_words_field = document.getElementById('voc-output-words-field') as HTMLInputElement;
-        const output_message = document.getElementById('voc-output-message') as HTMLDivElement;
+        const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
         const filename_input = document.getElementById('file-name') as HTMLInputElement;
+        const num_of_words_input = document.getElementById('num-of-words') as HTMLInputElement;
+        const word_divider_input = document.getElementById('word-divider') as HTMLInputElement;
+        const mode_input = document.getElementById('my_mode') as HTMLSelectElement;
         const generate_words_button = document.getElementById("generate-words") as HTMLButtonElement;
 
         if (output_words_field) {
@@ -197,7 +225,8 @@ window.addEventListener("load", () => {
         output_message.innerHTML = output_message_html;
 
         // Store file contents in local storage to be retrieved on page refresh
-        localStorage.setItem('vocabug', JSON.stringify([e.data.file, filename]));
+        localStorage.setItem('vocabug', JSON.stringify([e.data.file,
+            filename, num_of_words_input?.value, mode_input?.value, word_divider_input?.value]));
 
         if (generate_words_button) {
             generate_words_button.disabled = false;
@@ -249,27 +278,13 @@ window.addEventListener("load", () => {
         }
     });
 
-    // Mode buttons
-    document.querySelectorAll("input[name='mode-type']").forEach((element) => {
-        element.addEventListener("click", () => {
-            const word_list_mode = document.getElementById("word-list-mode") as HTMLInputElement;
-            const sort_words = document.getElementById("sort-words") as HTMLInputElement;
-            const remove_duplicates = document.getElementById("remove-duplicates") as HTMLInputElement;
-            const word_divider = document.getElementById("word-divider") as HTMLInputElement;
-            const force_words = document.getElementById("force-words") as HTMLInputElement;
-
-            if (word_list_mode?.checked) {
-                if (sort_words) sort_words.disabled = false;
-                if (remove_duplicates) remove_duplicates.disabled = false;
-                if (word_divider) word_divider.disabled = false;
-                if (force_words) force_words.disabled = false;
-            } else {
-                [sort_words, remove_duplicates, word_divider, force_words].forEach(element => {
-                    if (element) element.disabled = true;
-                });
-            }
-        });
+    // Check mode button click
+    const selectElement = document.getElementById("my_mode") as HTMLSelectElement;
+    selectElement.addEventListener("change", (event) => {
+        mode_buttons();
     });
+
+    
 
     // Load file button
     const load_button = document.getElementById("load-file") as HTMLButtonElement | null;
@@ -353,7 +368,12 @@ window.addEventListener("load", () => {
         const checkbox = document.getElementById('show-keyboard-section') as HTMLInputElement;
         
         if (keyboard_table && checkbox) {
-            keyboard_table.style.display = checkbox.checked ? "block" : "none";
+            if (checkbox.checked) {
+                keyboard_table.style.display = "block";
+                window.location.href = "#select-keyboard-section";
+            } else {
+                keyboard_table.style.display = "none";
+            }
         }
     });
 
@@ -378,7 +398,7 @@ window.addEventListener("load", () => {
 });
 
 function clear_results(): void {
-    (document.getElementById('voc-output-message') as HTMLDivElement).innerHTML = "";
+    (document.getElementById('prog-output-message') as HTMLDivElement).innerHTML = "";
     (document.getElementById('voc-output-words-field') as HTMLInputElement).value = "";
 }
 
@@ -386,6 +406,31 @@ function set_filename(filename: string): void {
     (document.getElementById('file-name') as HTMLInputElement).value = filename;
 }
 
+function mode_buttons() {
+    // Mode buttons
+    const selectElement = document.getElementById("my_mode") as HTMLSelectElement;
+    const sort_words = document.getElementById("sort-words") as HTMLInputElement;
+    const remove_duplicates = document.getElementById("remove-duplicates") as HTMLInputElement;
+    const word_divider = document.getElementById("word-divider") as HTMLInputElement;
+    const force_words = document.getElementById("force-words") as HTMLInputElement;
+
+    const selectedValue = selectElement.value;
+    switch (selectedValue) {
+        case "word-list":
+            if (sort_words) sort_words.disabled = false;
+            if (remove_duplicates) remove_duplicates.disabled = false;
+            if (word_divider) word_divider.disabled = false;
+            if (force_words) force_words.disabled = false;
+            break;
+        default:
+            if (sort_words) sort_words.disabled = true;
+            if (remove_duplicates) remove_duplicates.disabled = true;
+            if (word_divider) word_divider.disabled = true;
+            if (force_words) force_words.disabled = true;
+            break;
+    }
+
+}
 
 
 

@@ -40,8 +40,8 @@ TOKEN,TOKEN,TOKEN    TOKEN
 
 |         | TARGET | RESULT | BEFORE | AFTER |
 |---------|--------|--------|--------|-------|
-| ∅       | YES    | YES    | NO     | NO    | IF MODE IS BEFORE OR AFTER
-| ^REJECT | NO     | YES    | NO     | NO    | IF MODE IS NOT RESULT
+| ^       | YES    | YES    | NO     | NO    | IF MODE IS BEFORE OR AFTER
+| 0       | NO     | YES    | NO     | NO    | IF MODE IS NOT RESULT
 | #       | NO     | NO     | YES    | YES   | IF MODE IS TARGET OR RESULT
 | :       | YES    | YES    | YES    | YES   |
 | +, { }  | YES    | NO     | YES    | YES   | IF MODE IS RESULT

@@ -9,9 +9,8 @@
   <meta name="keywords" content="conlangs">
   <meta name="author" content="Neonnaut">
   <!-- Scripts and stylings -->
-  <link href="style.css" rel="stylesheet" type="text/css" media="all">
+  <link href="../style.css" rel="stylesheet" type="text/css" media="all">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="script/theme-picker.js"></script>
 
   <!-- Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -22,7 +21,7 @@
   <nav id="myNav">
     <ol class="breadcrumbs">
       <li>
-        <a href="/"><img alt="neocities favicon" src="./img/neonnaut.png"></a>
+        <a href="/"><img alt="neocities favicon" src="../img/neonnaut.png"></a>
       </li>
       <li style="float: right;">
         <button id="main_menu"><i class="fa fa-bars"></i> Menu</button>
@@ -33,7 +32,7 @@
   <div id="content">
     <section id="top">
       <div>
-        <img src="img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
+        <img src="../img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
 
         <h1 style="margin-bottom: 10px;">Vocabug<br>docs</h1>
         <b>Version: 0.4.0</b>
@@ -128,7 +127,7 @@
           <li><a href="#nescaProFeature">Pro-feature</a></li>
           <li><a href="#nescaAntiFeature">Anti-feature</a></li>
           <li><a href="#nescaParaFeature">Para-feature</a></li>
-          <li><a href="#nescaFeatureInFeature">Referencing featues inside features</a></li>
+          <li><a href="#nescaFeatureInFeature">Referencing features inside features</a></li>
           <li><a href="#nescaUsingFeatures">Using features</a></li>
           <li><a href="#nescaFeatureField">Feature-field</a></li>
         </ol>
@@ -158,12 +157,23 @@
 
         <li><a href="#nescaAdvancedRules">Advanced rules</a>
           <ol class="nice-list">
+            <li><a href="#nescaEngine">Engine</a></li>
             <li><a href="#nescaTargetReference">Target-reference</a></li>
             <li><a href="#nescaMetathesisReference">Metathesis-reference</a></li>
-            <!--
-            <li><a href="#nescaBackreference">Backreference</a></li>
-            -->
-            <li><a href="#nescaEngine">Engine</a></li>
+            <li><a href="#nescaEmptyMark">Empty-mark</a></li>
+
+            <li><a href="#nescaBackreference">Backreference</a>
+              <ol class="nice-list">
+                <li><a href="#nescaSingularBackreference">Backreference of singular grapheme</a></li>
+                <li><a href="#nescaBackreferenceSequence">Backreference of grapheme sequence</a></li>
+              </ol>
+            </li>
+            <li><a href="#nescaPolygraphemes">Polygraphemes</a>
+              <ol class="nice-list">
+                <li><a href="#nescaBasedMark">Based-mark</a></li>
+              </ol>
+            </li>
+            
         </ol>
         </li>
         <li><a href="#vocabugQuestionsAndAnswers">Questions and answers</a></li>
@@ -206,10 +216,6 @@
 
         <li><code class="example">Paragraph mode</code> will produce words that look vaguely like sentences by injecting punctuation into the word list and capitalising the first word of each sentence</li>
         
-
-
-
-
         <li><code class="example">Remove duplicates</code> will make sure all words generated are unique</li>
         <li><code class="example">Force words</code> will force the generator to try and generate the complete number of words requested within 30 seconds, despite the number of rejections / duplicates removed</li>
         <li><code class="example">Sort words</code> sorts the words in alphabetical order, or the order defined in the <code class="example">alphabet:</code> directive</li>
@@ -346,7 +352,7 @@
             <td><a href="#nescaOptionalatorSet">Optionalator-set</a></td>
           </tr>
           <tr>
-            <td><code class="example">&lt;</code> and a space</code></td>
+            <td><code class="example">&lt;</code> and a space</td>
             <td>Begins a <a href="#nescaClusterfield">Cluster-field</a></td>
           </tr>
           <tr>
@@ -362,7 +368,7 @@
             <td><a href="#nescaInsertionAndDeletion">Insertion</a> when in <code class="example">TARGET</code>, <a href="#nescaInsertionAndDeletion">deletion</a> when in <code class="example">RESULT</code></td>
           </tr>
           <tr>
-            <td><code class="example">^REJECT</code> or <code class="example">^R</code></td>
+            <td><code class="example">0</code></td>
             <td><a href="#nescaReject">Rejects</a> a word</td>
           </tr>
           <tr>
@@ -418,8 +424,8 @@
             <td><a href="#nescaSyllableMark">Syllable-mark</a> -- equivalent to <code class="example">&[.]</code></td>
           </tr>
           <tr>
-            <td><code class="example">~</code></td>
-            <td>Makes sequence of graphemes for blocked-anythings-mark</a></td>
+            <td><code class="example">|</code></td>
+            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
           </tr>
           <tr>
             <td><code class="example">&lt;T</code></td>
@@ -429,20 +435,27 @@
             <td><code class="example">&lt;M</code></td>
             <td><a href="#nescaMetathesisReference">Metathesis-reference</a></td>
           </tr>
-          <!--
           <tr>
-            <td>A positive digit</td>
-            <td><a href="#nescaBackreference">Backreference</a></td>
+            <td><code class="example">&lt;E</code></td>
+            <td><a href="#nescaEmptyMark">Empty-mark</a></td>
           </tr>
           <tr>
             <td><code class="example">=</code> and positive digit</td>
             <td><a href="#nescaBackreference">Backreference-capture</a></td>
           </tr>
-          -->
           <tr>
-            <td><code class="example">|</code></td>
-            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
+            <td><code class="example">&lt;=</code></td>
+            <td>Begins <a href="#nescaBackreference">Backreference-capture</a> of a sequence of graphemes</td>
           </tr>
+          <tr>
+            <td>A positive digit</td>
+            <td><a href="#nescaBackreference">Backreference</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">~</code></td>
+            <td><a href="#nescaBasedMark">Based-mark</a></td>
+          </tr> 
+
           
         </tbody>
       </table>
@@ -455,7 +468,7 @@
       <details class="dropdown-group">
         <summary class="dropdown-btn">Reveal</summary>
 
-        <table class="styled-table"><thead><thead>
+        <table class="styled-table"><thead>
           <tr>
             <th>Escape Name</th>
             <th>Unicode Character</th>
@@ -755,7 +768,7 @@
       <h3 id="vocInvisibility"><a class="head-num">9.1</a>Invisibility</h3>
       <p>Sometimes you will want characters, such as syllable dividers, to be invisible to alphabetisation. You can do this by listing these characters in the invisible: directive.</p>
       <div class="prog-pre"><span class="directive">invisible</span><span class="link">:</span> .<span class="link">,</span> ˈ<br></div>
-      <p> This will make these generated words: <code class="example">za'ta</code>, <code class="example">'ba.ta</code>, <code class="example">'za.ta</code> be reorderd into: <code class="example">'ba.ta</code>, <code class="example">za'ta</code>, <code class="example">'za.ta</code></p>
+      <p> This will make these generated words: <code class="example">za'ta</code>, <code class="example">'ba.ta</code>, <code class="example">'za.ta</code> be reordered into: <code class="example">'ba.ta</code>, <code class="example">za'ta</code>, <code class="example">'za.ta</code></p>
 
       <h2 id="vocGraphemes"><a class="head-num">10</a>Defining graphemes</h2>
       <p>The <code class="example">graphemes:</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nescaTransform">transformations</a>.</p>
@@ -802,10 +815,9 @@
       <div class="prog-pre"><span class="comment">; Merge [o] and [a] into [x]</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<span class="link">,</span> x<br><span class="comment">; boda ==> bxdx</span></div>
 
       <h3 id="nescaReject"><a class="head-num">12.3</a>Reject</h3>
-      <p>To remove, or in other words, reject a word, you use the <code class="example">^REJECT</code> keyword in <code class="example">RESULT</code>:</p>
-      <div class="prog-pre">a<span class="link">,</span> bi <span class="link">-></span> <span class="operator">^REJECT</span></div>
+      <p>To remove, or in other words, reject a word, you use a zero <code class="example">0</code> in <code class="example">RESULT</code>:</p>
+      <div class="prog-pre">a<span class="link">,</span> bi <span class="link">-></span> <span class="operator">0</span></div>
       <p>In the above example, any word that contains <code class="example">a</code> or <code class="example">bi</code> will be rejected.</p>
-      <p>A shorthand version to <code class="example">^REJECT</code> is <code class="example">^R</code></p>
 
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
       <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
@@ -850,6 +862,7 @@
       <p>Exceptions are placed following an exclamation mark <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- when a transform has an exception, the target must meet the environment described in the exception to prevent execution:</p>
       <div class="prog-pre">aa <span class="link">-></span> a <span class="link">!</span> <span class="link">_</span><span class="regexp">#</span></div>
       <p>In the above example, the transformation will not execute if <code class="example">aa</code> is at the end of the word.</p>
+      <p>If there are multiple exceptions, the transform must meet all of the exceptions for it not to execute.</p>
       <p>An alternative to using an exclamation mark is to use two forward slashes <code class="example">//</code>.</p>
 
       <h2 id="nescaUsingCategories"><a class="head-num">16</a>Using categories</h2>
@@ -956,15 +969,15 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
       <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
 
       <h2 id="nescaClusterfield"><a class="head-num">19</a>Cluster-field</h2>
-      <p>Cluster-field is a way to target sequences of graphemes and change them. They are laid out as tables, and start with <code class="example">%</code> followed by a space. The first part of a sequence is in the first column, and the second part is in the first row. For example:</p>
-      <div class="prog-pre"><span class="directive">%</span> p  t  k  m  n
+      <p>Cluster-field is a way to target sequences of graphemes and change them. They are laid out as tables, and start with <code class="example">&lt;</code> followed by a space. The first part of a sequence is in the first column, and the second part is in the first row. For example:</p>
+      <div class="prog-pre"><span class="directive">&lt;</span> p  t  k  m  n
 m <span class="link">+</span>  nt nk <span class="link">+</span>  mm 
 n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="link">+</span></div>
 
       <ul class="paragraphian">
         <li>In this example, <code class="example">np</code> becomes <i>mp</i> and <code class="example">mt</code> becomes <i>nt</i></li>
         <li><code class="example">+</code> means to not change the target cluster at all</li>
-        <li>Cluster-fields can use <code class="example">^R</code> or <code class="example">^REJECT</code> to reject the word if it contains that sequence</li>
+        <li>Cluster-fields can use <code class="example">0</code> to reject the word if it contains that sequence</li>
         <li>Cluster-fields can use <code class="example">^</code> or <code class="example">∅</code> to delete the target sequence</li>
         <li>These are executed concurrently just like concurrent changes. Their order does not matter</li>
         <li>Cluster-fields can also use conditions and exceptions, just put them on their own line</li>
@@ -1024,63 +1037,12 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       
       <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">&[</span>k<span class="link">,</span> g<span class="regexp">]</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
 
-      <p>You can additionally use a tilde <code class="example">~</code> between graphemes to block a sequence of graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Target everything word initialy until reaching</span><br><span class="comment">; a [t] and [r] cluster, or [d], and delete it.</span><br> <span class="regexp">&[</span>t<span class="regexp">~</span>r<span class="link">,</span> d<span class="regexp">]</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><br><span class="comment">; satatra ==> tra</span></div>
-
-
       <h3 id="nescaSyllableMark"><a class="head-num">20.8</a>Syllable-mark</h3>
       <p>Using the percent-sign <code class="example">%</code>, a 'syllable-mark' will match to a sequence of graphemes, as long as there is not a <code class="example">.</code> character in the sequence. This is equivalent to <code class="example">&{.}</code></p>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced rules</h2>
 
-      <h3 id="nescaTargetReference"><a class="head-num">21.1</a>Target-reference</h3>
-      <p>A target-reference is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses a less-than sign and a capital t <code class="example">&lt;T</code>.</p>
-      <p>Here are some examples where target-reference is employed:</p>
-      <p><b>Full reduplication</b>:</p>
-      <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="catkey">&lt;T&lt;T</span>
-<span class="comment">; malak ==&gt; malakmalak</span></div>
-      
-      <p>"<b>Haplology</b>":</p>
-      <div class="prog-pre">  <span class="regexp">{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="catkey">&lt;T</span>
-<span class="comment">; haplology ==> haplogy</span></div>
-      <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
-      <div class="prog-pre">  <span class="catkey">C</span> <span class="link">-></span> <span class="operator">^REJECT</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&[</span><span class="catkey">C</span><span class="regexp">]</span><span class="catkey">&lt;T</span></div>
-
-      <h3 id="nescaMetathesisReference"><a class="head-num">21.3</a>Metathesis-reference</h3>
-      <p>Simple metathesis involves a less-than-sign and a capital m <code class="example">&lt;M</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
-  <span class="regexp">{</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">}</span><span class="regexp">{</span>m<span class="link">,</span> n<span class="regexp">}</span> <span class="link">-></span> <span class="catkey">&lt;M</span><br><span class="comment">; apma ==> ampa</span></div>
-
-      <p>Since metathesis reference is swapping the first and last grapheme, we can effectively simulate long-distance metathesis using an anythings-mark:</p>
-
-      <div class="prog-pre"><span class="comment">; Simulate Old Spanish "Hyperthesis"</span>
-  r<span class="regexp">&</span>l <span class="link">-></span> <span class="catkey">&lt;M</span><br><span class="comment">; parabla ==> palabra</span></div>
-
-      <!--
-      <h3 id="nescaBackreference"><a class="head-num">21.2</a>Backreference</h3>
-      <p>Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of backreference.</p>
-
-      <p>Firstly, a grapheme is bound to a reference with a 'reference-capture', to the right of the grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number.</p>
-
-      <p>The captured grapheme can then be copied, or rather, inserted, somewhere else in the transform with a 'reference', even before the backreference-capture. However, a named-reference may only be used in <code class="example">RESULT</code> or the <span class="regexp">CONDITION</span>, it cannot be used in <code class='example'>TARGET</code> or an exception. A backreference  a single-digit number.</p>
-
-      <p>Here are some examples:</p>
-      
-      <div class="prog-pre"><span class="comment">; Delete [ʔ] between identical vowels</span>
-  ʔ <span class="link">-&gt;</span> <span class="operator">^</span> <span class="regexp">/</span> [+vowel]=$1<span class="link">_</span>$1
-<span class="comment">; baʔaʔe ==> baaʔe</span></div>
-
-      <p>In this rule, we are binding the <code class='example'>[+vowel]</code> feature-matrix to the reference <code class='example'>$1</code>, by appending <code class='example'>=$1</code> to it. Whatever this grapheme from <code class='example'>[+vowel]</code> is when the condition is met, is cptured as the value of <code class='example'>$1</code>. <p>Then the value of <code class='example'>$1</code> is inserted into <code class='example'>AFTER</code></p>
-
-      <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
-  <span class="operator">^</span> <span class="link">-&gt;</span> $1 <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span>=$1ʔ<span class="link">_</span><span class="regexp">#</span>
-<span class="comment">; foobaʔ ==&gt; foobaʔa</span></div>
-
-      <p>In this rule, we are binding the <code class='example'>V</code> category to the reference <code class='example'>$1</code>, by appending <code class='example'>=$1</code> to it. Whatever this grapheme from <code class='example'>V</code> is when the condition is met is the value of <code class='example'>$1</code>.</p>
-      <p>Then the value of <code class='example'>$1</code> is inserted into <code class='example'>RESULT</code>.</p>
-      -->
-      
-      <h3 id="nescaEngine"><a class="head-num">21.4</a>Engine</h3>
+      <h3 id="nescaEngine"><a class="head-num">21.1</a>Engine</h3>
       <p>The engine statement provides useful functions that you can call at any point in the transform block. You call an engine following a <code class="example">|</code> and a space on a new line.</p>
 
       <ul class="paragraphian">
@@ -1095,12 +1057,12 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         <li><code class="example">xsampa_to_ipa</code> will convert characters of a word written in X-SAMPA into IPA</li>
         
 
-        <li><code class="example">ipa_to_xsampa</code> will convert characters of a word written in IPA into X-SAMPA</li>
+        <li><code class="example">ipa_to_xsampa</code> will convert characters of a word written in IPA into X-SAMPA
         
         <details class="dropdown-group">
         <summary class="dropdown-btn">Reveal</summary>
 
-        <table class="styled-table"><thead></thead><thead>
+        <table class="styled-table"><thead>
           <tr>
             <th>IPA</th>
             <th>X-SAMPA</th>
@@ -1202,7 +1164,9 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         </tbody></table>
       </details>
 
-        <li><code class="example">roman-to-hangul</code> converts characters written in an arbitrary romanisation to Hangul Jamo blocks.</li>
+      </li>
+
+        <li><code class="example">roman-to-hangul</code> converts, or rather, transliterates characters written in an arbitrary romanisation to Hangul Jamo blocks.
         <details class="dropdown-group">
         <summary class="dropdown-btn">Reveal</summary>
 
@@ -1249,39 +1213,144 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
           <tbody>
             <tr><td>a</td><td>ㅏ</td></tr>
             <tr><td>è</td><td>ㅐ</td></tr>
-
             <tr><td>ò</td><td>ㅓ</td></tr>
             <tr><td>e</td><td>ㅔ</td></tr>
-
             <tr><td>o</td><td>ㅗ</td></tr>
             <tr><td>u</td><td>ㅜ</td></tr>
             <tr><td>ù</td><td>ㅡ</td></tr>
             <tr><td>i</td><td>ㅣ</td></tr>
-
             <tr><td>wa</td><td>ㅘ</td></tr>
             <tr><td>wè</td><td>ㅙ</td></tr>
             <tr><td>wò</td><td>ㅝ</td></tr>
             <tr><td>we</td><td>ㅞ</td></tr>
             <tr><td>wi</td><td>ㅚ</td></tr>
-
-
             <tr><td>uí</td><td>ㅟ</td></tr>
             <tr><td>ùí</td><td>ㅢ</td></tr>
-
             <tr><td>ya</td><td>ㅑ</td></tr>
             <tr><td>yè</td><td>ㅒ</td></tr>
             <tr><td>yò</td><td>ㅕ</td></tr>
             <tr><td>ye</td><td>ㅖ</td></tr>
             <tr><td>yo</td><td>ㅛ</td></tr>
             <tr><td>yu</td><td>ㅠ</td></tr>
-
-
           </tbody>
         </table>
-
       </details>
-      
+          <p>When there is no initial to be found, the jamo will have an initial Ieung. Forming an initial of the next jamo is prefered over creating a final for the current jamo.</p>
+      </li>
       </ul>
+
+      <h3 id="nescaTargetReference"><a class="head-num">21.2</a>Target-reference</h3>
+      <p>A target-reference is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses a less-than sign and a capital t <code class="example">&lt;T</code>.</p>
+      <p>Here are some examples where target-reference is employed:</p>
+      <p><b>Full reduplication</b>:</p>
+      <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="catkey">&lt;T&lt;T</span>
+<span class="comment">; malak ==&gt; malakmalak</span></div>
+      
+      <p>"<b>Haplology</b>":</p>
+      <div class="prog-pre">  <span class="regexp">{</span><span class="catkey">C</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">(</span><span class="catkey">B</span><span class="regexp">)</span> <span class="link">-></span> <span class="operator">^</span> <span class="link">/</span> <span class="link">_</span><span class="catkey">&lt;T</span>
+<span class="comment">; haplology ==> haplogy</span></div>
+      <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
+      <div class="prog-pre">  <span class="catkey">C</span> <span class="link">-></span> <span class="operator">0</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&[</span><span class="catkey">C</span><span class="regexp">]</span><span class="catkey">&lt;T</span></div>
+
+      <h3 id="nescaMetathesisReference"><a class="head-num">21.3</a>Metathesis-reference</h3>
+      <p>Simple metathesis involves a less-than-sign and a capital m <code class="example">&lt;M</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
+      <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
+  <span class="regexp">{</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">}</span><span class="regexp">{</span>m<span class="link">,</span> n<span class="regexp">}</span> <span class="link">-></span> <span class="catkey">&lt;M</span><br><span class="comment">; apma ==> ampa</span></div>
+
+      <p>Since metathesis reference is swapping the first and last grapheme, we can effectively simulate long-distance metathesis using an anythings-mark:</p>
+
+      <div class="prog-pre"><span class="comment">; Simulate Old Spanish "Hyperthesis"</span>
+  r<span class="regexp">&</span>l <span class="link">-></span> <span class="catkey">&lt;M</span><br><span class="comment">; parabla ==> palabra</span></div>
+
+      <h3 id="nescaEmptyMark"><a class="head-num">21.3</a>Empty-mark</h3>
+      <p>An Empty-mark using <code class="example">&lt;E</code>, inserts an 'empty' grapheme into the captured <code class="example">TARGET</code> graphemes. It is only allowed in <code class="example">TARGET</code></p>
+
+      <p>One use for it is a trick to make one-place long-distance metathesis work, for example:</p>
+
+      <div class="prog-pre"><span class="comment">; The [r] of a plosive + [r] cluster is moved</span>
+<span class="comment">; between a word initial plosive and a vowel</span>
+  <span class="catkey">&lt;E</span><span class="regexp">{</span>a<span class="link">,</span>e<span class="link">,</span>i<span class="link">,</span>o<span class="link">,</span>u<span class="regexp">}</span><span class="regexp">&[</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span><span class="regexp">*</span>r <span class="link">-></span> <span class="catkey">&lt;M</span> <span class="link">/</span> <span class="regexp">#</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span><span class="link">_</span>
+<span class="comment">; kotatros -> krotatos</span></div>
+
+      <p>Another use for it is in a romanisation or deromanisation system using a cluster-field:</p>
+
+      <div class="prog-pre"><span class="directive">&lt;</span>  p  t  k  j  y
+<span class="catkey">&lt;E</span> p  t  c  y  ü</div>
+
+      <h3 id="nescaBackreference"><a class="head-num">21.4</a>Backreference</h3>
+      <p>Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of backreference. Backreference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>
+
+      <h4 id="nescaSingularBackreference"><a class="head-num">21.4.1</a>Backreference of singular grapheme</h4>
+
+      <p>A grapheme is bound to a backreference using a 'reference-capture', to the right of some grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number. This number, is called the 'reference-name' of the backreference.</p>
+
+      <p>The key behaviours of reference-capture are:</p>
+      <ul>
+        <li>A Backreference forgets the value bound to via reference-capture in-between transforms. Backreferences do not persist between rules</li>
+        <li>You can have up to nine backreferences per transform</li>
+        <li>A backreference can be overwritten with a new value</li>
+        <li>For reference-capture in conditions, a grapheme is captured only if that condition is met</li>
+      </ul>
+
+      <p>The captured grapheme can then be reproduced elsewhere in the transform with a 'reference-name', even before the reference-capture. The reference-name is a single-digit positive number.</p>
+
+      <p>The key behaviours of reference-name are:</p>
+      <ul>
+        <li>A reference-name may not be used in the <code class='example'>TARGET</code> of a transform.</li>
+        <li>In each condition or exception of a transform, a reference-name cannot be used before content has been bound to its backreference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference-name is not recursive in conditions and exceptions.</li>
+        <li>If a reference-name is used where a reference-capture has not captured anything yet, it fails silently and outputs the number of the backrefence.</li>
+      </ul>
+
+      <p>Here are some examples:</p>
+
+      <div class="prog-pre"><span class="comment">; Delete [ʔ] between identical vowels</span>
+  ʔ <span class="link">-&gt;</span> <span class="operator">^</span> <span class="regexp">/</span> <span class="catkey">[+vowel]</span><span class="regexp">=1</span><span class="link">_</span><span class="catkey">1</span>
+<span class="comment">; baʔaʔe ==> baaʔe</span></div>
+
+      <p>In the rule above, we are binding the <code class='example'>[+vowel]</code> feature-matrix to the backreference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>[+vowel]</code> is when the condition is met, is captured as the value of <code class='example'>1</code>. Then the value of backrefence <code class='example'>1</code> is inserted into <code class='example'>AFTER</code> by invoking its reference-name.</p>
+
+      <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
+  <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
+<span class="comment">; foobaʔ ==&gt; foobaʔa</span></div>
+
+      <p>In the rule above, we are binding the <code class='example'>V</code> category to the backreference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>V</code> is when the condition is met is the value of <code class='example'>1</code>. Then the value of <code class='example'>1</code> is inserted into <code class='example'>RESULT</code> by invoking its reference-name.</p>
+
+      <h4 id="nescaBackreferenceSequence"><a class="head-num">21.4.2</a>Backreference of grapheme sequence</h4>
+
+      <p>Now that that has been (hopefully) introduced and explained adequately, with backreference's 'reference-capture' and 'reference-name', lets explain how to capture and reference a sequence of graphemes.</p>
+
+      <p>To start capturing a sequence, you use a 'start-reference-capture', <code class="example">&lt;=</code> before the graphmemes to be captured. Then at the end of the graphemes to be captured, a 'reference-capture' is used to bind those graphemes to a backreference:</p>
+
+      <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
+  <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
+<span class="comment">; foobaʔ ==&gt; foobaʔa</span></div>
+      
+      
+
+      <h3 id="nescaPolygraphemes"><a class="head-num">21.5</a>Polygraphemes</h3>
+      <p>If your language encodes tone, stress, breathy voice, or other phonological features directly on vowels, you’ll often need to target a particular grapheme across its variants.</p>
+      <p>One method is to target each variant manually:</p>
+
+      <div class="prog-pre">  <span class="regexp">{</span>a<span class="link">,</span> á<span class="link">,</span> à<span class="regexp">}</span> <span class="link">-&gt;</span> <span class="regexp">{</span>e<span class="link">,</span> é<span class="link">,</span> è<span class="regexp">}</span><br><span class="comment">; daná ==&gt; dené</span></div>
+
+      <p>This workaround uses alternators, but lacks semantic clarity and scalability, and is outright tedious.</p>
+      <p>To solve this, are 'polygraphemes' -- aligned grapheme variants of their bases. These allow you to target all forms of a grapheme with a single transform. To set up polygraphemes, they must be stated in the graphemes: directive like so:</p>
+      
+      <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">{</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span></div>
+      
+      <p>Each grouping must contain an equal number of graphemes, aligned by position. This creates a traceable overlay across tone, stress, and other features.</p>
+
+      <div class="prog-pre">  a <span class="link">-&gt;</span> e<br><span class="comment">; daná ==&gt; dené</span></div>
+      
+      <p>This targets all variants of a and maps them to the corresponding variant of e.</p>
+      <p>This does not mean that each variant must be different by means of diacritics, they are arbitrarily variant. This does not mean that only vowels may be polygraphemes, we can have multiple sets of polygraphemes for consonants, or perhaps a system for both.</p>
+
+      <h3 id="nescaBasedMark"><a class="head-num">21.5.1</a>Based-mark</h3>
+      <p>To target only the base grapheme, use a tilde <code class="example">~</code> after the grapheme:</p>
+
+      <div class="prog-pre">  a<span class="regexp">~</span> <span class="link">-&gt;</span> e<br><span class="comment">; daná ==&gt; dená</span></div>
+      
+      <p>This transform applies only to the unmarked a, leaving á untouched.</p>
 
       <h2 id="vocabugQuestionsAndAnswers"><a class="head-num">22</a>Questions and answers</h2>
       <p>Here are some common questions and answers about Vocabug:</p>

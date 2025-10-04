@@ -8,7 +8,7 @@ import Logger from '../logger.js';
 import Escape_Mapper from '../escape_mapper.js';
 import type { Token } from '../types.js';
 import type { Token_Stream_Mode } from '../types.js';
-import { get_last } from '../utilities.js';
+import { graphemosis } from '../utilities.js';
 
 class Nesca_Grammar_Stream {
    public logger: Logger;
@@ -41,11 +41,11 @@ class Nesca_Grammar_Stream {
          } else {
             this.logger.validation_error(`Unexpected character '${stream}' in mode '${mode}'`, line_num);
          }
-      } else if (stream === "^REJECT" || stream === "^R") {
+      } else if (stream === "0") {
          if (mode !== "RESULT"){
             this.logger.validation_error(`Reject not allowed in '${mode}'`, line_num);
          }
-         return [{ type: "reject", base: "^REJECT" }];
+         return [{ type: "reject", base: "0" }];
       }
 
       while (i < stream.length) {
@@ -82,16 +82,16 @@ class Nesca_Grammar_Stream {
                   blocked_stream += char;
                   look_ahead++;
                }
-
+               
                const blocked_items = blocked_stream
-               .split(",") // split into groups
-               .map(group =>
-                  group
-                     .split("~") // split each group into items
-                     .map(item => this.escape_mapper.restore_escaped_chars(item.trim()))
-                     .filter(Boolean)
-               )
-               .filter(group => group.length > 0);
+                  .split(",") // split into groups
+                  .map(group =>
+                     graphemosis(group.trim(), this.graphemes) // split group into graphemes
+                        .map(g => this.escape_mapper.restore_escaped_chars(g))
+                        .filter(Boolean)
+                  )
+                  .filter(group => group.length > 0);
+
 
                new_token.blocked_by = blocked_items;
                look_ahead++; // Consume }
@@ -122,7 +122,7 @@ class Nesca_Grammar_Stream {
             new_token = { type: "word-boundary", base: "#", min: 1, max: 1 };
             tokens.push(new_token);
             i++;
-            continue;
+            continue; // No modifiers allowed
          } else if (char == "$") {
             if (mode !== "BEFORE" && mode !== "AFTER") {
                this.logger.validation_error(`Syllable-boundary not allowed in '${mode}'`, line_num);
@@ -130,7 +130,7 @@ class Nesca_Grammar_Stream {
             new_token = { type: "syllable-boundary", base: "$", min: 1, max: 1 };
             tokens.push(new_token);
             i++;
-            continue;
+            continue; // No modifiers allowed
 
          } else if (char == "<"){
             let look_ahead = i + 1;
@@ -145,13 +145,62 @@ class Nesca_Grammar_Stream {
                   this.logger.validation_error(`Metathesis-reference not allowed in '${mode}'`, line_num);
                }
                new_token = { type: "metathesis-reference", base: '<M', min: 1, max: 1 };
-               i = look_ahead
+               i = look_ahead;
+            } else if (stream[look_ahead] === "E") {
+               if (mode !== "TARGET") {
+                  this.logger.validation_error(`Empty-mark only allowed in 'TARGET'`, line_num);
+               }
+               new_token = { type: "empty-mark", base: '<E', min: 1, max: 1 };
+               i = look_ahead;
             } else {
                this.logger.validation_error(`A 'T' or 'M' did not follow '<' in '${mode}'`, line_num);
             }
 
             i++;
 
+         } else if (char === "=") {
+            let look_ahead = i + 1;
+            if (stream[look_ahead] === "<") {
+               // It begins a backreference capture of sequenced graphemes
+               new_token = { type: "br-start-capture", base: "<=", min: 1, max: 1 };
+            } else {
+               // It ends a backreference
+               look_ahead += 1;
+               // If look_ahead is 1 to 9
+               switch (stream[look_ahead]) {
+                  case '1':
+                     new_token = { type: "br-end-capture", base: "=1", name:"1", min: 1, max: 1 };
+                     break;
+                  case '2':
+                     new_token = { type: "br-end-capture", base: "=2", name:"2", min: 1, max: 1 };
+                     break;                     
+                  case '3':
+                     new_token = { type: "br-end-capture", base: "=3", name:"3", min: 1, max: 1 };
+                     break;
+                  case '4':
+                     new_token = { type: "br-end-capture", base: "=4", name:"4", min: 1, max: 1 };
+                     break;
+                  case '5':
+                     new_token = { type: "br-end-capture", base: "=5", name:"5", min: 1, max: 1 };
+                     break;
+                  case '6':
+                     new_token = { type: "br-end-capture", base: "=6", name:"6", min: 1, max: 1 };
+                     break;
+                  case '7':
+                     new_token = { type: "br-end-capture", base: "=7", name:"7", min: 1, max: 1 };
+                     break;
+                  case '8':
+                     new_token = { type: "br-end-capture", base: "=8", name:"8", min: 1, max: 1 };
+                     break;
+                  case '9':
+                     new_token = { type: "br-end-capture", base: "=9", name:"9", min: 1, max: 1 };
+                     break;
+               }
+            }
+
+         } else if (char === "~") {
+            // It's a based-mark
+            
          } else if (
             char == '⇒' || char == '→' || char == '>' || char == '{' || char == '}' ||
             char == '[' || char == ']' || char == '(' || char == ')' || char == '<' ||

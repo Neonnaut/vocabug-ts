@@ -27,7 +27,7 @@ TransformLine {
 Escape { "\\" AnyChar }
 Operator { ">" | "->" | "→" | "+" | "-" | "=" | "," }
 Regexp { "^" | "#" | "(" | ")" | "[" | "]" | "{" | "}" }
-Reject { "^REJECT" }
+Reject { "0" }
 
 WordsBlock {
   "BEGIN" "words" ":" WordLine* "END"

@@ -47,7 +47,7 @@ const Darky = EditorView.theme({
   ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
     backgroundColor: "#00be6845", // Optional highlight background
   },
-  "@media only screen and (max-width: 400px)": {
+  "@media only screen and (max-width: 320px)": {
     ".cm-gutters": {
       display: "none!important"
     }
@@ -70,7 +70,7 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   // LIGHT BLUE / commas, equals sign, colon
   { tag: t.link, color: "#a6d3f7" , fontWeight: "bold" },
   
-  // CYAN / ^REJECT, ->, +, -
+  // CYAN / 0, ->, +, -
   { tag: t.operator, color: "#44ebd0ff" , fontWeight: "bold" },
 
   // PINK / #, +, *, (, {, [
@@ -134,7 +134,7 @@ const Lighty = EditorView.theme({
   ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
     backgroundColor: "#00be681e", // Optional highlight background
   },
-  "@media only screen and (max-width: 400px)": {
+  "@media only screen and (max-width: 200px)": {
     ".cm-gutters": {
       display: "none!important"
     }
@@ -156,7 +156,7 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   // LIGHT BLUE / commas, equals sign, colon
   { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, 
 
-  // CYAN / ^REJECT, ->, +, -
+  // CYAN / 0, ->, +, -
   { tag: t.operator, color: "#024bba", fontWeight: "bold"}, 
 
   // PINK / #, +, *, (, {, [
@@ -220,7 +220,7 @@ const Warmy = EditorView.theme({
   ".cm-matchingBracket, &.cm-editor.cm-focused .cm-matchingBracket": {
     backgroundColor: "#00be681e", // Optional highlight background
   },
-  "@media only screen and (max-width: 400px)": {
+  "@media only screen and (max-width: 320px)": {
     ".cm-gutters": {
       display: "none!important"
     }
@@ -247,7 +247,7 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   // LIGHT BLUE / commas, equals sign, colon
   { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, 
 
-  // CYAN / ^REJECT, ->, +, -
+  // CYAN / 0, ->, +, -
   { tag: t.operator, color: "#024bba", fontWeight: "bold"}, 
 
   // PINK / #, +, *, (, {, [

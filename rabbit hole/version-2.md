@@ -4,7 +4,6 @@
 
 ## IPA featurefield set
 
-
 ## 1. Word classes
 
 Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
@@ -120,4 +119,24 @@ This represents an almost idealist view on word generation
 
 Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
 
+## Rewrite of program in rust or haskel python, Kotlin
+
+## Use Vue for the UI
+
+## word class
+
+generated words would have meta information that they were in a pos or word class
+
+Tranforms could then have a condition that 
+
+## Naming rules
+
 Ability to give each transform a name
+
+## Automatic Syllables 
+
+## Structured syllable rule
+
+## `<N`
+
+## 

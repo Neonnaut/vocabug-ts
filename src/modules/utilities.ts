@@ -88,8 +88,29 @@ function recursive_expansion(
    return resolve_mapping(input);
 }
 
+function graphemosis(input: string, canon_graphemes:string[]): string[] {
+   const tokens: string[] = [];
+   let i = 0;
+   while (i < input.length) {
+      let matched = false;
+      for (const g of canon_graphemes.sort((a, b) => b.length - a.length)) {
+            if (input.startsWith(g, i)) {
+               tokens.push(g);
+               i += g.length;
+               matched = true;
+               break;
+            }
+      }
+      if (!matched) {
+            tokens.push(input[i]);
+            i++;
+      }
+   }
+   return tokens;
+}
+
 export {
     cappa,
     get_last, capitalise, make_percentage, swap_first_last_items, final_sentence,
-    recursive_expansion, reverse_items
+    recursive_expansion, reverse_items, graphemosis
 };

@@ -343,6 +343,9 @@ li::marker { color: var(--li-marker) }
 li, blockquote, dl, dl dt, dl dd, figcaption,
 summary, address, legend, label { color: var(--text)}
 
+.fa {
+  color: var(--bold);
+}
 
 /*TABLES*/
 table {
@@ -446,7 +449,7 @@ thead {
 .fixed-header thead tr {
   display: block;
 }
-code.example, code.voc-static {
+code.example {
   font-family: monospace;
   word-wrap: break-word;
   padding: 0 2px 1px 2px;
@@ -455,7 +458,7 @@ code.example, code.voc-static {
   border-radius: 3px;
   font-size: 1.18em;
 }
-pre.example, pre.voc-static {
+pre.example {
   background: var(--code-bg);
   color: var(--code-text);
   border-radius: 3px;
@@ -777,22 +780,22 @@ div .gll {
   font-variant-numeric: oldstyle-nums;
   text-transform: lowercase;
 }
-#voc-output-message .error-message {
+#prog-output-message .error-message {
   color: var(--error-text);
 }
-#voc-output-message .warning-message {
+#prog-output-message .warning-message {
   color: var(--warning-text);
 }
-#voc-output-message .info-message {
+#prog-output-message .info-message {
   color: var(--info-text);
 }
-#voc-output-message .grey-message {
+#prog-output-message .grey-message {
   color: var(--grey-text);
 }
-#voc-output-message {
+#prog-output-message {
   margin: 6px 0;
 }
-#voc-output-message p {
+#prog-output-message p {
   margin-left: 5px; margin-right: 5px;
 }
 
@@ -874,6 +877,7 @@ div .gll {
   height: 100%;
   border: none;
   border-radius: 0;
+  cursor: pointer;
 
   font-size: 1em;
 
@@ -1046,10 +1050,6 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
   user-select: none;
 }
 
-#voc-keyboard-table .special-button {
-  font-family: monospace;
-}
-
 /* --Mobile first, because that's the hipster thing to do I guess-- */
 @media only screen and (min-width: 701px) {
   section { padding: 30px 30px;}
@@ -1139,29 +1139,25 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
   box-shadow: none;
 }
 
-
-
-
 .cm-toolbar button {
-
     font-size: 1em;
     padding: 3px 5px 2px 5px;
     background: none;
     border: none;
-    cursor: pointer;
 }
 
-@media only screen and (min-width: 701px) {
+@media only screen and (min-width: 360px) {
   .cm-toolbar button {
       padding: 2px 9px 2px 9px;
   }
 }
 
-.cm-toolbar #generate-words {
+.cm-toolbar #generate-words, .cm-toolbar #apply-words {
     color: var(--info-text);
 }
-.cm-toolbar button:hover {
+.cm-toolbar button:hover:not(:disabled) {
   background: #8080803a;
+  cursor: pointer;
 }
 .cm-toolbar button:disabled, .cm-toolbar #generate-words:disabled {
   color: var(--disabled-button-text);

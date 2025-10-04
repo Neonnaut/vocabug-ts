@@ -36,8 +36,8 @@ export type Token =
       base: "∅";
     }
   | {
-      type: "reject"; // ^REJECT or ^R
-      base: "^REJECT";
+      type: "reject"; // 0
+      base: "0";
     }
   | {
       type: "word-boundary"; // #
@@ -73,10 +73,35 @@ export type Token =
       min: number;
       max: number|typeof Infinity;
     }
-  | {
+    | {
+      type: "empty-mark";
+      base: "<E";
+      min: number;
+      max: number|typeof Infinity;
+    }
+    | {
+      type: "based-mark";
+      base: "~";
+      min: number;
+      max: number|typeof Infinity;
+    }
+    | {
+      type: "br-start-capture";
+      base: "<=";
+      min: number;
+      max: number|typeof Infinity;
+    }
+    | {
+      type: "br-end-capture";
+      base: "=1"|"=2"|"=3"|"=4"|"=5"|"=6"|"=7"|"=8"|"=9";
+      name: "1"|"2"|"3"|"4"|"4"|"5"|"6"|"7"|"8"|"9"|"0"
+      min: number;
+      max: number|typeof Infinity;
+    }
+    | {
       type: "backreference";
       base: "1"|"2"|"3"|"4"|"4"|"5"|"6"|"7"|"8"|"9"|"0";
-      name: string;
+      name: "1"|"2"|"3"|"4"|"4"|"5"|"6"|"7"|"8"|"9"|"0"
       min: number;
       max: number|typeof Infinity;
     };

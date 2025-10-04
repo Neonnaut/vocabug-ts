@@ -54,7 +54,7 @@
 - [x] Transform char escape
 - [x] Single change
 - [x] Concurrent change
-- [x] A merging, concurent change. e.g: `a, e -> ^REJECT`
+- [x] A merging, concurent change. e.g: `a, e -> 0`
 - [x] Using category
 - [x] Alternator
 - [x] Optionalator
@@ -106,10 +106,6 @@
 - [x] Add `%` as syllable-mark
 - [x] Add `$` as syllable-boundary
 
-- [x] `~` tilde in blocked anythings mark
-
-- [ ] Alternative graphemes
-
 --------------
 
 - [ ] Target capture
@@ -119,9 +115,12 @@
 - [ ] Condition insertion
 - [ ] Result insertion
 
-- [ ] Backreference kebab as `~`
-- [ ] Backreference
+--------------
 
+- [ ] Alternative graphemes alternemes
+- [ ] Based-mark
+
+- [ ] clusterfield does not terminate on an END
 
 
 

@@ -23,7 +23,7 @@ graphemes: ee, oo, aa, ii, uu, ch
 BEGIN transform:
 nn, nm, np, sh, ss -> ny, m, mp, s, s
 aa, ee, ii, oo, uu -> a, e, i, o, u / #_#
-yi -> ^REJECT
+yi -> 0
 END`,
   tonal:
 `; A somewhat Yoruba-like tonal language
@@ -96,7 +96,7 @@ a',e',i',o',u' -> á,é,í,ó,ú ; Get stressed vowel
 u:+, u'u> o, e / _# ; /u/ final vowels should be less prominant
 {a,e,i,o,u}:+ -> {a,e,i,o,u} ; Vowels of 2+ length become 1
 áa,ée,íi,óo,úu -> á,é,í,ó,ú
-{a,e,o,u,á,é,í,ó,ú}{Σ} > ^REJECT / #_#
+{a,e,o,u,á,é,í,ó,ú}{Σ} > 0 / #_#
 
 ; Enlace y Hiato
 <   a  e  i  o  u
@@ -235,7 +235,7 @@ ai aʔ ac aŋ aɲ aj aw aʎ aɻ a-
 R -> ^ / _- / _ʔ
 
 ; <ji>, <ʎi> and <wu> are rejected.
-ji ʎi wu jiR ʎiR wuR -> ^REJECT
+ji ʎi wu jiR ʎiR wuR -> 0
 
 ; Romaniser:
 - > ^

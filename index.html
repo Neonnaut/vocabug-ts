@@ -42,7 +42,7 @@
 
         <div style="padding-left: 5px;">
           <b>Version: 0.4.0</b><br>
-          <a href="./vocabug_docs.html">Read the documentation here</a>
+          <a href="./docs/vocabug_docs.html">Read the documentation here</a>
         </div>
       </div>
 
@@ -59,26 +59,22 @@
         <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea>
         <input type="submit" class="styled-button" id="output-words-copy" value="Copy words">
         
-        <div id='voc-output-message' style="border: 2px solid #000;"><p class="grey-message">Information may be shown here...</p></div>
+        <div id='prog-output-message' style="border: 2px solid #000;"><p class="grey-message">Information may be shown here...</p></div>
     
         <fieldset style="float: left;" id="config">
           <legend>Config</legend>
 
-          <label for="word-divider">Word divider (" " is default. "\n" for newlines):</label><br>
-          <input type="text" autocomplete="off" id="word-divider">
+          <label for="word-divider">Word divider:</label>
+          <input type="text" autocomplete="off" id="word-divider" style="width: 100px;">
   
           <div>
             <div style="float:left; display: inline; margin: 4px 10px 2px 0;">
-              
-              <input type="radio" id="word-list-mode" name="mode-type" value=word-list>
-              <label for="word-list-mode">Word-list mode</label><br>
-
-              <input type="radio" id="debug-mode" name="mode-type" value="debug" checked>
-              <label for="debug-mode">Debug mode</label><br>
-  
-              <input type="radio" id="paragraph-mode" name="mode-type" value="paragraph">
-              <label for="paragraph-mode">Paragraph mode</label><br>
-  
+              <label for="my_mode">Mode:</label>
+              <select id="my_mode" aria-label="Generation mode">
+                <option value="word-list" selected>Word-list</option>
+                <option value="debug">Debug</option>
+                <option value="paragraph">Paragraph</option>
+              </select>
             </div>
             <div style="float: left; display: inline; margin: 4px 10px 2px 0;">
               <input type="checkbox" id="remove-duplicates" checked>
@@ -95,22 +91,29 @@
           <div style="clear: left;"></div>
         
         </fieldset>
+        <div style="clear: left;"></div>
+
 
         <fieldset style="float: left;">
             <legend>Editor options</legend>
-            <input type="checkbox" id="editor-wrap-lines">
-            <label for="editor-wrap-lines">Editor wrap lines</label><br>
+            <div style="float: left; display: inline; margin: 4px 10px 2px 0;">
+              <input type="checkbox" id="editor-wrap-lines">
+              <label for="editor-wrap-lines">Wrap lines</label>
+            </div>
 
-            <input type="checkbox" id="show-keyboard-section">
-            <label for="show-keyboard-section">Show keyboard</label><br>
+            <div style="float: left; display: inline; margin: 4px 10px 2px 0;">
+              <input type="checkbox" id="show-keyboard-section">
+              <label for="show-keyboard-section">Show keyboard</label>
+            </div>
+            <br style="clear: left;">
 
             <details class="dropdown-group" id="colour-switch-field">
               <summary class="dropdown-btn">Themes</summary>
-              <a type="submit" id="light-mode" value="Light" name="changeThemeButton">Light</a>
-              <a type="submit" id="warm-mode" value="Warm" name="changeThemeButton">Warm</a>
-              <a type="submit" id="dark-mode" value="Dark" name="changeThemeButton">Dark</a>
+              <a id="light-mode" value="Light" name="changeThemeButton">Light</a>
+              <a id="warm-mode" value="Warm" name="changeThemeButton">Warm</a>
+              <a id="dark-mode" value="Dark" name="changeThemeButton">Dark</a>
               <br>
-              <a type="submit" id="system-mode" value="System*" name="changeThemeButton">System</a>
+              <a id="system-mode" value="System*" name="changeThemeButton">System</a>
             </details>
 
         </fieldset>
@@ -119,8 +122,8 @@
         <fieldset id="file-save-load" style="float: left;">
           <legend>File save / load</legend>
   
-          <label for="file-name">File name:</label><br>
-          <input type="text" autocomplete="off" id="file-name" placeholder="vocabug"><br>
+          <label for="file-name">File name:</label>
+          <input type="text" autocomplete="off" id="file-name" placeholder="vocabug" style="width:102px"><br>
           <input type="submit" class="styled-button" id="load-file" value="Load file">
           <input type="submit" class="styled-button" id="save-file" value="Save file">
           <br>
@@ -138,6 +141,7 @@
         <br style="clear: left;">
 
       </section>
+      
 
 
     <section id="select-keyboard-section" style="display: none;">
