@@ -58,46 +58,66 @@ class Nesca_Grammar_Stream {
          }
 
          // Base token
-         if (char === "&" || char === "…") {
+         if (char === "&") {
             if (mode === "RESULT") {
                this.logger.validation_error(`Anythings-mark not allowed in '${mode}'`, line_num);
             }
 
             new_token = { type: "anythings-mark", base: "&", min: 1, max: Infinity };
+
             let look_ahead = i + 1;
 
             if (stream[look_ahead] === "[") {
                look_ahead++;
-               let blocked_stream = "";
+               let garde_stream = "";
 
-               while (true) {
-                  const char = stream[look_ahead];
-
-                  if (char === "]") break;
-
-                  if (look_ahead >= stream.length) {
-                     this.logger.validation_error(`Unclosed blocker`, line_num);
-                  }
-
-                  blocked_stream += char;
+               //  Collect full stream inside brackets
+               while (look_ahead < stream.length) {
+                  const next_char = stream[look_ahead];
+                  if (next_char === "]") break;
+                  garde_stream += next_char;
                   look_ahead++;
                }
-               
-               const blocked_items = blocked_stream
-                  .split(",") // split into groups
-                  .map(group =>
-                     graphemosis(group.trim(), this.graphemes) // split group into graphemes
-                        .map(g => this.escape_mapper.restore_escaped_chars(g))
-                        .filter(Boolean)
-                  )
-                  .filter(group => group.length > 0);
 
+               if (look_ahead >= stream.length || stream[look_ahead] !== "]") {
+                  this.logger.validation_error(`Unclosed blocker`, line_num);
+               }
 
-               new_token.blocked_by = blocked_items;
-               look_ahead++; // Consume }
+               //  Parse stream into consume and blocked_by
+               const raw_groups = garde_stream
+                  .split(",")
+                  .map(group => group.trim())
+                  .filter(Boolean);
+
+               const consume: string[][] = [];
+               const blocked_by: string[][] = [];
+
+               let is_blocker = false;
+
+               for (const group of raw_groups) {
+                  if (group.startsWith("^")) {
+                     is_blocker = true;
+                     continue; // Skip the ^ marker itself
+                  }
+
+                  const graphemes = graphemosis(group, this.graphemes)
+                     .map(g => this.escape_mapper.restore_escaped_chars(g))
+                     .filter(Boolean);
+
+                  if (graphemes.length > 0) {
+                     if (is_blocker) {
+                        blocked_by.push(graphemes);
+                     } else {
+                        consume.push(graphemes);
+                     }
+                  }
+               }
+
+               new_token.consume = consume;
+               new_token.blocked_by = blocked_by;
+
+               look_ahead++; // Consume closing bracket
             }
-
-            i = look_ahead;
          } else if (char === "%") {
             if (mode === "RESULT") {
                this.logger.validation_error(`Syllable-mark not allowed in '${mode}'`, line_num);
@@ -136,15 +156,15 @@ class Nesca_Grammar_Stream {
             let look_ahead = i + 1;
             if (stream[look_ahead] === "T") {
                if (mode === "TARGET") {
-                  this.logger.validation_error(`Target-reference not allowed in '${mode}'`, line_num);
+                  this.logger.validation_error(`Target-mark not allowed in '${mode}'`, line_num);
                }
-               new_token = { type: "target-reference", base: '<T', min: 1, max: 1 };
+               new_token = { type: "target-mark", base: '<T', min: 1, max: 1 };
                i = look_ahead
             } else if (stream[look_ahead] === "M") {
                if (mode === "TARGET") {
-                  this.logger.validation_error(`Metathesis-reference not allowed in '${mode}'`, line_num);
+                  this.logger.validation_error(`Metathesis-mark not allowed in '${mode}'`, line_num);
                }
-               new_token = { type: "metathesis-reference", base: '<M', min: 1, max: 1 };
+               new_token = { type: "metathesis-mark", base: '<M', min: 1, max: 1 };
                i = look_ahead;
             } else if (stream[look_ahead] === "E") {
                if (mode !== "TARGET") {
@@ -161,10 +181,10 @@ class Nesca_Grammar_Stream {
          } else if (char === "=") {
             let look_ahead = i + 1;
             if (stream[look_ahead] === "<") {
-               // It begins a backreference capture of sequenced graphemes
+               // It begins a reference capture of sequenced graphemes
                new_token = { type: "br-start-capture", base: "<=", min: 1, max: 1 };
             } else {
-               // It ends a backreference
+               // It ends a reference
                look_ahead += 1;
                // If look_ahead is 1 to 9
                switch (stream[look_ahead]) {

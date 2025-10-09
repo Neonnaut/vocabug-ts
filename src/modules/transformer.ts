@@ -2,6 +2,7 @@ import Word from './word';
 import Logger from './logger';
 import { swap_first_last_items, reverse_items, graphemosis } from './utilities';
 import type { Token, Output_Mode } from './types';
+import Reference_Mapper from './reference_mapper';
 
 import { xsampa_to_ipa, ipa_to_xsampa } from './xsampa';
 import { roman_to_hangul } from './hangul';
@@ -80,10 +81,13 @@ class Transformer {
 
     target_to_word_match(
         word_tokens: string[],
-        raw_target: Token[]
+        raw_target: Token[],
+        reference_mapper: Reference_Mapper
     ): [number, number, string[]] {
         for (let j = 0; j <= word_tokens.length; j++) {
-            const result = this.match_pattern_at(word_tokens, raw_target, j, word_tokens.length);
+            const result = this.match_pattern_at(
+                word_tokens, raw_target, j, reference_mapper, word_tokens.length
+            );
             if (result !== null) {
                 return [result.start, result.end - result.start, result.matched];
             }
@@ -101,11 +105,11 @@ class Transformer {
 
             if (my_result_token.type === "grapheme") {
                 replacement_stream.push(my_result_token.base);
-            } else if (my_result_token.type === "target-reference") {
+            } else if (my_result_token.type === "target-mark") {
                 for (let k:number = 0; k < target_stream.length; k++) {
                     replacement_stream.push(target_stream[k]);
                 }
-            } else if (my_result_token.type === "metathesis-reference") {
+            } else if (my_result_token.type === "metathesis-mark") {
                 const my_metathesis_graphemes = swap_first_last_items([...target_stream]);
                 for (let k:number = 0; k < my_metathesis_graphemes.length; k++) {
                     replacement_stream.push(my_metathesis_graphemes[k]);
@@ -120,8 +124,9 @@ class Transformer {
         stream: string[],
         pattern: Token[],
         start: number,
+        reference_mapper: Reference_Mapper,
         max_end?: number,
-        target_stream?: string[]
+        target_stream?: string[],
     ): Match_Result | null {
         let i = start;
         let j = 0;
@@ -134,9 +139,9 @@ class Transformer {
                 token.type !== 'wildcard' &&
                 token.type !== 'anythings-mark' &&
                 token.type !== 'syllable-mark' &&
-                token.type !== 'target-reference' &&
-                token.type !== 'metathesis-reference' &&
-                //token.type !== 'backreference' &&
+                token.type !== 'target-mark' &&
+                token.type !== 'metathesis-mark' &&
+                //token.type !== 'reference' &&
                 token.type !== 'syllable-boundary' &&
                 token.type !== 'word-boundary' &&
                 token.type !== 'empty-mark'
@@ -164,9 +169,9 @@ class Transformer {
                 matched.push(...stream.slice(i, i + count));
                 i += count;
 
-            } else if (token.type === 'target-reference') {
+            } else if (token.type === 'target-mark') {
                 if (!target_stream || target_stream.length === 0) {
-                    this.logger.validation_error("Target-reference requires a non-empty target_stream");
+                    this.logger.validation_error("Target-mark requires a non-empty target_stream");
                 }
 
                 const unit = target_stream;
@@ -196,9 +201,9 @@ class Transformer {
                 matched.push(...stream.slice(i, i + total_length));
                 i += total_length;
                 
-            } else if (token.type === 'metathesis-reference') {
+            } else if (token.type === 'metathesis-mark') {
                 if (!target_stream || target_stream.length === 0) {
-                    this.logger.validation_error("Metathesis-reference requires a non-empty target_stream");
+                    this.logger.validation_error("Metathesis-mark requires a non-empty target_stream");
                 }
 
                 const unit = swap_first_last_items([...target_stream]);
@@ -298,7 +303,7 @@ class Transformer {
                 i += count;
             } else if (token.type === 'anythings-mark') {
                 const blocked = token.blocked_by ?? [];
-                const next_token = pattern[j + 1];
+                const consume = token.consume ?? [];
 
                 let count = 0;
 
@@ -306,31 +311,44 @@ class Transformer {
                     count < max_available &&
                     stream[i + count] !== undefined
                 ) {
-                    // Check if any blocked group matches exactly at stream[i + count]
+                    // Check for blocked sequences
                     for (const group of blocked) {
-                    const group_len = group.length;
-                    const slice = stream.slice(i + count, i + count + group_len);
+                        const group_len = group.length;
+                        const slice = stream.slice(i + count, i + count + group_len);
 
-                    if (slice.length === group_len && slice.every((val, idx) => val === group[idx])) {
-                        break outer; // full sequence match → block
+                        if (
+                            slice.length === group_len &&
+                            slice.every((val, idx) => val === group[idx])
+                        ) {
+                            break outer; // Blocker matched → halt traversal
+                        }
                     }
+
+                    // Check for consume sequence match
+                    for (const group of consume) {
+                        const group_len = group.length;
+                        const slice = stream.slice(i + count, i + count + group_len);
+
+                        if (
+                            slice.length === group_len &&
+                            slice.every((val, idx) => val === group[idx])
+                        ) {
+                            count += group_len; // Consume the group
+                            break outer; // Stop traversal after consuming
+                        }
+                    }
+
+                    count++; // Advance if no blocker or consume match
                 }
 
-                // Check if next token is a grapheme and matches current stream char
-                if (next_token?.type === 'grapheme' && stream[i + count] === next_token.base) {
-                    break;
-                }
-                count++;
-                
-                }
-
-                if (count < min) {
+                if (count < token.min) {
                     return null;
                 }
 
                 matched.push(...stream.slice(i, i + count));
                 i += count;
             }
+
             j++;
         }
         return {
@@ -346,7 +364,8 @@ class Transformer {
         startIdx: number,
         raw_target: string[],
         before: Token[],
-        after: Token[]
+        after: Token[],
+        reference_mapper: Reference_Mapper
     ): boolean {
         const target_len = raw_target.length;
 
@@ -355,7 +374,12 @@ class Transformer {
 
         let before_matched = false;
         for (let i = 0; i <= startIdx; i++) {
-            const result = this.match_pattern_at(word_stream, before_tokens, i, startIdx, target_stream);
+            const result = this.match_pattern_at(
+                word_stream, before_tokens, i,
+                reference_mapper,
+                startIdx,
+                target_stream,
+            );
             if (result !== null && result.end === startIdx) {
                 before_matched = true;
                 break;
@@ -367,7 +391,10 @@ class Transformer {
         const after_tokens =  after;
         const after_start = startIdx + target_len;
 
-        const result = this.match_pattern_at(word_stream, after_tokens, after_start, word_stream.length, target_stream);
+        const result = this.match_pattern_at(
+            word_stream, after_tokens, after_start, reference_mapper,
+            word_stream.length, target_stream
+            );
 
         if (result === null) return false;
         return true;
@@ -499,6 +526,8 @@ class Transformer {
         }
     ): string[] {
 
+        const reference_mapper = new Reference_Mapper(); // New mapper for each transform application
+
         const { target, result, conditions, exceptions, chance, line_num } = transform;
 
         // CHANCE CONDITION
@@ -559,12 +588,18 @@ class Transformer {
                     let matched_condition: typeof conditions[number] | null = null;
 
                     const passes = conditions.length === 0 || conditions.some(c => {
-                        const result = this.environment_match(word_stream, my_replacement_stream, insert_index, [], c.before, c.after);
+                        const result = this.environment_match(
+                            word_stream, my_replacement_stream, insert_index, [], c.before, c.after,
+                            reference_mapper
+                        );
                         if (result) matched_condition = c;
                         return result;
                     });
                     const blocked = exceptions.some(e =>
-                        this.environment_match(word_stream, my_replacement_stream, insert_index, [], e.before, e.after)
+                        this.environment_match(
+                            word_stream, my_replacement_stream, insert_index, [], e.before, e.after,
+                            reference_mapper
+                        )
                     );
                     if (!passes || blocked) continue;
 
@@ -583,7 +618,7 @@ class Transformer {
                 while (cursor <= word_stream.length - raw_target.length) {
                     const [match_index, match_length, matched_stream] = this.target_to_word_match(
                         word_stream.slice(cursor),
-                        raw_target
+                        raw_target, reference_mapper
                     );
 
                     if (match_length === 0) {
@@ -604,14 +639,18 @@ class Transformer {
                             global_index,
                             matched_stream,
                             c.before,
-                            c.after
+                            c.after,
+                            reference_mapper
                         );
                         if (result && !matched_condition) matched_condition = c;
                         return result;
                     });
 
                     const blocked = exceptions.some(e =>
-                        this.environment_match(word_stream, matched_stream, global_index, matched_stream, e.before, e.after)
+                        this.environment_match(
+                            word_stream, matched_stream, global_index, matched_stream, e.before, e.after,
+                            reference_mapper
+                        )
                     );
                     if (!passes || blocked) {
                         cursor = global_index + 1; continue; // skip this match

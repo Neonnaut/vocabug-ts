@@ -31,14 +31,14 @@ References can be modified with diacritics or a feature matrix as if they were a
 
 ## Brassica
 
-### Category backreferences
+### Category references
 
-Backreferences allow explicitly specifying the correspondence between categories.
-Two forms of backreference exist: identifier backreferences, and numeric backreferences.
+References allow explicitly specifying the correspondence between categories.
+Two forms of reference exist: identifier references, and numeric references.
 
-An **identifier backreference** is written as `@#id` followed by a category,
+An **identifier reference** is written as `@#id` followed by a category,
   where the identifier `id` can be any grapheme except `#` which is not followed by a tilde.
-Identifier backreferences extend over the entirety of a rule:
+Identifier references extend over the entirety of a rule:
   any two categories with the same identifier
   must match or produce an element at the same index as each other.
 
@@ -76,24 +76,24 @@ Identifier backreferences extend over the entirety of a rule:
 ; aku → akxu
 ```
 
-A **numeric backreference** is written as `@n` followed by a category,
+A **numeric reference** is written as `@n` followed by a category,
   where `n` can be any number greater than 0.
-Unlike identifier backreferences,
-  the meaning of a numeric backreference depends on which sound change part it is in:
+Unlike identifier references,
+  the meaning of a numeric reference depends on which sound change part it is in:
   
-- In the target, a numeric backreference `@n Category`
+- In the target, a numeric reference `@n Category`
     refers to the `n`th element of the list of matched category indices in the target.
   The `n`th element of `Category` must then match successfully.
-- In an environment or exception, a backreference has the same meaning,
+- In an environment or exception, a reference has the same meaning,
     except that it refers to the list of matched category indices
-    in the environment or exception in which the backreference is placed.
-  The scope of backreferences extends across the underscore representing the target.
-- In the replacement, a numeric backreference `@n Category`
+    in the environment or exception in which the reference is placed.
+  The scope of references extends across the underscore representing the target.
+- In the replacement, a numeric reference `@n Category`
     refers to the `n`th element of the list of matched category indices in the *target* (not the replacement).
   The `n`th element of `Category` is then produced.
   
 Note that, as lexemes are traversed from right to left in a sound change flagged as `-rtl`,
-  numeric backreferences naturally operate in the same order in such rules.
+  numeric references naturally operate in the same order in such rules.
   
 ```brassica
 [m n ŋ] [b d g] / @2 [m n ŋ] @2 [b d g]

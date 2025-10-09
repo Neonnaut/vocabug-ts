@@ -77,7 +77,7 @@
 - [x] Wildcard
 - [x] Anythings-mark
 - [x] Blocked Anythings-mark
-- [x] Target-reference
+- [x] Target-mark
 
 - [x] Engine, decompose
 - [x] Engine, compose
@@ -101,8 +101,8 @@
 
 - [x] graphemes block
 - [x] Make the met condition say so in debug
-- [x] Deal with metathesis-reference as `<M`
-- [x] Deal with target-reference as `<T`
+- [x] Deal with metathesis-mark as `<M`
+- [x] Deal with target-mark as `<T`
 - [x] Add `%` as syllable-mark
 - [x] Add `$` as syllable-boundary
 
@@ -119,8 +119,6 @@
 
 - [ ] Alternative graphemes alternemes
 - [ ] Based-mark
-
-- [ ] clusterfield does not terminate on an END
 
 
 

@@ -19,6 +19,7 @@ export type Token =
       base: "&";
       min: number;
       max: number|typeof Infinity;
+      consume?: string[][];
       blocked_by?: string[][];
     }
   | {
@@ -62,13 +63,13 @@ export type Token =
       max: number|typeof Infinity;
     }
   | {
-      type: "target-reference";
+      type: "target-mark";
       base: '<T';
       min: number;
       max: number|typeof Infinity;
     }
     | {
-      type: "metathesis-reference";
+      type: "metathesis-mark";
       base: "<M";
       min: number;
       max: number|typeof Infinity;
@@ -99,7 +100,7 @@ export type Token =
       max: number|typeof Infinity;
     }
     | {
-      type: "backreference";
+      type: "reference";
       base: "1"|"2"|"3"|"4"|"4"|"5"|"6"|"7"|"8"|"9"|"0";
       name: "1"|"2"|"3"|"4"|"4"|"5"|"6"|"7"|"8"|"9"|"0"
       min: number;

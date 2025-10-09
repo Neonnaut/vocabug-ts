@@ -129,14 +129,103 @@ generated words would have meta information that they were in a pos or word clas
 
 Tranforms could then have a condition that 
 
-## Naming rules
-
-Ability to give each transform a name
-
 ## Automatic Syllables 
+
+cons . vowel vowel . cons
+
+reluctance - makes 
+
+multiple syllable shapes
+
+
 
 ## Structured syllable rule
 
-## `<N`
+## Naming rules
 
-## 
+Ability to give each transform a name. The name would be printed out in debug mode
+
+## Reversable
+
+## abanana rule, no overlappinng
+
+## Right-to-left
+
+## Left-to-right
+
+## Clean-up
+
+A cleanup rule, marked with the modifier cleanup after the rule name, applies after every subsequent rule:
+
+Ability to deactivate cleanup, or temporarily deactivate on a transform
+
+## terminate at first replacement
+
+## transforms line wrap on -> / etc
+
+## syllable level features
+
+## feature target missmatch of features
+
+## syllable reference
+
+## Probably do spaces between graphemes and tokens to do sequences
+
+## then, else, if, blocks that can be nested
+
+## Add typo check on comments
+
+## Able to chain changes: a -> e -> i
+
+## Associateme
+
+## A way to do sandhi. For example: ^ -> n / a_#a 
+
+## feature bundles... %manner = velar, labial
+
+## Alter the anythings mark
+
+I need to change it from clunky syntax like `&[tr]*r`
+
+should be like: `&[^p r, ^t r, ^k r, p, t, k]r`
+
+means to match as many graphemes as possible unless its a `pr` sequence etc. stop matching once matching a `t`
+
+## Change reference
+
+equals sign in-between tokens
+
+now I can have infinite number of references
+
+## Headers
+
+Top level header
+@top reverse-sound-change
+Somehow do rule before, after, like auto syllabifying
+name of changes: eg: egyptian-to-blahblah. Also do parent
+
+Blocks:
+If, then, else
+Can be nested
+
+header:
+@header Name, -left-to-right, -right-to-left, -replace-once, -no-overlap, -is-engine
+way to do word-class only 
+
+Feature geometry
+
+Autosegmental phonology
+
+Word-and-paradigm morphology
+
+`N -> [+nasal, b=PLACE] / _[+consonant a=PLACE]`
+`a -> b,`
+
+## reference factory
+`| a -> b, a -> shift-right, `
+
+## Escapes
+
+Right now, escape chars could interfere with PUA 
+
+---

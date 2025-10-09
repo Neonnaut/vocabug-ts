@@ -150,7 +150,7 @@
           <li><a href="#nescaGeminateMark">Geminate-mark</a></li>
           <li><a href="#nescaWildcard">Wildcard</a></li>
           <li><a href="#nescaAnythingsMark">Anythings-mark</a></li>
-          <li><a href="#nescaBlocker">Blocked-anythings-mark</a></li>
+          <li><a href="#nescaGuarded">Guarded-anythings-mark</a></li>
           <li><a href="#nescaSyllableMark">Syllable-mark</a></li>
         </ol>
         </li>
@@ -158,17 +158,17 @@
         <li><a href="#nescaAdvancedRules">Advanced rules</a>
           <ol class="nice-list">
             <li><a href="#nescaEngine">Engine</a></li>
-            <li><a href="#nescaTargetReference">Target-reference</a></li>
-            <li><a href="#nescaMetathesisReference">Metathesis-reference</a></li>
+            <li><a href="#nescaTargetMark">Target-mark</a></li>
+            <li><a href="#nescaMetathesisMark">Metathesis-mark</a></li>
             <li><a href="#nescaEmptyMark">Empty-mark</a></li>
 
-            <li><a href="#nescaBackreference">Backreference</a>
+            <li><a href="#nescaReference">Reference</a>
               <ol class="nice-list">
-                <li><a href="#nescaSingularBackreference">Backreference of singular grapheme</a></li>
-                <li><a href="#nescaBackreferenceSequence">Backreference of grapheme sequence</a></li>
+                <li><a href="#nescaSingularReference">Reference of singular grapheme</a></li>
+                <li><a href="#nescaReferenceSequence">Reference of grapheme sequence</a></li>
               </ol>
             </li>
-            <li><a href="#nescaPolygraphemes">Polygraphemes</a>
+            <li><a href="#nescaAssociatemes">Associatemes</a>
               <ol class="nice-list">
                 <li><a href="#nescaBasedMark">Based-mark</a></li>
               </ol>
@@ -417,7 +417,7 @@
           </tr>
           <tr>
             <td><code class="example">&[</code> or <code class="example">…[</code> and <code class="example">]</code></td>
-            <td><a href="#nescaBlocker">Blocked-anythings-mark</a></td>
+            <td><a href="#nescaGuarded">Guarded-anythings-mark</a></td>
           </tr>
           <tr>
             <td><code class="example">%</code></td>
@@ -429,11 +429,11 @@
           </tr>
           <tr>
             <td><code class="example">&lt;T</code></td>
-            <td><a href="#nescaTargetReference">Target-reference</a></td>
+            <td><a href="#nescaTargetMark">Target-mark</a></td>
           </tr>
           <tr>
             <td><code class="example">&lt;M</code></td>
-            <td><a href="#nescaMetathesisReference">Metathesis-reference</a></td>
+            <td><a href="#nescaMetathesisMark">Metathesis-mark</a></td>
           </tr>
           <tr>
             <td><code class="example">&lt;E</code></td>
@@ -441,15 +441,15 @@
           </tr>
           <tr>
             <td><code class="example">=</code> and positive digit</td>
-            <td><a href="#nescaBackreference">Backreference-capture</a></td>
+            <td><a href="#nescaReference">Reference-capture</a></td>
           </tr>
           <tr>
             <td><code class="example">&lt;=</code></td>
-            <td>Begins <a href="#nescaBackreference">Backreference-capture</a> of a sequence of graphemes</td>
+            <td>Begins <a href="#nescaReference">Reference-capture</a> of a sequence of graphemes</td>
           </tr>
           <tr>
             <td>A positive digit</td>
-            <td><a href="#nescaBackreference">Backreference</a></td>
+            <td><a href="#nescaReference">Reference</a></td>
           </tr>
           <tr>
             <td><code class="example">~</code></td>
@@ -780,7 +780,7 @@
       <p>Graphemes may alternatively be declared in the <code class="example">BEGIN graphemes:</code> block. Allowing graphemes to be declared over multiple lines, and allowing the use of comments between graphemes. You must use the <code class="example">END</code> keyword on a new line to end the block.</p>
 
       <h2 id="nescaTransform"><a class="head-num">11</a>Transform</h2>
-      <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of the transform block, which implements the <a href="./nesca.html">NeSCA program</a>.</p>
+      <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of the transform block, which uses SPE style rules, and implements the <a href="./nesca.html">NeSCA program</a>.</p>
       <p>All transforms must be used inside this block. To terminate this block you use an <code class="example">END</code> line. However, all unterminated blocks are automatically terminated at the end of the definition-build:</p>
       <div class="prog-pre"><span class="directive">BEGIN transform</span><span class="link">:</span><br><span class="comment">; Your rules go here</span><br><span class="directive">END</span></div>
       <p>A rule can be summarised in four fields: <code class="example">CHANGE / CONDITION ! EXCEPTION</code>. The characters <code class="example">/</code> and <code class="example">!</code> that precede each field (except for the <code class="example">CHANGE</code>) are necessary for signalling each field. For example, including a <code class="example">!</code> will signal that this rule contains an exception, and all text following it until the next field marker will be interpreted as such.</p>
@@ -1026,16 +1026,35 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>Wildcard can be placed by itself inside an <a href="#nescaOptionalatorSet">optionalator</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">20.6</a>Anythings-mark</h3>
-      <p>The anythings-mark uses ampersand <code class="example">&</code> or the ellipsis character <code class="example">…</code> U+2026. It will match as many (but not zero) times to any grapheme as needed. For example:</p>
-      <div class="prog-pre">  b<span class="regexp">&</span>t <span class="link">-></span> x<br><code class="comment">; babitto => xto</code></div>
-      <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, then stopped matching. Why did the anythings-mark not continue matching <code class="example">t</code> and beyond like <code class="example">*+</code> would? This is because it is non-greedy, or in other words, lazy. The anythings-mark will continue matching graphemes until a grapheme that would be matched matches an item following the anythings-mark.</p>
+      <p>The anythings-mark uses ampersand <code class="example">&</code>. It will match as many (but not zero) times to any grapheme. For example:</p>
+      <div class="prog-pre">  b<span class="regexp">&</span> <span class="link">-></span> x<br><code class="comment">; abitto => ax</code></div>
+      <p>As we can see, the rule matched <code class="example">b</code> and greedily matched everything else.</p>
       <p>The example below uses an anythings-mark in the condition:</p>
       <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">&</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
 
-      <h3 id="nescaBlocker"><a class="head-num">20.7</a>Blocked-anythings-mark</h3>
-      <p>Blocked-anythings-mark is designed to block the spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set of graphemes inside <code class="example"><span class="regexp">&[</span></code> and <code class="example">]</code> that will block spreading. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
+      <h3 id="nescaGuarded"><a class="head-num">20.7</a>Guarded-anythings-mark</h3>
+      <p>Guarded-anythings-mark is designed to change the greedy, spreading behaviour of the anythings-mark when certain graphemes are ahead of it. You enclose a set that consists of singular graphemes, or a sequence of graphemes inside <code class="example"><span class="regexp">&[</span></code> and <code class="example">]</code> that will condition spreading.</p>
+
+      <p><b>Consuming negative lookahead</b>:</p>
+
+      <p>Sometimes it is necessary to for the anythings mark to consume graphemes we are monitoring for, and then stop consuming:</p>
+
+      <div class="prog-pre">  b<span class="regexp">&[</span>t<span class="regexp">]</span> <span class="link">-></span> x<br><code class="comment">; babitto => xto</code></div>
+      <p>As we can see, the rule matched <code class="example">b</code> followed by anything else until it reached the first <code class="example">t</code>, consumed that, then stopped matching. This anythings-mark in Regular Expression terminology would be called "lazy" / "non-greedy"</p>
+
+      <p><b>Negative lookahead</b>:</p>
+
+      <p>Sometimes it is necessary for graphemes to block the spread without having them be consumed. To do this put a caret <code class="example">^</code> in front of all these blocking graphemes or grapheme sequences. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       
-      <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">&[</span>k<span class="link">,</span> g<span class="regexp">]</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
+      <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">&[</span><span class="operator">^</span>k<span class="link">,</span> g<span class="regexp">]</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
+
+      <p>e</p>
+      <div class="prog-pre"><span class="comment">; capture up to a plosive + [r] cluster</span>
+<span class="comment">; and then it's plosive. Transform this into [x].</span>
+  <span class="regexp">&[<span class="operator">^</span></span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span> <span class="link">-></span> x 
+<span class="comment">; kotatros -> xros</span></div>
+
+
 
       <h3 id="nescaSyllableMark"><a class="head-num">20.8</a>Syllable-mark</h3>
       <p>Using the percent-sign <code class="example">%</code>, a 'syllable-mark' will match to a sequence of graphemes, as long as there is not a <code class="example">.</code> character in the sequence. This is equivalent to <code class="example">&{.}</code></p>
@@ -1239,9 +1258,9 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       </li>
       </ul>
 
-      <h3 id="nescaTargetReference"><a class="head-num">21.2</a>Target-reference</h3>
-      <p>A target-reference is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses a less-than sign and a capital t <code class="example">&lt;T</code>.</p>
-      <p>Here are some examples where target-reference is employed:</p>
+      <h3 id="nescaTargetMark"><a class="head-num">21.2</a>Target-mark</h3>
+      <p>A target-mark is a reference to the captured <code class="example">TARGET</code> graphemes. It cannot be used in <code class="example">TARGET</code>. This uses a less-than sign and a capital t <code class="example">&lt;T</code>.</p>
+      <p>Here are some examples where target-mark is employed:</p>
       <p><b>Full reduplication</b>:</p>
       <div class="prog-pre">  <span class="regexp">&</span> <span class="link">-></span> <span class="catkey">&lt;T&lt;T</span>
 <span class="comment">; malak ==&gt; malakmalak</span></div>
@@ -1252,7 +1271,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p><b>Reject a word when a word-initial consonant is identical to the next consonant</b>:</p>
       <div class="prog-pre">  <span class="catkey">C</span> <span class="link">-></span> <span class="operator">0</span> <span class="link">/</span> <span class="regexp">#</span><span class="link">_</span><span class="regexp">&[</span><span class="catkey">C</span><span class="regexp">]</span><span class="catkey">&lt;T</span></div>
 
-      <h3 id="nescaMetathesisReference"><a class="head-num">21.3</a>Metathesis-reference</h3>
+      <h3 id="nescaMetathesisMark"><a class="head-num">21.3</a>Metathesis-mark</h3>
       <p>Simple metathesis involves a less-than-sign and a capital m <code class="example">&lt;M</code> in <code class="example">RESULT</code>. This will swap the first and last grapheme from the captured <code class="example">TARGET</code> graphemes:</p>
       <div class="prog-pre"><span class="comment">; Swap a plosive and nasal stop</span>
   <span class="regexp">{</span>p<span class="link">,</span> t<span class="link">,</span> k<span class="link"></span><span class="regexp">}</span><span class="regexp">{</span>m<span class="link">,</span> n<span class="regexp">}</span> <span class="link">-></span> <span class="catkey">&lt;M</span><br><span class="comment">; apma ==> ampa</span></div>
@@ -1269,7 +1288,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 
       <div class="prog-pre"><span class="comment">; The [r] of a plosive + [r] cluster is moved</span>
 <span class="comment">; between a word initial plosive and a vowel</span>
-  <span class="catkey">&lt;E</span><span class="regexp">{</span>a<span class="link">,</span>e<span class="link">,</span>i<span class="link">,</span>o<span class="link">,</span>u<span class="regexp">}</span><span class="regexp">&[</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span><span class="regexp">*</span>r <span class="link">-></span> <span class="catkey">&lt;M</span> <span class="link">/</span> <span class="regexp">#</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span><span class="link">_</span>
+  <span class="catkey">&lt;E</span><span class="regexp">{</span>a<span class="link">,</span>e<span class="link">,</span>i<span class="link">,</span>o<span class="link">,</span>u<span class="regexp">}</span><span class="regexp">&[<span class="operator">^</span></span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r <span class="link">-></span> <span class="catkey">&lt;M</span> <span class="link">/</span> <span class="regexp">#</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span><span class="link">_</span>
 <span class="comment">; kotatros -> krotatos</span></div>
 
       <p>Another use for it is in a romanisation or deromanisation system using a cluster-field:</p>
@@ -1277,28 +1296,28 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre"><span class="directive">&lt;</span>  p  t  k  j  y
 <span class="catkey">&lt;E</span> p  t  c  y  ü</div>
 
-      <h3 id="nescaBackreference"><a class="head-num">21.4</a>Backreference</h3>
-      <p>Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of backreference. Backreference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>
+      <h3 id="nescaReference"><a class="head-num">21.4</a>Reference</h3>
+      <p>Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of reference. Reference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>
 
-      <h4 id="nescaSingularBackreference"><a class="head-num">21.4.1</a>Backreference of singular grapheme</h4>
+      <h4 id="nescaSingularReference"><a class="head-num">21.4.1</a>Reference of singular grapheme</h4>
 
-      <p>A grapheme is bound to a backreference using a 'reference-capture', to the right of some grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number. This number, is called the 'reference-name' of the backreference.</p>
+      <p>A grapheme (or graphemes) are bound to a reference using a 'reference-capture', to the right of some grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number. This number, is called the 'reference-key' of the reference. The grapheme (or graphemes) bound to the reference is callsed the 'reference-value'.</p>
 
       <p>The key behaviours of reference-capture are:</p>
       <ul>
-        <li>A Backreference forgets the value bound to via reference-capture in-between transforms. Backreferences do not persist between rules</li>
-        <li>You can have up to nine backreferences per transform</li>
-        <li>A backreference can be overwritten with a new value</li>
+        <li>A Reference forgets its reference-value in-between transforms. References do not persist between rules</li>
+        <li>You can have up to nine references per transform</li>
+        <li>A reference-value can be overwritten with a new reference-capture to that reference</li>
         <li>For reference-capture in conditions, a grapheme is captured only if that condition is met</li>
       </ul>
 
-      <p>The captured grapheme can then be reproduced elsewhere in the transform with a 'reference-name', even before the reference-capture. The reference-name is a single-digit positive number.</p>
+      <p>The captured grapheme can then be reproduced elsewhere in the transform with a 'reference-mark', even before the reference-capture. The reference-mark invokes the reference-key of a reference.</p>
 
-      <p>The key behaviours of reference-name are:</p>
+      <p>The key behaviours of reference-mark are:</p>
       <ul>
-        <li>A reference-name may not be used in the <code class='example'>TARGET</code> of a transform.</li>
-        <li>In each condition or exception of a transform, a reference-name cannot be used before content has been bound to its backreference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference-name is not recursive in conditions and exceptions.</li>
-        <li>If a reference-name is used where a reference-capture has not captured anything yet, it fails silently and outputs the number of the backrefence.</li>
+        <li>A reference-mark may not be used in the <code class='example'>TARGET</code> of a transform.</li>
+        <li>In each condition or exception of a transform, a reference-mark cannot be used before content has been bound to its reference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference-name is not recursive in conditions and exceptions.</li>
+        <li>If a reference-mark is used where a reference-capture has not captured anything yet, it fails silently and outputs the number of the backrefence.</li>
       </ul>
 
       <p>Here are some examples:</p>
@@ -1307,19 +1326,19 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
   ʔ <span class="link">-&gt;</span> <span class="operator">^</span> <span class="regexp">/</span> <span class="catkey">[+vowel]</span><span class="regexp">=1</span><span class="link">_</span><span class="catkey">1</span>
 <span class="comment">; baʔaʔe ==> baaʔe</span></div>
 
-      <p>In the rule above, we are binding the <code class='example'>[+vowel]</code> feature-matrix to the backreference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>[+vowel]</code> is when the condition is met, is captured as the value of <code class='example'>1</code>. Then the value of backrefence <code class='example'>1</code> is inserted into <code class='example'>AFTER</code> by invoking its reference-name.</p>
+      <p>In the rule above, we are binding the <code class='example'>[+vowel]</code> feature-matrix to the reference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>[+vowel]</code> is when the condition is met, is captured as the value of <code class='example'>1</code>. Then the value of backrefence <code class='example'>1</code> is inserted into <code class='example'>AFTER</code> by invoking its reference-mark.</p>
 
       <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
   <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
 <span class="comment">; foobaʔ ==&gt; foobaʔa</span></div>
 
-      <p>In the rule above, we are binding the <code class='example'>V</code> category to the backreference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>V</code> is when the condition is met is the value of <code class='example'>1</code>. Then the value of <code class='example'>1</code> is inserted into <code class='example'>RESULT</code> by invoking its reference-name.</p>
+      <p>In the rule above, we are binding the <code class='example'>V</code> category to the reference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>V</code> is when the condition is met is the value of <code class='example'>1</code>. Then the value of <code class='example'>1</code> is inserted into <code class='example'>RESULT</code> by invoking its reference-mark.</p>
 
-      <h4 id="nescaBackreferenceSequence"><a class="head-num">21.4.2</a>Backreference of grapheme sequence</h4>
+      <h4 id="nescaReferenceSequence"><a class="head-num">21.4.2</a>Reference of grapheme sequence</h4>
 
-      <p>Now that that has been (hopefully) introduced and explained adequately, with backreference's 'reference-capture' and 'reference-name', lets explain how to capture and reference a sequence of graphemes.</p>
+      <p>Now that that has been (hopefully) introduced and explained adequately, with reference's 'reference-capture' and 'reference-mark', lets explain how to capture and reference a sequence of graphemes.</p>
 
-      <p>To start capturing a sequence, you use a 'start-reference-capture', <code class="example">&lt;=</code> before the graphmemes to be captured. Then at the end of the graphemes to be captured, a 'reference-capture' is used to bind those graphemes to a backreference:</p>
+      <p>To start capturing a sequence, you use a 'start-reference-capture', <code class="example">&lt;=</code> before the graphmemes to be captured. Then at the end of the graphemes to be captured, a 'reference-capture' is used to bind those graphemes to a reference:</p>
 
       <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
   <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
@@ -1327,23 +1346,26 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       
       
 
-      <h3 id="nescaPolygraphemes"><a class="head-num">21.5</a>Polygraphemes</h3>
-      <p>If your language encodes tone, stress, breathy voice, or other phonological features directly on vowels, you’ll often need to target a particular grapheme across its variants.</p>
+      <h3 id="nescaAssociatemes"><a class="head-num">21.5</a>Associatemes</h3>
+      <p>If your language encodes tone, stress, breathy voice, or other phonological features directly on vowels, you'll often need to target a particular grapheme across its variants.</p>
       <p>One method is to target each variant manually:</p>
 
       <div class="prog-pre">  <span class="regexp">{</span>a<span class="link">,</span> á<span class="link">,</span> à<span class="regexp">}</span> <span class="link">-&gt;</span> <span class="regexp">{</span>e<span class="link">,</span> é<span class="link">,</span> è<span class="regexp">}</span><br><span class="comment">; daná ==&gt; dené</span></div>
 
       <p>This workaround uses alternators, but lacks semantic clarity and scalability, and is outright tedious.</p>
-      <p>To solve this, are 'polygraphemes' -- aligned grapheme variants of their bases. These allow you to target all forms of a grapheme with a single transform. To set up polygraphemes, they must be stated in the graphemes: directive like so:</p>
+      <p>To solve this, are 'assosiatemes' -- aligned graphemes assosiated with their base grapheme, and other assosiated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single transform. To set up associatemes, they must be stated in the graphemes: directive like so:</p>
       
-      <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">{</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span></div>
+      <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">{</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span>
+  a <span class="link">-&gt;</span> e<br><span class="comment">; daná ==&gt; dené</span></div>
       
-      <p>Each grouping must contain an equal number of graphemes, aligned by position. This creates a traceable overlay across tone, stress, and other features.</p>
+      <p>This transform targets all variants of <code class="example">a</code> and maps them to the assosiated variant of <code class="example">e</code>.</p>
 
-      <div class="prog-pre">  a <span class="link">-&gt;</span> e<br><span class="comment">; daná ==&gt; dené</span></div>
-      
-      <p>This targets all variants of a and maps them to the corresponding variant of e.</p>
-      <p>This does not mean that each variant must be different by means of diacritics, they are arbitrarily variant. This does not mean that only vowels may be polygraphemes, we can have multiple sets of polygraphemes for consonants, or perhaps a system for both.</p>
+      <p>The behaviour of assosiatemes are:</p>
+      <ul>
+        <li>Each grouping must contain an equal number of graphemes, aligned by position. This creates a traceable overlay across tone, stress, and other features</li>
+        <li>This does not mean that each variant must be different by means of diacritics, they are arbitrarily variant. For example <code class="example">graphemes: {a,b,c}&lt;{x,y,z}</code> is valid</li>
+        <li>This does not mean that we can have only one grouping set. For example <code class="example">graphemes: {a,i,o}&lt;{á,í,ó}, {a,b,c}&lt;{x,y,z}</code> is valid</li>
+      </ul>
 
       <h3 id="nescaBasedMark"><a class="head-num">21.5.1</a>Based-mark</h3>
       <p>To target only the base grapheme, use a tilde <code class="example">~</code> after the grapheme:</p>

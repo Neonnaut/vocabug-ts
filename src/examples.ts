@@ -31,17 +31,17 @@ I = k t ^ {p,f} n r b m s l d c ç ş h y w g {kp,gb}
 C = t k {f,p} n r b m s d h l ŋ g c ş ç l y w {mb,nd,ŋg} {kp,gb,ŋgb}
 V = a i e o u
 W = a i ẹ ọ u
-T = ^*3.7 \`*3 '*3.3 ; Gives mid-tone, low-tone, high-tone
+T = ^*3.7 [@Grave]*3 [@Acute]*3.3 ; Gives mid-tone, low-tone, high-tone
 
 ; + ATR harmony 
-$A = ITV
-$B = CTV
-$C = CTV(n)
+$A = IVT
+$B = CVT
+$C = CVT(n)
 
 ; - ATR harmony
-$X = ITW
-$Y = CTW
-$Z = CTW(n)
+$X = IWT
+$Y = CWT
+$Z = CWT(n)
 
 BEGIN words:
 $A$C $A$B$C $A$B$B$C
@@ -53,11 +53,7 @@ graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
 
 ; Mark vowels with a tone mark
 BEGIN transform:
-< a e ẹ i o ọ u
-' á é ẹ́ í ó ọ́ ú
-\` à è ẹ̀ ì ò ọ̀ ù
-
-c -> ç / _i / _í / _ì
+| compose
 END`,
   romance:
 `; This should produce... simplified Spanish-looking words
