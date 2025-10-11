@@ -229,3 +229,5 @@ Word-and-paradigm morphology
 Right now, escape chars could interfere with PUA 
 
 ---
+
+## CLI

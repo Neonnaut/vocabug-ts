@@ -21,13 +21,17 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "build:win": "tsc.cmd && vite.cmd",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:ts": "tsc && vite build",
+    "build:win": "tsc.cmd",
+    "build:cli": "tsc -p bin/tsconfig.json",
+    "build:all": "npm run build:ts && npm run build:win && npm run build:cli",
+    "build:web": "vite build --config devbuild/vite.config.js"
   },
   "devDependencies": {
     "@types/node": "^24.0.12",
+    "@types/yargs": "^17.0.33",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vitest": "^3.2.4"
@@ -48,6 +52,7 @@
     "README"
   ],
   "dependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.1"
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "yargs": "^18.0.0"
   }
 }

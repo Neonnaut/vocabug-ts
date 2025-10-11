@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist",
+    "rootDir": ".",
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "strict": true
+  },
+  "include": ["cli.ts"]
+}
