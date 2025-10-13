@@ -195,7 +195,6 @@ class Parser {
                 let optionals_weight = make_percentage(line_value);
                 if (optionals_weight == null) {
                     this.logger.validation_error(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
-                    continue;
                 }
                 this.optionals_weight = optionals_weight;
 

@@ -1,11 +1,15 @@
 {
-  "compilerOptions": {
-    "outDir": "../dist",
-    "rootDir": ".",
-    "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "node",
-    "strict": true
-  },
-  "include": ["cli.ts"]
+    "files": ["./index.ts"],
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
+        "strict": true,
+        "noEmitOnError": true,
+        "outDir": ".",
+        "target": "ES2022",
+        "lib": ["ES2022"],
+        "module": "commonjs"
+    }
 }

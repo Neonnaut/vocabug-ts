@@ -110,7 +110,7 @@ function roman_to_hangul(input: string): string {
 
         // If initial matched but no medial, emit standalone jamo
         if (initial_index !== null && medial_index === null) {
-            const jamo = String.fromCharCode(compatibility_jamos[initial_index]); // compatibility jamo
+            const jamo = String.fromCharCode(compatibility_jamos[initial_index as number]); // compatibility jamo
             output += jamo;
             input = input.slice(consumed); // consume matched initial
             continue;

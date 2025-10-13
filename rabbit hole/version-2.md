@@ -231,3 +231,5 @@ Right now, escape chars could interfere with PUA
 ---
 
 ## CLI
+
+## Build.sh eslint

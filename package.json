@@ -27,11 +27,13 @@
     "build:win": "tsc.cmd",
     "build:cli": "tsc -p bin/tsconfig.json",
     "build:all": "npm run build:ts && npm run build:win && npm run build:cli",
-    "build:web": "vite build --config devbuild/vite.config.js"
+    "build:web": "vite build --config devbuild/vite.config.js",
+    "lint": "eslint ./"
   },
   "devDependencies": {
     "@types/node": "^24.0.12",
     "@types/yargs": "^17.0.33",
+    "eslint": "^9.37.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vitest": "^3.2.4"
@@ -51,6 +53,9 @@
     "LICENSE",
     "README"
   ],
+  "bin": {
+    "vocabug": "bin/vocabug"
+  },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "yargs": "^18.0.0"

@@ -1,13 +1,20 @@
+
 {
-  "compilerOptions": {
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "outDir": "./dist",
-    "noEmit": false,
-    "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "node",
-    "strict": true
-  },
-  "include": ["src/index.ts"]
+    "files": ["src/index.ts"],
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitReturns": true,
+        //"noUncheckedIndexedAccess": true,
+        "strict": true,
+        "declaration": true,
+        "noEmitOnError": true,
+        "outDir": "./dist/",
+        "module": "commonjs",
+        "exactOptionalPropertyTypes": true,
+        "removeComments": true,
+        "target": "ES2022",
+        "lib": ["ES2022", "DOM"],
+        "newLine": "lf"
+    }
 }

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-
-import * as fs from 'fs';
-import yargs from 'yargs';
-import generate from '../dist/modules/core';
+import fs = require('fs');
+import yargs = require('yargs/yargs');
 import { hideBin } from 'yargs/helpers';
+import vocabug = require('../dist'); // resolves to dist/index.js
 
+// Type-only import (safe in CommonJS with TypeScript)
 import type { Arguments } from 'yargs';
+
 
 type CLI_Args = Arguments<{
   num_of_words: number;
@@ -111,11 +112,18 @@ const argv = yargs(hideBin(process.argv))
   .parseSync() as CLI_Args;
 
 const filePath = argv._[0]; // first positional arg
+
+if (!filePath) {
+  console.error('Error: No file path provided.');
+  process.exitCode = 1;
+  process.exit();
+}
+
 const file_text = fs.readFileSync(filePath, argv.encoding);
 
 try {
   console.log(
-    generate({
+    vocabug.generate({
       file: file_text,
       num_of_words: argv.num_of_words,
       mode: argv.output_mode  as Output_Modes,
