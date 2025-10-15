@@ -2,7 +2,8 @@
 import fs = require('fs');
 import yargs = require('yargs/yargs');
 import { hideBin } from 'yargs/helpers';
-import vocabug = require('../dist'); // resolves to dist/index.js
+import vocabug = require('../dist/vocabug.cjs.js');
+
 
 // Type-only import (safe in CommonJS with TypeScript)
 import type { Arguments } from 'yargs';

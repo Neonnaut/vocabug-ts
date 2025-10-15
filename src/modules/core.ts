@@ -23,7 +23,7 @@ type generate_options = {
   word_divider?: string;
 };
 
-function generate({
+export function generate({
     file,
     num_of_words = 100,
     mode = 'word-list',
@@ -108,5 +108,3 @@ function generate({
     return { text:text, errors:logger.errors, warnings:logger.warnings,
         infos:logger.infos, diagnostics:logger.diagnostics };
 }
-
-export default generate;

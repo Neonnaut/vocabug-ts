@@ -11,6 +11,8 @@
         "noEmitOnError": true,
         "outDir": "./dist/",
         "module": "commonjs",
+        "emitDeclarationOnly": true,
+
         "exactOptionalPropertyTypes": true,
         "removeComments": true,
         "target": "ES2022",

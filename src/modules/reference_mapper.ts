@@ -10,7 +10,7 @@ class Reference_Mapper {
     }
 
     restore_escaped_chars(input: string): string {
-      return '';
+      return input;
     }
 }
 

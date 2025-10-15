@@ -82,8 +82,8 @@ class Word_Builder {
         distribution: string,
         optionals_weight: number // percentage chance to include optionals (0–100)
     ): string {
-        const curly_pattern = /\{[^\{\}]*\}/g;
-        const round_pattern = /\([^\(\)]*\)/g;
+        const curly_pattern = /\{[^{}]*\}/g;
+        const round_pattern = /\([^()]*\)/g;
         let matches: RegExpMatchArray | null;
 
         let items: string[] = [];
@@ -169,7 +169,7 @@ class Word_Builder {
         }
 
         input_list.forEach(item => {
-            let [value, weight_str] = item.split("*");
+            const [value, weight_str] = item.split("*");
             const weight = weight_str && !isNaN(Number(weight_str)) ? parseFloat(weight_str) : 1;
             my_values.push(value);
             my_weights.push(weight);

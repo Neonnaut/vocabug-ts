@@ -1,11 +1,8 @@
-// @ts-ignore
-import MyWorker from './worker?worker';
-
 import { examples } from './examples';
 
 const cm6 = (window as any).cm6; // This was global. Stops TS from complaining
 
-const w = new MyWorker();
+const w = new Worker('./worker.js', { type: 'module' });
 
 function create_file_editor() {
     // Work out content and theme of file editor

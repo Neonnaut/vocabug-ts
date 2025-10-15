@@ -1,9 +1,4 @@
-import generate from './modules/core';
-import { examples } from './examples';
 
-const vocabug = {
-  generate,
-  examples
-};
-
-export default vocabug;
+import { generate } from './modules/core';
+const vocabug = { generate };
+export = vocabug;

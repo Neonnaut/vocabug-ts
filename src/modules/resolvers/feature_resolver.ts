@@ -98,12 +98,12 @@ class Resolver {
     }
 
     show_debug(): void {
-        let features = [];
+        const features = [];
         for (const [key, value] of this.features) {
             features.push(`  ${key} = ${value.graphemes.join(', ')}`);
         }
 
-        let info:string =
+        const info:string =
             `Features {\n` + features.join('\n') + `\n}`
 
         this.logger.diagnostic(info);

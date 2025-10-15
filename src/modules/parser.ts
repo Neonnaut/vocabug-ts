@@ -113,7 +113,7 @@ class Parser {
     parse_file(file: string) {
 
         let transform_mode = false;
-        let file_array = file.split('\n');
+        const file_array = file.split('\n');
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
             let line = file_array[this.file_line_num];
@@ -167,7 +167,7 @@ class Parser {
                 }
                 
                 // Else it's a normal transform rule
-                let [target, result, conditions, exceptions, chance] = this.get_transform(line_value);
+                const [target, result, conditions, exceptions, chance] = this.get_transform(line_value);
                 
                 this.transform_pending.push( {
                     target:target, result:result,
@@ -192,7 +192,7 @@ class Parser {
             } else if (line.startsWith("optionals-weight:")) {
                 line_value = line.substring(17).replace(/%/g, "").trim();
                 line_value = this.escape_mapper.restore_preserve_escaped_chars(line_value);
-                let optionals_weight = make_percentage(line_value);
+                const optionals_weight = make_percentage(line_value);
                 if (optionals_weight == null) {
                     this.logger.validation_error(`Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`, this.file_line_num);
                 }
@@ -201,7 +201,7 @@ class Parser {
             } else if (line.startsWith("alphabet:")) {
                 line_value = line.substring(9).trim();
 
-                let alphabet = line_value.split(/[,\s]+/).filter(Boolean);
+                const alphabet = line_value.split(/[,\s]+/).filter(Boolean);
                 for (let i = 0; i < alphabet.length; i++) {
                     alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]);
                 }
@@ -214,7 +214,7 @@ class Parser {
             } else if (line.startsWith("invisible:")) {
                 line_value = line.substring(10).trim();
 
-                let invisible = line_value.split(/[,\s]+/).filter(Boolean);
+                const invisible = line_value.split(/[,\s]+/).filter(Boolean);
                 for (let i = 0; i < invisible.length; i++) {
                     invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]);
                 }
@@ -227,7 +227,7 @@ class Parser {
             } else if (line.startsWith("alphabet-and-graphemes:")) {
                 line_value = line.substring(23).trim();
 
-                let alf_and_gra = line_value.split(/[,\s]+/).filter(Boolean);
+                const alf_and_gra = line_value.split(/[,\s]+/).filter(Boolean);
                 for (let i = 0; i < alf_and_gra.length; i++) {
                     alf_and_gra[i] = this.escape_mapper.restore_escaped_chars(alf_and_gra[i]);
                 }
@@ -241,8 +241,8 @@ class Parser {
             } else if (line.startsWith("graphemes:")) {
                 line_value = line.substring(10).trim();
 
-                let graphemes = line_value.split(/[,\s]+/).filter(Boolean);
-                for (let i = 0; i < graphemes.length; i++) {
+                const graphemes = line_value.split(/[,\s]+/).filter(Boolean);
+                for (let i:number = 0; i < graphemes.length; i++) {
                     graphemes[i] = this.escape_mapper.restore_escaped_chars(graphemes[i]);
                 }
                 if (graphemes.length == 0){
@@ -365,7 +365,7 @@ class Parser {
         let line_value = '';
         this.file_line_num ++;
 
-        let my_graphemes:string[] = [];
+        const my_graphemes:string[] = [];
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
             line_value = file_array[this.file_line_num];
@@ -374,7 +374,7 @@ class Parser {
             line_value = this.escape_mapper.escape_named_escape(line_value);
             if (line_value === 'END') { break} // END !!
 
-            let line_graphemes = line_value.split(/[,\s]+/).filter(Boolean);
+            const line_graphemes = line_value.split(/[,\s]+/).filter(Boolean);
             for (let i = 0; i < line_graphemes.length; i++) {
                 my_graphemes.push(this.escape_mapper.restore_escaped_chars(line_graphemes[i]));
             }
@@ -391,7 +391,7 @@ class Parser {
         this.file_line_num ++;
 
         let my_first_line_num = 0;
-        let done_line_num = false;
+        const done_line_num = false;
         let my_wordshape = '';
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
@@ -587,16 +587,16 @@ class Parser {
 
         if (line === '') { return; } // Blank line. End clusterfield... early !!
         if (line === 'END') { return; } // END ... early !!
-        let top_row = line.split(/[,\s]+/).filter(Boolean);
+        const top_row = line.split(/[,\s]+/).filter(Boolean);
         top_row.shift();
         const row_length = top_row.length;
         this.file_line_num ++;
 
-        let concurrent_target: string[] = [];
-        let concurrent_result: string[] = [];
+        const concurrent_target: string[] = [];
+        const concurrent_result: string[] = [];
 
-        let my_conditions: string[] = [];
-        let my_exceptions: string[] = [];
+        const my_conditions: string[] = [];
+        const my_exceptions: string[] = [];
         let my_chance: (number|null) = null;
 
         for (; this.file_line_num < file_array.length; ++this.file_line_num) {
@@ -618,8 +618,8 @@ class Parser {
                 continue
             }
 
-            let row = line.split(/[,\s]+/).filter(Boolean);
-            let column = row[0];
+            const row = line.split(/[,\s]+/).filter(Boolean);
+            const column = row[0];
             row.shift();
 
             if (row.length > row_length) {
@@ -651,7 +651,7 @@ class Parser {
         line = this.escape_mapper.escape_named_escape(line);
 
         if (line === '') { return; } // Blank line. End clusterfield... early !!
-        let top_row = line.split(/[,\s]+/).filter(Boolean);
+        const top_row = line.split(/[,\s]+/).filter(Boolean);
         top_row.shift(); // Erase +-
         const row_length = top_row.length;
         this.file_line_num ++;
@@ -665,8 +665,8 @@ class Parser {
 
             if (line === '') { break} // Blank line. End clusterfield !!
 
-            let row = line.split(/[,\s]+/).filter(Boolean);
-            let column = row[0];
+            const row = line.split(/[,\s]+/).filter(Boolean);
+            const column = row[0];
             row.shift();
 
             const featureRegex = /^[a-z]+$/;
@@ -681,8 +681,8 @@ class Parser {
                 this.logger.validation_error(`Feature-field row too short`, this.file_line_num);
             }
 
-            let my_pro_graphemes:string[] = [];
-            let my_anti_graphemes:string[] = [];
+            const my_pro_graphemes:string[] = [];
+            const my_anti_graphemes:string[] = [];
 
             for (let i = 0; i < row_length; ++i) {
                 if (row[i] === '.') {

@@ -20,22 +20,34 @@
     "vocabug"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config app/vite.config.ts",
     "preview": "vite preview",
     "test": "vitest run",
     "build:ts": "tsc && vite build",
     "build:win": "tsc.cmd",
     "build:cli": "tsc -p bin/tsconfig.json",
     "build:all": "npm run build:ts && npm run build:win && npm run build:cli",
-    "build:web": "vite build --config devbuild/vite.config.js",
-    "lint": "eslint ./"
+    "build:app": "vite build --config app/vite.config.js",
+    "lint": "eslint ./ --fix",
+    "build:b": "tsc && npx terser dist/index.js -m reserved='[generate]' --ecma 2022 --toplevel -c unsafe,unsafe_symbols,top_retain='generate' -o dist/vocabug.min.js"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.37.0",
     "@types/node": "^24.0.12",
     "@types/yargs": "^17.0.33",
     "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-unicorn": "^61.0.2",
+    "globals": "^16.4.0",
+    "jiti": "^2.6.1",
+    "prettier": "3.6.2",
     "typescript": "~5.8.3",
+    "typescript-eslint": "^8.46.0",
     "vite": "^6.3.5",
+    "vite-plugin-banner": "^0.8.1",
+    "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   },
   "main": "./dist/vocabug.cjs.js",
@@ -43,7 +55,6 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/vocabug.es.js",
       "require": "./dist/vocabug.cjs.js"
     }
@@ -58,6 +69,7 @@
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
     "yargs": "^18.0.0"
   }
 }

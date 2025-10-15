@@ -222,7 +222,7 @@ const parser: StreamParser<State> = {
                     return "tagName";
                 }
                 // Feature
-                let Fmatch = stream.match(/[-+>][a-zA-Z+-]+(?=\s*=)/)
+                const Fmatch = stream.match(/[-+>][a-zA-Z+-]+(?=\s*=)/)
                 if (Fmatch) {
                     if (Fmatch[0][0] === '>') {
                         state.featureList.push('+' + Fmatch[0].slice(1));
@@ -244,12 +244,12 @@ const parser: StreamParser<State> = {
                 return "meta";
             }
 
-            for (let rule of wordRules) {
+            for (const rule of wordRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
-            for (let cato of state.catMacList) {
+            for (const cato of state.catMacList) {
                 if (stream.match(cato)) {
                     return "tagName";
                 }
@@ -264,7 +264,7 @@ const parser: StreamParser<State> = {
                 return "meta";
             }
 
-            for (let rule of listRules) {
+            for (const rule of listRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -294,7 +294,7 @@ const parser: StreamParser<State> = {
 
             // Inside Feature matrix
             if (state.feature_matrix) {
-                for (let featuro of state.featureList) {
+                for (const featuro of state.featureList) {
                     if (stream.match(featuro, false)) {
                         const start = stream.pos;
                         const end = start + featuro.length;
@@ -323,14 +323,14 @@ const parser: StreamParser<State> = {
             }
 
             // Syntax etc.
-            for (let rule of transformRules) {
+            for (const rule of transformRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
 
             // Categories into transforms
-            for (let cato of state.catList) {
+            for (const cato of state.catList) {
                 if (stream.match(cato)) {
                     return "tagName";
                 }
@@ -339,7 +339,7 @@ const parser: StreamParser<State> = {
 
         // DEFAULT DISTRIBUTION
         if (state.mode == 'distro-line') {
-            for (let rule of distroRules) {
+            for (const rule of distroRules) {
                 if (stream.match(rule.regex)) {
                     state.mode = 'none';
                     return rule.token;
@@ -349,7 +349,7 @@ const parser: StreamParser<State> = {
 
         // LISTS
         if (state.mode == 'list-line') {
-            for (let rule of listRules) {
+            for (const rule of listRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -358,12 +358,12 @@ const parser: StreamParser<State> = {
 
         // WORDS DECLARATION
         if (state.mode == 'word-line') {
-            for (let rule of wordRules) {
+            for (const rule of wordRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
-            for (let cato of state.catMacList) {
+            for (const cato of state.catMacList) {
                 if (stream.match(cato)) {
                     return "tagName";
                 }
@@ -372,12 +372,12 @@ const parser: StreamParser<State> = {
 
         // CATEGORY
         if (state.mode == 'category-line') {
-            for (let rule of categoryRules) {
+            for (const rule of categoryRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
-            for (let cato of state.catList) {
+            for (const cato of state.catList) {
                 if (stream.match(cato)) {
                     return "tagName";
                 }
@@ -386,12 +386,12 @@ const parser: StreamParser<State> = {
 
         // SEGMENT
         if (state.mode == 'segment-line') {
-            for (let rule of wordRules) {
+            for (const rule of wordRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
-            for (let cato of state.catMacList) {
+            for (const cato of state.catMacList) {
                 if (stream.match(cato)) {
                     return "tagName";
                 }
@@ -400,12 +400,12 @@ const parser: StreamParser<State> = {
 
         // FEATURE DECLARATION
         if (state.mode == 'feature-line') {
-            for (let rule of featureRules) {
+            for (const rule of featureRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
             }
-            for (let featuro of state.featureList) {
+            for (const featuro of state.featureList) {
                 if (stream.match(featuro, false)) {
                     const start = stream.pos;
                     const end = start + featuro.length;
@@ -428,7 +428,7 @@ const parser: StreamParser<State> = {
             }
 
             if (stream.sol()) {
-                let Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/)
+                const Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/)
                 if (Fmatch) {
                     state.featureList.push('+' + Fmatch[0]);
                     state.featureList.push('-' + Fmatch[0]);
@@ -436,7 +436,7 @@ const parser: StreamParser<State> = {
                 }
             }
 
-            for (let rule of featureFieldRules) {
+            for (const rule of featureFieldRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -446,7 +446,7 @@ const parser: StreamParser<State> = {
         // ENGINE
         if (state.mode == 'engine') {
             state.mode = 'transform';
-            for (let rule of engineRules) {
+            for (const rule of engineRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }
@@ -462,7 +462,7 @@ const parser: StreamParser<State> = {
                 return "meta";
             }
 
-            for (let rule of clusterRules) {
+            for (const rule of clusterRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
                 }

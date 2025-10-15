@@ -23,7 +23,7 @@ const make_percentage = (input: string): number | null => {
   return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
 };
 
-function swap_first_last_items(array: any[]): any[] {
+function swap_first_last_items(array: string[]): string[] {
    if (array.length >= 2) {
       const first_item = array[0];
       const last_item_index = array.length - 1;
@@ -35,11 +35,13 @@ function swap_first_last_items(array: any[]): any[] {
    return array;
 }
 
-function reverse_items(array: any[]): any[] {
+function reverse_items(array: string[]): string[] {
    return array.slice().reverse();
 }
 
 function final_sentence(items: string[]): string {
+// This function takes an array of strings and returns a string
+// with commas and 'and' before the last item.
   const len = items.length;
 
   if (len === 0) return '';

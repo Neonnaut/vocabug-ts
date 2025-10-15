@@ -99,7 +99,7 @@ class Transformer {
         raw_result: Token[],
         target_stream: string[]
     ) : string[] {
-        let replacement_stream:string[] = []
+        const replacement_stream:string[] = []
         for (let j = 0; j < raw_result.length; j++) {
             const my_result_token:Token = raw_result[j];
 
@@ -550,8 +550,8 @@ class Transformer {
         }[] = [];
 
         for (let i = 0; i < target.length; i++) {
-            let raw_target:Token[] = target[i]; // like 'abc' of 'abc, hij > y, z'
-            let raw_result:Token[] = result[i]; // like 'y' of 'abc, hij > y, z'
+            const raw_target:Token[] = target[i]; // like 'abc' of 'abc, hij > y, z'
+            const raw_result:Token[] = result[i]; // like 'y' of 'abc, hij > y, z'
 
             let mode: "deletion"|"insertion"|"reject"|"replacement" = "replacement";
 

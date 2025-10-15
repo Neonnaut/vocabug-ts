@@ -11,9 +11,8 @@
   <meta name="author" content="Neonnaut">
   <!-- Scripts and stylings -->
   <link href="style.css" rel="stylesheet" type="text/css" media="all">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-  <script src="codemirror/dist/cm6.bundle.js"></script>
+  <script src="./cm6.bundle.js"></script>
 
   <!-- Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -42,7 +41,7 @@
 
         <div style="padding-left: 5px;">
           <b>Version: 0.4.0</b><br>
-          <a href="./docs/vocabug_docs.html">Read the documentation here</a>
+          <a href="./vocabug_docs.html">Read the documentation here</a>
         </div>
       </div>
 
@@ -54,7 +53,7 @@
 
       <br>
 
-        <script src="./src/shell.ts" type="module"></script>
+        <script src="./index.ts" type="module"></script>
   
         <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea>
         <input type="submit" class="styled-button" id="output-words-copy" value="Copy words">

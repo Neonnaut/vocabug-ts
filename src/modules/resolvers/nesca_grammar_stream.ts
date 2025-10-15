@@ -153,7 +153,7 @@ class Nesca_Grammar_Stream {
             continue; // No modifiers allowed
 
          } else if (char == "<"){
-            let look_ahead = i + 1;
+            const look_ahead = i + 1;
             if (stream[look_ahead] === "T") {
                if (mode === "TARGET") {
                   this.logger.validation_error(`Target-mark not allowed in '${mode}'`, line_num);

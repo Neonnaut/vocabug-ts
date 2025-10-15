@@ -95,7 +95,7 @@ class Category_Resolver {
       const asterisk_at_start = /^\*/; // Returns false if follows rule
 
       // Rule 3: asterisk must not be preceded by space or comma
-      const asterisk_after_space_or_comma = /[ ,\{\}]\*/g; // Returns false if follows rule
+      const asterisk_after_space_or_comma = /[ ,{}]\*/g; // Returns false if follows rule
 
       // Rule 4: asterisk-number (int or decimal) pair
       // must be followed by space, comma, ], or end of string
@@ -228,9 +228,9 @@ class Category_Resolver {
    }
 
    show_debug(): void {
-      let categories = [];
+      const categories = [];
       for (const [key, value] of this.categories) {
-         let cat_field:string[] = [];
+         const cat_field:string[] = [];
          for (let i = 0; i < value.graphemes.length; i++) {
                cat_field.push(`${value.graphemes[i]}*${value.weights[i]}`);
          }
@@ -239,7 +239,7 @@ class Category_Resolver {
          categories.push(`  ${key} = ${category_field}`);
       }
 
-      let info:string =
+      const info:string =
          `Category-distribution: ` + this.category_distribution +
          `\nCategories {\n` + categories.join('\n') + `\n}`
 

@@ -106,11 +106,11 @@ class Text_Builder {
 
     create_record() {
         // Send some good info about the generation results
-        let ms:any = Date.now() - this.build_start;
+        const ms = Date.now() - this.build_start;
         const display = ms >= 1000 ? `${(ms / 1000).toFixed(ms % 1000 === 0 ? 0 : 1)} s` : `${ms} ms`;
         
         
-        let records:string[] = [];
+        const records:string[] = [];
         
         if (this.words.length == 1) {
             records.push(`1 word generated`);
@@ -195,7 +195,7 @@ class Text_Builder {
     }
 
     show_debug(): void {
-        let info:string =
+        const info:string =
             `Num of words: ` + this.num_of_words + 
             `\nMode: ` + this.output_mode +
             `\nRemove duplicates: ` + this.remove_duplicates +

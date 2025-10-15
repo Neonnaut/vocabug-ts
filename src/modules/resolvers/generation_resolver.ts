@@ -43,7 +43,7 @@ class Generation_Resolver {
     }
 
     private set_wordshapes() {
-        let result = [];
+        const result = [];
         let buffer = "";
         let inside_brackets = 0;
 
@@ -83,7 +83,7 @@ class Generation_Resolver {
             result.push(buffer);
         }
 
-        let [result_str, result_num] = this.extract_wordshape_value_and_weight(result, this.wordshape_distribution);
+        const [result_str, result_num] = this.extract_wordshape_value_and_weight(result, this.wordshape_distribution);
         for (let i = 0; i < result_str.length; i++) {
             this.wordshapes.items.push(result_str[i]);
             this.wordshapes.weights.push(result_num[i]); ///
@@ -156,8 +156,7 @@ class Generation_Resolver {
         const trimmed_values = all_parts.map(part => part.trim());
         const total_items = trimmed_values.length;
 
-        let chosen_distribution: number[];
-        chosen_distribution = get_distribution(total_items, default_distribution);
+        const chosen_distribution: number[] = get_distribution(total_items, default_distribution);
 
         my_values.push(...trimmed_values);
         my_weights.push(...chosen_distribution);
@@ -198,7 +197,7 @@ class Generation_Resolver {
 
         // Rule 4: asterisk-number (int or decimal) pair
         // must be followed by space, comma, }, ], ), or end of string
-        const asterisk_number_bad_suffix = /\*(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,}\]\)\n]|$)/g;
+        const asterisk_number_bad_suffix = /\*(\d+\.\d+|\d+)(?=[^.\d]|$)(?![ ,}\])\n]|$)/g;
 
         // If any are true return false
         if (
@@ -233,17 +232,17 @@ class Generation_Resolver {
     }
 
     show_debug(): void {
-        let segments = [];
+        const segments = [];
         for (const [key, value] of this.segments) {
             segments.push(`  ${key} = ${value.content}`);
         }
 
-        let wordshapes = [];
+        const wordshapes = [];
         for (let i = 0; i < this.wordshapes.items.length; i++) {
             wordshapes.push(`  ${this.wordshapes.items[i]}*${this.wordshapes.weights[i]}`);
         }
 
-        let info:string =
+        const info:string =
             `Wordshape-distribution: ` + this.wordshape_distribution +
             `\nOptionals-weight: ` + this.optionals_weight +
             `\nSegments {\n` + segments.join('\n') + `\n}` +

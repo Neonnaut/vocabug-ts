@@ -4,7 +4,7 @@ import typescript from '@rollup/plugin-typescript';
 export default {
   input: './src/editor.ts',
   output: {
-    file: 'dist/cm6.bundle.js',
+    file: '..app/cm6.bundle.js',
     format: 'iife',
     name: 'cm6',
     sourcemap: true,

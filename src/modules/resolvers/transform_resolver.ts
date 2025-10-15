@@ -56,7 +56,7 @@ class Transform_Resolver {
         for (let i = 0; i < this.transform_pending.length; i++) {
             this.line_num = this.transform_pending[i].line_num;
 
-            let target = this.transform_pending[i].target; // string
+            const target = this.transform_pending[i].target; // string
 
             // Replace category keys with category graphemes, must be item, or alone
             const target_with_cat = this.categories_into_transform(target);
@@ -82,22 +82,22 @@ class Transform_Resolver {
             const result_length_match:string[] = result_array.flat();
             const target_length_match:string[] = target_array.flat();
 
-            let tokenised_target_array:Token[][] = []
+            const tokenised_target_array:Token[][] = []
             // Grammar stream for target
             for (let j = 0; j < target_length_match.length; j++) {
                 tokenised_target_array.push(this.nesca_grammar_stream.main_parser(target_length_match[j], 'TARGET', this.line_num));
             }
 
-            let tokenised_result_array:Token[][] = [];
+            const tokenised_result_array:Token[][] = [];
             // Grammar stream for result
             for (let j = 0; j < result_length_match.length; j++) {
                 tokenised_result_array.push(this.nesca_grammar_stream.main_parser(result_length_match[j], 'RESULT', this.line_num));
             }
 
-            let chance = this.transform_pending[i].chance;
+            const chance = this.transform_pending[i].chance;
 
-            let new_conditions:{ before:Token[], after:Token[] }[] = []
-            let new_exceptions:{ before:Token[], after:Token[] }[] = [];
+            const new_conditions:{ before:Token[], after:Token[] }[] = []
+            const new_exceptions:{ before:Token[], after:Token[] }[] = [];
 
             for (let j = 0; j < this.transform_pending[i].conditions.length; j++) {
 
@@ -109,9 +109,9 @@ class Transform_Resolver {
                 if (!this.valid_transform_brackets(my_condition)) {
                     this.logger.validation_error(`Invalid brackets in condition "${my_condition}"`, this.line_num);
                 }
-                let alt_opt_condition = this.resolve_alt_opt(my_condition);
+                const alt_opt_condition = this.resolve_alt_opt(my_condition);
                 for (let k = 0; k < alt_opt_condition[0].length; k++) {
-                    let split_condition = alt_opt_condition[0][k].split('_');
+                    const split_condition = alt_opt_condition[0][k].split('_');
                     // Grammar stream for condition before
                     const before = this.nesca_grammar_stream.main_parser(split_condition[0], 'BEFORE', this.line_num);
                     // Grammar stream for condition after
@@ -132,9 +132,9 @@ class Transform_Resolver {
                 if (!this.valid_transform_brackets(my_exception)) {
                     this.logger.validation_error(`Invalid brackets in exception "${my_exception}"`, this.line_num);
                 }
-                let alt_opt_exception = this.resolve_alt_opt(my_exception);
+                const alt_opt_exception = this.resolve_alt_opt(my_exception);
                 for (let k = 0; k < alt_opt_exception[0].length; k++) {
-                    let split_exception = alt_opt_exception[0][k].split('_');
+                    const split_exception = alt_opt_exception[0][k].split('_');
                     // Grammar stream for exception before
                     // Grammar stream for exception after
                     const before = this.nesca_grammar_stream.main_parser(split_exception[0], 'BEFORE', this.line_num);
@@ -230,7 +230,7 @@ class Transform_Resolver {
     expand_chunk(chunk: string): string[] {
         this.check_grammar_rules(chunk);
 
-        const regex = /([^\{\(\}\)]+)|(\{[^\}]+\})|(\([^\)]+\))/g;
+        const regex = /([^{(})]+)|(\{[^}]+\})|(\([^)]+\))/g;
         const parts = [...chunk.matchAll(regex)].map(m => m[0]);
 
         const expansions: string[][] = parts.map(part => {
@@ -263,7 +263,7 @@ class Transform_Resolver {
         return chunks.map(chunk => this.expand_chunk(chunk));
     }
     
-    getTransformLengths(target: any[][], result: any[][]): any[][] {
+    getTransformLengths<T>(target: T[][], result: T[][]): T[][] {
         // 🔁 Surface level: Broadcast result if only one entry
         if (result.length === 1 && target.length > 1) {
             result = Array(target.length).fill(result[0]);
@@ -499,20 +499,20 @@ class Transform_Resolver {
     }
 
     show_debug(): void {
-        let transforms = [];
+        const transforms = [];
         for (let i = 0; i < this.transforms.length; i++) {
             const my_transform = this.transforms[i];
 
-            let my_target = [];
+            const my_target = [];
             for (let j = 0; j < my_transform.target.length; j++) {
                 my_target.push(this.format_tokens(my_transform.target[j]));
             }
-            let my_result = [];
+            const my_result = [];
             for (let j = 0; j < my_transform.result.length; j++) {
                 my_result.push(this.format_tokens(my_transform.result[j]));
             }
 
-            let chance = my_transform.chance ? ` ? ${my_transform.chance}` : '';
+            const chance = my_transform.chance ? ` ? ${my_transform.chance}` : '';
             let exceptions = '';
             for (let j = 0; j < my_transform.exceptions.length; j++) {
                 exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
@@ -525,12 +525,12 @@ class Transform_Resolver {
             transforms.push(`  ⟨${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance}⟩:${my_transform.line_num}`);
         }
 
-        let features = [];
+        const features = [];
         for (const [key, value] of this.features) {
             features.push(`  ${key} = ${value.graphemes.join(', ')}`);
         }
 
-        let info:string =
+        const info:string =
             `Graphemes: ` + this.nesca_grammar_stream.graphemes.join(', ') +
             `\nFeatures {\n` + features.join('\n') + `\n}` +
             `\nTransforms {\n` + transforms.join('\n') + `\n}`

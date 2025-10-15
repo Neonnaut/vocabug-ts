@@ -17,7 +17,7 @@ class Word {
     }
 
     get_last_form(): string { // Gets canonical word. Use this when sorting the words
-        let output = get_last(this.forms);
+        const output = get_last(this.forms);
         if (output == undefined) {
             return "undefined";
         }

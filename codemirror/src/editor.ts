@@ -18,7 +18,7 @@ import { stream } from './language';
 import { toolbar } from './toolbar';
 
 function createEditorState(initialContents:string, myTheme:string) {
-    let extensions = [
+    const extensions = [
         lineNumbers(),
         highlightActiveLineGutter(),
         history(),
