@@ -23,9 +23,10 @@
     "dev": "vite --config app/vite.config.ts",
     "preview": "vite preview",
     "test": "vitest run",
+
     "build:ts": "tsc && vite build",
     "build:win": "tsc.cmd",
-    "build:cli": "tsc -p bin/tsconfig.json",
+    "build:cli": "vite build --config bin/vite.config.js",
     "build:all": "npm run build:ts && npm run build:win && npm run build:cli",
     "build:app": "vite build --config app/vite.config.js",
     "lint": "eslint ./ --fix",
@@ -43,6 +44,7 @@
     "globals": "^16.4.0",
     "jiti": "^2.6.1",
     "prettier": "3.6.2",
+    "terser": "^5.44.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.46.0",
     "vite": "^6.3.5",
@@ -65,7 +67,7 @@
     "README"
   ],
   "bin": {
-    "vocabug": "bin/vocabug"
+    "vocabug": "./bin/index.cjs"
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",

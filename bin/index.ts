@@ -1,12 +1,15 @@
 #!/usr/bin/env node
-import fs = require('fs');
-import yargs = require('yargs/yargs');
-import { hideBin } from 'yargs/helpers';
-import vocabug = require('../dist/vocabug.cjs.js');
+import fs from 'fs';
+import yargs from 'yargs/yargs';
 
+import { hideBin } from 'yargs/helpers';
 
 // Type-only import (safe in CommonJS with TypeScript)
 import type { Arguments } from 'yargs';
+
+import { generate } from '../src/modules/core';
+
+
 
 
 type CLI_Args = Arguments<{
@@ -123,8 +126,8 @@ if (!filePath) {
 const file_text = fs.readFileSync(filePath, argv.encoding);
 
 try {
-  console.log(
-    vocabug.generate({
+  const run = 
+      generate({
       file: file_text,
       num_of_words: argv.num_of_words,
       mode: argv.output_mode  as Output_Modes,
@@ -133,6 +136,18 @@ try {
       sort_words: argv.sort_words,
       word_divider: argv.word_divider
     } )
+
+  for (const warning of run.warnings) {
+    console.warn(warning);
+  }
+  for (const error of run.errors) {
+    console.error(error);
+  }
+  for (const info of run.infos) {
+    console.info(info);
+  }
+  console.log(
+    run.text
   );
 } catch {
   process.exitCode = 1;

@@ -1,6 +1,7 @@
 //import vocabug from '../dist/vocabug.es.js';
 
 import vocabug from '../src/index'
+import { examples } from '../app/examples'
 
 
 import { describe, it, expect } from 'vitest';
@@ -8,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 describe('vocabug', () => {
   it('returns generated words', () => {
 
-    for (const [name, example] of Object.entries(vocabug.examples)) {
+    for (const [name, example] of Object.entries(examples)) {
 
       const run = vocabug.generate({
         file: example,

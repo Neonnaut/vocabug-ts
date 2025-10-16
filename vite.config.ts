@@ -25,23 +25,37 @@ dts({
     globals: true,
     environment: 'node'
   },
+  
   build: {
-  //terserOptions: {
-  //  keep_fnames: true
-  //},
-
-
-    lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'vocabug',
-      formats: ['es', 'cjs'],
-      fileName: format => `vocabug.${format}.js`
+  minify: 'terser',
+  outDir: 'dist',
+  lib: {
+    entry: resolve(__dirname, 'src/index.ts'),
+    name: 'vocabug',
+    formats: ['es', 'cjs'],
+    fileName: format => `vocabug.${format}.js`
+  },
+  rollupOptions: {
+    external: []
+  },
+  terserOptions: {
+    ecma: 2020,
+    compress: {
+      unsafe: true,
+      unsafe_symbols: true,
+      toplevel: true,
+      top_retain: ['generate', 'vocabug']
     },
-    outDir: 'dist',
-    rollupOptions: {
-      external: [] // Add any external packages here
+    mangle: {
+      toplevel: true,
+      reserved: ['generate', 'vocabug']
+    },
+    format: {
+      wrap_func_args: false,
+      semicolons: false,
+      preamble: `/*! ${pkg.name} v${pkg.version} | ${pkg.license} */`
     }
   }
+}
+
 });
-
-

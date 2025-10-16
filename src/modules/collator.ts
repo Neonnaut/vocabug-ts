@@ -4,7 +4,7 @@ function collator(
   logger: Logger,
   words: string[],
   custom_alphabet: string[],
-  invisible: string[] = []
+  invisible: string[] = [],
 ): string[] {
   if (custom_alphabet.length === 0) {
     if (invisible.length == 0) {
@@ -13,14 +13,14 @@ function collator(
       const invisible_set = new Set<string>(invisible);
       const collator = Intl.Collator();
 
-      const stripped_words = words.map(w => ({
+      const stripped_words = words.map((w) => ({
         original: w,
-        stripped: strip_invisible(w, invisible_set)
+        stripped: strip_invisible(w, invisible_set),
       }));
 
       return stripped_words
-      .sort((a, b) => collator.compare(a.stripped, b.stripped))
-      .map(entry => entry.original);
+        .sort((a, b) => collator.compare(a.stripped, b.stripped))
+        .map((entry) => entry.original);
     }
   }
 
@@ -61,8 +61,8 @@ function collator(
   }
 
   function custom_compare(a: string, b: string): number {
-    const aTokens = tokenize(a).filter(t => !invisible_set.has(t));
-    const bTokens = tokenize(b).filter(t => !invisible_set.has(t));
+    const aTokens = tokenize(a).filter((t) => !invisible_set.has(t));
+    const bTokens = tokenize(b).filter((t) => !invisible_set.has(t));
 
     for (let i = 0; i < Math.max(aTokens.length, bTokens.length); i++) {
       const aTok = aTokens[i];
@@ -85,7 +85,9 @@ function collator(
   }
 
   function strip_invisible(word: string, invisible_set: Set<string>): string {
-    const graphemes = Array.from(invisible_set).sort((a, b) => b.length - a.length);
+    const graphemes = Array.from(invisible_set).sort(
+      (a, b) => b.length - a.length,
+    );
     let result = "";
     let i = 0;
 
@@ -107,18 +109,16 @@ function collator(
     return result;
   }
 
-
   const sorted = [...words].sort(custom_compare);
 
   if (unknown_set.size > 0) {
     logger.warn(
-      `The custom order stated in 'alphabet' was ignored because words had unknown graphemes: '${Array.from(unknown_set).join(", ")}' missing from 'alphabet'`
+      `The custom order stated in 'alphabet' was ignored because words had unknown graphemes: '${Array.from(unknown_set).join(", ")}' missing from 'alphabet'`,
     );
     return words.sort(Intl.Collator().compare);
   }
 
   return sorted;
 }
-
 
 export default collator;

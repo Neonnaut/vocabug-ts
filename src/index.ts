@@ -1,4 +1,3 @@
-
-import { generate } from './modules/core';
+import { generate } from "./modules/core";
 const vocabug = { generate };
-export = vocabug;
+export default vocabug;
