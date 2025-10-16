@@ -1,9 +1,9 @@
 import type Escape_Mapper from "./escape_mapper";
 import Logger from "./logger";
-import Supra_Builder from "./supra_builder";
+import Supra_Builder from "./generata/supra_builder";
 
-import { make_percentage, cappa } from "./utilities";
-import type { Output_Mode, Distribution } from "./types";
+import { make_percentage, cappa } from "./utils/utilities";
+import type { Output_Mode, Distribution } from "./utils/types";
 
 class Parser {
   private logger: Logger;

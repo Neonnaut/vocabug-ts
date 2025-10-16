@@ -1,5 +1,5 @@
-import Logger from "./logger";
-import { cappa } from "./utilities";
+import Logger from "../logger";
+import { cappa } from "../utils/utilities";
 
 export class Supra_Builder {
   private logger: Logger;

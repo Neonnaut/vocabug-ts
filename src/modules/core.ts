@@ -1,13 +1,13 @@
 import Parser from "./parser";
-import Word_Builder from "./word_builder";
-import Transformer from "./transformer";
+import Word_Builder from "./generata/word_builder";
+import Transformer from "./transforma/transformer";
 import Text_Builder from "./text_builder";
 import Logger from "./logger";
 import Escape_Mapper from "./escape_mapper";
-import Supra_Builder from "./supra_builder";
+import Supra_Builder from "./generata/supra_builder";
 import Transform_Resolver from "./resolvers/transform_resolver";
 import Nesca_Grammar_Stream from "./resolvers/nesca_grammar_stream";
-import type { Output_Mode } from "./types";
+import type { Output_Mode } from "./utils/types";
 
 import CategoryResolver from "./resolvers/category_resolver";
 import GenerationResolver from "./resolvers/generation_resolver";

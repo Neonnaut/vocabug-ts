@@ -1,8 +1,8 @@
 import Word from "./word";
 import Logger from "./logger";
 import collator from "./collator";
-import { capitalise, final_sentence } from "./utilities";
-import type { Output_Mode } from "./types";
+import { capitalise, final_sentence } from "./utils/utilities";
+import type { Output_Mode } from "./utils/types";
 
 class Text_Builder {
   private logger: Logger;

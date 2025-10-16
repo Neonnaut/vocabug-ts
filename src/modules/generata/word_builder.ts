@@ -1,13 +1,13 @@
 //import Logger from './logger';
-import Word from "./word";
-import Escape_Mapper from "./escape_mapper";
+import Word from "../word";
+import Escape_Mapper from "../escape_mapper";
 import Supra_Builder from "./supra_builder";
 import {
   weighted_random_pick,
   supra_weighted_random_pick,
   get_distribution,
-} from "./picker_utilities";
-import type { Output_Mode } from "./types";
+} from "../utils/picker_utilities";
+import type { Output_Mode } from "../utils/types";
 
 class Word_Builder {
   //private logger: Logger;

@@ -1,9 +1,9 @@
 import type Escape_Mapper from "../escape_mapper";
 import Logger from "../logger";
 
-import { recursive_expansion } from "../utilities";
-import { get_distribution } from "../picker_utilities";
-import type { Output_Mode } from "../types";
+import { recursive_expansion } from "../utils/utilities";
+import { get_distribution } from "../utils/picker_utilities";
+import type { Output_Mode } from "../utils/types";
 
 class Category_Resolver {
   private logger: Logger;

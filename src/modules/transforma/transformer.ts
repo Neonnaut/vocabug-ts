@@ -1,7 +1,7 @@
-import Word from "./word";
-import Logger from "./logger";
-import { swap_first_last_items, reverse_items, graphemosis } from "./utilities";
-import type { Token, Output_Mode } from "./types";
+import Word from "../word";
+import Logger from "../logger";
+import { swap_first_last_items, reverse_items, graphemosis } from "../utils/utilities";
+import type { Token, Output_Mode } from "../utils/types";
 import Reference_Mapper from "./reference_mapper";
 
 import { xsampa_to_ipa, ipa_to_xsampa } from "./xsampa";

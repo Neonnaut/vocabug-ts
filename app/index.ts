@@ -151,6 +151,9 @@ window.addEventListener("load", () => {
         const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
         generate_button.disabled = true;
 
+        const output_message_html = `<p class='info-message'>Generating words... This may take up to 30 seconds</p>`;
+        output_message.innerHTML = output_message_html;
+
         try {
             w.postMessage({
                 file: editor.state.doc.toString(),

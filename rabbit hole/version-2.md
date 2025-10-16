@@ -209,7 +209,10 @@ If, then, else
 Can be nested
 
 header:
-@header Name, -left-to-right, -right-to-left, -replace-once, -no-overlap, -is-engine
+@transform "Name", -left-to-right, -right-to-left, -replace-once, -no-overlap, -is-engine
+                  -ltr             -rtl            -ro            -no          -ir
+
+@transform-macro 
 way to do word-class only 
 
 Feature geometry

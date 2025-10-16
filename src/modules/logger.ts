@@ -40,9 +40,9 @@ class Logger {
   validation_error(message: string, line_num: number | null = null): never {
     const err = new this.Validation_Error(message);
     if (line_num || line_num === 0) {
-      this.errors.push(`Error: ${message} @ line ${line_num + 1}.`);
+      this.errors.push(`Error: ${message} @ line ${line_num + 1}`);
     } else {
-      this.errors.push(`Error: ${message}.`);
+      this.errors.push(`Error: ${message}`);
     }
     throw err;
   }
@@ -67,14 +67,14 @@ class Logger {
 
   warn(warn: string, line_num: number | null = null): void {
     if (line_num || line_num === 0) {
-      this.warnings.push(`Warning: ${warn} @ line ${line_num + 1}.`);
+      this.warnings.push(`Warning: ${warn} @ line ${line_num + 1}`);
     } else {
-      this.warnings.push(`Warning: ${warn}.`);
+      this.warnings.push(`Warning: ${warn}`);
     }
   }
 
   info(info: string): void {
-    this.infos.push(`Info: ${info}.`);
+    this.infos.push(`Info: ${info}`);
   }
   diagnostic(diagnostic: string): void {
     this.diagnostics.push(diagnostic);

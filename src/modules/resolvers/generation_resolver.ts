@@ -1,9 +1,9 @@
 import Logger from "../logger";
-import Supra_Builder from "../supra_builder";
+import Supra_Builder from "../generata/supra_builder";
 
-import { recursive_expansion } from "../utilities";
-import { get_distribution } from "../picker_utilities";
-import type { Distribution, Output_Mode } from "../types";
+import { recursive_expansion } from "../utils/utilities";
+import { get_distribution } from "../utils/picker_utilities";
+import type { Distribution, Output_Mode } from "../utils/types";
 
 class Generation_Resolver {
   private logger: Logger;

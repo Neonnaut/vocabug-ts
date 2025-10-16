@@ -1155,6 +1155,9 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
 .cm-toolbar #generate-words, .cm-toolbar #apply-words {
     color: var(--info-text);
 }
+
+
+
 .cm-toolbar button:hover:not(:disabled) {
   background: #8080803a;
   cursor: pointer;

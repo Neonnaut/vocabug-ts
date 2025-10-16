@@ -1,5 +1,5 @@
-import { get_last } from "./utilities";
-import type { Output_Mode } from "./types";
+import { get_last } from "./utils/utilities";
+import type { Output_Mode } from "./utils/types";
 
 class Word {
   static output_mode: Output_Mode = "word-list";

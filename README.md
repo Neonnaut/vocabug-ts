@@ -3,7 +3,7 @@
 [![version][1]][2] [![license][3]][4] [![Tests]][badge-link]
 [![issue count][5]][6] [![git activity][7]][8]
 
-![Vocabug logo](./img/vocabug_logo.svg?raw=true "Vocabug")
+![Vocabug logo](./app/img/vocabug_logo.svg?raw=true "Vocabug")
 
 This is a word generator designed to be a successor to the Williams' [Lexifer][10] and to [Awkwords][11]. It is built using TypeScript and builds using Vite as a browser app with a complete interface. Vocabug is the 'pro' version of the 'lite' Vocabug, Vocabug-lite.
 

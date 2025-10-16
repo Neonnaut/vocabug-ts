@@ -1,8 +1,8 @@
 import type Escape_Mapper from "../escape_mapper";
 import Logger from "../logger";
 
-import { recursive_expansion } from "../utilities";
-import type { Output_Mode } from "../types";
+import { recursive_expansion } from "../utils/utilities";
+import type { Output_Mode } from "../utils/types";
 
 class Resolver {
   private logger: Logger;
