@@ -1,4 +1,4 @@
-import { generate } from '../src/modules/core';
+import { generate } from '../src/core';
 
 onmessage = function (event) {
     const vocabug = generate({

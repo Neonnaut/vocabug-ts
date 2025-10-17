@@ -7,7 +7,7 @@ import { hideBin } from 'yargs/helpers';
 // Type-only import (safe in CommonJS with TypeScript)
 import type { Arguments } from 'yargs';
 
-import { generate } from '../src/modules/core';
+import { generate } from '../src/core';
 
 
 
