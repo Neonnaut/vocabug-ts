@@ -13,6 +13,15 @@ type Match_Result = {
   matched: string[]; // matched tokens
 };
 
+type Replacement = {
+  index_span: number;
+  length_span: number;
+  target_stream: string[];
+  replacement_stream: string[];
+  matched_conditions: string[];
+};
+
+
 class Transformer {
   public logger: Logger;
 
@@ -115,7 +124,7 @@ class Transformer {
     return [0, 0, []];
   }
 
-  result_former(raw_result: Token[], target_stream: string[]): string[] {
+  result_former(raw_result: Token[], target_stream: string[], reference_mapper: Reference_Mapper): string[] {
     const replacement_stream: string[] = [];
     for (let j = 0; j < raw_result.length; j++) {
       const my_result_token: Token = raw_result[j];
@@ -130,11 +139,22 @@ class Transformer {
         const my_metathesis_graphemes = swap_first_last_items([
           ...target_stream,
         ]);
-        for (let k: number = 0; k < my_metathesis_graphemes.length; k++) {
-          replacement_stream.push(my_metathesis_graphemes[k]);
-        }
+        replacement_stream.push(...my_metathesis_graphemes);
+
+      } else if (my_result_token.type === "reference-start-capture") {
+        // looks like `<=`
+        reference_mapper.set_capture_stream_index(replacement_stream.length);
+      } else if (my_result_token.type === "reference-capture") {
+        // Looks like `=1`
+        reference_mapper.capture_reference( my_result_token.key, replacement_stream );
+      } else if (my_result_token.type === "reference-mark") {
+        // It's a reference mark
+        const reference_value: string[] = reference_mapper.get_captured_reference(my_result_token.key);
+
+        replacement_stream.push(...reference_value);
       }
     }
+    reference_mapper.reset_capture_stream_index();
     return replacement_stream;
   }
 
@@ -160,10 +180,12 @@ class Transformer {
         token.type !== "syllable-mark" &&
         token.type !== "target-mark" &&
         token.type !== "metathesis-mark" &&
-        //token.type !== 'reference' &&
         token.type !== "syllable-boundary" &&
         token.type !== "word-boundary" &&
-        token.type !== "empty-mark"
+        token.type !== "empty-mark" &&
+        token.type !== 'reference-capture' &&
+        token.type !== "reference-mark" &&
+        token.type !== "reference-start-capture"
       ) {
         j++;
         continue;
@@ -371,10 +393,48 @@ class Transformer {
 
         matched.push(...stream.slice(i, i + count));
         i += count;
+
+      } else if (token.type === "reference-start-capture") {
+        // looks like `<=`
+        reference_mapper.set_capture_stream_index(matched.length);
+      } else if (token.type === "reference-capture") {
+        // Looks like `=1`
+        reference_mapper.capture_reference( token.key, matched );
+      } else if (token.type === "reference-mark") {
+        const reference_value: string[] = reference_mapper.get_captured_reference(token.key);
+        const unit_length = reference_value.length;
+
+        if (unit_length === 0) {
+          return null; // nothing to match
+        }
+
+        const max_available = max_end !== undefined
+          ? Math.min(token.max, Math.floor((max_end - i) / unit_length))
+          : token.max;
+
+        let repetitions = 0;
+
+        while (
+          repetitions < max_available &&
+          stream
+            .slice(i + repetitions * unit_length, i + (repetitions + 1) * unit_length)
+            .every((val, idx) => val === reference_value[idx])
+        ) {
+          repetitions++;
+        }
+
+        if (repetitions < token.min) {
+          return null;
+        }
+
+        const total_length = repetitions * unit_length;
+        matched.push(...stream.slice(i, i + total_length));
+        i += total_length;
       }
 
       j++;
     }
+    reference_mapper.reset_capture_stream_index();
     return {
       start,
       end: i,
@@ -390,7 +450,9 @@ class Transformer {
     before: Token[],
     after: Token[],
     reference_mapper: Reference_Mapper,
-  ): boolean {
+  ): [boolean, string] {
+    let human_readable_condition_match:string[] = [' / '];
+
     const target_len = raw_target.length;
 
     // BEFORE logic
@@ -408,10 +470,13 @@ class Transformer {
       );
       if (result !== null && result.end === startIdx) {
         before_matched = true;
+        human_readable_condition_match.push( ...result.matched);
         break;
       }
     }
-    if (!before_matched) return false;
+    if (!before_matched) return [false, ''];
+
+    human_readable_condition_match.push('_');
 
     // AFTER logic
     const after_tokens = after;
@@ -426,23 +491,17 @@ class Transformer {
       target_stream,
     );
 
-    if (result === null) return false;
-    return true;
+    if (result === null) {
+      return [false, ''];
+    }
+    human_readable_condition_match.push( ...result.matched);
+    return [true, human_readable_condition_match.join("")];
   }
 
   // Non destructively apply replacements
   replacementa(
     word_stream: string[],
-    replacements: {
-      index_span: number;
-      length_span: number;
-      replacement_stream: string[];
-      matched_condition: {
-        type: "condition";
-        before: Token[];
-        after: Token[];
-      } | null;
-    }[],
+    replacements: Replacement[],
     word: Word,
     exceptions: { before: Token[]; after: Token[] }[],
     line_num: number,
@@ -542,12 +601,10 @@ class Transformer {
 
       let my_conditions = "";
       for (const r of replacements) {
-        if (r.matched_condition) {
-          const before = r.matched_condition.before
-            .map((t) => t.base)
-            .join(" ");
-          const after = r.matched_condition.after.map((t) => t.base).join(" ");
-          my_conditions += ` / ${before}_${after}`;
+        if (r.matched_conditions.length != 0) {
+          for (const c of r.matched_conditions) {
+            my_conditions += c;
+          }
         }
       }
 
@@ -574,7 +631,7 @@ class Transformer {
       line_num: number;
     },
   ): string[] {
-    const reference_mapper = new Reference_Mapper(); // New mapper for each transform application
+    
 
     const { target, result, conditions, exceptions, chance, line_num } =
       transform;
@@ -601,26 +658,18 @@ class Transformer {
       );
     }
 
-    const replacements: {
-      index_span: number;
-      length_span: number;
-      target_stream: string[];
-      replacement_stream: string[];
-      matched_condition: {
-        type: "condition";
-        before: Token[];
-        after: Token[];
-      } | null;
-    }[] = [];
+    const replacements: Replacement[] = []; ///
 
     for (let i = 0; i < target.length; i++) {
+      const reference_mapper = new Reference_Mapper(); // New mapper for each transform application
+
+
       const raw_target: Token[] = target[i]; // like 'abc' of 'abc, hij > y, z'
       const raw_result: Token[] = result[i]; // like 'y' of 'abc, hij > y, z'
 
-      let mode: "deletion" | "insertion" | "reject" | "replacement" =
-        "replacement";
+      let mode: "deletion" | "insertion" | "reject" | "replacement" = "replacement";
 
-      // NOW, build-up REPLACEMENT STREAM named-references from RESULT tokens.
+      // NOW, build-up REPLACEMENT STREAM from RESULT tokens.
       if (raw_result[0].type === "deletion") {
         // DELETION
         mode = "deletion";
@@ -629,6 +678,12 @@ class Transformer {
         mode = "reject";
       } else {
         // NORMAL GRAPHEME STREAM
+        // Just get the references in replace_stream
+        this.target_to_word_match(
+          word_stream,
+          raw_target,
+          reference_mapper,
+        )
       }
 
       // NOW, Go through TARGET
@@ -656,55 +711,68 @@ class Transformer {
           const my_replacement_stream = this.result_former(
             raw_result,
             word_stream,
+            reference_mapper
           );
 
-          // Get replacement bindings
+          // Get environment bindings 1
 
-          // Get environment bindings
+          const matched_conditions: string[] = [];
+          let passes = conditions.length === 0;
 
-          let matched_condition: (typeof conditions)[number] | null = null;
+          for (const c of conditions) {
+            const temp_mapper = reference_mapper.clone();
+            const [pass, result] = this.environment_match(
+              word_stream,
+              my_replacement_stream,
+              insert_index,
+              [],
+              c.before,
+              c.after,
+              temp_mapper,
+            );
+            if (pass) {
+              matched_conditions.push(result);
+              reference_mapper.absorb(temp_mapper);
+              passes = true;
+            }
+          }
 
-          const passes =
-            conditions.length === 0 ||
-            conditions.some((c) => {
-              const result = this.environment_match(
-                word_stream,
-                my_replacement_stream,
-                insert_index,
-                [],
-                c.before,
-                c.after,
-                reference_mapper,
-              );
-              if (result) matched_condition = c;
-              return result;
-            });
-          const blocked = exceptions.some((e) =>
-            this.environment_match(
+          const blocked = exceptions.some((e) => {
+            const temp_mapper = reference_mapper.clone();
+            const [block, result] = this.environment_match(
               word_stream,
               my_replacement_stream,
               insert_index,
               [],
               e.before,
               e.after,
-              reference_mapper,
-            ),
-          );
+              temp_mapper
+            );
+            return block;
+          });
+
           if (!passes || blocked) continue;
+
+          const second_replacement_stream = this.result_former(
+            raw_result,
+            word_stream,
+            reference_mapper
+          );
 
           replacements.push({
             index_span: insert_index,
             length_span: 0,
             target_stream: ["^"], // symbolic marker for insertion
-            replacement_stream: my_replacement_stream,
-            matched_condition: matched_condition,
+            replacement_stream: second_replacement_stream,
+            matched_conditions: matched_conditions,
           });
+
         }
       } else {
         // TARGET is normal stream of grapheme, wildcard, anythings-mark, syllable ...
         let cursor = 0;
 
-        while (cursor <= word_stream.length - raw_target.length) {
+        while (cursor <= word_stream.length) {
           const [match_index, match_length, matched_stream] =
             this.target_to_word_match(
               word_stream.slice(cursor),
@@ -719,36 +787,43 @@ class Transformer {
 
           const global_index = cursor + match_index;
 
-          // Condition match and exception not match
-          let matched_condition: (typeof conditions)[number] | null = null;
+          // Condition match and exception not match 2
 
-          const passes =
-            conditions.length === 0 ||
-            conditions.some((c) => {
-              const result = this.environment_match(
-                word_stream,
-                matched_stream,
-                global_index,
-                matched_stream,
-                c.before,
-                c.after,
-                reference_mapper,
-              );
-              if (result && !matched_condition) matched_condition = c;
-              return result;
-            });
+          const matched_conditions: string[] = [];
+          let passes = conditions.length === 0;
 
-          const blocked = exceptions.some((e) =>
-            this.environment_match(
+          for (const c of conditions) {
+            const temp_mapper = reference_mapper.clone();
+            const [pass, result] = this.environment_match(
+              word_stream,
+              matched_stream,
+              global_index,
+              matched_stream,
+              c.before,
+              c.after,
+              temp_mapper,
+            );
+            if (pass) {
+              matched_conditions.push(result);
+              reference_mapper.absorb(temp_mapper);
+              passes = true;
+            }
+          }
+
+          const blocked = exceptions.some((e) => {
+            const temp_mapper = reference_mapper.clone();
+            const [block, result] = this.environment_match(
               word_stream,
               matched_stream,
               global_index,
               matched_stream,
               e.before,
               e.after,
-              reference_mapper,
-            ),
-          );
+              temp_mapper,
+            );
+            return block;
+          });
+
           if (!passes || blocked) {
             cursor = global_index + 1;
             continue; // skip this match
@@ -769,7 +844,7 @@ class Transformer {
               length_span: match_length,
               target_stream: matched_stream,
               replacement_stream: [],
-              matched_condition: matched_condition,
+              matched_conditions: matched_conditions,
             });
           } else {
             // Get replacement bindings
@@ -778,6 +853,7 @@ class Transformer {
             const my_replacement_stream = this.result_former(
               raw_result,
               matched_stream,
+              reference_mapper
             );
 
             replacements.push({
@@ -785,7 +861,7 @@ class Transformer {
               length_span: match_length,
               target_stream: matched_stream,
               replacement_stream: my_replacement_stream,
-              matched_condition: matched_condition,
+              matched_conditions: matched_conditions,
             });
           }
           cursor = global_index + match_length;
@@ -794,7 +870,7 @@ class Transformer {
     }
     word_stream = this.replacementa(
       word_stream,
-      replacements, ////
+      replacements,
       word,
       exceptions,
       line_num,

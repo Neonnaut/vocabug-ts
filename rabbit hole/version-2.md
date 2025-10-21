@@ -183,6 +183,8 @@ Ability to deactivate cleanup, or temporarily deactivate on a transform
 
 ## feature bundles... %manner = velar, labial
 
+## root-nodes and nodes
+
 ## Alter the anythings mark
 
 I need to change it from clunky syntax like `&[tr]*r`
@@ -232,7 +234,3 @@ Word-and-paradigm morphology
 Right now, escape chars could interfere with PUA 
 
 ---
-
-## CLI
-
-## Build.sh eslint

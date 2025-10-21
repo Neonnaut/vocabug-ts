@@ -585,7 +585,7 @@ class Transform_Resolver {
         }
         return s;
       })
-      .join("");
+      .join(" ");
   }
 
   show_debug(): void {

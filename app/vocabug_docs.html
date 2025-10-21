@@ -412,11 +412,11 @@
             <td><a href="#nescaWildcard">Wildcard</a>, matches exactly 1 of any grapheme</td>
           </tr>
           <tr>
-            <td><code class="example">&</code> or <code class="example">…</code></td>
+            <td><code class="example">&</code></td>
             <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches ungreedily 1 or more wildcards</td>
           </tr>
           <tr>
-            <td><code class="example">&[</code> or <code class="example">…[</code> and <code class="example">]</code></td>
+            <td><code class="example">&[</code> and <code class="example">]</code></td>
             <td><a href="#nescaGuarded">Guarded-anythings-mark</a></td>
           </tr>
           <tr>
@@ -1297,17 +1297,18 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 <span class="catkey">&lt;E</span> p  t  c  y  ü</div>
 
       <h3 id="nescaReference"><a class="head-num">21.4</a>Reference</h3>
-      <p>Sometimes graphemes must be moved, copied, or asserted to be a certain grapheme between sounds. This is the purpose of reference. Reference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>
+      <p>Sometimes graphemes must be copied or asserted to be a certain grapheme between other graphemes. This is the purpose of 'reference'. Reference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>
 
       <h4 id="nescaSingularReference"><a class="head-num">21.4.1</a>Reference of singular grapheme</h4>
 
-      <p>A grapheme (or graphemes) are bound to a reference using a 'reference-capture', to the right of some grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number. This number, is called the 'reference-key' of the reference. The grapheme (or graphemes) bound to the reference is callsed the 'reference-value'.</p>
+      <p>A grapheme (or graphemes) are bound to a reference using a 'reference-capture', to the right of some grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number. This number is called the 'reference-key' of the reference. The grapheme (or graphemes) bound to the reference is called the 'reference-value'.</p>
 
       <p>The key behaviours of reference-capture are:</p>
       <ul>
+        <li>If there are no graphemes to be captured by the reference-capture, nothing is captured</li>
         <li>A Reference forgets its reference-value in-between transforms. References do not persist between rules</li>
         <li>You can have up to nine references per transform</li>
-        <li>A reference-value can be overwritten with a new reference-capture to that reference</li>
+        <li>A reference's reference-value can be overwritten with a new reference-capture</li>
         <li>For reference-capture in conditions, a grapheme is captured only if that condition is met</li>
       </ul>
 
@@ -1316,7 +1317,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>The key behaviours of reference-mark are:</p>
       <ul>
         <li>A reference-mark may not be used in the <code class='example'>TARGET</code> of a transform.</li>
-        <li>In each condition or exception of a transform, a reference-mark cannot be used before content has been bound to its reference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference-name is not recursive in conditions and exceptions.</li>
+        <li>In each condition or exception of a transform, a reference-mark cannot be used before content has been bound to its reference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference is not recursive in conditions and exceptions.</li>
         <li>If a reference-mark is used where a reference-capture has not captured anything yet, it fails silently and outputs the number of the backrefence.</li>
       </ul>
 
@@ -1336,7 +1337,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 
       <h4 id="nescaReferenceSequence"><a class="head-num">21.4.2</a>Reference of grapheme sequence</h4>
 
-      <p>Now that that has been (hopefully) introduced and explained adequately, with reference's 'reference-capture' and 'reference-mark', lets explain how to capture and reference a sequence of graphemes.</p>
+      <p>Now that 'reference-capture' and 'reference-mark' has been (hopefully) introduced and explained adequately, let's explain how to capture and reference a sequence of graphemes.</p>
 
       <p>To start capturing a sequence, you use a 'start-reference-capture', <code class="example">&lt;=</code> before the graphmemes to be captured. Then at the end of the graphemes to be captured, a 'reference-capture' is used to bind those graphemes to a reference:</p>
 
@@ -1353,14 +1354,16 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre">  <span class="regexp">{</span>a<span class="link">,</span> á<span class="link">,</span> à<span class="regexp">}</span> <span class="link">-&gt;</span> <span class="regexp">{</span>e<span class="link">,</span> é<span class="link">,</span> è<span class="regexp">}</span><br><span class="comment">; daná ==&gt; dené</span></div>
 
       <p>This workaround uses alternators, but lacks semantic clarity and scalability, and is outright tedious.</p>
-      <p>To solve this, are 'assosiatemes' -- aligned graphemes assosiated with their base grapheme, and other assosiated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single transform. To set up associatemes, they must be stated in the graphemes: directive like so:</p>
+      <p>To solve this, are 'associatemes' -- aligned graphemes associated with their base grapheme, and other associated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single transform. To set up associatemes, they must be stated in the graphemes: directive like so///:</p>
       
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">{</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span>
-  a <span class="link">-&gt;</span> e<br><span class="comment">; daná ==&gt; dené</span></div>
+<span class="directive">BEGIN transform</span>
+  a <span class="link">-&gt;</span> e<br><span class="comment">; daná ==&gt; dené</span>
+<span class="directive">END</span></div>
       
-      <p>This transform targets all variants of <code class="example">a</code> and maps them to the assosiated variant of <code class="example">e</code>.</p>
+      <p>This transform targets all variants of <code class="example">a</code> and maps them to the associated variant of <code class="example">e</code>.</p>
 
-      <p>The behaviour of assosiatemes are:</p>
+      <p>The behaviour of associatemes are:</p>
       <ul>
         <li>Each grouping must contain an equal number of graphemes, aligned by position. This creates a traceable overlay across tone, stress, and other features</li>
         <li>This does not mean that each variant must be different by means of diacritics, they are arbitrarily variant. For example <code class="example">graphemes: {a,b,c}&lt;{x,y,z}</code> is valid</li>

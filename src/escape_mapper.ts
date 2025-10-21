@@ -66,7 +66,6 @@ const transform_syntax_chars = [
   ":",
   "*",
   "&",
-  "…",
   "|",
   "<",
   "~",

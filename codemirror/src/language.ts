@@ -64,7 +64,7 @@ const transformRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: />|->|→|=>|⇒|\/|!|\?|,|_/ },
   { token: "operator", regex: /0|\^|∅/ }, 
-  { token: "regexp",   regex: /<=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|…|&|%|~/ },
+  { token: "regexp",   regex: /<=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|&|%|~/ },
   { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|<T|<M|<E/ }
 ];
 
@@ -72,7 +72,7 @@ const clusterRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\/|!|\?|_|\+/ },
   { token: "operator", regex: /0|\^|∅/ },
-  { token: "regexp",   regex: /<=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|…|&|%|~/ },
+  { token: "regexp",   regex: /<=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|&|%|~/ },
   { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|<T|<M|<E/ }
 ];
 

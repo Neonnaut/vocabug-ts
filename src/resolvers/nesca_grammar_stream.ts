@@ -211,107 +211,51 @@ class Nesca_Grammar_Stream {
           }
           new_token = { type: "empty-mark", base: "<E", min: 1, max: 1 };
           i = look_ahead;
+        } else if (stream[look_ahead] === "=") {
+          // Begins a reference capture of sequenced graphemes
+          new_token = { type: "reference-start-capture", base: "<=", min: 1, max: 1 };
+          i = look_ahead;
+          tokens.push(new_token);
+          continue; // No modifiers allowed
         } else {
           this.logger.validation_error(
-            `A 'T' or 'M' did not follow '<' in '${mode}'`,
+            `A 'T', 'M' or '=' did not follow '<' in '${mode}'`,
             line_num,
           );
         }
 
         i++;
       } else if (char === "=") {
-        let look_ahead = i + 1;
-        if (stream[look_ahead] === "<") {
-          // It begins a reference capture of sequenced graphemes
-          new_token = { type: "br-start-capture", base: "<=", min: 1, max: 1 };
+        const look_ahead = i + 1;
+        const digit = stream[look_ahead];
+        if (/^[1-9]$/.test(digit)) {
+          // It's a reference capture
+          new_token = {
+            type: "reference-capture",
+            base: `=${digit}`,
+            key: digit,
+            min: 1,
+            max: 1,
+          };
+          tokens.push(new_token);
+          i = look_ahead + 1;
+          continue; // No modifiers allowed
         } else {
-          // It ends a reference
-          look_ahead += 1;
-          // If look_ahead is 1 to 9
-          switch (stream[look_ahead]) {
-            case "1":
-              new_token = {
-                type: "br-end-capture",
-                base: "=1",
-                name: "1",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "2":
-              new_token = {
-                type: "br-end-capture",
-                base: "=2",
-                name: "2",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "3":
-              new_token = {
-                type: "br-end-capture",
-                base: "=3",
-                name: "3",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "4":
-              new_token = {
-                type: "br-end-capture",
-                base: "=4",
-                name: "4",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "5":
-              new_token = {
-                type: "br-end-capture",
-                base: "=5",
-                name: "5",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "6":
-              new_token = {
-                type: "br-end-capture",
-                base: "=6",
-                name: "6",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "7":
-              new_token = {
-                type: "br-end-capture",
-                base: "=7",
-                name: "7",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "8":
-              new_token = {
-                type: "br-end-capture",
-                base: "=8",
-                name: "8",
-                min: 1,
-                max: 1,
-              };
-              break;
-            case "9":
-              new_token = {
-                type: "br-end-capture",
-                base: "=9",
-                name: "9",
-                min: 1,
-                max: 1,
-              };
-              break;
-          }
+          this.logger.validation_error(
+            `Invalid reference capture syntax in '${mode}'`,
+            line_num,
+          );
         }
+        
+      } else if (/^[1-9]$/.test(char)) {
+        // It's a reference-mark
+        if (mode === "TARGET") {
+          this.logger.validation_error("Reference-mark not allowed in 'TARGET'", line_num);
+        }
+
+        new_token = { type: "reference-mark", base: char, key: char, min: 1, max: 1 };
+        i++;
+
       } else if (char === "~") {
         // It's a based-mark
       } else if (
@@ -335,7 +279,6 @@ class Nesca_Grammar_Stream {
         char == "+" ||
         char == ":" ||
         char == "*" ||
-        char === "…" ||
         char === "&" ||
         char == "|" ||
         char === "~" ||

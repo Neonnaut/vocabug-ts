@@ -87,22 +87,22 @@ export type Token =
       max: number | typeof Infinity;
     }
   | {
-      type: "br-start-capture";
+      type: "reference-start-capture";
       base: "<=";
       min: number;
       max: number | typeof Infinity;
     }
   | {
-      type: "br-end-capture";
-      base: "=1" | "=2" | "=3" | "=4" | "=5" | "=6" | "=7" | "=8" | "=9";
-      name: "1" | "2" | "3" | "4" | "4" | "5" | "6" | "7" | "8" | "9" | "0";
+      type: "reference-capture";
+      base: string;
+      key: string;
       min: number;
       max: number | typeof Infinity;
     }
   | {
-      type: "reference";
-      base: "1" | "2" | "3" | "4" | "4" | "5" | "6" | "7" | "8" | "9" | "0";
-      name: "1" | "2" | "3" | "4" | "4" | "5" | "6" | "7" | "8" | "9" | "0";
+      type: "reference-mark";
+      base: string;
+      key: string;
       min: number;
       max: number | typeof Infinity;
     };

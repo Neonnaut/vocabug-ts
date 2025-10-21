@@ -108,17 +108,20 @@
 
 --------------
 
-- [ ] Target capture
-- [ ] Result capture
-- [ ] Condition capture
+- [x] Target capture
 
-- [ ] Condition insertion
-- [ ] Result insertion
+- [x] Result capture 1 of 2
+
+- [x] Condition capture and Condition insertion
+
+- [x] Result insertion 2 of 2
 
 --------------
 
-- [ ] Alternative graphemes alternemes
+- [ ] Associatemes
 - [ ] Based-mark
+
+- [ ] Docs
 
 group folders generation, transforming, utilities
 

@@ -6336,6 +6336,7 @@ class Transformer {
     );
     return word_stream;
   }
+  
   do_transforms(word) {
     if (word.get_last_form() == "") {
       word.rejected = true;

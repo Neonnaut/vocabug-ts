@@ -125,18 +125,19 @@ END`,
 `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
 ; and link.springer.com/content/pdf/10.3758/BF03195600.pdf
 
-; <R> gives me long vowels
-; <N> is the syllable final nasal. <Q> gives me geminate consonants
+; <ʀ> yields long vowels.
+; <ɴ> is the syllable final nasal.
+; <ꞯ> yields geminate consonants.
 
 I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
 C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
-V = a, i, u, o, e, {oR, aR, iR, eR, uR, yu, yo, ya, {yoR, yuR, yaR}}
-F = N, Q
+V = a, i, u, o, e, {oʀ, aʀ, iʀ, eʀ, uʀ, yu, yo, ya, {yoʀ, yuʀ, yaʀ}}
+F = ɴ, ꞯ
 
 $A = IV(F) ; First syllable of slightly different consonant distribution.
-$S = CV(F) ; Gives type C(y)V(R)(N,Q).
+$S = CV(F) ; Gives type C(y)V(ʀ)(ɴ,ꞯ).
 
-; Where light syllable is (C)V, and heavy is (C){VF,VR(F)}.
+; Where light syllable is (C)V, and heavy is (C){VF,Vʀ(F)}.
 ; The final two syllables are least likely to be light + heavy...
 
 words: $A$S$S $A$S$S$S $A $A$S$S$S$S $A$S
@@ -145,7 +146,7 @@ graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 BEGIN transform:
 
-{a,e,i,o,u}+ > ^ / R_
+{a,e,i,o,u}+ > ^ / ʀ_
 {a,e,i,o,u}+[3,] > {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
@@ -156,27 +157,27 @@ t  chi tsu +   +   cha  chu  cho
 d  ji  zu  +   +   ja   ju   jo
 h  +   fu  +   +   +    +    +
 w  i   yu  yo  yo  ya   yu   yo
-N  n'a n'u n'e n'o n'ya n'yu n'yo
+ɴ  n'a n'u n'e n'o n'ya n'yu n'yo
 
-; <N> assimilation, and <Q> gemination.
+; <ɴ> assimilation, and <ꞯ> gemination.
 < ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
-Q Qtch Qshsh Qtts j  Qkk g  Qss z  Qtt d  n  Qpp b  Qpp m  r  l  Qpp Qpp
-N nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
+ꞯ ꞯtch ꞯshsh ꞯtts j  ꞯkk g  ꞯss z  ꞯtt d  n  ꞯpp b  ꞯpp m  r  l  ꞯpp ꞯpp
+ɴ nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
 
-RQ N Q -> ^ n ^ ; <R> + <Q> is illegal.
+ʀꞯ ɴ ꞯ -> ^ n ^ ; <ʀ> + <ꞯ> is illegal.
 
 ; Vowel sequences:
 <  a   i   u   e  o
-a  ai  +   oR  +  +
-i  ya  ui  yuR +  yo
-u  uR  +   ui  ai ai
-e  eR  eR  yoR ai yo
-o  oR  +   +   +  o
-R  R   R   R   R  R
+a  ai  +   oʀ  +  +
+i  ya  ui  yuʀ +  yo
+u  uʀ  +   ui  ai ai
+e  eʀ  eʀ  yoʀ ai yo
+o  oʀ  +   +   +  o
+ʀ  ʀ   ʀ   ʀ   ʀ  ʀ
 
 y -> ^ / sh_ / j_ / ch_
 
-aR eR iR oR uR -> aa ee ii oo uu ; Get long vowels
+aʀ eʀ iʀ oʀ uʀ -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
 aa ee ii oo uu -> a e i o u / #_#
