@@ -66,7 +66,7 @@ class Nesca_Grammar_Stream {
         continue;
       }
 
-      // Base token
+      // Anythings-mark
       if (char === "&") {
         if (mode === "RESULT") {
           this.logger.validation_error(
@@ -101,20 +101,21 @@ class Nesca_Grammar_Stream {
           }
 
           //  Parse stream into consume and blocked_by
+
+          const consume: string[][] = [];
+          const blocked_by: string[][] = [];
+
           const raw_groups = garde_stream
             .split(",")
             .map((group) => group.trim())
             .filter(Boolean);
-
-          const consume: string[][] = [];
-          const blocked_by: string[][] = [];
 
           let is_blocker = false;
 
           for (const group of raw_groups) {
             if (group.startsWith("^")) {
               is_blocker = true;
-              continue; // Skip the ^ marker itself
+              //group.pop // Skip the ^ marker itself
             }
 
             const graphemes = graphemosis(group, this.graphemes)
@@ -130,10 +131,14 @@ class Nesca_Grammar_Stream {
             }
           }
 
-          new_token.consume = consume;
-          new_token.blocked_by = blocked_by;
-
+          if (consume.length !== 0) {
+            new_token.consume = consume;
+          }
+          if (blocked_by.length !== 0) {
+            new_token.blocked_by = blocked_by;
+          }
           look_ahead++; // Consume closing bracket
+          i = look_ahead;
         }
       } else if (char === "%") {
         if (mode === "RESULT") {
@@ -213,8 +218,13 @@ class Nesca_Grammar_Stream {
           i = look_ahead;
         } else if (stream[look_ahead] === "=") {
           // Begins a reference capture of sequenced graphemes
-          new_token = { type: "reference-start-capture", base: "<=", min: 1, max: 1 };
-          i = look_ahead;
+          new_token = {
+            type: "reference-start-capture",
+            base: "<=",
+            min: 1,
+            max: 1,
+          };
+          i = look_ahead + 1;
           tokens.push(new_token);
           continue; // No modifiers allowed
         } else {
@@ -246,16 +256,23 @@ class Nesca_Grammar_Stream {
             line_num,
           );
         }
-        
       } else if (/^[1-9]$/.test(char)) {
         // It's a reference-mark
         if (mode === "TARGET") {
-          this.logger.validation_error("Reference-mark not allowed in 'TARGET'", line_num);
+          this.logger.validation_error(
+            "Reference-mark not allowed in 'TARGET'",
+            line_num,
+          );
         }
 
-        new_token = { type: "reference-mark", base: char, key: char, min: 1, max: 1 };
+        new_token = {
+          type: "reference-mark",
+          base: char,
+          key: char,
+          min: 1,
+          max: 1,
+        };
         i++;
-
       } else if (char === "~") {
         // It's a based-mark
       } else if (

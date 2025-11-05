@@ -187,6 +187,10 @@ END`,
 ; Australian looking. The glottal stop and lack of retroflex stops make it
 ; not an 'average' Australian language word list, but not unusual.
 
+; You might notice /aCV/ words are not possible. This is intentional.
+
+; Only /a/ word initially. Only /i/ /a/ /u/ word finally.
+
 ; I use <R> for length and <-> for coda-matching.
 ; <t̪  c ʔ n̪  ɲ  ŋ  r  ɻ ʎ  j> romanise as...
 ; <th j ꞌ nh ny ng rr r ly y> at the end.

@@ -4,53 +4,32 @@ function run(cmd) {
   console.log(`🔧 ${cmd}`);
   execSync(cmd, { stdio: "inherit" });
 }
-
-function lint() {
-  console.log("Running EsLint...");
-  run("npm run lint");
-}
-
-function prettier() {
-  console.log("Running Prettier...");
-  run("npx prettier --write 'src/**/*.{ts,js,json,md}'");
-}
-
-function test() {
-  console.log("Running Vitest");
-  run("npm run test");
-}
-
-function app_build() {
-  console.log("Building app-folder scripts");
-  run("npm run build:app");
-}
-
-function main_build() {
-  console.log("Building main scripts");
-  run("npm run build:ts");
-}
-
-function main_build_d_modules() {
-  console.log("Making modules/ for index.d.ts");
-  run("npm run build:win")
-}
-
-function cli_build() {
-  console.log("Building CLI script");
-  run("npm run build:cli");
+function log(msg) {
+  console.log(`\u001b[1;32m${msg}\u001b[0m`);
 }
 
 function main() {
-  lint();
-  prettier();
-  test();
+  log("Running EsLint...");
+  run("npm run lint");
 
-  app_build();
+  log("Running Prettier...");
+  run("npm run prettier");
 
-  main_build();
-  main_build_d_modules();
+  log("Running Vitest");
+  run("npm run test");
 
-  cli_build();
-  console.log("✅ Done.");
+  log("Building app-folder scripts");
+  run("npm run build:app");
+
+  log("Building main scripts");
+  run("npm run build:ts");
+
+  log("Making modules/ for index.d.ts");
+  run("npm run build:win")
+
+  log("Building CLI script");
+  run("npm run build:cli");
+  
+  log("✅ Done.");
 }
 main();

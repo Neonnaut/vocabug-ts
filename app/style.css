@@ -857,29 +857,42 @@ div .gll {
   background: var(--pale-brown)
 }
 
+
+.ipa-keyboard {
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.ipa-keyboard-seperator {
+ padding: 10px;
+}
+
+
+
 .ipa-table {
   overflow-x: auto;
   white-space: nowrap;
-  display: block;
   overflow-y: hidden;
+  align-items: center;
 }
+
 
 .ipa-table tr td{
  padding: 1px 1px 0 0;
- width: 24px;
- height: 26px;
+ width: 28px;
+ height: 28px;
 }
 .ipa-table button, .keyboard-button {
   color: #000;
   margin: 0 auto;
   padding: 0;
-  width: 24px;
+  width: 27px;
   height: 100%;
   border: none;
   border-radius: 0;
   cursor: pointer;
 
-  font-size: 1em;
+  font-size: 19px;
 
   box-shadow: inset 0 1px 3px rgba(88,88,88,0.4), 0 1px rgb(88 88 88 / 10%);
   -webkit-box-shadow: inset 0 1px 3px rgba(88,88,88,0.4), 0 1px rgb(88 88 88 / 10%);
@@ -896,23 +909,46 @@ div .gll {
   box-shadow: none;
 }
 
-@media only screen and (min-width: 810px) {
+@media only screen and (min-width: 660px) {
 
-   .ipa-table button, .keyboard-button {
-    font-size: 19px;
-    width: 27px;
+  .ipa-table button, .keyboard-button {
+    font-size: 1em;
+    width: 24px;
   }
   .ipa-table tr td{
-    padding: 2px 2px 0 0;
-    width: 27px;
-    height: 27px;
+    width: 24px;
+    height: 24px;
+  }
+
+
+  .ipa-keyboard-section, .ipa-keyboard-seperator {
+    float:left;
+    display: inline;
+  }
+
+}
+
+@media only screen and (min-width: 797px) {
+  .ipa-table button, .keyboard-button {
+    font-size: 21px;
+    width: 28px;
+  }
+  .ipa-table tr td{
+    width: 28px;
+    height: 28px;
+  }
+
+
+
+   .ipa-table button, .keyboard-button {
+    font-size: 21px;
+    width: 28px;
+  }
+  .ipa-table tr td{
+
+    width: 28px;
+    height: 28px;
    }
-   .ipa-table tr td:first-child {
-    padding-left: 1px;
-  }
-  .ipa-table tr:last-child td {
-    padding-bottom: 1px;
-  }
 }
 
 #ipa-output-toolbar {
@@ -1146,18 +1182,15 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
     border: none;
 }
 
-@media only screen and (min-width: 370px) {
+@media only screen and (min-width: 360px) {
   .cm-toolbar button {
-      padding: 2px 10px 2px 10px;
+      padding: 2px 9px 2px 9px;
   }
 }
 
 .cm-toolbar #generate-words, .cm-toolbar #apply-words {
     color: var(--info-text);
 }
-
-
-
 .cm-toolbar button:hover:not(:disabled) {
   background: #8080803a;
   cursor: pointer;

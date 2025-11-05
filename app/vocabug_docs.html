@@ -266,7 +266,7 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
-            <td><code class="example">[@</code> and <code class="example">]</code></td>
+            <td><code class="example">@[</code> and <code class="example">]</code></td>
             <td>Named escape</td>
           </tr>
           <tr>
@@ -332,11 +332,11 @@
             <td>Escapes a character after it</td>
           </tr>
           <tr>
-            <td><code class="example">[@</code> and <code class="example">]</code></td>
+            <td><code class="example">@[</code> and <code class="example">]</code></td>
             <td>Named escape</td>
           </tr>
           <tr>
-            <td><code class="example">&gt;</code>, <code class="example">-&gt;</code>, <code class="example">=&gt;</code>, <code class="example">⇒</code> or <code class="example">→</code></td>
+            <td><code class="example">&gt;&gt;</code>, <code class="example">=&gt;</code>, <code class="example">⇒</code> or <code class="example">→</code></td>
             <td>Indicates <a href="#nescaTheChange">change</a></td>
           </tr>
           <tr>
@@ -352,7 +352,7 @@
             <td><a href="#nescaOptionalatorSet">Optionalator-set</a></td>
           </tr>
           <tr>
-            <td><code class="example">&lt;</code> and a space</td>
+            <td><code class="example">|</code> and a space</td>
             <td>Begins a <a href="#nescaClusterfield">Cluster-field</a></td>
           </tr>
           <tr>
@@ -360,7 +360,7 @@
             <td>Any one-length capital letter can refer to a <a href="#nescaUsingCategories">category</a></td>
           </tr>
           <tr>
-            <td><code class="example">[+</code> or <code class="example">[-</code> and <code class="example">]</code></td>
+            <td><code class="example">&lt;[</code> and <code class="example">]</code></td>
             <td><a href="#nescaUsingFeatures">Feature</a> matrix</td>
           </tr>
           <tr>
@@ -368,8 +368,8 @@
             <td><a href="#nescaInsertionAndDeletion">Insertion</a> when in <code class="example">TARGET</code>, <a href="#nescaInsertionAndDeletion">deletion</a> when in <code class="example">RESULT</code></td>
           </tr>
           <tr>
-            <td><code class="example">0</code></td>
-            <td><a href="#nescaReject">Rejects</a> a word</td>
+            <td><code class="example">@X</code></td>
+            <td><a href="#nescaReject">Expels</a> a word</td>
           </tr>
           <tr>
             <td><code class="example">/</code></td>
@@ -416,7 +416,7 @@
             <td><a href="#nescaAnythingsMark">Anythings-mark</a>, matches ungreedily 1 or more wildcards</td>
           </tr>
           <tr>
-            <td><code class="example">&[</code> and <code class="example">]</code></td>
+            <td><code class="example">&[</code> and <code class="example">][</code> and <code class="example">]</code></td>
             <td><a href="#nescaGuarded">Guarded-anythings-mark</a></td>
           </tr>
           <tr>
@@ -424,28 +424,28 @@
             <td><a href="#nescaSyllableMark">Syllable-mark</a> -- equivalent to <code class="example">&[.]</code></td>
           </tr>
           <tr>
-            <td><code class="example">|</code></td>
-            <td><a href="#nescaEngine">Engines</a> are placed after this character, and a space</td>
+            <td><code class="example">@R[</code> and <code class="example">]</code></td>
+            <td>A <a href="#nescaEngine">routine</a> is placed inside the angle brackets</td>
           </tr>
           <tr>
-            <td><code class="example">&lt;T</code></td>
+            <td><code class="example">@T</code></td>
             <td><a href="#nescaTargetMark">Target-mark</a></td>
           </tr>
           <tr>
-            <td><code class="example">&lt;M</code></td>
+            <td><code class="example">@M</code></td>
             <td><a href="#nescaMetathesisMark">Metathesis-mark</a></td>
           </tr>
           <tr>
-            <td><code class="example">&lt;E</code></td>
+            <td><code class="example">@E</code></td>
             <td><a href="#nescaEmptyMark">Empty-mark</a></td>
+          </tr>
+          <tr>
+            <td><code class="example">@=</code></td>
+            <td>Begins <a href="#nescaReference">Reference-capture</a> of a sequence of graphemes</td>
           </tr>
           <tr>
             <td><code class="example">=</code> and positive digit</td>
             <td><a href="#nescaReference">Reference-capture</a></td>
-          </tr>
-          <tr>
-            <td><code class="example">&lt;=</code></td>
-            <td>Begins <a href="#nescaReference">Reference-capture</a> of a sequence of graphemes</td>
           </tr>
           <tr>
             <td>A positive digit</td>
@@ -794,7 +794,7 @@
       <p>The format of the change can be expressed as <code class="example">TARGET -> RESULT</code>.</p>
       <ul class="paragraphian">
         <li><code class="example">TARGET</code> specifies which part of the word is being changed</li>
-        <li>Then followed by a space and the <code class="example">></code> character. <code class="example">></code> can be swapped with either <code class="example">-></code>, <code class="example">=></code>, <code class="example">⇒</code> or <code class="example">→</code> if you prefer</li>
+        <li>Then followed by a space and the <code class="example">></code> character. <code class="example">></code> can be swapped with either <code class="example">>></code>, <code class="example">=></code>, <code class="example">⇒</code> or <code class="example">→</code> if you prefer</li>
         <li><code class="example">RESULT</code> is what <code class="example">TARGET</code> is changing into, or in other words, replacing</li>
       </ul>
       <p>Let's look at a simple unconditional rule:</p>

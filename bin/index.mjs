@@ -4963,11 +4963,44 @@ class Word_Builder {
 }
 class Reference_Mapper {
   constructor() {
-    __publicField(this, "store", /* @__PURE__ */ new Map());
-    this.store = /* @__PURE__ */ new Map();
+    __publicField(this, "map", /* @__PURE__ */ new Map());
+    __publicField(this, "capture_stream_index", null);
+    __publicField(this, "capture_stream", []);
+    __publicField(this, "is_capturing_sequence", false);
+    this.map = /* @__PURE__ */ new Map();
   }
-  restore_escaped_chars(input) {
-    return input;
+  reset_capture_stream_index() {
+    this.capture_stream_index = null;
+  }
+  set_capture_stream_index(index) {
+    this.capture_stream_index = index;
+  }
+  capture_reference(key, stream) {
+    if (this.capture_stream_index === null) {
+      const last_item = get_last(stream);
+      if (last_item) {
+        this.map.set(key, [last_item]);
+      } else {
+        this.map.set(key, [""]);
+      }
+    } else {
+      const captured_sequence = stream.slice(this.capture_stream_index);
+      this.map.set(key, captured_sequence);
+    }
+  }
+  get_captured_reference(key) {
+    return this.map.get(key) ?? [key];
+  }
+  clone() {
+    const clone = new Reference_Mapper();
+    clone.map = new Map(this.map);
+    clone.capture_stream_index = this.capture_stream_index;
+    return clone;
+  }
+  absorb(other) {
+    for (const [key, value] of other.map.entries()) {
+      this.map.set(key, value);
+    }
   }
 }
 const xsampa_to_ipa_code_map = {
@@ -5873,7 +5906,7 @@ class Transformer {
     }
     return [0, 0, []];
   }
-  result_former(raw_result, target_stream) {
+  result_former(raw_result, target_stream, reference_mapper) {
     const replacement_stream = [];
     for (let j = 0; j < raw_result.length; j++) {
       const my_result_token = raw_result[j];
@@ -5887,11 +5920,20 @@ class Transformer {
         const my_metathesis_graphemes = swap_first_last_items([
           ...target_stream
         ]);
-        for (let k = 0; k < my_metathesis_graphemes.length; k++) {
-          replacement_stream.push(my_metathesis_graphemes[k]);
-        }
+        replacement_stream.push(...my_metathesis_graphemes);
+      } else if (my_result_token.type === "reference-start-capture") {
+        reference_mapper.set_capture_stream_index(replacement_stream.length);
+      } else if (my_result_token.type === "reference-capture") {
+        reference_mapper.capture_reference(
+          my_result_token.key,
+          replacement_stream
+        );
+      } else if (my_result_token.type === "reference-mark") {
+        const reference_value = reference_mapper.get_captured_reference(my_result_token.key);
+        replacement_stream.push(...reference_value);
       }
     }
+    reference_mapper.reset_capture_stream_index();
     return replacement_stream;
   }
   // BEFORE and AFTER and TARGET use this
@@ -5901,8 +5943,7 @@ class Transformer {
     const matched = [];
     while (j < pattern.length) {
       const token = pattern[j];
-      if (token.type !== "grapheme" && token.type !== "wildcard" && token.type !== "anythings-mark" && token.type !== "syllable-mark" && token.type !== "target-mark" && token.type !== "metathesis-mark" && //token.type !== 'reference' &&
-      token.type !== "syllable-boundary" && token.type !== "word-boundary" && token.type !== "empty-mark") {
+      if (token.type !== "grapheme" && token.type !== "wildcard" && token.type !== "anythings-mark" && token.type !== "syllable-mark" && token.type !== "target-mark" && token.type !== "metathesis-mark" && token.type !== "syllable-boundary" && token.type !== "word-boundary" && token.type !== "empty-mark" && token.type !== "reference-capture" && token.type !== "reference-mark" && token.type !== "reference-start-capture") {
         j++;
         continue;
       }
@@ -6040,9 +6081,34 @@ class Transformer {
         }
         matched.push(...stream.slice(i, i + count));
         i += count;
+      } else if (token.type === "reference-start-capture") {
+        reference_mapper.set_capture_stream_index(matched.length);
+      } else if (token.type === "reference-capture") {
+        reference_mapper.capture_reference(token.key, matched);
+      } else if (token.type === "reference-mark") {
+        const reference_value = reference_mapper.get_captured_reference(token.key);
+        const unit_length = reference_value.length;
+        if (unit_length === 0) {
+          return null;
+        }
+        const max_available2 = max_end !== void 0 ? Math.min(token.max, Math.floor((max_end - i) / unit_length)) : token.max;
+        let repetitions = 0;
+        while (repetitions < max_available2 && stream.slice(
+          i + repetitions * unit_length,
+          i + (repetitions + 1) * unit_length
+        ).every((val, idx) => val === reference_value[idx])) {
+          repetitions++;
+        }
+        if (repetitions < token.min) {
+          return null;
+        }
+        const total_length = repetitions * unit_length;
+        matched.push(...stream.slice(i, i + total_length));
+        i += total_length;
       }
       j++;
     }
+    reference_mapper.reset_capture_stream_index();
     return {
       start,
       end: i,
@@ -6050,6 +6116,7 @@ class Transformer {
     };
   }
   environment_match(word_stream, target_stream, startIdx, raw_target, before, after, reference_mapper) {
+    const human_readable_condition_match = [" / "];
     const target_len = raw_target.length;
     const before_tokens = before;
     let before_matched = false;
@@ -6064,10 +6131,12 @@ class Transformer {
       );
       if (result2 !== null && result2.end === startIdx) {
         before_matched = true;
+        human_readable_condition_match.push(...result2.matched);
         break;
       }
     }
-    if (!before_matched) return false;
+    if (!before_matched) return [false, ""];
+    human_readable_condition_match.push("_");
     const after_tokens = after;
     const after_start = startIdx + target_len;
     const result = this.match_pattern_at(
@@ -6078,8 +6147,11 @@ class Transformer {
       word_stream.length,
       target_stream
     );
-    if (result === null) return false;
-    return true;
+    if (result === null) {
+      return [false, ""];
+    }
+    human_readable_condition_match.push(...result.matched);
+    return [true, human_readable_condition_match.join("")];
   }
   // Non destructively apply replacements
   replacementa(word_stream, replacements, word, exceptions, line_num) {
@@ -6152,10 +6224,10 @@ class Transformer {
       }
       let my_conditions = "";
       for (const r of replacements) {
-        if (r.matched_condition) {
-          const before = r.matched_condition.before.map((t) => t.base).join(" ");
-          const after = r.matched_condition.after.map((t) => t.base).join(" ");
-          my_conditions += ` / ${before}_${after}`;
+        if (r.matched_conditions.length != 0) {
+          for (const c of r.matched_conditions) {
+            my_conditions += c;
+          }
         }
       }
       const transformation_str = `${applied_targets.join(", ")} → ${applied_results.join(", ")}`;
@@ -6168,7 +6240,6 @@ class Transformer {
     return normalized;
   }
   apply_transform(word, word_stream, transform) {
-    const reference_mapper = new Reference_Mapper();
     const { target, result, conditions, exceptions, chance, line_num } = transform;
     if (chance != null && Math.random() * 100 >= chance) {
       return word_stream;
@@ -6189,6 +6260,7 @@ class Transformer {
     }
     const replacements = [];
     for (let i = 0; i < target.length; i++) {
+      const reference_mapper = new Reference_Mapper();
       const raw_target = target[i];
       const raw_result = result[i];
       let mode = "replacement";
@@ -6196,7 +6268,9 @@ class Transformer {
         mode = "deletion";
       } else if (raw_result[0].type === "reject") {
         mode = "reject";
-      } else ;
+      } else {
+        this.target_to_word_match(word_stream, raw_target, reference_mapper);
+      }
       if (raw_target[0].type === "insertion") {
         if (mode === "deletion" || mode === "reject") {
           this.logger.validation_error(
@@ -6214,46 +6288,59 @@ class Transformer {
         for (let insert_index = 0; insert_index <= word_stream.length; insert_index++) {
           const my_replacement_stream = this.result_former(
             raw_result,
-            word_stream
+            word_stream,
+            reference_mapper
           );
-          let matched_condition = null;
-          const passes = conditions.length === 0 || conditions.some((c) => {
-            const result2 = this.environment_match(
+          const matched_conditions = [];
+          let passes = conditions.length === 0;
+          for (const c of conditions) {
+            const temp_mapper = reference_mapper.clone();
+            const [pass, result2] = this.environment_match(
               word_stream,
               my_replacement_stream,
               insert_index,
               [],
               c.before,
               c.after,
-              reference_mapper
+              temp_mapper
             );
-            if (result2) matched_condition = c;
-            return result2;
-          });
-          const blocked = exceptions.some(
-            (e) => this.environment_match(
+            if (pass) {
+              matched_conditions.push(result2);
+              reference_mapper.absorb(temp_mapper);
+              passes = true;
+            }
+          }
+          const blocked = exceptions.some((e) => {
+            const temp_mapper = reference_mapper.clone();
+            const [block] = this.environment_match(
               word_stream,
               my_replacement_stream,
               insert_index,
               [],
               e.before,
               e.after,
-              reference_mapper
-            )
-          );
+              temp_mapper
+            );
+            return block;
+          });
           if (!passes || blocked) continue;
+          const second_replacement_stream = this.result_former(
+            raw_result,
+            word_stream,
+            reference_mapper
+          );
           replacements.push({
             index_span: insert_index,
             length_span: 0,
             target_stream: ["^"],
             // symbolic marker for insertion
-            replacement_stream: my_replacement_stream,
-            matched_condition
+            replacement_stream: second_replacement_stream,
+            matched_conditions
           });
         }
       } else {
         let cursor = 0;
-        while (cursor <= word_stream.length - raw_target.length) {
+        while (cursor <= word_stream.length) {
           const [match_index, match_length, matched_stream] = this.target_to_word_match(
             word_stream.slice(cursor),
             raw_target,
@@ -6264,31 +6351,38 @@ class Transformer {
             continue;
           }
           const global_index = cursor + match_index;
-          let matched_condition = null;
-          const passes = conditions.length === 0 || conditions.some((c) => {
-            const result2 = this.environment_match(
+          const matched_conditions = [];
+          let passes = conditions.length === 0;
+          for (const c of conditions) {
+            const temp_mapper = reference_mapper.clone();
+            const [pass, result2] = this.environment_match(
               word_stream,
               matched_stream,
               global_index,
               matched_stream,
               c.before,
               c.after,
-              reference_mapper
+              temp_mapper
             );
-            if (result2 && !matched_condition) matched_condition = c;
-            return result2;
-          });
-          const blocked = exceptions.some(
-            (e) => this.environment_match(
+            if (pass) {
+              matched_conditions.push(result2);
+              reference_mapper.absorb(temp_mapper);
+              passes = true;
+            }
+          }
+          const blocked = exceptions.some((e) => {
+            const temp_mapper = reference_mapper.clone();
+            const [block] = this.environment_match(
               word_stream,
               matched_stream,
               global_index,
               matched_stream,
               e.before,
               e.after,
-              reference_mapper
-            )
-          );
+              temp_mapper
+            );
+            return block;
+          });
           if (!passes || blocked) {
             cursor = global_index + 1;
             continue;
@@ -6307,19 +6401,20 @@ class Transformer {
               length_span: match_length,
               target_stream: matched_stream,
               replacement_stream: [],
-              matched_condition
+              matched_conditions
             });
           } else {
             const my_replacement_stream = this.result_former(
               raw_result,
-              matched_stream
+              matched_stream,
+              reference_mapper
             );
             replacements.push({
               index_span: global_index,
               length_span: match_length,
               target_stream: matched_stream,
               replacement_stream: my_replacement_stream,
-              matched_condition
+              matched_conditions
             });
           }
           cursor = global_index + match_length;
@@ -6329,14 +6424,12 @@ class Transformer {
     word_stream = this.replacementa(
       word_stream,
       replacements,
-      ////
       word,
       exceptions,
       line_num
     );
     return word_stream;
   }
-  
   do_transforms(word) {
     if (word.get_last_form() == "") {
       word.rejected = true;
@@ -6670,9 +6763,9 @@ class Logger {
   validation_error(message, line_num = null) {
     const err = new this.Validation_Error(message);
     if (line_num || line_num === 0) {
-      this.errors.push(`Error: ${message} @ line ${line_num + 1}.`);
+      this.errors.push(`Error: ${message} @ line ${line_num + 1}`);
     } else {
-      this.errors.push(`Error: ${message}.`);
+      this.errors.push(`Error: ${message}`);
     }
     throw err;
   }
@@ -6692,13 +6785,13 @@ class Logger {
   }
   warn(warn, line_num = null) {
     if (line_num || line_num === 0) {
-      this.warnings.push(`Warning: ${warn} @ line ${line_num + 1}.`);
+      this.warnings.push(`Warning: ${warn} @ line ${line_num + 1}`);
     } else {
-      this.warnings.push(`Warning: ${warn}.`);
+      this.warnings.push(`Warning: ${warn}`);
     }
   }
   info(info) {
-    this.infos.push(`Info: ${info}.`);
+    this.infos.push(`Info: ${info}`);
   }
   diagnostic(diagnostic) {
     this.diagnostics.push(diagnostic);
@@ -6792,7 +6885,6 @@ const transform_syntax_chars = [
   ":",
   "*",
   "&",
-  "…",
   "|",
   "<",
   "~",
@@ -7336,13 +7428,13 @@ class Transform_Resolver {
     return seq.map((t) => {
       let s = t.base;
       if (t.type === "anythings-mark") {
-        if ("blocked_by" in t && t.blocked_by) {
-          const groups = t.blocked_by.map((group) => group.join("")).join(", ");
-          s += `[${groups}]`;
-        }
         if ("consume" in t && t.consume) {
           const groups = t.consume.map((group) => group.join("")).join(", ");
           s += `[${groups}]`;
+        }
+        if ("blocked_by" in t && t.blocked_by) {
+          const groups = t.blocked_by.map((group) => group.join("")).join(", ");
+          s += `^[${groups}]`;
         }
       }
       if ("escaped" in t && t.escaped) {
@@ -7361,7 +7453,7 @@ class Transform_Resolver {
         s += `+[${t.min}${t.max !== Infinity ? "," + t.max : ""}]`;
       }
       return s;
-    }).join("");
+    }).join(" ");
   }
   show_debug() {
     const transforms = [];
@@ -7470,9 +7562,9 @@ class Nesca_Grammar_Stream {
           if (look_ahead >= stream.length || stream[look_ahead] !== "]") {
             this.logger.validation_error(`Unclosed blocker`, line_num);
           }
-          const raw_groups = garde_stream.split(",").map((group) => group.trim()).filter(Boolean);
           const consume = [];
           const blocked_by = [];
+          const raw_groups = garde_stream.split(",").map((group) => group.trim()).filter(Boolean);
           let is_blocker = false;
           for (const group of raw_groups) {
             if (group.startsWith("^")) {
@@ -7488,9 +7580,14 @@ class Nesca_Grammar_Stream {
               }
             }
           }
-          new_token.consume = consume;
-          new_token.blocked_by = blocked_by;
+          if (consume.length !== 0) {
+            new_token.consume = consume;
+          }
+          if (blocked_by.length !== 0) {
+            new_token.blocked_by = blocked_by;
+          }
           look_ahead++;
+          i = look_ahead;
         }
       } else if (char === "%") {
         if (mode === "RESULT") {
@@ -7567,105 +7664,60 @@ class Nesca_Grammar_Stream {
           }
           new_token = { type: "empty-mark", base: "<E", min: 1, max: 1 };
           i = look_ahead;
+        } else if (stream[look_ahead] === "=") {
+          new_token = {
+            type: "reference-start-capture",
+            base: "<=",
+            min: 1,
+            max: 1
+          };
+          i = look_ahead + 1;
+          tokens.push(new_token);
+          continue;
         } else {
           this.logger.validation_error(
-            `A 'T' or 'M' did not follow '<' in '${mode}'`,
+            `A 'T', 'M' or '=' did not follow '<' in '${mode}'`,
             line_num
           );
         }
         i++;
       } else if (char === "=") {
-        let look_ahead = i + 1;
-        if (stream[look_ahead] === "<") {
-          new_token = { type: "br-start-capture", base: "<=", min: 1, max: 1 };
+        const look_ahead = i + 1;
+        const digit = stream[look_ahead];
+        if (/^[1-9]$/.test(digit)) {
+          new_token = {
+            type: "reference-capture",
+            base: `=${digit}`,
+            key: digit,
+            min: 1,
+            max: 1
+          };
+          tokens.push(new_token);
+          i = look_ahead + 1;
+          continue;
         } else {
-          look_ahead += 1;
-          switch (stream[look_ahead]) {
-            case "1":
-              new_token = {
-                type: "br-end-capture",
-                base: "=1",
-                name: "1",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "2":
-              new_token = {
-                type: "br-end-capture",
-                base: "=2",
-                name: "2",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "3":
-              new_token = {
-                type: "br-end-capture",
-                base: "=3",
-                name: "3",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "4":
-              new_token = {
-                type: "br-end-capture",
-                base: "=4",
-                name: "4",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "5":
-              new_token = {
-                type: "br-end-capture",
-                base: "=5",
-                name: "5",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "6":
-              new_token = {
-                type: "br-end-capture",
-                base: "=6",
-                name: "6",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "7":
-              new_token = {
-                type: "br-end-capture",
-                base: "=7",
-                name: "7",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "8":
-              new_token = {
-                type: "br-end-capture",
-                base: "=8",
-                name: "8",
-                min: 1,
-                max: 1
-              };
-              break;
-            case "9":
-              new_token = {
-                type: "br-end-capture",
-                base: "=9",
-                name: "9",
-                min: 1,
-                max: 1
-              };
-              break;
-          }
+          this.logger.validation_error(
+            `Invalid reference capture syntax in '${mode}'`,
+            line_num
+          );
         }
+      } else if (/^[1-9]$/.test(char)) {
+        if (mode === "TARGET") {
+          this.logger.validation_error(
+            "Reference-mark not allowed in 'TARGET'",
+            line_num
+          );
+        }
+        new_token = {
+          type: "reference-mark",
+          base: char,
+          key: char,
+          min: 1,
+          max: 1
+        };
+        i++;
       } else if (char === "~") ;
-      else if (char == "⇒" || char == "→" || char == ">" || char == "{" || char == "}" || char == "[" || char == "]" || char == "(" || char == ")" || char == "<" || char === "∅" || char === "^" || char == "/" || char === "!" || char === "?" || char == "_" || char == "#" || char == "+" || char == ":" || char == "*" || char === "…" || char === "&" || char == "|" || char === "~" || char == "@" || char === "=" || char === "1" || char === "2" || char === "3" || char === "4" || char === "5" || char === "6" || char === "7" || char === "8" || char === "9" || char === "0") {
+      else if (char == "⇒" || char == "→" || char == ">" || char == "{" || char == "}" || char == "[" || char == "]" || char == "(" || char == ")" || char == "<" || char === "∅" || char === "^" || char == "/" || char === "!" || char === "?" || char == "_" || char == "#" || char == "+" || char == ":" || char == "*" || char === "&" || char == "|" || char === "~" || char == "@" || char === "=" || char === "1" || char === "2" || char === "3" || char === "4" || char === "5" || char === "6" || char === "7" || char === "8" || char === "9" || char === "0") {
         this.logger.validation_error(
           `Unexpected syntax character '${char}' in ${mode}`,
           line_num

@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import  { xsampa_to_ipa } from "../src/modules/xsampa";
+import  { xsampa_to_ipa } from "../src/transforma/xsampa";
 
 const my_xsampa = "b b_< c d d_< d` e f g g_< h h\\ i j j\\ k l l\\ l` m n n` o p p\\ q r r\\ r\\` r` s s\\ s` t t` u v v\\ w x x\\ y z z\\ z` A B B\\ C D E F G G\\ G\\_< H H\\ I J J\\ J\\_< K K\\ L L\\ M M\\ N N\\ O O\\ P Q R R\\ S T U V W X X\\ Y Z . \"◌ %◌ ◌' ◌: ◌:\\ @ @\\ @` { } 1 2 3 3\\ 4 5 6 7 8 9 & ? ?\\ <\\ >\\ ^ ! !\\ | |\\ || |\\|\\ =\\ -\\ ◌_\" ◌_+ ◌_- ◌_0 ◌= ◌_> ◌_?\\ ◌_^ ◌_} ◌` ◌~ ◌_= ◌_~) ◌_A ◌_a ◌_B ◌_B_L ◌_c ◌_d ◌_e <F> ◌_F ◌_G ◌_H ◌_H_T ◌_h ◌_j ◌_k ◌_L ◌_l ◌_M ◌_m ◌_N ◌_n ◌_O ◌_o ◌_q <R> ◌_R ◌_R_F ◌_r ◌_T ◌_t ◌_v ◌_w ◌_X ◌_x ◌_\\ ◌_/"
 

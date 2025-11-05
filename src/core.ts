@@ -118,6 +118,7 @@ function generate({
       p.graphemes,
       transform_resolver.transforms,
       p.output_mode,
+      p.associateme_mapper,
     );
 
     const text_builder = new Text_Builder(

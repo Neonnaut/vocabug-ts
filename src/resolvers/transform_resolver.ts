@@ -553,17 +553,17 @@ class Transform_Resolver {
         let s = t.base;
 
         if (t.type === "anythings-mark") {
-          if ("blocked_by" in t && t.blocked_by) {
-            const groups = t.blocked_by
-              .map((group) => group.join("")) // join inner items
-              .join(", "); // join groups with ,
-            s += `[${groups}]`;
-          }
           if ("consume" in t && t.consume) {
             const groups = t.consume
               .map((group) => group.join("")) // join inner items
               .join(", "); // join groups with ,
             s += `[${groups}]`;
+          }
+          if ("blocked_by" in t && t.blocked_by) {
+            const groups = t.blocked_by
+              .map((group) => group.join("")) // join inner items
+              .join(", "); // join groups with ,
+            s += `^[${groups}]`;
           }
         }
 

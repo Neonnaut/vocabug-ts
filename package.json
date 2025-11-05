@@ -21,15 +21,15 @@
   ],
   "scripts": {
     "dev": "vite --config app/vite.config.ts",
-    "preview": "vite preview",
+    "lint": "eslint ./ --fix",
+    "prettier": "prettier --write 'src/**/*.{ts,js,json,md}'",
     "test": "vitest run",
-
+    "build:app": "vite build --config app/vite.config.js",
     "build:ts": "tsc && vite build",
     "build:win": "tsc.cmd",
     "build:cli": "vite build --config bin/vite.config.js",
-    "build:all": "npm run build:ts && npm run build:win && npm run build:cli",
-    "build:app": "vite build --config app/vite.config.js",
-    "lint": "eslint ./ --fix",
+    "build": "node build.js",
+    
     "build:b": "tsc && npx terser dist/index.js -m reserved='[generate]' --ecma 2022 --toplevel -c unsafe,unsafe_symbols,top_retain='generate' -o dist/vocabug.min.js"
   },
   "devDependencies": {

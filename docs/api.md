@@ -8,11 +8,11 @@ const vocabug = require('vocabug'); // CommonJS (Node.js)
 import vocabug from 'vocabug'; // ES modules
 ```
 
-There are two parts inside this `vocabug` instance, the main function `generate()` and `examples`, below is a very minimal use of the program:
+There is one part inside this `vocabug` instance, the main function `generate()`. Below is a very minimal use of the program:
 ```ts
 import vocabug from 'vocabug';
 const def = vocabug.generate({
-    file: vocabug.examples.tonal
+    file: text
 });
 
 console.log(def.text);
@@ -25,12 +25,12 @@ The input signature for `vocabug.generate()` is:
 ```ts
 type generate_options = {
     file: string; // Your definition file
-    num_of_words?: number | string; // Number of words to generate
-    generation_mode?: 'word-list'|'debug'|'paragraph'; // generation mode
-    remove_duplicates?: boolean;
-    force_word_limit?: boolean; // Force to the time limit
-    sort_words?: boolean;
-    word_divider?: string;
+    num_of_words?: number | string = 100; // Number of words to generate. Must be in range 1 to 100,000
+    output_mode?: 'word-list'|'debug'|'paragraph' = "word-list";
+    remove_duplicates?: boolean = true; // Remove duplicate words
+    force_word_limit?: boolean = false;
+    sort_words?: boolean = true; // Sort generated words alphabetically.
+    word_divider?: string = " "; // Divider or "delimeter" between words
 };
 ```
 
@@ -44,26 +44,3 @@ type generate_output = {
     diagnostics: string[]; // Useful information about parsing the file on debug mode.
 }
 ```
-
-There are 5 examples to choose from in `vocabug.examples`: `default`, `tonal`, `romance`, `japanese` and `australian`.
-
-## Development
-
-To build use `npm run build`. For live testing use `npm run dev`.
-
-[1]: https://img.shields.io/npm/v/vocabug
-[2]: https://www.npmjs.com/package/vocabug "npm package"
-[3]: https://img.shields.io/npm/l/vocabug
-[4]: https://github.com/Neonnaut/vocabug-ts/blob/master/LICENSE "license text"
-[5]: https://img.shields.io/github/issues-raw/Neonnaut/vocabug-ts
-[6]: https://github.com/Neonnaut/vocabug-ts/issues "issues page"
-[7]: https://img.shields.io/github/commit-activity/m/Neonnaut/vocabug-ts
-[8]: https://github.com/Neonnaut/vocabug-ts/commits "commit log"
-
-[badge-link]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml
-[Tests]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml/badge.svg
-
-[10]: https://github.com/bbrk24/lexifer-ts
-[11]: https://github.com/nai888/awkwords
-[12]: https://neonnaut.neocities.org/vocabug "deployment"
-[13]: https://neonnaut.neocities.org/vocabug_docs "docs"

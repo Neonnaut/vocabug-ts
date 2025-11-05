@@ -5,6 +5,8 @@ import Supra_Builder from "./generata/supra_builder";
 import { make_percentage, cappa } from "./utils/utilities";
 import type { Output_Mode, Distribution } from "./utils/types";
 
+import Associateme_Mapper from "./transforma/associateme_mapper";
+
 class Parser {
   private logger: Logger;
   private escape_mapper: Escape_Mapper;
@@ -35,7 +37,10 @@ class Parser {
     chance: number | null;
     line_num: number;
   }[];
+
   public graphemes: string[];
+
+  public associateme_mapper: Associateme_Mapper;
 
   public alphabet: string[];
   public invisible: string[];
@@ -112,6 +117,9 @@ class Parser {
     this.wordshape_pending = { content: "", line_num: 0 };
 
     this.graphemes = [];
+
+    this.associateme_mapper = new Associateme_Mapper();
+
     this.transform_pending = [];
 
     this.feature_pending = new Map();
@@ -131,7 +139,7 @@ class Parser {
       line = this.escape_mapper.escape_backslash_pairs(line);
       line = line.replace(/;.*/u, "").trim(); // Remove comment!!
       line = this.escape_mapper.escape_named_escape(line);
-      if (line.includes("[@")) {
+      if (line.includes("@[")) {
         this.logger.validation_error(
           `Invalid named escape`,
           this.file_line_num,
@@ -151,14 +159,14 @@ class Parser {
           continue;
         }
 
-        if (line.startsWith("< ")) {
+        if (line.startsWith("| ")) {
           // Parse clusterfield
           this.parse_clusterfield(file_array);
           continue;
         }
 
-        if (line.startsWith("| ")) {
-          // Engine
+        if (line.startsWith("@R ")) {
+          // Engine. Routine
           line_value = line.substring(2).trim().toLowerCase();
 
           const engine = line_value.replace(/\bcapitalize\b/g, "capitalise");

@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import Logger from "../src/modules/logger";
-import  collator  from "../src/modules/collator"
+import Logger from "../src/logger";
+import  collator  from "../src/collator"
  
 test('collator', () => {
   const logger = new Logger

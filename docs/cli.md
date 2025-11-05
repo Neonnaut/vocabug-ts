@@ -11,25 +11,28 @@ yarn global add vocabug
 ```
 
 ```
-wordgen <path> [options]
+vocabug <path> [options]
 ```
 
-<path> is the required path to the input text file
+`<path>` is the required path to the input text file
 
-- `?`, --help                        Show help
-- `v`, --version                     Show version number
-- `-n`, --num_of_words <number>       Number of words to generate (default: 100)
-- `-m`, --output_mode <mode>          Output mode: word-list, debug, paragraph (default: word-list)
-- `-d`, --remove_duplicates           Remove duplicate words (default: true)
-- `-l`, --force_word_limit            Force word limit even if input is short (default: false)
-- `-s`, --sort_words                  Sort generated words alphabetically (default: true)
-- `-w`, --word_divider <string>       Divider between words (default: " ")
-- `-e`, --encoding <encoding>         File encoding to use (default: utf8)
+Options:
 
-  Supported encodings:
-    ascii, binary, latin1, ucs-2, ucs2, utf-8, utf16le, utf8
-
-  Notes:
-    - Encoding is case-insensitive
-    - "utf-16le" is accepted as a synonym for "utf16le"
-    - Invalid encodings will throw an error listing valid choices
+- `--help` or `?`
+Show help
+- `--version` or `v`
+Show version number
+- `--num_of_words` or `-n` and `<number>`
+Number of words to generate. `<number>` must be in range 1 to 100,000 -- the default is 100
+- `--output_mode` or `-m` and `<mode>`
+Output mode. `<mode>` must be `word-list`, `debug`, or `paragraph` -- default is `word-list`
+- `--remove_duplicates` or `-d`
+Remove duplicate words. Default is true
+- `--force_word_limit` or `-l`
+Force word limit. Default is false
+- `--sort_words` or `-s`
+Sort generated words alphabetically. Default is true
+- `--word_divider` or `-w` and `<string>` 
+Divider or "delimeter" between words. Default of `<string>` in a space
+- `--encoding` or `-e` and  `<encoding>`
+File encoding to use. `<encoding>` must be `ascii`, `binary`, `latin1`, `ucs-2`, `ucs2`, `utf8`, `utf-8`, `utf16le`, `utf-16le` -- default is `utf8`
