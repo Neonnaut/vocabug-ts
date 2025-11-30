@@ -1,153 +1,98 @@
 const examples: { [key: string]: string } = {
   basic: 
-`; These are 'categories', categories are groups of graphemes.
-C = {t*9, tr} n {k*13, kr} m r s {p*12, pr} ch h w y
-L = ee oo aa ii uu
-V = a i e o u L
-F = n r s
-; By default, graphemes furthest to the right are picked more 
-; often than graphemes to the left.
+`; A Category is a group of graphemes assigned to a key.
+; By default, graphemes in a category furthest to the right
+; are picked more often than graphemes to the left.
+categories:
+  C = {t*9, tr} n {k*13, kr} m r s {p*12, pr} ch h w y
+  L = ee oo aa ii uu
+  V = a i e o u L
+  F = n r s
 
-; Segments provide abbreviation of parts of a word-shape.
-; Here we are using '$S' to define the main syllable.
-$S = CV(F)
+; A Unit provides abbreviation of parts of a word-shape.
+; Here we are using <S> to define the main syllable.
 ; Items enclosed in '(' and ')' only appear 10% of the time by default.
+units:
+  $ = CV(F)
 
 ; The first word-shape is picked the most often, the last, the least often.
-words: (V)$S, (V)$S$S, (V)$S$S$S, (V)$S$S$S$S, V
+words:
+  (V)<$>, (V)<$><$>, (V)<$><$><$>, (V)<$><$><$><$>, V
 
-; 'graphemes' directive prevents transforms targeting only part of a grapheme.
-graphemes: ee, oo, aa, ii, uu, ch
+; The 'graphemes' directive prevents transforms targeting
+; only part of a grapheme. It also has additional uses.
+graphemes:
+  ee, oo, aa, ii, uu, ch
 
 ; Vocabug uses 'transforms' to change words, or outright reject them.
-BEGIN transform:
+; Transforms are all placed inside the 'stage' directive
+stage:
 nn, nm, np, sh, ss -> ny, m, mp, s, s
 aa, ee, ii, oo, uu -> a, e, i, o, u / #_#
 yi -> 0
-END`,
+
+; Click the green 'Generate' button in the taskbar below to generate words!!
+; Read the instructions linked above, or by clicking '?' in the taskbar below`,
   tonal:
 `; A somewhat Yoruba-like tonal language
-I = k t ^ {p,f} n r b m s l d c ç ş h y w g {kp,gb}
-C = t k {f,p} n r b m s d h l ŋ g c ş ç l y w {mb,nd,ŋg} {kp,gb,ŋgb}
-V = a i e o u
-W = a i ẹ ọ u
-T = ^*3.7 [@Grave]*3 [@Acute]*3.3 ; Gives mid-tone, low-tone, high-tone
+categories:
+  I = k t ^ {p,f} n r b m s l d c ç ş h y w g {kp,gb}
+  C = t k {f,p} n r b m s d h l ŋ g c ş ç l y w {mb,nd,ŋg} {kp,gb,ŋgb}
+  V = a i e o u
+  W = a i ẹ ọ u
+  T = ^*3.7 &[Grave]*3 &[Acute]*3.3 ; Gives mid-tone, low-tone, high-tone
 
+units:
 ; + ATR harmony 
-$A = IVT
-$B = CVT
-$C = CVT(n)
+  A = IVT
+  B = CVT
+  C = CVT(n)
 
 ; - ATR harmony
-$X = IWT
-$Y = CWT
-$Z = CWT(n)
+  X = IWT
+  Y = CWT
+  Z = CWT(n)
 
-BEGIN words:
-$A$C $A$B$C $A$B$B$C
-$X$Z $X$Y$Z $X$Y$Y$Z
-$A $Z
-END
+words:
+  <A><C> <A><B><C> <A><B><B><C>
+  <X><Z> <X><Y><Z> <X><Y><Y><Z>
+  <A>    <Z>
 
-graphemes: ẹ́ ọ́ ẹ̀ ọ̀ kp gb
+graphemes:
+  ẹ́ ọ́ ẹ̀ ọ̀ kp gb
 
-; Mark vowels with a tone mark
-BEGIN transform:
-| compose
-END`,
-  romance:
-`; This should produce... simplified Spanish-looking words
-
-; Initial-cluster: pl pr tr cl cr bl br dr gl gr
-; All-consonant: t s k q d n b m p l r g h č f z
-; Vowels: a e i o u
-; Diphthongs: aj aw ej ew oj ja je jo ju wa we wi wo
-; Hiato: ea eo oa
-; Word-internal coda: n r l s m
-; Word-final coda: n r l s
-; If stressing the penultimate syllable, don't show stress.
-; Stress can also appear on the last or third-from-last syllable
-
-optionals-weight: 15 %
-
-C = {t*9,tr} s ^ {k*12,kr*2,kl} {d*12,dr} n {p*12,pr*2,pl} l m r {b*9,br*2,bl} q g h {č*12 f z}
-V = a i o u e
-F = n r l s m
-X = n r l s
-T = '
-$S = CV(F)
-$X = CV{[T*1]*9,[T*3]F} ; 3rd last syllable
-$Y = CV{[^*80]*9,[^*95]F} ; 2nd last syllable
-$Z = CV{[T*3]*10,[T*9]X} ; last syllable
-
-Σ = a,e,i,o,u,á,é,í,ó,ú
-
-BEGIN words:
-  $Y$Z $X$Y$Z $S$X$Y$Z
-END
-
-BEGIN transform:
-
-a',e',i',o',u' -> á,é,í,ó,ú ; Get stressed vowel
-u:+, u'u> o, e / _# ; /u/ final vowels should be less prominant
-{a,e,i,o,u}:+ -> {a,e,i,o,u} ; Vowels of 2+ length become 1
-áa,ée,íi,óo,úu -> á,é,í,ó,ú
-{a,e,o,u,á,é,í,ó,ú}{Σ} > 0 / #_#
-
-; Enlace y Hiato
-<   a  e  i  o  u
-a   +  aj aj o  aw
-e   +  +  ej +  ew
-i   ja je +  jo ju
-o   +  e  oj +  ju
-u   wa we wi wo +
-
-qw -> kw / _{a,o,á,ó}
-q -> k / _{a,o,á,ó}
-
-nj gj gn gl qw -> ň ň ň ʎ q
-jg jn jj jl ww -> ň ň j ʎ w
-
-<  b  k  q  g  č  d  f  h  l  m  n  p  r  s  t  z  
-m  +  nk nq ng nč nd nf h  nl m  ň  +  r  +  nt nz 
-n  mb +  +  +  +  +  +  h  l  ň  ň  mp +  +  +  +  
-r  +  +  +  +  +  +  +  h  l  +  +  +  +  +  +  z  
-l  +  +  +  +  +  +  +  h  ʎ  +  ʎ  +  r  +  +  z
-s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z  
-
-; Taco-taco, burrito-burrito
-k q č h ň ʎ j w > c qu ch j ñ ll i u
-
-i > y / #_{Σ} / {Σ}_{Σ}
-
-END`,
+stage:
+; Combine vowels and diacritics into one character, if possible.
+<routine = compose>`,
   japanese: 
 `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
-; and link.springer.com/content/pdf/10.3758/BF03195600.pdf
+; and Phonological Unit Frequencies in Japanese... by Katsuo Tamaoka.
 
+categories:
+  I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
+  C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
 ; <ʀ> yields long vowels.
+  V = a, i, u, o, e, {oʀ, aʀ, iʀ, eʀ, uʀ, yu, yo, ya, {yoʀ, yuʀ, yaʀ}}
 ; <ɴ> is the syllable final nasal.
 ; <ꞯ> yields geminate consonants.
+  F = ɴ, ꞯ
 
-I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
-C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
-V = a, i, u, o, e, {oʀ, aʀ, iʀ, eʀ, uʀ, yu, yo, ya, {yoʀ, yuʀ, yaʀ}}
-F = ɴ, ꞯ
-
-$A = IV(F) ; First syllable of slightly different consonant distribution.
-$S = CV(F) ; Gives type C(y)V(ʀ)(ɴ,ꞯ).
+units:
+  F = IV(F) ; First syllable of slightly different consonant distribution.
+  $ = CV(F) ; Gives type C(y)V(ʀ)(ɴ,ꞯ).
 
 ; Where light syllable is (C)V, and heavy is (C){VF,Vʀ(F)}.
 ; The final two syllables are least likely to be light + heavy...
 
-words: $A$S$S $A$S$S$S $A $A$S$S$S$S $A$S
+words:
+  <F><$><$> <F><$><$><$> <F> <F><$><$><$><$> <F><$>
 
-graphemes: a b ch d e f g h i j k l m n o p r s sh t ts u w y z
+graphemes:
+  a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
-BEGIN transform:
-
-{a,e,i,o,u}+ > ^ / ʀ_
-{a,e,i,o,u}+[3,] > {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
+stage:
+{a,e,i,o,u}+ > ^ / ʀ_ ; No vowels after a long vowel
+{a,e,i,o,u}?[3,] > {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
 <  i   u   e   o   ya   yu   yo
@@ -158,11 +103,13 @@ d  ji  zu  +   +   ja   ju   jo
 h  +   fu  +   +   +    +    +
 w  i   yu  yo  yo  ya   yu   yo
 ɴ  n'a n'u n'e n'o n'ya n'yu n'yo
+>
 
 ; <ɴ> assimilation, and <ꞯ> gemination.
 < ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
 ꞯ ꞯtch ꞯshsh ꞯtts j  ꞯkk g  ꞯss z  ꞯtt d  n  ꞯpp b  ꞯpp m  r  l  ꞯpp ꞯpp
 ɴ nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
+>
 
 ʀꞯ ɴ ꞯ -> ^ n ^ ; <ʀ> + <ꞯ> is illegal.
 
@@ -174,6 +121,7 @@ u  uʀ  +   ui  ai ai
 e  eʀ  eʀ  yoʀ ai yo
 o  oʀ  +   +   +  o
 ʀ  ʀ   ʀ   ʀ   ʀ  ʀ
+>
 
 y -> ^ / sh_ / j_ / ch_
 
@@ -181,69 +129,79 @@ aʀ eʀ iʀ oʀ uʀ -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
 aa ee ii oo uu -> a e i o u / #_#
-END`,
+}`,
   australian: 
 `; This does not represent a single Australian language, it does something
 ; Australian looking. The glottal stop and lack of retroflex stops make it
 ; not an 'average' Australian language word list, but not unusual.
 
-; You might notice /aCV/ words are not possible. This is intentional.
-
-; Only /a/ word initially. Only /i/ /a/ /u/ word finally.
-
-; I use <R> for length and <-> for coda-matching.
-; <t̪  c ʔ n̪  ɲ  ŋ  r  ɻ ʎ  j> romanise as...
-; <th j ꞌ nh ny ng rr r ly y> at the end.
+; <ʀ> is vowel length and <\`> is for coda-matching.
 
 ; CONSONANTS:
-; p t̪ t   c k ʔ
-; m n̪ n   ɲ ŋ
-;     r ɻ j w
+; p t̪ t   č k ꞌ
+; m n̪ n   ň ŋ
+;     r ṛ y w
 ;     l   ʎ
 
+; VOWELS:
+; i ii    u uu
+;   ee      oo
+; a aa ai
+
+categories:
 ; Initials:
-I = k, p, m, w, ^, c, ŋ, j, t, ɲ, n, ʎ, t̪
-J = k, p, m, w, c, ŋ, j, t, ɲ, n, ʎ, t̪ ; For disyllabic words
+  I = k, p, m, w, č, ŋ, y, t, ň, n, ʎ, t̪
 ; Medials
-C = k, m, ɻ, l, r, n, c, p, ŋ, t, ɲ, t̪, w, j, {n̪*5, ʎ*5, ʔ}
+  C = k, m, ṛ, l, r, n, č, p, ŋ, t, ň, t̪, w, y, {n̪*5, ʎ*5, ꞌ}
 ; Clusters
-X = lk rk ɻk ŋk ɻm lm rm ɻɳ lc rc ɻc ɲc kp mp lp rp ɻp tp
-Y = lŋ rŋ ɻŋ nt ɻʈ n̪t̪ lt̪ ln̪ n̪ʔ t̪ʔ
-Z = ɻŋk ɻmp ɻɳʈ ɻɲc lŋk lmp lɲc ln̪t̪ ɻŋk ɻmp ɻɳʈ ɻɲc rŋk rmp rɲc
-F = n l r ɻ 
-; VOWELS: <a aa i ii u uu ee oo> and diphthong <ai>
-V = a, i, u, {oR, eR, aR, iR, uR, ai}
-W = a, i, u
+  X = lk rk ṛk ŋk ṛm lm rm ṛn lč rč ṛč ňč kp mp lp rp ṛp tp
+  Y = lŋ rŋ ṛŋ nt ṛt n̪t̪ lt̪ ln̪ n̪ꞌ t̪ꞌ
+  Z = ṛŋk ṛmp ṛnt ṛňč lŋk lmp lňč ln̪t̪ ṛŋk ṛmp ṛnt ṛňč rŋk rmp rňč
+; Finals
+  F = n l r ṛ 
+; Vowels
+  V = a, i, u, {oʀ, eʀ, aʀ, iʀ, uʀ, ai}
+  W = a, i, u
 
-; Syllable shapes: (C)V(F), CVFNCV. (C is optional ONLY word initially).
-; <l r ɻ n̪> DON'T occur word initially. ONLY <n ɲ l r ɻ> occur word finally.
-; Disylabic words DON'T begin with a vowel. NO monosyllabic words.
-$I = IW
-$S = {C*12,-X*2,-Y,-Z}V
-$J = JV
-$Z = CW(F)
+; No monosyllabic words.
 
-words: $I$S$Z $I$S$S$Z $I$S$S$S$Z $J$Z $I$S$S$S$S$Z
+; Words begin with a consonant that is not <l, r, ṛ, n̪> or <a>.
+; Disylabic words DON'T begin with <a>.
+; Medial syllables are unrestricted
+; There are intervocalic clusters.
+; Words end with <a, i, u> or <n, ň, l, r, ṛ,>.
 
-graphemes: a aR e eR i iR o oR u uR p t̪ t c k ʔ m n̪ n ɲ ŋ r ɻ j w l ʎ
+units:
+  First = {IW*12, a}
+  Di-first = IW
+  Medial = {C*12,\`X*2,\`Y,\`Z}V
+  Last = {C*16,\`X*2,\`Y,\`Z}W(F)
 
-BEGIN transform:
-; Restrict the occurance of <ai>.
-<  ʔ  c  ŋ  ɲ  j  w  ʎ  ɻ  -
-ai aʔ ac aŋ aɲ aj aw aʎ aɻ a-
+words:
+  <First><Medial><Last>, <First><Medial><Medial><Last>,
+  <First><Medial><Medial><Medial><Last>, <Di-first><Last>,
+  <First><Medial><Medial><Medial><Medial><Last>
 
-; Long vowels become short before a consonant cluster or <ʔ>.
-R -> ^ / _- / _ʔ
+graphemes:
+  a aʀ e eʀ i iʀ o oʀ u uʀ p t̪ t č k ꞌ m n̪ n ň ŋ r ṛ y w l ʎ }
 
-; <ji>, <ʎi> and <wu> are rejected.
-ji ʎi wu jiR ʎiR wuR -> 0
+stage:
+; ʀestrict the occurance of <ai>.
+<  ꞌ  č  ŋ  ň  y  w  ʎ  ṛ  \`
+ai aꞌ ač aŋ aň ay aw aʎ aṛ a\`
+>
 
-; Romaniser:
-- > ^
-oR eR iR uR aR -> oo ee ii uu aa
-r ɻ n̪ t̪ ʔ ɳ -> rr r nh th ꞌ n
-ɲ ʎ j c ʈ ŋ -> ny ly y j t ng
-END`,
+; Long vowels become short before a consonant cluster or <ꞌ>.
+ʀ -> ^ / _\` / _ꞌ
+
+; <yi>, <ʎi> and <wu> are rejected.
+yi ʎi wu yiʀ ʎiʀ wuʀ -> 0
+
+; ʀomaniser:
+\` -> ^
+oʀ eʀ iʀ uʀ aʀ -> oo ee ii uu aa
+r ṛ n̪ t̪ -> rr r nh th
+ň ʎ č ŋ -> ny ly j ng`,
 
 /*
   btx:
@@ -503,6 +461,8 @@ BEGIN transform:
   ; Tonogenesis:
 
   ; Sandhi: impossible?
+
+  ; /r/ dissimilation: [sərˈpraiz] -> [səˈpraiz].   [ˈfeb.ru.e.ri] -> [ˈfeb.ju.e.ri]
 
 END`
 */

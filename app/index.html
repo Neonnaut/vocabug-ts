@@ -108,11 +108,11 @@
 
             <details class="dropdown-group" id="colour-switch-field">
               <summary class="dropdown-btn">Themes</summary>
-              <a id="light-mode" value="Light" name="changeThemeButton">Light</a>
-              <a id="warm-mode" value="Warm" name="changeThemeButton">Warm</a>
-              <a id="dark-mode" value="Dark" name="changeThemeButton">Dark</a>
+              <a class="dropdown-itm-btn" id="light-mode" value="Light" name="changeThemeButton">Light</a>
+              <a class="dropdown-itm-btn" id="warm-mode" value="Warm" name="changeThemeButton">Warm</a>
+              <a class="dropdown-itm-btn" id="dark-mode" value="Dark" name="changeThemeButton">Dark</a>
               <br>
-              <a id="system-mode" value="System*" name="changeThemeButton">System</a>
+              <a class="dropdown-itm-btn" id="system-mode" value="System*" name="changeThemeButton">System</a>
             </details>
 
         </fieldset>
@@ -129,11 +129,10 @@
 
           <details class="dropdown-group">
             <summary class="dropdown-btn">Examples</summary>
-            <a class="voc-example" value="basic">Default</a>
-            <a class="voc-example" value="tonal">Tonal</a>
-            <a class="voc-example" value="romance">Romance-like</a><br>
-            <a class="voc-example" value="japanese">Japanese-like</a>
-            <a class="voc-example" value="australian">Australian-like</a>
+            <a class="dropdown-itm-btn voc-example" value="basic">Default</a>
+            <a class="dropdown-itm-btn voc-example" value="japanese">Japanese-like</a><br>
+            <a class="dropdown-itm-btn voc-example" value="tonal">Tonal</a>
+            <a class="dropdown-itm-btn voc-example" value="australian">Australian-like</a>
           </details>
 
         </fieldset>
@@ -167,9 +166,12 @@
       <button class="cons keyboard-button" title="voiced bilabial fricative" value="&#x03B2;">&#x03B2;</button>
       <button class="cons keyboard-button" title="voiced bilabial implosive" value="&#x0253;">&#x0253;</button>
       <button class="consN keyboard-button" title="small caps B" value="&#665;">&#665;</button>
+      <button class="consN keyboard-button" title="b with stroke" value="&#384;">&#384;</button>
+      
+      
       <button class="cons keyboard-button" title="voiceless palatal fricative" value="&#x00E7;">&#x00E7;</button>
       <button class="cons keyboard-button" title="voiceless alveolo-palatal fricative" value="&#x0255;">&#x0255;</button>
-      <button class="consN keyboard-button" title="small caps C" value="&#7428;">&#7428;</button>
+
       <button class="consN keyboard-button" title="c with acute" value="&#x0107;">&#x0107;</button>
       <button class="consN keyboard-button" title="c with caron" value="&#x010D;">&#x010D;</button>
 
@@ -177,7 +179,7 @@
       <button class="cons keyboard-button" title="voiced retroflex plosive" value="&#x0256;">&#x0256;</button>
       <button class="cons keyboard-button" title="voiced alveolar implosive" value="&#x0257;">&#x0257;</button>
       <button class="cons keyboard-button" title="voiced retroflex implosive" value="&#x1D91;">&#x1D91;</button>
-      <button class="consN keyboard-button" title="small caps D" value="&#7428;">&#7428;</button>
+      <button class="consN keyboard-button" title="small caps D" value="&#7429;">&#7429;</button>
       <button class="consN keyboard-button" title="d with underdot" value="&#x1E0D;">&#x1E0D;</button>
     
       <button class="consN keyboard-button" title="d with stroke" value="&#x0111;">&#x0111;</button>
@@ -185,8 +187,14 @@
       <button class="vowel keyboard-button" title="mid central (unrounded) vowel (schwa)" value='&#601;'>&#601;</button>
       <button class="vowel keyboard-button" title="close-mid central unrounded vowel" value="&#x0258;">&#x0258;</button>
       <button class="vowel keyboard-button" title="open-mid central unrounded vowel" value="&#x025C;">&#x025C;</button>
+      
+      <button class="vowelX keyboard-button" title="small caps E" value="&#7431;">&#7431;</button>
+
       <button class="vowelX keyboard-button" title="e with acute" value="&#x00E9;">&#x00E9;</button>
       <button class="vowelX keyboard-button" title="e with grave" value="&#x00E8;">&#x00E8;</button>
+      <button class="vowelX keyboard-button" title="e with caron" value="&#283;">&#283;</button>
+      <button class="vowelX keyboard-button" title="e with circumflex" value="&#234;">&#234;</button>
+      
       <button class="vowelX keyboard-button" title="e with macron" value="&#x0113;">&#x0113;</button>
       <button class="vowelX keyboard-button" title="e with tilde" value="&#x1EBD;">&#x1EBD;</button>
       <button class="vowelX keyboard-button" title="e with ogonek" value="&#x0119;">&#x0119;</button>
@@ -208,6 +216,9 @@
     
       <button class="vowelX keyboard-button" title="i with acute" value="&#x00ED;">&#x00ED;</button>
       <button class="vowelX keyboard-button" title="i with grave" value="&#x00EC;">&#x00EC;</button>
+      <button class="vowelX keyboard-button" title="i with caron" value="&#464;">&#464;</button>
+      <button class="vowelX keyboard-button" title="i with circumflex" value="&#238;">&#238;</button>
+
       <button class="vowelX keyboard-button" title="i with macron" value="&#x012B;">&#x012B;</button>
       <button class="vowelX keyboard-button" title="i with tilde" value="&#x0129;">&#x0129;</button>
       <button class="vowelX keyboard-button" title="i with ogonek" value="&#x012F;">&#x012F;</button>
@@ -217,6 +228,10 @@
       <button class="cons keyboard-button" title="voiced palatal fricative" value="&#x029D;">&#x029D;</button>
       <button class="cons keyboard-button" title="voiced palatal plosive" value="&#x025F;">&#x025F;</button>
       <button class="cons keyboard-button" title="voiced palatal implosive" value="&#x0284;">&#x0284;</button>
+
+      <button class="consN keyboard-button" title="small caps J" value="&#7434;">&#7434;</button>
+      <button class="consN keyboard-button" title="small caps K" value="&#7435;">&#7435;</button>
+      
       <button class="cons keyboard-button" title="velarized alveolar lateral approximant" value="&#x026B;">&#x026B;</button>
       <button class="cons keyboard-button" title="voiced alveolar lateral flap" value='&#634;'>&#634;</button>
       <button class="cons keyboard-button" title="voiced retroflex lateral approximant" value="&#x026D;">&#x026D;</button>
@@ -227,6 +242,7 @@
       <button class="consN keyboard-button" title="l with underdot" value="&#x1E37;">&#x1E37;</button>
       <button class="consN keyboard-button" title="l with stroke" value="&#x0142;">&#x0142;</button>
       <button class="cons keyboard-button" title="voiced bilabial nasal (superscript)" value="&#x1D50;">&#9676;&#x1D50;</button>
+      <button class="consN keyboard-button" title="small caps M" value="&#7437;">&#7437;</button>
       <button class="cons keyboard-button" title="voiced alveolar nasal (superscript)" value="&#x207F;">&#9676;&#x207F;</button>
       <button class="cons keyboard-button" title="voiced retroflex nasal" value='&#627;'>&#627;</button>
       <button class="cons keyboard-button" title="voiced retroflex nasal (superscript)" value='ᶯ'>&#9676;ᶯ</button>
@@ -248,12 +264,19 @@
       <button class="vowel keyboard-button" title="open-mid back rounded vowel" value="&#x0254;">&#x0254;</button>
       <button class="vowelX keyboard-button" title="o with acute" value="&#x00F3;">&#x00F3;</button>
       <button class="vowelX keyboard-button" title="o with grave" value="&#x00F2;">&#x00F2;</button>
+      
+      <button class="vowelX keyboard-button" title="o with caron" value="&#466;">&#466;</button>
+      <button class="vowelX keyboard-button" title="o with circumflex" value="&#244;">&#244;</button>
       <button class="vowelX keyboard-button" title="o with macron" value="&#x014D;">&#x014D;</button>
       <button class="vowelX keyboard-button" title="o with tilde" value="&#x00F5;">&#x00F5;</button>
       <button class="vowelX keyboard-button" title="o with ogonek" value="&#x01EB;">&#x01EB;</button>
       <button class="vowelX keyboard-button" title="o with underdot" value="&#x1ECD;">&#x1ECD;</button>
       <button class="vowelX keyboard-button" title="o with diaeresis" value="&#x04E7;">&#x04E7;</button>
       <button class="vowelX keyboard-button" title="o with hook" value="&#x01A1;">&#x01A1;</button>
+      
+      <button class="consN keyboard-button" title="small caps P" value="&#7448;">&#7448;</button>
+      <button class="consN keyboard-button" title="small caps Q" value="&#42927;">&#42927;</button>
+      
       <button class="cons keyboard-button" title="voiced alveolar tap" value="&#x027E;">&#x027E;</button>
       <button class="cons keyboard-button" title="voiced alveolar approximant" value="&#x0279;">&#x0279;</button>
     
@@ -271,7 +294,10 @@
 
       <button class="consN keyboard-button" title="s with cedilla" value="&#x15F;">&#x15F;</button>
 
+      <button class="consN keyboard-button" title="small caps T" value="&#7451;">&#7451;</button>
+      
       <button class="cons keyboard-button" title="voiceless retroflex plosive" value="&#x0288;">&#x0288;</button>
+      
       <button class="consN keyboard-button" title="t with underdot" value="&#x1E6D;">&#x1E6D;</button>
       <button class="consN keyboard-button" title="t with stroke" value="&#x0167;">&#x0167;</button>
       <button class="vowel keyboard-button" title="near-close near-back rounded vowel" value="&#x028A;">&#x028A;</button>
@@ -279,6 +305,9 @@
       <button class="vowel keyboard-button" title="close back unrounded vowel" value="&#x026F;">&#x026F;</button>
       <button class="vowelX keyboard-button" title="u with acute" value="&#x00FA;">&#x00FA;</button>
       <button class="vowelX keyboard-button" title="u with grave" value="&#x00F9;">&#x00F9;</button>
+      <button class="vowelX keyboard-button" title="u with caron" value="&#468;">&#468;</button>
+      <button class="vowelX keyboard-button" title="u with circumflex" value="&#251;">&#251;</button>
+      
       <button class="vowelX keyboard-button" title="u with macron" value="&#x016B;">&#x016B;</button>
       <button class="vowelX keyboard-button" title="u with tilde" value="&#x0169;">&#x0169;</button>
       <button class="vowelX keyboard-button" title="u with ogonek" value="&#x0173;">&#x0173;</button>
@@ -295,6 +324,8 @@
       <button class="vowel keyboard-button" title="close-mid back unrounded vowel" value="&#x0264;">&#x0264;</button>
       <button class="vowelX keyboard-button" title="y with acute" value="&#x00FD;">&#x00FD;</button>
       <button class="vowelX keyboard-button" title="y with grave" value="&#x1EF3;">&#x1EF3;</button>
+      <button class="vowelX keyboard-button" title="y with breve" value="&#1118;">&#1118;</button>
+      <button class="vowelX keyboard-button" title="y with circumflex" value="&#375;">&#375;</button>
       <button class="vowelX keyboard-button" title="y with macron" value="&#x0233;">&#x0233;</button>
       <button class="vowelX keyboard-button" title="y with tilde" value="&#x1EF9;">&#x1EF9;</button>
       <button class="vowelX keyboard-button" title="y with ogonek" value="&#x0079;&#x0328;">&#x0079;&#x0328;</button>
@@ -336,6 +367,8 @@
       <button class="consN special-button keyboard-button" title="tilde" value="&#x007E;">&#x007E;</button>
       <button class="consN keyboard-button" title="zero (nonIPA)" value="&#x2205;">&#x2205;</button>
       <button class="consN keyboard-button" title="rightwards arrow (nonIPA)" value="&#x2192;">&#x2192;</button>
+
+      <button class="consN keyboard-button" title="Greek capital Pi" value="&#928;">&#928;</button>
             
       <button class="consN keyboard-button" title="superscript 1 (nonIPA)" value="&#x00B9;">&#9676;&#x00B9;</button>
       <button class="consN keyboard-button" title="superscript 2 (nonIPA)" value="&#x00B2;">&#9676;&#x00B2;</button>

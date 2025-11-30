@@ -11,6 +11,7 @@ import vocabug from 'vocabug'; // ES modules
 There is one part inside this `vocabug` instance, the main function `generate()`. Below is a very minimal use of the program:
 ```ts
 import vocabug from 'vocabug';
+const text = "example"
 const def = vocabug.generate({
     file: text
 });

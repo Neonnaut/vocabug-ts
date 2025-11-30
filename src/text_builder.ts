@@ -4,6 +4,7 @@ import collator from "./collator";
 import { capitalise, final_sentence } from "./utils/utilities";
 import type { Output_Mode } from "./utils/types";
 
+
 class Text_Builder {
   private logger: Logger;
   private build_start: number;

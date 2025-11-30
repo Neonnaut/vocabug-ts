@@ -1,5 +1,11 @@
 export type Token =
   | {
+      type: "pending";
+      base: string;
+      min: number;
+      max: number | typeof Infinity;
+    }
+  | {
       type: "grapheme"; // ch, a, \*
       base: string;
       min: number;
@@ -16,25 +22,19 @@ export type Token =
     }
   | {
       type: "anythings-mark"; // &
-      base: "&";
+      base: "%";
       min: number;
       max: number | typeof Infinity;
       consume?: string[][];
       blocked_by?: string[][];
     }
   | {
-      type: "syllable-mark"; // %
-      base: "%";
-      min: number;
-      max: number | typeof Infinity;
-    }
-  | {
       type: "deletion"; // ∅
-      base: "∅";
+      base: "^";
     }
   | {
       type: "insertion"; // ∅
-      base: "∅";
+      base: "^";
     }
   | {
       type: "reject"; // 0
@@ -53,30 +53,26 @@ export type Token =
       max: number | typeof Infinity;
     }
   | {
-      type: "engine"; // $
+      type: "routine"; // @routine
       base: string;
-    }
-  | {
-      type: "pending";
-      base: string;
-      min: number;
-      max: number | typeof Infinity;
+      routine: string;
+      // the routine
     }
   | {
       type: "target-mark";
-      base: "<T";
+      base: "&T";
       min: number;
       max: number | typeof Infinity;
     }
   | {
       type: "metathesis-mark";
-      base: "<M";
+      base: "&M";
       min: number;
       max: number | typeof Infinity;
     }
   | {
       type: "empty-mark";
-      base: "<E";
+      base: "&E";
       min: number;
       max: number | typeof Infinity;
     }
@@ -88,7 +84,7 @@ export type Token =
     }
   | {
       type: "reference-start-capture";
-      base: "<=";
+      base: "&=";
       min: number;
       max: number | typeof Infinity;
     }
@@ -112,3 +108,6 @@ export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 export type Output_Mode = "word-list" | "debug" | "paragraph" | "old-to-new";
 
 export type Distribution = "gusein-zade" | "zipfian" | "shallow" | "flat";
+
+export type Directive = "categories" | "words" | "units" | "alphabet" | "invisible" |
+"graphemes" | "features" | "feature-field" | "stage" | "none";

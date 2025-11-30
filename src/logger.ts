@@ -1,3 +1,5 @@
+import { VOCABUG_VERSION } from "./utils/vocabug-version";
+
 class Logger {
   public errors: string[];
   public warnings: string[];
@@ -74,7 +76,7 @@ class Logger {
   }
 
   info(info: string): void {
-    this.infos.push(`Info: ${info}`);
+    this.infos.push(`Vocabug version ${VOCABUG_VERSION}: ${info}`);
   }
   diagnostic(diagnostic: string): void {
     this.diagnostics.push(diagnostic);

@@ -398,7 +398,7 @@ window.addEventListener("load", () => {
 });
 
 function clear_results(): void {
-    (document.getElementById('prog-output-message') as HTMLDivElement).innerHTML = "";
+    (document.getElementById('prog-output-message') as HTMLDivElement).innerHTML = "<p class='grey-message'>Information may be shown here...</p>";
     (document.getElementById('voc-output-words-field') as HTMLInputElement).value = "";
 }
 

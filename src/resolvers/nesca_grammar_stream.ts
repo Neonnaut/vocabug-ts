@@ -33,14 +33,14 @@ class Nesca_Grammar_Stream {
     let i = 0;
     const tokens: Token[] = [];
 
-    if (stream.startsWith("|")) {
-      const engine = stream.slice(1);
-      return [{ type: "engine", base: engine }];
-    } else if (stream === "^" || stream === "∅") {
+    if (stream.startsWith("@routine")) {
+      const routine = stream.slice(8);
+      return [{ type: "routine", base: routine, routine: routine }];
+    } else if (stream === "^") {
       if (mode === "RESULT") {
-        return [{ type: "deletion", base: "∅" }];
+        return [{ type: "deletion", base: "^" }];
       } else if (mode === "TARGET") {
-        return [{ type: "insertion", base: "∅" }];
+        return [{ type: "insertion", base: "^" }];
       } else {
         this.logger.validation_error(
           `Unexpected character '${stream}' in mode '${mode}'`,
@@ -67,7 +67,7 @@ class Nesca_Grammar_Stream {
       }
 
       // Anythings-mark
-      if (char === "&") {
+      if (char === "%") {
         if (mode === "RESULT") {
           this.logger.validation_error(
             `Anythings-mark not allowed in '${mode}'`,
@@ -77,7 +77,7 @@ class Nesca_Grammar_Stream {
 
         new_token = {
           type: "anythings-mark",
-          base: "&",
+          base: "%",
           min: 1,
           max: Infinity,
         };
@@ -140,16 +140,6 @@ class Nesca_Grammar_Stream {
           look_ahead++; // Consume closing bracket
           i = look_ahead;
         }
-      } else if (char === "%") {
-        if (mode === "RESULT") {
-          this.logger.validation_error(
-            `Syllable-mark not allowed in '${mode}'`,
-            line_num,
-          );
-        }
-
-        new_token = { type: "syllable-mark", base: "%", min: 1, max: Infinity };
-        i++;
       } else if (char === "*") {
         if (mode == "RESULT") {
           this.logger.validation_error(
@@ -187,7 +177,7 @@ class Nesca_Grammar_Stream {
         tokens.push(new_token);
         i++;
         continue; // No modifiers allowed
-      } else if (char == "<") {
+      } else if (char == "&") {
         const look_ahead = i + 1;
         if (stream[look_ahead] === "T") {
           if (mode === "TARGET") {
@@ -196,7 +186,7 @@ class Nesca_Grammar_Stream {
               line_num,
             );
           }
-          new_token = { type: "target-mark", base: "<T", min: 1, max: 1 };
+          new_token = { type: "target-mark", base: "&T", min: 1, max: 1 };
           i = look_ahead;
         } else if (stream[look_ahead] === "M") {
           if (mode === "TARGET") {
@@ -205,7 +195,7 @@ class Nesca_Grammar_Stream {
               line_num,
             );
           }
-          new_token = { type: "metathesis-mark", base: "<M", min: 1, max: 1 };
+          new_token = { type: "metathesis-mark", base: "&M", min: 1, max: 1 };
           i = look_ahead;
         } else if (stream[look_ahead] === "E") {
           if (mode !== "TARGET") {
@@ -214,13 +204,13 @@ class Nesca_Grammar_Stream {
               line_num,
             );
           }
-          new_token = { type: "empty-mark", base: "<E", min: 1, max: 1 };
+          new_token = { type: "empty-mark", base: "&E", min: 1, max: 1 };
           i = look_ahead;
         } else if (stream[look_ahead] === "=") {
           // Begins a reference capture of sequenced graphemes
           new_token = {
             type: "reference-start-capture",
-            base: "<=",
+            base: "&=",
             min: 1,
             max: 1,
           };
@@ -229,7 +219,7 @@ class Nesca_Grammar_Stream {
           continue; // No modifiers allowed
         } else {
           this.logger.validation_error(
-            `A 'T', 'M' or '=' did not follow '<' in '${mode}'`,
+            `A 'T', 'M' or '=' did not follow '&' in '${mode}'`,
             line_num,
           );
         }
@@ -276,6 +266,7 @@ class Nesca_Grammar_Stream {
       } else if (char === "~") {
         // It's a based-mark
       } else if (
+        // Syntax character used wrongly
         char == "⇒" ||
         char == "→" ||
         char == ">" ||
@@ -297,6 +288,7 @@ class Nesca_Grammar_Stream {
         char == ":" ||
         char == "*" ||
         char === "&" ||
+        char === "%" ||
         char == "|" ||
         char === "~" ||
         char == "@" ||

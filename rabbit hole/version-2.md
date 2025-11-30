@@ -44,16 +44,16 @@ END is the end of the block
 For example:
 
 ```
-BEGIN if:
+@if {
   ; Deletion of schwa before r
   ə -> ^ / _r
-then:
+} @then {
   ; Then do metathesis of r and l
   r|l -> 2|1 / _|[plosive]_
-else:
+} @else {
   ; Schwa becomes e if the first rule did not apply
   ə -> e
-END
+}
 ```
 
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
@@ -231,6 +231,26 @@ Word-and-paradigm morphology
 
 ## Escapes
 
-Right now, escape chars could interfere with PUA 
+Right now, escape chars could interfere with PUA
+
+## Shortcuts
+
+- [ ] Alt + Z does line breaking
+- [ ] Alt + S does file saving
+- [ ] Alt + C does clear fields
+- [ ] Alt + G does generate
+- [ ] Alt + H does help
+
+# A decorator to disable a directive
+
+# Romance-like example
+
+# Change the syllable dividers in a decorator:
+
+@stage.syllable-dividers = {., '}
+
+# Ability to make infos!!
+
+@meta.info = "message {version}"
 
 ---

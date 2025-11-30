@@ -1,4 +1,7 @@
 import { execSync } from "child_process";
+import { readFileSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
+
 
 function run(cmd) {
   console.log(`🔧 ${cmd}`);
@@ -9,6 +12,11 @@ function log(msg) {
 }
 
 function main() {
+  const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'));
+  const projectVersion = pkg.version;
+  const output = `// Auto-generated -- do not edit.\nexport const VOCABUG_VERSION = '${projectVersion}';\n`;
+  writeFileSync(resolve('./src/utils/vocabug-version.ts'), output);
+
   log("Running EsLint...");
   run("npm run lint");
 

@@ -194,7 +194,6 @@ class Transformer {
         token.type !== "grapheme" &&
         token.type !== "wildcard" &&
         token.type !== "anythings-mark" &&
-        token.type !== "syllable-mark" &&
         token.type !== "target-mark" &&
         token.type !== "metathesis-mark" &&
         token.type !== "syllable-boundary" &&
@@ -341,29 +340,6 @@ class Transformer {
         } else {
           return null; // not a word boundary
         }
-      } else if (token.type === "syllable-mark") {
-        const blocked = ".";
-        const next_token = pattern[j + 1];
-
-        let count = 0;
-        while (
-          count < max_available &&
-          stream[i + count] !== undefined &&
-          !blocked.includes(stream[i + count]) &&
-          !(
-            next_token?.type === "grapheme" &&
-            stream[i + count] === next_token.base
-          )
-        ) {
-          count++;
-        }
-
-        if (count < min) {
-          return null;
-        }
-
-        matched.push(...stream.slice(i, i + count));
-        i += count;
       } else if (token.type === "anythings-mark") {
         const blocked = token.blocked_by ?? [];
         const consume = token.consume ?? [];
@@ -661,7 +637,7 @@ class Transformer {
     } // 🎲 Roll failed
 
     // ENGINE
-    if (target[0][0].type == "engine") {
+    if (target[0][0].type == "routine") {
       word_stream = this.run_engine(
         target[0][0].base,
         word,

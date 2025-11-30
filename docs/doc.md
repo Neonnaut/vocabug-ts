@@ -142,7 +142,9 @@ The supported characters are:
 
 | Escape Name | Unicode Character |
 | --- | --- |
-| `[@Space]` |  |
+| `[@Space]` | `space` |
+| `[@Tab]` | `tab`  |
+| `[@Newline]` | `newline`  |
 | `[@Acute]` |  ◌́ |
 | `[@DoubleAcute]` |  ◌̋ |
 | `[@Grave]` |  ◌̀ |
@@ -815,7 +817,7 @@ The engine statement provides useful functions that you can call at any point in
 * `xsampa_to_ipa` will convert characters of a word written in X-SAMPA into IPA
 
 
-* `ipa_to_xsampa` will convert characters of a word written in IPA into X-SAMPA
+* `ipa-to-xsampa` will convert characters of a word written in IPA into X-SAMPA
 
 <details>
 

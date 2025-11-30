@@ -30,6 +30,7 @@ class Word {
     let output: string | undefined = "";
 
     if (Word.output_mode == "debug") {
+      
       for (let i = 0; i < this.forms.length; i++) {
         if (this.transformations[i]) {
           output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} ➤ ⟨${this.forms[i]}⟩\n`;

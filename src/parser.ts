@@ -3,7 +3,7 @@ import Logger from "./logger";
 import Supra_Builder from "./generata/supra_builder";
 
 import { make_percentage, cappa } from "./utils/utilities";
-import type { Output_Mode, Distribution } from "./utils/types";
+import type { Output_Mode, Distribution, Directive } from "./utils/types";
 
 import Associateme_Mapper from "./transforma/associateme_mapper";
 
@@ -18,6 +18,8 @@ class Parser {
   public force_word_limit: boolean;
   public sort_words: boolean;
   public word_divider: string;
+
+  public directive: Directive = "none";
 
   public category_distribution: Distribution;
   public category_pending: Map<string, { content: string; line_num: number }>;
@@ -46,6 +48,7 @@ class Parser {
   public invisible: string[];
 
   private file_line_num = 0;
+
 
   constructor(
     logger: Logger,
@@ -126,6 +129,8 @@ class Parser {
 
     this.alphabet = [];
     this.invisible = [];
+
+    this.directive = "none";
   }
 
   parse_file(file: string) {
@@ -138,8 +143,9 @@ class Parser {
 
       line = this.escape_mapper.escape_backslash_pairs(line);
       line = line.replace(/;.*/u, "").trim(); // Remove comment!!
+
       line = this.escape_mapper.escape_named_escape(line);
-      if (line.includes("@[")) {
+      if (line.includes("&[")) {
         this.logger.validation_error(
           `Invalid named escape`,
           this.file_line_num,
@@ -149,6 +155,35 @@ class Parser {
       if (line === "") {
         continue;
       } // Blank line !!
+
+      // Check for decorator
+      if (line.startsWith("@")){
+
+      }
+      // check for directive change
+      if (line === "categories:") {
+        this.directive = "categories";
+      } else if (line === "words:") {
+        this.directive = "words";
+      } else if (line === "units:") {
+        this.directive = "units";
+      } else if (line === "alphabet:") {
+        this.directive = "alphabet";
+      } else if (line === "invisible:") {
+        this.directive = "invisible";
+      } else if (line === "graphemes:") {
+        this.directive = "graphemes";
+      } else if (line === "features:") {
+        this.directive = "features";
+      } else if (line === "feature-field:") {
+        this.directive = "feature-field";
+      } else if (line === "stage:") {
+        this.directive = "stage";
+      }
+
+
+
+
 
       if (transform_mode) {
         // Lets do transforms !!
@@ -165,26 +200,26 @@ class Parser {
           continue;
         }
 
-        if (line.startsWith("@R ")) {
+        if (line.startsWith("@routine ")) {
           // Engine. Routine
-          line_value = line.substring(2).trim().toLowerCase();
+          line_value = line.substring(9).trim().toLowerCase();
 
           const engine = line_value.replace(/\bcapitalize\b/g, "capitalise");
 
           if (
-            engine == "decompose" ||
-            engine == "compose" ||
-            engine == "capitalise" ||
-            engine == "decapitalise" ||
-            engine == "to-uppercase" ||
-            engine == "to-lowercase" ||
-            engine == "xsampa-to-ipa" ||
-            engine == "ipa-to-xsampa" ||
-            engine == "roman-to-hangul" ||
-            engine == "reverse"
+            engine === "decompose" ||
+            engine === "compose" ||
+            engine === "capitalise" ||
+            engine === "decapitalise" ||
+            engine === "to-uppercase" ||
+            engine === "to-lowercase" ||
+            engine === "xsampa-to-ipa" ||
+            engine === "ipa-to-xsampa" ||
+            engine === "roman-to-hangul" ||
+            engine === "reverse"
           ) {
             this.transform_pending.push({
-              target: `|${engine}`,
+              target: `@routine${engine}`,
               result: "\\",
               conditions: [],
               exceptions: [],
@@ -197,7 +232,6 @@ class Parser {
               this.file_line_num,
             );
           }
-
           continue;
         }
 
@@ -270,24 +304,6 @@ class Parser {
           );
         }
         this.invisible = invisible;
-      } else if (line.startsWith("alphabet-and-graphemes:")) {
-        line_value = line.substring(23).trim();
-
-        const alf_and_gra = line_value.split(/[,\s]+/).filter(Boolean);
-        for (let i = 0; i < alf_and_gra.length; i++) {
-          alf_and_gra[i] = this.escape_mapper.restore_escaped_chars(
-            alf_and_gra[i],
-          );
-        }
-
-        if (alf_and_gra.length == 0) {
-          this.logger.validation_error(
-            `'alphabet-and-graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`,
-            this.file_line_num,
-          );
-        }
-        this.graphemes = this.graphemes = Array.from(new Set(alf_and_gra));
-        this.alphabet = alf_and_gra;
       } else if (line.startsWith("graphemes:")) {
         line_value = line.substring(10).trim();
 

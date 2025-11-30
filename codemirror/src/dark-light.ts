@@ -59,7 +59,7 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#eeeeff" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#bee79d"}, 
+  { tag: t.comment, color: "#b6ababff" },
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#f0f0f0", backgroundColor:"#5f4418ff" }, 
@@ -80,7 +80,10 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.tagName, color: "#ffcd90" },
 
   // Weights
-  { tag: t.strong, color: "#ff7a7a", fontStyle: "italic" }
+  { tag: t.strong, color: "#bee79d", fontStyle: "italic" },
+
+  // distribution etc
+  { tag: t.attributeName, color: "#bee79d" }
 ];
 
 export const xcodeDarkInit = (options?: Partial<CreateThemeOptions>) => {
@@ -145,7 +148,7 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#000000" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#277022"},
+  { tag: t.comment, color: "#74747eff"},
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
@@ -165,8 +168,11 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   // ORANGE / Categories
   { tag: t.tagName, color: "#7f5700ff" },
 
-  // RED ITALIC / Weights
-  { tag: t.strong, color: "#a11c08ff", fontWeight: "italic" }
+  // Weights
+  { tag: t.strong, color: "#12770aff", fontStyle: "italic" },
+
+  // distribution etc
+  { tag: t.attributeName, color: "#12770aff" }
 ];
 
 export function xcodeLightInit(options?: Partial<CreateThemeOptions>) {
@@ -194,7 +200,7 @@ export const defaultSettingsXcodeWarm: CreateThemeOptions["settings"] = {
 const Warmy = EditorView.theme({
   "&": {
     fontSize: "12pt",
-    color: "#323d41ff;"
+    color: "#181e20ff;"
   },
   ".cm-gutters": {
     color: "#8f8f8fff",
@@ -236,7 +242,7 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#000000" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#338f2cff"},
+  { tag: t.comment, color: "#74747eff"},
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
@@ -256,8 +262,11 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   // ORANGE / Categories
   { tag: t.tagName, color: "#b07c0bff" },
 
-  // RED ITALIC / Weights
-  { tag: t.strong, color: "#a11c08ff", fontWeight: "italic" }
+  // Weights
+  { tag: t.strong, color: "#338f2cff", fontStyle: "italic" },
+
+  // distribution etc
+  { tag: t.attributeName, color: "#338f2cff" }
 ];
 
 export function xcodeWarmInit(options?: Partial<CreateThemeOptions>) {

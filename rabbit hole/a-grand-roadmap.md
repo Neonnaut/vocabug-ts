@@ -47,7 +47,6 @@
 ## Before transforms
 
 - [x] Graphemes directive
-- [x] Alphabet-graphemes directive
 
 ## Transform
 
@@ -103,7 +102,6 @@
 - [x] Make the met condition say so in debug
 - [x] Deal with metathesis-mark as `<M`
 - [x] Deal with target-mark as `<T`
-- [x] Add `%` as syllable-mark
 - [x] Add `$` as syllable-boundary
 
 --------------
@@ -119,15 +117,21 @@
 --------------
 
 - [ ] The anythings-mark is borked
-- [ ] Feature borked
-- [ ] 
 
 - [ ] Associatemes
 - [ ] Based-mark
 
 - [ ] Docs
 
-group folders generation, transforming, utilities
+- [ ] Update docs say result feature matrix must be qualified
+- [ ] Rename segments to units
+
+- [ ] group folders generation, transforming, utilities
+
+- [ ] A routine should look at and then make a transform 
+
+- [ ] Looking at invalid should look at imported list of syntax chars
+
 
 
 

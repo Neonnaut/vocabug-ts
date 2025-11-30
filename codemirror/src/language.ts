@@ -22,26 +22,36 @@ const cappa = "[A-Z" +
     // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
     "\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]";
 
-const escapeRegex = /\\.|\[@(?:Space|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek|VerticalLineBelow|VerticalLineAbove|DoubleVerticalLineBelow|PlusSignBelow|PlusSignStandalone|uptackBelow|UpTackStandalone|LeftTackBelow|rightTackBelow|DownTackBelow|DownTackStandalone|BreveBelow|InvertedBreveBelow|MacronBelow|MacronBelowStandalone|BridgeBelow|BridgeAbove|InvertedBridgeBelow|SquareBelow|SeagullBelow|LeftBracketBelow)\]/;
+const escapeRegex = /\\[^\s]|&\[(?:Space|Tab|Newline|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek|VerticalLineBelow|VerticalLineAbove|DoubleVerticalLineBelow|PlusSignBelow|PlusSignStandalone|uptackBelow|UpTackStandalone|LeftTackBelow|rightTackBelow|DownTackBelow|DownTackStandalone|BreveBelow|InvertedBreveBelow|MacronBelow|MacronBelowStandalone|BridgeBelow|BridgeAbove|InvertedBridgeBelow|SquareBelow|SeagullBelow|LeftBracketBelow)\]/;
 
-const distroRules = [
-  { token: "operator",     regex: /\s+(zipfian|flat|gusein-zade|shallow)(?!\S)/ }
-];
-const engineRules = [
+const routineRules = [
   {
-    token: "operator",
-    regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|reverse)(?!\S)/
-  }
+    token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|reverse)/
+  },
+  { token: "link", regex: /=/ },
+  { token: "meta", regex: />/}
 ];
 const listRules = [
   { token: "escape",   regex: escapeRegex},
   { token: "link",     regex: /,/ }
 ];
 
+const decoratorRules = [
+  { token: "link",     regex: /\.|=/ },
+  { token: "meta", regex: /words|categories|distribution|optionals-weight/ },
+  { token: "attributeName", regex: /flat|zipfian|gusein-zade|shallow|\d{1,2}%/ }
+];
+
+const graphemesRules = [
+  { token: "escape",   regex: escapeRegex},
+  { token: "link",     regex: /,/ },
+  { token: "regexp",   regex: /\<{|\}/ },
+];
+
 const categoryRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
-  { token: "operator", regex: /\^|∅/ },
+  { token: "operator", regex: /\^/ },
   { token: "regexp",   regex: /\{|\}/ },
   { token: "strong",   regex: /(\*\d+(\.\d+)?)/ } // Weights
 ];
@@ -49,179 +59,279 @@ const categoryRules = [
 const featureRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
-  { token: "operator", regex: /\^|∅/ }
+  { token: "operator", regex: /\^/ }
 ];
 
 const wordRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|=/ },
-  { token: "operator", regex: /\^|∅/ },
-  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}/ },
+  { token: "operator", regex: /\^/ },
+  { token: "regexp",   regex: /\[|\]|\(|\)|\{|\}|>/ },
   { token: "strong",   regex: /(\*(\d+(\.\d+)?|s))/ } // Weights
 ];
 
 const transformRules = [
   { token: "escape",   regex: escapeRegex },
-  { token: "link",     regex: / >|->|→|=>|⇒|\/|!|\?|,|_/ },
-  { token: "operator", regex: /@X|\^|∅/ }, 
-  { token: "regexp",   regex: /@=|=[1-9]|\<|\>|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|&|%|~/ },
-  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|@T|@M|@E/ }
+  { token: "link",     regex: />>|->|=>|⇒|→|\/|!|,|_/ },
+  { token: "operator", regex: /0|\^/ }, 
+  { token: "regexp",   regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~/ },
+  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
 ];
 
 const clusterRules = [
   { token: "escape",   regex: escapeRegex },
-  { token: "link",     regex: /,|\/|!|\?|_|\+/ },
-  { token: "operator", regex: /@X|\^|∅/ },
-  { token: "regexp",   regex: /@=|=[1-9]|\<|\>|\[|\]|\(|\)|\{|\}|#|\$|\+|\*|:|&|%|~/ },
-  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|@T|@M|@E/ }
+  { token: "link",     regex: /,|\/|!|_|\+/ },
+  { token: "operator", regex: /0|\^/ },
+  { token: "regexp",   regex: /&=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\?|\*|:|%|~/ },
+  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
 ];
 
 const featureFieldRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\./ },
   { token: "operator", regex: /\+/ },
-  { token : "regexp",   regex: /-/ }
+  { token: "regexp",   regex: /-/ }
 ];
 
 type State = {
-  mode: ('none'|'cluster-block'|'transform'|'feature-field'|'words-block'|'engine'|'distro-line'|
-    'list-line'|'word-line'|'segment-line'|'category-line'|'feature-line'|'graphemes-block'
+  directive: ('none'|'decorator'|'categories'|'words'|'units'|'list'|'graphemes'|'stage'|'features'|'feature-field'
   );
+  sub_directive: ('none'|'routine'|'cluster-block');
   feature_matrix: boolean;
   transform: boolean;
   doIndent: boolean;
-  blanko: boolean;
   catList: string[];
-  catMacList: string[];
+  unitList: string[];
   featureList: string[];
+
+  we_on_newline: boolean;
+  insideUnit: boolean;
 };
 
 const parser: StreamParser<State> = {
 
     name: "dsl",
     startState: (i): State => { return {
-        mode: 'none',
+        directive: 'none',
+        sub_directive: 'none',
         feature_matrix: false,
         transform: false,
         doIndent: false,
-        blanko: false,
         catList: [],
-        catMacList: [],
-        featureList: []
+        unitList: [],
+        featureList: [],
+        we_on_newline: true,
+        insideUnit: false
     }},
-    blankLine: function (state){
-        if (!state.blanko && ( state.mode == 'cluster-block' || state.mode == 'feature-field') ) {
-            state.blanko = true;
-        };},
     token: function (stream, state) {
-        // Comment / GREEN /
+        // Comments
         if (stream.match(/\s*;.*$/)) {
-            if (state.mode == 'cluster-block'){
-                state.mode = 'transform';
-            } else if (state.mode != 'transform' && state.mode != 'words-block' && state.mode != 'graphemes-block') {
-                state.mode = 'none';
-            }
-            if (state.blanko) {state.blanko = false};
             return "comment";
         }
+        // If directive change
         if (stream.sol()) {
+            state.we_on_newline = true;
+            state.insideUnit = false;
             state.feature_matrix = false;
-            // No more clusterblock we reached line with blankspaces
-            if (stream.string.trim() == "" && ( state.mode == 'cluster-block' || state.mode == 'feature-field' )) { 
-                state.blanko = true;
+
+            if (state.directive === 'decorator') {
+                state.directive = 'none';
             }
 
-            if (state.mode == 'engine') {
-                state.mode = 'transform';
-            } else if (stream.string.trim() && state.mode != 'cluster-block' && state.mode != 'transform' && state.mode != 'words-block' && state.mode != 'graphemes-block' && state.mode != 'feature-field') {
-                state.mode = 'none';
+            stream.match(/\s*/);
+
+            // Decorators
+            if (stream.match(/@/)) {
+                state.directive = 'decorator';
+                return "link";
             }
+            // Categories
+            if (stream.match(/(categories)(?=:\s*(?:;|$))/)) {
+                state.directive = 'categories';
+                state.doIndent = true;
+                return "meta";
+            }
+            // Words
+            if (stream.match(/(words)(?=:\s*(?:;|$))/)) {
+                state.directive = 'words';
+                state.doIndent = true;
+                return "meta";
+            }
+            // Units
+            if (stream.match(/(units)(?=:\s*(?:;|$))/)) {
+                state.directive = 'units';
+                state.doIndent = true;
+                return "meta";
+            }
+            // Alphabet, Invisible
+            if (stream.match(/(alphabet|invisible)(?=:\s*(?:;|$))/)) {
+                state.directive = 'list';
+                state.doIndent = true;
+                return "meta";
+            }
+            // Graphemes
+            if (stream.match(/(graphemes)(?=:\s*(?:;|$))/)) {
+                state.directive = 'graphemes';
+                state.doIndent = true;
+                return "meta";
+            }
+            // Features
+            if (stream.match(/(features)(?=:\s*(?:;|$))/)) {
+                state.directive = 'features';
+                state.doIndent = true;
+                return "meta";
+            }
+            // Feature-field
+            if (stream.match(/(feature-field)(?=:\s*(?:;|$))/)) {
+                state.directive = "feature-field";
+                state.doIndent = true;
+                return "meta";
+            }
+            // Stage
+            if (stream.match(/(stage)(?=:\s*(?:;|$))/)) {
+                state.directive = 'stage';
+                state.doIndent = true;
+                return "meta";
+            }
+        }
 
-        }
-        if (state.blanko && state.mode == 'cluster-block')  {
-            // No more clusterblock we reached blank line
-            state.mode = 'transform';
-            state.blanko = false;
-        }
-        if (state.blanko && state.mode == 'feature-field')  {
-            // No more clusterblock we reached blank line
-            state.mode = 'none';
-            state.blanko = false;
-        }
-
+        // Okay, return ':' as directive opener
         if (state.doIndent) {
             stream.match(/:/);
             state.doIndent = false;
             return "link";
         }
 
-        if (state.mode == 'none') {
+        if (state.directive == 'none') {
+            // Check for nothing
             if (stream.sol()){
+
+            }
+        }
+
+        // DECORATOR
+        if (state.directive == 'decorator') {
+            for (const rule of decoratorRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+        }
+
+        // CATEGORIES
+        if (state.directive == 'categories') {
+
+            if (state.we_on_newline) {
                 stream.match(/\s*/);
-                // Distributions
-                if (stream.match(/wordshape-distribution|category-distribution(?=:)/)) {
-                    state.mode = 'distro-line';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Graphemes, Alphabet
-                if (stream.match(/(graphemes|alphabet|invisible|alphabet-and-graphemes)(?=:)/)) {
-                    state.mode = 'list-line';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Optionals-weight
-                if (stream.match(/(optionals-weight)(?=:)/)) {
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Words
-                if (stream.match(/(words)(?=:)/)) {
-                    state.mode = 'word-line';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Begin Words
-                if (stream.match(/BEGIN words(?=:\s*(?:;|$))/)) {
-                    state.mode = 'words-block';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Begin graphemes
-                if (stream.match(/BEGIN graphemes(?=:\s*(?:;|$))/)) {
-                    state.mode = 'graphemes-block';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Transform
-                if (stream.match(/BEGIN transform(?=:\s*(?:;|$))/)) {
-                    state.mode = "transform";
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Feature-field
-                if (stream.match(/\+- /)) {
-                    state.mode = "feature-field";
-                    return "meta";
-                }
-                // Segment
-                const segmentRegex = new RegExp(`(\\$${cappa})(?=\\s*=)`, "u");
-                let match = stream.match(segmentRegex) as RegExpMatchArray;;
-                if (match) {
-                    state.catMacList.push(match[1]);
-                    state.mode = 'segment-line';
-                    return "tagName";
-                }
-                // Category
+
+                // A new Category
                 const catRegex = new RegExp(`(${cappa})(?=\\s*=)`, "u");
-                match = stream.match(catRegex) as RegExpMatchArray;
+                let match = stream.match(catRegex) as RegExpMatchArray;
                 if (match) {
                     state.catList.push(match[1]);
-                    state.catMacList.push(match[1]);
-                    state.mode = 'category-line';
+                    state.unitList.push(match[1]);
+                    state.we_on_newline = false;
                     return "tagName";
                 }
-                // Feature
+            } else {
+                for (const rule of categoryRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
+                }
+                for (const cato of state.catList) {
+                    if (stream.match(cato)) {
+                        return "tagName";
+                    }
+                }
+            }
+        }
+
+        // WORDS
+        if (state.directive == 'words') {
+            if (state.insideUnit) {
+                for (const unito of state.unitList) {
+                    const regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");
+                    if (stream.match(regex)) {
+                        state.insideUnit = false;
+                        return "tagName";
+                    }
+                }
+            } else if (stream.match(/</)) {
+                state.insideUnit = true
+                return "regexp";
+            } else {
+                // Categories
+                for (const cato of state.catList) {
+                    if (stream.match(cato)) {
+                        state.insideUnit = false;
+                        return "tagName";
+                    }
+                }
+
+                for (const rule of wordRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
+                }
+            }
+        }
+
+        // UNITS
+        if (state.directive == 'units') {
+
+            if (state.we_on_newline) {
+                stream.match(/\s*/);
+
+                // A new UNIT!!
+                let match = stream.match(/([A-Za-z+$\-]+)(?=\s*=)/);
+                if (match) {
+                    state.unitList.push(match[1]);
+                    state.we_on_newline = false;
+                    return "tagName";
+                }
+            } else {
+                for (const rule of wordRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
+                }
+                for (const unito of state.unitList) {
+                    if (stream.match(unito)) {
+                        return "tagName";
+                    }
+                }
+                for (const cato of state.catList) {
+                    if (stream.match(cato)) {
+                        return "tagName";
+                    }
+                }
+            }
+        }
+
+        // LISTS
+        if (state.directive == 'list') {
+            for (const rule of listRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+        }
+
+        // GRAPHEMES
+        if (state.directive == 'graphemes') {
+            for (const rule of graphemesRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+        }
+
+        // FEATURES
+        if (state.directive == 'features') {
+            if (state.we_on_newline) {
+                stream.match(/\s*/);
+                // A new Feature
                 const Fmatch = stream.match(/[-+>][a-zA-Z+-]+(?=\s*=)/)
                 if (Fmatch) {
                     if (Fmatch[0][0] === '>') {
@@ -230,70 +340,100 @@ const parser: StreamParser<State> = {
                     } else {
                         state.featureList.push(Fmatch[0]);
                     }
-                    state.mode = 'feature-line';
+                    state.directive = 'features';
+                    state.we_on_newline = false;
                     return "tagName";
                 }
-            }
-        }
+            } else {
 
-        // WORDS BLOCK
-        if (state.mode == 'words-block') {
-            //End
-            if (stream.match(/END(?=\s*;|\s*$)/)) {
-                state.mode = 'none';
-                return "meta";
-            }
-
-            for (const rule of wordRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
+                for (const rule of featureRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
                 }
-            }
-            for (const cato of state.catMacList) {
-                if (stream.match(cato)) {
-                    return "tagName";
-                }
-            }
-        }
+                for (const featuro of state.featureList) {
+                    if (stream.match(featuro, false)) {
+                        const start = stream.pos;
+                        const end = start + featuro.length;
+                        const nextChar = stream.string.charAt(end);
 
-        // graphemes BLOCK
-        if (state.mode == 'graphemes-block') {
-            //End
-            if (stream.match(/END(?=\s*;|\s*$)/)) {
-                state.mode = 'none';
-                return "meta";
-            }
-
-            for (const rule of listRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
+                        if (nextChar === ' ' || nextChar === ',' || nextChar === '') {
+                            stream.match(featuro); // consume it
+                            return "tagName";
+                        }
+                    }
                 }
             }
         }
 
-        //TRANSFORM
-        if (state.mode == 'transform') {
-
+        // FEATURES-FIELD
+        if (state.directive == 'feature-field') {
             if (stream.sol()) {
-                // End Transform
-                if (stream.match(/END(?=\s*;|\s*$)/)) {
-                    state.mode = 'none';
-                    return "meta";
+                const Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/)
+                if (Fmatch) {
+                    state.featureList.push('+' + Fmatch[0]);
+                    state.featureList.push('-' + Fmatch[0]);
+                    return 'tagName'
                 }
+            }
+
+            for (const rule of featureFieldRules) {
+                if (stream.match(rule.regex)) {
+                    return rule.token;
+                }
+            }
+        }
+
+        // STAGE
+        if (state.directive == 'stage') {
+
+            if (state.we_on_newline) {
+                if (state.sub_directive === 'routine') {
+                    state.sub_directive = 'none';
+                }
+
+                stream.match(/\s*/);
+
                 // Clusterfield
-                if (stream.match(/<\s/)) {
-                    state.mode = 'cluster-block';
+                if (stream.match(/< /)) {
+                    state.sub_directive = 'cluster-block';
+                    state.we_on_newline = false;
                     return "meta";
                 }
-                // Engine
-                if (stream.match(/\|(?= )/)) {
-                    state.mode = 'engine';
+
+                // End of clusterfield
+                if (stream.match(/>(?=\s*($|;))/)) {
+                    state.sub_directive = 'none';
                     return "meta";
+                }
+
+                // Routine
+                if (stream.match(/<routine/)) {
+                    state.sub_directive = 'routine';
+                    state.we_on_newline = false;
+                    return "meta";
+                }
+            }
+
+            // ROUTINE
+            if (state.sub_directive == 'routine') {
+                for (const rule of routineRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
+                }
+            }
+            // CLUSTER-FIELD
+            else if (state.sub_directive == 'cluster-block') {
+                for (const rule of clusterRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
                 }
             }
 
             // Inside Feature matrix
-            if (state.feature_matrix) {
+            else if (state.feature_matrix) {
                 for (const featuro of state.featureList) {
                     if (stream.match(featuro, false)) {
                         const start = stream.pos;
@@ -314,160 +454,31 @@ const parser: StreamParser<State> = {
                     return "regexp"
                 }
                 
-            }
+            } else { // Syntax etc.
 
-            // Feature matrix
-            if (stream.match(/\[(?=\+|\-)/)) {
-                state.feature_matrix = true;
-                return "regexp";
-            }
+                // Generic tokens
+                for (const rule of transformRules) {
+                    if (stream.match(rule.regex)) {
+                        return rule.token;
+                    }
+                }
 
-            // Syntax etc.
-            for (const rule of transformRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
+                // Feature matrix
+                if (stream.match(/\[/)) {
+                    state.feature_matrix = true;
+                    return "regexp";
                 }
-            }
 
-            // Categories into transforms
-            for (const cato of state.catList) {
-                if (stream.match(cato)) {
-                    return "tagName";
-                }
-            }
-        }
-
-        // DEFAULT DISTRIBUTION
-        if (state.mode == 'distro-line') {
-            for (const rule of distroRules) {
-                if (stream.match(rule.regex)) {
-                    state.mode = 'none';
-                    return rule.token;
-                }
-            }
-        }
-
-        // LISTS
-        if (state.mode == 'list-line') {
-            for (const rule of listRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-        }
-
-        // WORDS DECLARATION
-        if (state.mode == 'word-line') {
-            for (const rule of wordRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-            for (const cato of state.catMacList) {
-                if (stream.match(cato)) {
-                    return "tagName";
-                }
-            }
-        }
-
-        // CATEGORY
-        if (state.mode == 'category-line') {
-            for (const rule of categoryRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-            for (const cato of state.catList) {
-                if (stream.match(cato)) {
-                    return "tagName";
-                }
-            }
-        }
-
-        // SEGMENT
-        if (state.mode == 'segment-line') {
-            for (const rule of wordRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-            for (const cato of state.catMacList) {
-                if (stream.match(cato)) {
-                    return "tagName";
-                }
-            }
-        }
-
-        // FEATURE DECLARATION
-        if (state.mode == 'feature-line') {
-            for (const rule of featureRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-            for (const featuro of state.featureList) {
-                if (stream.match(featuro, false)) {
-                    const start = stream.pos;
-                    const end = start + featuro.length;
-                    const nextChar = stream.string.charAt(end);
-
-                    if (nextChar === ' ' || nextChar === ',' || nextChar === '') {
-                        stream.match(featuro); // consume it
+                // Categories into transforms
+                for (const cato of state.catList) {
+                    if (stream.match(cato)) {
                         return "tagName";
                     }
                 }
             }
         }
 
-        // FEATURE-FIELD
-        if (state.mode == 'feature-field') {
-            // End Transform
-            if (stream.match(/END(?=\s*;|\s*$)/)) {
-                state.mode = 'none';
-                return "meta";
-            }
-
-            if (stream.sol()) {
-                const Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/)
-                if (Fmatch) {
-                    state.featureList.push('+' + Fmatch[0]);
-                    state.featureList.push('-' + Fmatch[0]);
-                    return 'tagName'
-                }
-            }
-
-            for (const rule of featureFieldRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-        }
-
-        // ENGINE
-        if (state.mode == 'engine') {
-            state.mode = 'transform';
-            for (const rule of engineRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-            return null;
-        }
-
-        // CLUSTER-FIELD
-        if (state.mode == 'cluster-block') {
-            // End Transform
-            if (stream.match(/END(?=\s*;|\s*$)/)) {
-                state.mode = 'transform';
-                return "meta";
-            }
-
-            for (const rule of clusterRules) {
-                if (stream.match(rule.regex)) {
-                    return rule.token;
-                }
-            }
-        }
+        // IT'S JUST WISHFUL THINKING
         stream.next();
         return null;
     }
