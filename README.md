@@ -19,11 +19,11 @@ Documentation lives online at [neonnaut.neocities.org/vocabug_docs][13]
 
 ## API
 
-[Read the API doc here](../api/README.md)
+[Read the API doc here](./docs/api.md)
 
 ## CLI
 
-[Read the CLI (command-line-interface) doc here](../cli/README.md)
+[Read the CLI (command-line-interface) doc here](./docs/cli.md)
 
 ## Development
 
