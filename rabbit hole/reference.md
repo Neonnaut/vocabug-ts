@@ -22,7 +22,7 @@ It can also be used to define a simple haplology rule:
 %=1 > * / 1_    ;; A syllable is deleted if preceded by an identical syllable
 ```
 
-References can be modified with diacritics or a feature matrix as if they were a segment or syllable:
+References can be modified with diacritics or a feature matrix as if they were a unit or syllable:
 
 ```
 %=1 > * / 1:[+str]_ 

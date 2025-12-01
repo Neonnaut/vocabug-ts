@@ -73,7 +73,7 @@ class Resolver {
       const graphemes_to_remove: string[] = [];
 
       for (const item of unique_graphemes) {
-        if (item.startsWith("^") || item.startsWith("∅")) {
+        if (item.startsWith("^")) {
           const modified = item.slice(1);
           graphemes_to_remove.push(modified);
           continue;
@@ -81,12 +81,6 @@ class Resolver {
         if (item.includes("^")) {
           this.logger.validation_error(
             `Invalid grapheme '${item}' has a misplaced caret`,
-            value.line_num,
-          );
-        }
-        if (item.includes("∅")) {
-          this.logger.validation_error(
-            `Invalid grapheme '${item}' has a misplaced null character`,
             value.line_num,
           );
         }

@@ -15,7 +15,7 @@ const vocabugHighlight = styleTags({
   DistributionType: t.meta,
   MetaLine: t.meta,
   CategoryLine: t.className,
-  SegmentLine: t.className,
+  UnitLine: t.className,
   WordToken: t.variableName
 });
 

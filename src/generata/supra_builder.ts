@@ -17,7 +17,7 @@ export class Supra_Builder {
   process_string(input: string, wordshape_line_num: number): string {
     const token_regex = /\[([^\]]*)\]/g;
     const valid_content_regex = new RegExp(
-      `^(\\^|∅|${cappa})(?:\\*((\\d+(?:\\.\\d+)?)|s))?$`,
+      `^(\\^|${cappa})(?:\\*((\\d+(?:\\.\\d+)?)|s))?$`,
     );
 
     return input.replace(token_regex, (fullMatch, content) => {

@@ -19,52 +19,11 @@ Documentation lives online at [neonnaut.neocities.org/vocabug_docs][13]
 
 ## API
 
-Install with `npm install vocabug`, or `yarn add vocabug` and import it with either:
+[Read the API doc here](../api/README.md)
 
-```ts
-const vocabug = require('vocabug'); // CommonJS (Node.js)
+## CLI
 
-import vocabug from 'vocabug'; // ES modules
-```
-
-There are two parts inside this `vocabug` instance, the main function `generate()` and `examples`, below is a very minimal use of the program:
-```ts
-import vocabug from 'vocabug';
-const def = vocabug.generate({
-    file: vocabug.examples.tonal
-});
-
-console.log(def.text);
-console.log(def.warnings.join(", "));
-console.log(def.errors.join(", "));
-console.log(def.infos.join(", "));
-```
-
-The input signature for `vocabug.generate()` is:
-```ts
-type generate_options = {
-    file: string; // Your definition file
-    num_of_words?: number | string; // Number of words to generate
-    generation_mode?: 'word-list'|'debug'|'paragraph'; // generation mode
-    remove_duplicates?: boolean;
-    force_word_limit?: boolean; // Force to the time limit
-    sort_words?: boolean;
-    word_divider?: string;
-};
-```
-
-The properties of the return type of `vocabug.generate()` are:
-```ts
-type generate_output = {
-    text: string; // The generated corpus of words.
-    errors: string[]; // A list of errors that occurred, that terminated generation.
-    warnings: string[]; // A list of warnings that occurred.
-    infos: string[]; // Useful information about the generation run.
-    diagnostics: string[]; // Useful information about parsing the file on debug mode.
-}
-```
-
-There are 5 examples to choose from in `vocabug.examples`: `default`, `tonal`, `romance`, `japanese` and `australian`.
+[Read the CLI (command-line-interface) doc here](../cli/README.md)
 
 ## Development
 

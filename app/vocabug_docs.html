@@ -49,10 +49,10 @@
         </ol>
         </li>
 
-        <li><a href="#vocAboutGraphemes">Overall structure</a>
+        <li><a href="#vocOverallStructure">Overall structure</a>
         <ol class="nice-list">
 
-          <li><a href="#vocComments">Using comments</a></li>
+          <li><a href="#vocComments">Comments</a></li>
           <li><a href="#vocAboutGraphemes">About graphemes</a></li>
 
             <li><a href="#vocNullGrapheme">Null grapheme</a></li>
@@ -98,7 +98,7 @@
         <li><a href="#vocAlphabetisation">Alphabetisation</a></li>
           <li><a href="#vocInvisibility">Invisibility</a></li>
         <li><a href="#vocGraphemes">Defining graphemes</a></li>
-        <li><a href="#nescaTransform">Transform</a></li>
+        <li><a href="#nescaStage">The stage directive</a></li>
         <li><a href="#nescaTheChange">The change</a>
         <ol class="nice-list">
           <li><a href="#nescaConcurrentChange">Concurrent change</a></li>
@@ -183,7 +183,7 @@
       <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
       <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version: 0.4.0</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
 
-      <p>This word generator is designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find Vocabug's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. If you want a "modern" user interface, albeit with limited features, check out <a href="https://neonnaut.neocities.org/vocabug-lite">Vocabug-lite</a>.</p>
+      <p>This word generator is designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find Vocabug's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. You can also install Vocabug to be used in your own projects or as a command-line-interface <a href="https://www.npmjs.com/package/vocabug">here</a>. If you want a "modern" user interface, albeit with limited features, check out <a href="https://neonnaut.neocities.org/vocabug-lite">Vocabug-lite</a>.</p>
 
       <h2 id="vocInterface"><a class="head-num">2</a>Interface</h2>
       <ul class="paragraphian">
@@ -234,11 +234,11 @@
         <li>Use the buttons in the <code class="example">Examples</code> dropdown to load an example into the definition-build editor</li>
       </ul>
 
-      <h2 id="vocComments"><a class="head-num">3</a>Overall structure</h2>
+      <h2 id="vocOverallStructure"><a class="head-num">3</a>Overall structure</h2>
 
       <p>A definition-build is comprised of two top-level concepts: 'directives' and 'decorators'.</p>
         
-      <p>Directives are laid out like blocks and define the functions of Vocabug. The primary directives are the <a href="#vocWords">words</a> directive, which creates each word, and the <a href="#vocStage">stage</a> directive, which modifies each word with transforms. The other directives define concepts that are used by these primary directives.</p>
+      <p>Directives are laid out like blocks and define the functions of Vocabug. The primary directives are the <a href="#vocWords">words</a> directive, which creates each word, and the <a href="#nescaStage">stage</a> directive, which modifies each word with transforms. The other directives define concepts that are used by these primary directives.</p>
 
       <p>Directives are written with their name on a newline, followed by a colon <code class="example">:</code> on the same line, then followed by a newline. The payload after declaring a directive is interpreted according to the directive's semantics. A directive ends when a new directive begins, or when there are no more lines in the definition-build. For example:</p>
       <div class="prog-pre"><code class="directive">words</code><code class="link">:</code><br>  example</div>
@@ -322,7 +322,7 @@
       </details>
 
       <h4 id="vocEscapeTransform"><a class="head-num">3.3.2</a>Transform character escape</h4>
-      <p>These are the characters you must escape if you want to use them in the <a href="#nescaTransform">stage</a> block:</p>
+      <p>These are the characters you must escape if you want to use them in the <a href="#nescaStage">stage</a> directive:</p>
       <details class="dropdown-group">
         <summary class="dropdown-btn">Reveal</summary>
         <table class="styled-table">
@@ -824,14 +824,14 @@
       <p> This will make these generated words: <code class="example">za'ta</code>, <code class="example">'ba.ta</code>, <code class="example">'za.ta</code> be reordered into: <code class="example">'ba.ta</code>, <code class="example">za'ta</code>, <code class="example">'za.ta</code></p>
 
       <h2 id="vocGraphemes"><a class="head-num">10</a>The graphemes directive</h2>
-      <p>The <code class="example">graphemes</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nescaTransform">transformations</a>.</p>
+      <p>The <code class="example">graphemes</code> directive tells Vocabug which (multi)graphs, including character + combining diacritics, are to be treated as grapheme units when using <a href="#nescaStage">transformations</a>.</p>
       <div class="prog-pre"><span class="directive">graphemes</span><code class="link">:</code>
   a<span class="link">,</span> b<span class="link">,</span> c<span class="link">,</span> ch<span class="link">,</span> e<span class="link">,</span> f<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> l<span class="link">,</span> m<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> p<span class="link">,</span> p'<span class="link">,</span> r<span class="link">,</span> s<span class="link">,</span> t<span class="link">,</span> t'<span class="link">,</span> y</div>
       <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
 
       <p>Which graphemes are 'associatemes' of their 'bases' are declared in the graphemes directive. Read more about this in <a href="vocAssociatemes">this section of the documentation</a>.</p>
 
-      <h2 id="nescaTransform"><a class="head-num">11</a>The stage directive</h2>
+      <h2 id="nescaStage"><a class="head-num">11</a>The stage directive</h2>
       <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of transforms, which are all declared in the stage directive:</p>
       <div class="prog-pre"><span class="directive">stage</span><code class="link">:</code>
 <span class="comment">; Your transforms go here</span></div>
@@ -849,7 +849,7 @@
       <p>The format of a rule's <code class="example">CHANGE</code> can be expressed as <code class="example">TARGET -> REPLACEMENT</code>.</p>
       <ul class="paragraphian">
         <li><code class="example">TARGET</code> specifies which part of the word is being changed</li>
-        <li>Then followed by a space and the <code class="example">></code> character. <code class="example">></code> can be swapped with either <code class="example">>></code>, <code class="example">=></code>, <code class="example">⇒</code> or <code class="example">→</code> if you prefer</li>
+        <li>Then followed by hyphen and greater-than-sign <code class="example">-&gt;</code>. <code class="example">-&gt;</code> can be swapped with either <code class="example">&gt;></code>, <code class="example">=&gt;</code>, <code class="example">⇒</code> or <code class="example">→</code> if you prefer</li>
         <li><code class="example">REPLACEMENT</code> is what <code class="example">TARGET</code> is changing into, or in other words, replacing</li>
       </ul>
       <p>Let's look at a simple unconditional rule:</p>
@@ -908,10 +908,12 @@
       <p>Dollar-sign <code class="example">$</code> matches to either the character <code class="example">.</code> or if no match, tries to match word boundaries. Either the beginning of the word if it is in <code class="example">BEFORE</code>, or the end of the word if it is in <code class="example">AFTER</code></p>
       <div class="prog-pre">  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<span class="regexp">$</span><br><span class="comment">; o.pop.pop ==> o.pxp.pxp</span></div>
 
+      <!--
       <h3 id="nescaChanceCondition"><a class="head-num">14.4</a>The chance condition</h3>
       <p>The chance condition is placed following a <code class="example">?</code> as a number from 0 to 100. This number represents the chance of the transformation occuring:</p>
       <div class="prog-pre">aa <span class="link">-></span> a <span class="link">/</span> <span class="link">&lt;chance =</span> <span class="operator">30%</span><span class="link">&gt;</span></div>
       <p>In the above example, the transformation will execute only 30% of the time.</p>
+      -->
 
       <h2 id="nescaTheException"><a class="head-num">15</a>The exception</h2>
       <p>Exceptions are placed following an exclamation mark <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- when a transform has an exception, the target must meet the environment described in the exception to prevent execution:</p>
@@ -1137,7 +1139,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>The routines are:</p>
       <ul class="paragraphian">
         <li><code class="example">decompose</code> will break-down all characters in a word into their "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfc">Unicode Normalization, Canonical Decomposition</a>" form. For example, <code class="example">ñ</code> as a singular unicode entity, \u00F1, will be broken-down into a sequence of two characters, \u006E + \u0303</li>
-        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E\u0303, will be transformed into one character, \u00F1</li>
+        <li><code class="example">compose</code> does the opposite of decompose. It converts all characters in a word to the "<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize#nfd">Unicode Normalization, Canonical Decomposition followed by Canonical Composition</a>" form. For example, <code class="example">ñ</code> as two characters \u006E + \u0303, will be transformed into one character, \u00F1</li>
         <li><code class="example">capitalise</code> will convert the first character of a word to uppercase</li>
         <li><code class="example">decapitalise</code> will convert the first character of a word to lowercase</li>
         <li><code class="example">to-uppercase</code> will convert all characters of a word to uppercase</li>

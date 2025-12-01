@@ -73,7 +73,7 @@ function generate({
       p.output_mode,
       supra_builder,
       p.wordshape_distribution,
-      p.segments,
+      p.units,
       p.wordshape_pending,
       p.optionals_weight,
     );

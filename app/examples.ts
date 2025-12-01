@@ -255,10 +255,10 @@ END
   ; syntax characters
   C = ^
 
-; SEGMENTS
+; UNITS
   $S = CVCVCV
 
-  ; Segments-in-segments
+  ; Units-in-units
   $H = $S
 
   ; Escape characters

@@ -11,7 +11,7 @@ class Generation_Resolver {
   private output_mode: Output_Mode;
 
   public optionals_weight: number;
-  public segments: Map<string, { content: string; line_num: number }>;
+  public units: Map<string, { content: string; line_num: number }>;
   public wordshape_distribution: string;
 
   private wordshape_pending: { content: string; line_num: number };
@@ -22,7 +22,7 @@ class Generation_Resolver {
     output_mode: Output_Mode,
     supra_builder: Supra_Builder,
     wordshape_distribution: Distribution,
-    segments: Map<string, { content: string; line_num: number }>,
+    units: Map<string, { content: string; line_num: number }>,
     wordshape_pending: { content: string; line_num: number },
     optionals_weight: number,
   ) {
@@ -31,14 +31,14 @@ class Generation_Resolver {
 
     this.supra_builder = supra_builder;
     this.optionals_weight = optionals_weight;
-    this.segments = segments;
+    this.units = units;
     this.wordshape_distribution = wordshape_distribution;
 
     this.wordshape_pending = wordshape_pending;
     this.wordshapes = { items: [], weights: [] };
 
-    this.expand_segments();
-    this.expand_wordshape_segments();
+    this.expand_units();
+    this.expand_wordshape_units();
     this.set_wordshapes();
     if (this.output_mode === "debug") {
       this.show_debug();
@@ -235,29 +235,29 @@ class Generation_Resolver {
     return true;
   }
 
-  private expand_wordshape_segments() {
+  private expand_wordshape_units() {
     this.wordshape_pending.content = recursive_expansion(
       this.wordshape_pending.content,
-      this.segments,
+      this.units,
     );
 
-    // Remove dud segments
+    // Remove dud units
     const match = this.wordshape_pending.content.match(/\$[A-Z]/);
     if (match) {
       this.logger.validation_error(
-        `Nonexistent segment detected: '${match[0]}'`,
+        `Nonexistent unit detected: '${match[0]}'`,
         this.wordshape_pending.line_num,
       );
     }
   }
 
-  private expand_segments() {
-    for (const [key, value] of this.segments.entries()) {
+  private expand_units() {
+    for (const [key, value] of this.units.entries()) {
       const expanded_content = recursive_expansion(
         value.content,
-        this.segments,
+        this.units,
       );
-      this.segments.set(key, {
+      this.units.set(key, {
         content: expanded_content,
         line_num: value.line_num, // Preserve original line_num
       });
@@ -265,9 +265,9 @@ class Generation_Resolver {
   }
 
   show_debug(): void {
-    const segments = [];
-    for (const [key, value] of this.segments) {
-      segments.push(`  ${key} = ${value.content}`);
+    const units = [];
+    for (const [key, value] of this.units) {
+      units.push(`  ${key} = ${value.content}`);
     }
 
     const wordshapes = [];
@@ -282,8 +282,8 @@ class Generation_Resolver {
       this.wordshape_distribution +
       `\nOptionals-weight: ` +
       this.optionals_weight +
-      `\nSegments {\n` +
-      segments.join("\n") +
+      `\nUnits {\n` +
+      units.join("\n") +
       `\n}` +
       `\nWordshapes {\n` +
       wordshapes.join("\n") +

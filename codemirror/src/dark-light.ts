@@ -74,10 +74,10 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.operator, color: "#44ebd0ff" , fontWeight: "bold" },
 
   // PINK / #, +, *, (, {, [
-  { tag: t.regexp, color: "#e687e4" },
+  { tag: t.regexp, color: "#eb8af0ff" },
 
   // ORANGE / Categories
-  { tag: t.tagName, color: "#ffcd90" },
+  { tag: t.tagName, color: "#f6be85ff" },
 
   // Weights
   { tag: t.strong, color: "#bee79d", fontStyle: "italic" },

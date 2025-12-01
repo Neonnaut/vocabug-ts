@@ -390,7 +390,7 @@ class Transform_Resolver {
         if (is_boundary_before && is_boundary_after) {
           const entry = this.categories.get(char)!;
           output += entry
-            .filter((g) => !["^", "∅"].some((b) => g.includes(b)))
+            .filter((g) => !["^"].some((b) => g.includes(b)))
             .join(", ");
         } else {
           this.logger.validation_error(

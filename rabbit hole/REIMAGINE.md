@@ -80,7 +80,7 @@ stage {
 ( and )	        Optionalator-set
 C, D, K, ...    Any one-length cap-letter can refer to a category
 <[ and ]	      Feature matrix
-^ or ∅	        Insertion when in TARGET, deletion when in RESULT
+^ or  	        Insertion when in TARGET, deletion when in RESULT
 , or " " 	      Separates choices
 /		            A condition follows this character
 ?		            A chance condition follows this character

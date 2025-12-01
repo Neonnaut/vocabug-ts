@@ -29,11 +29,11 @@ export type Token =
       blocked_by?: string[][];
     }
   | {
-      type: "deletion"; // ∅
+      type: "deletion"; // ^
       base: "^";
     }
   | {
-      type: "insertion"; // ∅
+      type: "insertion"; // ^
       base: "^";
     }
   | {

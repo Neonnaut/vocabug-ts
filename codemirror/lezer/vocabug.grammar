@@ -7,7 +7,7 @@ AnyChar { "." }
 Digit {"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"}
 
 Line {
-  TransformBlock | WordsBlock | CategoryLine | SegmentLine
+  TransformBlock | WordsBlock | CategoryLine | UnitLine
   | DistributionLine | GraphemeListLine | MetaLine
   | Comment | BlankLine
 }
@@ -42,7 +42,7 @@ MacroName { "$" ClassChar }
 ClassName { ClassChar }
 
 CategoryLine { ClassChar "=" WordToken+ }
-SegmentLine { "$" ClassChar "=" WordToken+ }
+UnitLine { "$" ClassChar "=" WordToken+ }
 
 DistributionLine {
   ("wordshape-distribution" | "category-distribution") ":" DistributionType

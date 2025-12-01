@@ -20481,9 +20481,9 @@ var cm6 = (function (exports) {
         // CYAN / 0, ->, +, -
         { tag: tags.operator, color: "#44ebd0ff", fontWeight: "bold" },
         // PINK / #, +, *, (, {, [
-        { tag: tags.regexp, color: "#e687e4" },
+        { tag: tags.regexp, color: "#eb8af0ff" },
         // ORANGE / Categories
-        { tag: tags.tagName, color: "#ffcd90" },
+        { tag: tags.tagName, color: "#f6be85ff" },
         // Weights
         { tag: tags.strong, color: "#bee79d", fontStyle: "italic" },
         // distribution etc

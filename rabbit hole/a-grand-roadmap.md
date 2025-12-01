@@ -33,7 +33,7 @@
 - [x] Category sets
 - [x] Category distribution
 - [x] Category weights
-- [x] Segments
+- [x] Units
 - [x] Words directive
 - [x] Words directive block
 - [x] Words distribution
@@ -124,7 +124,7 @@
 - [ ] Docs
 
 - [ ] Update docs say result feature matrix must be qualified
-- [ ] Rename segments to units
+- [ ] Rename units to units
 
 - [ ] group folders generation, transforming, utilities
 

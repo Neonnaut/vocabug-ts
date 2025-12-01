@@ -579,7 +579,7 @@ class Transformer {
     // Handle insertions after the last token
     if (insertion_map.has(word_stream.length)) {
       for (const rep of insertion_map.get(word_stream.length)!) {
-        applied_targets.push("∅");
+        applied_targets.push("^");
         applied_results.push(rep);
         result_tokens.push(rep);
       }
@@ -890,7 +890,7 @@ class Transformer {
       if (tokens.length == 0) {
         word.rejected = true;
         if (this.debug) {
-          word.record_transformation(`REJECT NULL WORD`, `∅`);
+          word.record_transformation(`<reject-null-word>`, `∅`);
         }
       }
     }

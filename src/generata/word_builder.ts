@@ -88,7 +88,7 @@ class Word_Builder {
     }
 
     // Stage five, remove caret from word
-    let stage_five = stage_four.replace(/\^/g, "").replace(/∅/g, "");
+    let stage_five = stage_four.replace(/\^/g, "");
 
     if (this.escape_mapper.counter != 0) {
       stage_one = this.escape_mapper.restore_escaped_chars(stage_one);

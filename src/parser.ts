@@ -24,7 +24,7 @@ class Parser {
   public category_distribution: Distribution;
   public category_pending: Map<string, { content: string; line_num: number }>;
 
-  public segments: Map<string, { content: string; line_num: number }>;
+  public units: Map<string, { content: string; line_num: number }>;
   public optionals_weight: number;
   public wordshape_distribution: Distribution;
   public wordshape_pending: { content: string; line_num: number };
@@ -48,6 +48,7 @@ class Parser {
   public invisible: string[];
 
   private file_line_num = 0;
+  private file_array: string[] = [];
 
 
   constructor(
@@ -115,7 +116,7 @@ class Parser {
     this.category_distribution = "gusein-zade";
     this.category_pending = new Map();
     this.optionals_weight = 10;
-    this.segments = new Map();
+    this.units = new Map();
     this.wordshape_distribution = "zipfian";
     this.wordshape_pending = { content: "", line_num: 0 };
 
@@ -134,16 +135,18 @@ class Parser {
   }
 
   parse_file(file: string) {
-    let transform_mode = false;
     const file_array = file.split("\n");
+
+    let my_decorator: string = "none";
+    let my_directive: string = "none";
+    let my_subdirective: string = "none";
+    let my_header: string[] = [];
 
     for (; this.file_line_num < file_array.length; ++this.file_line_num) {
       let line = file_array[this.file_line_num];
-      let line_value = "";
 
       line = this.escape_mapper.escape_backslash_pairs(line);
       line = line.replace(/;.*/u, "").trim(); // Remove comment!!
-
       line = this.escape_mapper.escape_named_escape(line);
       if (line.includes("&[")) {
         this.logger.validation_error(
@@ -151,56 +154,147 @@ class Parser {
           this.file_line_num,
         );
       }
-
       if (line === "") {
-        continue;
-      } // Blank line !!
+        continue; // Blank line !!
+      }
 
-      // Check for decorator
+      // check for decorator
       if (line.startsWith("@")){
-
+        my_decorator = this.parse_decorator(line, my_decorator);
+        if (my_decorator != "none") {
+          continue; // It's a decorator
+        }
       }
+
       // check for directive change
-      if (line === "categories:") {
-        this.directive = "categories";
-      } else if (line === "words:") {
-        this.directive = "words";
-      } else if (line === "units:") {
-        this.directive = "units";
-      } else if (line === "alphabet:") {
-        this.directive = "alphabet";
-      } else if (line === "invisible:") {
-        this.directive = "invisible";
-      } else if (line === "graphemes:") {
-        this.directive = "graphemes";
-      } else if (line === "features:") {
-        this.directive = "features";
-      } else if (line === "feature-field:") {
-        this.directive = "feature-field";
-      } else if (line === "stage:") {
-        this.directive = "stage";
+      let temp_directive = this.parse_directive(line, my_decorator);
+      if (temp_directive != "none") {
+        my_directive = temp_directive;
+        continue; // It's a directive change
       }
 
+      // CATEGORIES
+      if (my_directive === "categories") {
+        const [key, field, mode] = this.get_cat_seg_fea(line);
+        if (mode === "trash") {
+          this.logger.validation_error(
+            `${line} is not a category declaration`,
+            this.file_line_num,
+          );
+        }
+        this.category_pending.set(key, {
+          content: field,
+          line_num: this.file_line_num,
+        });
+      }
+      
+      // WORDS
+      if (my_directive === "words") {
+        if (!this.valid_words_brackets(line)) {
+          this.logger.validation_error(
+            `Wordshapes had missmatched brackets`,
+            this.file_line_num,
+          );
+        }
+        this.wordshape_pending.content += " " + line;
+        this.wordshape_pending.line_num = this.file_line_num;
+        continue; // Added some wordshapes
+      }
 
+      // UNITS
+      if (my_directive === "units") {
+        const [key, field, mode] = this.get_cat_seg_fea(line);
+        if (mode === "trash") {
+          this.logger.validation_error(
+            `${line} is not a unit declaration`,
+            this.file_line_num,
+          );
+        }
+        if (!this.validate_unit(field)) {
+          this.logger.validation_error(
+            `The unit '${key}' had separator(s) outside sets -- expected separators for units to appear only in sets`,
+            this.file_line_num,
+          );
+        }
+        if (!this.valid_words_brackets(field)) {
+          this.logger.validation_error(
+            `The unit '${key}' had missmatched brackets`,
+            this.file_line_num,
+          );
+        }
+        this.units.set(key, {
+          content: field,
+          line_num: this.file_line_num,
+        });
+      }
 
+      // ALPHABET
+      if (my_directive === "alphabet") {
+        const alphabet = line.split(/[,\s]+/).filter(Boolean);
+        for (let i = 0; i < alphabet.length; i++) {
+          alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]);
+        }
+        // Add alphabet items to this.alphabet
+        this.alphabet.push(...alphabet);
+      }
 
+      // INVISIBLE
+      if (my_directive === "invisible") {
+        const invisible = line.split(/[,\s]+/).filter(Boolean);
+        for (let i = 0; i < invisible.length; i++) {
+          invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]);
+        }
+        // Add invisible items to this.invisible
+        this.invisible.push(...invisible);
+      }
+      
+      // GRAPHEMES
+      if (my_directive === "graphemes") {
+        
+      }
 
-      if (transform_mode) {
-        // Lets do transforms !!
-        line_value = line;
+      // FEATURES !!!
+      if (my_directive === "features") {
+        const [key, field, mode] = this.get_cat_seg_fea(line);
+        if (mode === "trash") {
+          this.logger.validation_error(
+            `${line} is not a feature declaration`,
+            this.file_line_num,
+          );
+        }
+        const graphemes = field.split(/[,\s]+/).filter(Boolean);
+        if (graphemes.length == 0) {
+          this.logger.validation_error(
+            `Feature ${key} had no graphemes`,
+            this.file_line_num,
+          );
+        }
+        this.feature_pending.set(key, {
+          content: graphemes.join(","),
+          line_num: this.file_line_num,
+        });
+      }
 
-        if (line_value === "END") {
-          transform_mode = false;
+      // FEATURE-FIELD
+      if (my_directive === "feature-field") {
+        if (line.startsWith("+- ")) {
+          this.parse_featurefield(file_array);
           continue;
         }
+      }
 
-        if (line.startsWith("| ")) {
+
+      if (my_directive === "stage") {
+        // Lets do transforms !!
+        let line_value = line;
+
+        if (line.startsWith("< ")) {
           // Parse clusterfield
           this.parse_clusterfield(file_array);
           continue;
         }
 
-        if (line.startsWith("@routine ")) {
+        if (line.startsWith("<routine ")) {
           // Engine. Routine
           line_value = line.substring(9).trim().toLowerCase();
 
@@ -249,144 +343,12 @@ class Parser {
         });
         continue;
       }
-
-      if (line === "BEGIN transform:") {
-        transform_mode = true;
-      } else if (line.startsWith("category-distribution:")) {
-        line_value = line.substring(22).trim().toLowerCase();
-        line_value =
-          this.escape_mapper.restore_preserve_escaped_chars(line_value);
-        this.category_distribution = this.parse_distribution(line_value);
-      } else if (line.startsWith("wordshape-distribution:")) {
-        line_value = line.substring(23).trim().toLowerCase();
-        line_value =
-          this.escape_mapper.restore_preserve_escaped_chars(line_value);
-        this.wordshape_distribution = this.parse_distribution(line_value);
-      } else if (line.startsWith("optionals-weight:")) {
-        line_value = line.substring(17).replace(/%/g, "").trim();
-        line_value =
-          this.escape_mapper.restore_preserve_escaped_chars(line_value);
-        const optionals_weight = make_percentage(line_value);
-        if (optionals_weight == null) {
-          this.logger.validation_error(
-            `Invalid optionals-weight '${line_value}' -- expected a number between 1 and 100`,
-            this.file_line_num,
-          );
-        }
-        this.optionals_weight = optionals_weight;
-      } else if (line.startsWith("alphabet:")) {
-        line_value = line.substring(9).trim();
-
-        const alphabet = line_value.split(/[,\s]+/).filter(Boolean);
-        for (let i = 0; i < alphabet.length; i++) {
-          alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]);
-        }
-
-        if (alphabet.length == 0) {
-          this.logger.validation_error(
-            `'alphabet' was introduced but there were no graphemes listed -- expected a list of graphemes`,
-            this.file_line_num,
-          );
-        }
-        this.alphabet = alphabet;
-      } else if (line.startsWith("invisible:")) {
-        line_value = line.substring(10).trim();
-
-        const invisible = line_value.split(/[,\s]+/).filter(Boolean);
-        for (let i = 0; i < invisible.length; i++) {
-          invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]);
-        }
-
-        if (invisible.length == 0) {
-          this.logger.validation_error(
-            `'invisible' was introduced but there were no graphemes listed -- expected a list of graphemes`,
-            this.file_line_num,
-          );
-        }
-        this.invisible = invisible;
-      } else if (line.startsWith("graphemes:")) {
-        line_value = line.substring(10).trim();
-
-        const graphemes = line_value.split(/[,\s]+/).filter(Boolean);
-        for (let i: number = 0; i < graphemes.length; i++) {
-          graphemes[i] = this.escape_mapper.restore_escaped_chars(graphemes[i]);
-        }
-        if (graphemes.length == 0) {
-          this.logger.validation_error(
-            `'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`,
-            this.file_line_num,
-          );
-        }
-        this.graphemes = this.graphemes = Array.from(new Set(graphemes));
-      } else if (line.startsWith("BEGIN graphemes:")) {
-        this.parse_graphemes_block(file_array);
-      } else if (line.startsWith("words:")) {
-        line_value = line.substring(6).trim();
-        if (line_value != "") {
-          this.wordshape_pending = {
-            content: line_value,
-            line_num: this.file_line_num,
-          };
-        }
-      } else if (line === "BEGIN words:") {
-        this.parse_words_block(file_array);
-      } else if (line.startsWith("+- ")) {
-        this.parse_featurefield(file_array);
-      } else {
-        // It's a category or segment or feature
-        line_value = line;
-
-        const [key, field, mode] = this.get_cat_seg_fea(line_value);
-        if (mode === "trash") {
-          this.logger.validation_error(
-            `${line_value} is not a category, segment, feature, etc`,
-            this.file_line_num,
-          );
-        } else if (mode === "segment") {
-          // SEGMENTS !!!
-          if (!this.validate_segment(field)) {
-            this.logger.validation_error(
-              `The segment '${key}' had separator(s) outside sets -- expected separators for segments to appear only in sets`,
-              this.file_line_num,
-            );
-          }
-          if (!this.valid_words_brackets(field)) {
-            this.logger.validation_error(
-              `The segment '${key}' had missmatched brackets`,
-              this.file_line_num,
-            );
-          }
-          this.segments.set(key, {
-            content: field,
-            line_num: this.file_line_num,
-          });
-        } else if (mode === "category") {
-          // CATEGORIES !!!
-          this.category_pending.set(key, {
-            content: field,
-            line_num: this.file_line_num,
-          });
-        } else if (mode === "feature") {
-          // FEATURES !!!
-          const graphemes = field.split(/[,\s]+/).filter(Boolean);
-          if (graphemes.length == 0) {
-            this.logger.validation_error(
-              `Feature ${key} had no graphemes`,
-              this.file_line_num,
-            );
-          }
-          this.feature_pending.set(key, {
-            content: graphemes.join(","),
-            line_num: this.file_line_num,
-          });
-        }
-      }
     }
   }
 
   get_cat_seg_fea(
     input: string,
-  ): [string, string, "category" | "segment" | "feature" | "trash"] {
+  ): [string, string, "category" | "unit" | "feature" | "trash"] {
     const divider = "=";
 
     if (input === "") {
@@ -404,14 +366,14 @@ class Parser {
 
     // Construct dynamic regexes using cappa
     const categoryRegex = new RegExp(`^${cappa}$`);
-    const segmentRegex = new RegExp(`^\\$${cappa}$`);
+    const unitRegex = new RegExp(`^\\$${cappa}$`);
     const featureRegex = /^(\+|-|>)[a-zA-Z+-]+$/;
 
     if (categoryRegex.test(key)) {
       return [key, field, "category"];
     }
-    if (segmentRegex.test(key)) {
-      return [key, field, "segment"];
+    if (unitRegex.test(key)) {
+      return [key, field, "unit"];
     }
     if (featureRegex.test(key)) {
       return [key, field, "feature"];
@@ -430,11 +392,11 @@ class Parser {
     return "flat";
   }
 
-  private validate_segment(str: string): boolean {
+  private validate_unit(str: string): boolean {
     let inside_square = false;
     let inside_paren = false;
 
-    // We don't want random space or comma inside segment
+    // We don't want random space or comma inside unit
     for (let i = 0; i < str.length; i++) {
       const char = str[i];
 
@@ -448,6 +410,100 @@ class Parser {
       }
     }
     return true;
+  }
+
+  private parse_decorator(line: string, old_decorator: string): string {
+    let new_decorator: "none"|"words"|"categories" = "none"
+
+    line = line.substring(1) // remove at sign
+    line = this.escape_mapper.restore_preserve_escaped_chars(line);
+
+    if (line === "words.") {
+      line = line.substring(6);
+      if (line === "distribution") {
+        line = line.substring(12).trim();
+        // ignore whitespace up to equals sign
+        if (line.startsWith("=")) {
+          line = line.substring(1).trim();
+          new_decorator = "words";
+          this.wordshape_distribution = this.parse_distribution(line);
+        }
+      } else if (line === "optionals-weight") {
+        line = line.substring(16).trim();
+        // ignore whitespace up to equals sign
+        if (line.startsWith("=")) {
+          line = line.substring(1).trim();
+          const optionals_weight = make_percentage(line);
+          if (optionals_weight == null) {
+            this.logger.validation_error(
+              `Invalid optionals-weight '${line}' -- expected a number between 1 and 100`,
+              this.file_line_num,
+            );
+          }
+          new_decorator = "words";
+          this.optionals_weight = optionals_weight;
+        }
+      }
+
+    } else if (line === "categories.") {
+      line = line.substring(11);
+      if (line === "distribution") {
+        line = line.substring(12).trim();
+        // ignore whitespace up to equals sign
+        new_decorator = "categories";
+        this.category_distribution = this.parse_distribution(line);
+      }
+    }
+
+    // Errors
+    if (new_decorator === "none") {
+      this.logger.validation_error(
+        `Invalid decorator`,
+        this.file_line_num,
+      );
+    } else if (old_decorator !== "none" && old_decorator !== new_decorator) {
+      this.logger.validation_error(
+        `Decorator mismatch -- expected '${old_decorator}' decorator after '${old_decorator}' decorator`,
+        this.file_line_num,
+      );
+    }
+    return new_decorator;
+  }
+
+  private parse_directive(line: string, current_decorator: string): string {
+    let temp_directive: Directive = "none";
+
+    if (line === "categories:") {
+      temp_directive = "categories";
+    } else if (line === "words:") {
+      temp_directive = "words";
+    } else if (line === "units:") {
+      temp_directive = "units";
+    } else if (line === "alphabet:") {
+      temp_directive = "alphabet";
+    } else if (line === "invisible:") {
+      temp_directive = "invisible";
+    } else if (line === "graphemes:") {
+      temp_directive = "graphemes";
+    } else if (line === "features:") {
+      temp_directive = "features";
+    } else if (line === "feature-field:") {
+      temp_directive = "feature-field";
+    } else if (line === "stage:") {
+      temp_directive = "stage";
+    }
+    if (temp_directive === "none") {
+      return "none"; // Not a directive change
+    }
+
+    // Errors
+    if (this.directive != "none" && this.directive != current_decorator) {
+      this.logger.validation_error(
+        `Directive mismatch -- expected '${current_decorator}' directive after '${current_decorator}' decorator`,
+        this.file_line_num,
+      );
+    }
+    return temp_directive;
   }
 
   private parse_graphemes_block(file_array: string[]) {
@@ -653,12 +709,12 @@ class Parser {
     }
 
     if (buffer.trim()) {
-      const segment = buffer.trim();
+      const unit = buffer.trim();
       if (mode === "chance") {
-        const parsed = parseInt(segment, 10);
+        const parsed = parseInt(unit, 10);
         if (chance != null) {
           this.logger.validation_error(
-            `Duplicate chance value '${segment}'`,
+            `Duplicate chance value '${unit}'`,
             this.file_line_num,
           );
         }
@@ -666,12 +722,12 @@ class Parser {
           chance = parsed;
         } else {
           this.logger.validation_error(
-            `Chance value "${segment}" must be between 0 and 100`,
+            `Chance value "${unit}" must be between 0 and 100`,
             this.file_line_num,
           );
         }
       } else {
-        const validated = this.validate_environment(segment, mode);
+        const validated = this.validate_environment(unit, mode);
         (mode === "condition" ? conditions : exceptions).push(validated);
       }
     }
@@ -684,25 +740,25 @@ class Parser {
   }
 
   private validate_environment(
-    segment: string,
+    unit: string,
     kind: "condition" | "exception" | "chance",
   ): string {
     if (kind === "chance") {
-      const parsed = parseInt(segment, 10);
+      const parsed = parseInt(unit, 10);
       if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-        return segment;
+        return unit;
       } else {
         this.logger.validation_error(
-          `Chance "${segment}" must be a number between 0 and 100`,
+          `Chance "${unit}" must be a number between 0 and 100`,
           this.file_line_num,
         );
       }
     }
 
-    const parts = segment.split("_");
+    const parts = unit.split("_");
     if (parts.length !== 2) {
       this.logger.validation_error(
-        `${kind} "${segment}" must contain exactly one underscore`,
+        `${kind} "${unit}" must contain exactly one underscore`,
         this.file_line_num,
       );
     }
@@ -710,7 +766,7 @@ class Parser {
     const [before, after] = parts;
     if (!before && !after) {
       this.logger.validation_error(
-        `${kind} "${segment}" must have content on at least one side of '_'`,
+        `${kind} "${unit}" must have content on at least one side of '_'`,
         this.file_line_num,
       );
     }

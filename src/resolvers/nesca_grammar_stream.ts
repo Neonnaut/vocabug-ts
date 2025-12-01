@@ -277,7 +277,6 @@ class Nesca_Grammar_Stream {
         char == "(" ||
         char == ")" ||
         char == "<" ||
-        char === "∅" ||
         char === "^" ||
         char == "/" ||
         char === "!" ||
