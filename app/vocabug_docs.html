@@ -95,9 +95,9 @@
         </li>
         <li><a href="#vocDistributions">Default distributions</a></li>
         <li><a href="#vocAssigningWeights">Assigning weights</a></li>
-        <li><a href="#vocAlphabetisation">Alphabetisation</a></li>
-          <li><a href="#vocInvisibility">Invisibility</a></li>
-        <li><a href="#vocGraphemes">Defining graphemes</a></li>
+        <li><a href="#vocAlphabetisation">The alphabet directive</a></li>
+          <li><a href="#vocInvisibility">The invisible directive</a></li>
+        <li><a href="#vocGraphemes">The graphemes directive</a></li>
         <li><a href="#nescaStage">The stage directive</a></li>
         <li><a href="#nescaTheChange">The change</a>
         <ol class="nice-list">
@@ -115,7 +115,6 @@
           <li><a href="#nescaMultipleCondition">Multiple conditions in one rule</a></li>
           <li><a href="#nescaWordBoundary">Word boundary</a></li>
           <li><a href="#nescaSyllableBoundary">Syllable boundary</a></li>
-          <li><a href="#nescaChanceCondition">The chance condition</a></li>
         </ol>
         </li>
 
@@ -130,7 +129,7 @@
           <li><a href="#nescaParaFeature">Para-feature</a></li>
           <li><a href="#nescaFeatureInFeature">Referencing features inside features</a></li>
           <li><a href="#nescaUsingFeatures">Using features</a></li>
-          <li><a href="#nescaFeatureField">Feature-field</a></li>
+          <li><a href="#nescaFeatureField">The feature-field directive</a></li>
         </ol>
         </li>
 
@@ -150,9 +149,11 @@
           <li><a href="#nescaKleeneStar">Kleene-star</a></li>
           <li><a href="#nescaGeminateMark">Geminate-mark</a></li>
           <li><a href="#nescaWildcard">Wildcard</a></li>
-          <li><a href="#nescaAnythingsMark">Anythings-mark</a></li>
-          <li><a href="#nescaGuarded">Guarded-anythings-mark</a></li>
-          <li><a href="#nescaSyllableMark">Syllable-mark</a></li>
+          <li><a href="#nescaAnythingsMark">Anythings-mark</a>
+          <ol class="nice-list">
+            <li><a href="#nescaLaziness">Laziness and cowardliness</a></li>
+          </ol>
+          </li>
         </ol>
         </li>
 
@@ -169,11 +170,7 @@
                 <li><a href="#nescaReferenceSequence">Reference of grapheme sequence</a></li>
               </ol>
             </li>
-            <li><a href="#nescaAssociatemes">Associatemes</a>
-              <ol class="nice-list">
-                <li><a href="#nescaBasedMark">Based-mark</a></li>
-              </ol>
-            </li>
+            <li><a href="#nescaAssociatemes">Associatemes</a></li>
             
         </ol>
         </li>
@@ -348,7 +345,7 @@
           </tr>
           <tr>
             <td><code class="example">&lt;</code> and a space</td>
-            <td>Begins a <a href="#nescaClusterfield">Cluster-field</a></td>
+            <td>Begins a <a href="#nescaClusterfield">cluster-field</a></td>
           </tr>
           <tr>
             <td><code class="example">&[</code> and <code class="example">]</code></td>
@@ -385,14 +382,6 @@
           <tr>
             <td><code class="example">0</code></td>
             <td><a href="#nescaReject">Rejects</a> a word</td>
-          </tr>
-          <tr>
-            <td><code class="example">/</code></td>
-            <td>A <a href="#nescaTheCondition">condition</a> follows this character</td>
-          </tr>
-          <tr>
-            <td><code class="example">?</code></td>
-            <td>A <a href="#nescaChanceCondition"> chance condition</a> follows this character</td>
           </tr>
           <tr>
             <td><code class="example">!</code> or <code class="example">//</code></td>
@@ -432,7 +421,7 @@
           </tr>
           <tr>
             <td><code class="example">%[</code> and <code class="example">|</code> and <code class="example">]</code></td>
-            <td><a href="#nescaGuarded">Anythings-mark</a> with degrees or 'cowardliness'</td>
+            <td><a href="#nescaLaziness">Anythings-mark</a> with degrees or 'cowardliness'</td>
           </tr>
 
           <tr>
@@ -461,7 +450,7 @@
           </tr>
           <tr>
             <td><code class="example">~</code></td>
-            <td><a href="#nescaBasedMark">Associateme-mark</a></td>
+            <td><a href="#nescaAssociatemes">Associateme-mark</a></td>
           </tr> 
 
           
@@ -710,7 +699,7 @@
       <h3 id="vocWords"><a class="head-num">5.1</a>Words</h3>
       <p>The <code class="example">words</code> directive defines a set of 'word-shapes' that Vocabug will choose from to create words. A word-shape can consist of individual graphemes, <a href="#vocCategories">categories</a>, <a href="#vocUnits">units</a> or a mixture of both.</p>
 
-      <p>Word-shapes are seperated by a comma, space, or a newline.</p>
+      <p>Word-shapes are separated by a comma, space, or a newline.</p>
 
       <p>By default, words are selected using the Zipf distribution. The first word-shape will be chosen the most often, then the second word-shape the second most often and so on. <a href="#vocDistributions">You can change this distribution</a>. Below is a very simple example that will generate words with one to three CV syllables:</p>
       <div class="prog-pre"><span class="directive">categories</span><code class="link">:</code>
@@ -725,7 +714,7 @@
       <ul class="paragraphian">
         <li>Every unit's key is a series of characters that are lowercase a to z, uppercase A to Z, <code class="example">$</code>, <code class="example">+</code> and <code class="example">-</code></li>
 
-        <li>Units are evoked in the <code class="example">words</code> directive inside angle brackets <code class="example">&lt;</code> and <code class="example">&gt;</code>.
+        <li>Units are evoked in the <code class="example">words</code> directive or inside another unit inside angle brackets <code class="example">&lt;</code> and <code class="example">&gt;</code>.
 
         <li>Units are not sets like categories are. <code class="example">$ = a, b, c</code> will not work as you might expect (because as already stated, units are abbreviation for word-shapes). You would need to use a <a href="#vocPickOne">pick-one-set</a>, i.e: <code class="example">&lt;M&gt; = {a, b, c}</code></li>
       </ul>
@@ -829,14 +818,14 @@
   a<span class="link">,</span> b<span class="link">,</span> c<span class="link">,</span> ch<span class="link">,</span> e<span class="link">,</span> f<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> l<span class="link">,</span> m<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> p<span class="link">,</span> p'<span class="link">,</span> r<span class="link">,</span> s<span class="link">,</span> t<span class="link">,</span> t'<span class="link">,</span> y</div>
       <p>In the above example, we defined <code class="example">ch</code> as a grapheme. This would stop a rule such as <code class="example">c -> g</code> changing the word <code class="example">chat</code> into <code class="example">ghat</code>, but it will make <code class="example">cobra</code> change into <code class="example">gobra</code>.</p>
 
-      <p>Which graphemes are 'associatemes' of their 'bases' are declared in the graphemes directive. Read more about this in <a href="vocAssociatemes">this section of the documentation</a>.</p>
+      <p>Which graphemes are 'associatemes' of their 'bases' are declared in the graphemes directive. Read more about this in <a href="#nescaAssociatemes">this section of the documentation</a>.</p>
 
       <h2 id="nescaStage"><a class="head-num">11</a>The stage directive</h2>
       <p>Once words are generated, you might want to modify them to prevent certain sequences, outright reject certain words, or simulate historical sound changes. This is the purpose of transforms, which are all declared in the stage directive:</p>
       <div class="prog-pre"><span class="directive">stage</span><code class="link">:</code>
 <span class="comment">; Your transforms go here</span></div>
 
-      <p>The default transform is a rule. These should be familiar to anyone who knows a little about phonological rules. The two other types of transforms are <a href="nescaClusterField">cluster-fields</a> and <a href="nescaRoutines">routines</a>.</p>
+      <p>The default transform is a rule. These should be familiar to anyone who knows a little about phonological rules. The two other types of transforms are <a href="#nescaClusterfield">cluster-fields</a> and <a href="#nescaRoutine">routines</a>.</p>
 
       <p>A rule can be summarised as four fields: <code class="example">CHANGE / CONDITION ! EXCEPTION</code>. The characters <code class="example">/</code> and <code class="example">!</code> that precede each field (except for the <code class="example">CHANGE</code>) are necessary for signalling each field. For example, including a <code class="example">!</code> will signal that this rule contains an exception, and all text following it until the next field marker will be interpreted as such.</p>
 
@@ -982,11 +971,13 @@
 
       <p>In this rule, in <code class="example">REPLACEMENT</code>, <code class="example">[+voice]</code> has a symmetrical one-to-one change of graphemes from the graphemes in <code class="example">[-voice]</code> in <code class="example">TARGET</code>, leading to a concurrent change. Let's quickly imagine a scenario where the only <code class="example">[+voice]</code> grapheme was <code class="example">b</code>. The result will be a merging of all <code class="example">-voice</code> graphemes into <code class="example">b</code>: <code class="example">tamepfa ==&gt; bamebba</code>.</p>
 
+      <p>It should be noted that feature-matrices in <code class="example">TARGET</code> have no carryover to feature-matrices in <code class="example">REPLACEMENT</code>. For example, in a bogus rule such as <code class="example">o -> [+high]</code> Vocabug will <b>not</b> try to transform <code class="example">&lt;o&gt;</code> into it's [+high] counterpart, it will try and replace <code class="example">&lt;o&gt;</code> with some grapheme marked as <code class="example">[+high]</code> and will probably fail unless only one grapheme is marked as <code class="example">[+high]</code>.</p>
+
       <p>If the feature-matrix is part of a target, i.e: it has tokens on either side of it, it MUST be inside an alternator set.</p>
 
-      <h3 id="nescaFeatureField"><a class="head-num">17.6</a>Feature-field</h3>
+      <h3 id="nescaFeatureField"><a class="head-num">17.6</a>The feature-field directive</h3>
       <p>Feature-fields allow graphemes to be easily marked by multiple features in table format.</p>
-      <p>The feature-field begins with a <code class="example">+-</code> and a space. The graphemes being marked by the features are listed on the first row. The features are listed in the first column.</p>
+      <p>The graphemes being marked by the features are listed on the first row. The features are listed in the first column.</p>
       <p>For example:</p>
       <div class="prog-pre"><code class='directive'>feature-field</code><code class="link">:</code>
            m n p b t d k g s h l j
@@ -1104,7 +1095,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>The example below uses an anythings-mark in the condition:</p>
       <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">%[]</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
 
-      <h3 id="nescaGuarded"><a class="head-num">20.6.1</a>Laziness and cowardliness</h3>
+      <h3 id="nescaLaziness"><a class="head-num">20.6.1</a>Laziness and cowardliness</h3>
       <p>By listing graphemes and grapheme sequences inside the square brackets, we can alter the "greedy" behaviour of an anythings-mark with degrees of "laziness" and 'cowardliness'.</p>
 
       <p><b>Consuming negative lookahead, AKA "laziness"</b>:</p>
@@ -1327,7 +1318,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
           </tbody>
         </table>
       </details>
-          <p>When there is no initial to be found, the jamo will have an initial Ieung. Forming an initial of the next jamo is prefered over creating a final for the current jamo.</p>
+          <p>When there is no initial to be found, the jamo will have an initial Ieung. Forming an initial of the next jamo is preferred over creating a final for the current jamo.</p>
       </li>
       </ul>
 
@@ -1354,7 +1345,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre"><span class="comment">; Simulate Old Spanish "Hyperthesis"</span>
   r<span class="regexp">&</span>l <span class="link">-></span> <span class="catkey">&M</span><br><span class="comment">; parabla ==> palabra</span></div>
 
-      <h3 id="nescaEmptyMark"><a class="head-num">21.3</a>Empty-mark</h3>
+      <h3 id="nescaEmptyMark"><a class="head-num">21.4</a>Empty-mark</h3>
       <p>An Empty-mark using <code class="example">&E</code>, inserts an 'empty' grapheme into the captured <code class="example">TARGET</code> graphemes. It is only allowed in <code class="example">TARGET</code></p>
 
       <p>One use for it is a trick to make one-place long-distance metathesis work, for example:</p>
@@ -1369,10 +1360,10 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre"><span class="directive">&</span>  p  t  k  j  y
 <span class="catkey">&E</span> p  t  c  y  ü</div>
 
-      <h3 id="nescaReference"><a class="head-num">21.4</a>Reference</h3>
+      <h3 id="nescaReference"><a class="head-num">21.5</a>Reference</h3>
       <p>Sometimes graphemes must be copied or asserted to be a certain grapheme between other graphemes. This is the purpose of 'reference'. Reference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>
 
-      <h4 id="nescaSingularReference"><a class="head-num">21.4.1</a>Reference of singular grapheme</h4>
+      <h4 id="nescaSingularReference"><a class="head-num">21.5.1</a>Reference of singular grapheme</h4>
 
       <p>A grapheme (or graphemes) are bound to a reference using a 'reference-capture', to the right of some grapheme. A reference-capture looks like <code class='example'>=</code> followed by a single-digit positive number. This number is called the 'reference-key' of the reference. The grapheme (or graphemes) bound to the reference is called the 'reference-value'.</p>
 
@@ -1408,7 +1399,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 
       <p>In the rule above, we are binding the <code class='example'>V</code> category to the reference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>V</code> is when the condition is met is the value of <code class='example'>1</code>. Then the value of <code class='example'>1</code> is inserted into <code class='example'>REPLACEMENT</code> by invoking its reference-mark.</p>
 
-      <h4 id="nescaReferenceSequence"><a class="head-num">21.4.2</a>Reference of grapheme sequence</h4>
+      <h4 id="nescaReferenceSequence"><a class="head-num">21.5.2</a>Reference of grapheme sequence</h4>
 
       <p>Now that 'reference-capture' and 'reference-mark' has been (hopefully) introduced and explained adequately, let's explain how to capture and reference a sequence of graphemes.</p>
 
@@ -1418,16 +1409,14 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
   <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">&=</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
 <span class="comment">; foobaaʔ ==&gt; foobaaʔaa</span></div>
       
-      
-
-      <h3 id="nescaAssociatemes"><a class="head-num">21.5</a>Associatemes</h3>
+      <h3 id="nescaAssociatemes"><a class="head-num">21.6</a>Associatemes</h3>
       <p>If your language encodes tone, stress, breathy voice, or other phonological features directly on vowels, you'll often need to target a particular grapheme across its variants.</p>
       <p>One method is to target each variant manually:</p>
 
       <div class="prog-pre">  <span class="regexp">{</span>a<span class="link">,</span> á<span class="link">,</span> à<span class="regexp">}</span> <span class="link">-&gt;</span> <span class="regexp">{</span>e<span class="link">,</span> é<span class="link">,</span> è<span class="regexp">}</span><br><span class="comment">; daná ==&gt; dené</span></div>
 
       <p>This workaround uses alternators, but lacks semantic clarity and scalability, and is outright tedious.</p>
-      <p>To solve this, are 'associatemes' -- aligned graphemes associated with their base grapheme, and other associated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single token. To set up associatemes, they must be stated in the <code class="example">graphemes</code> directive with the base assosiateme set inside curly braces, and each assosiateme set in curly braces with a &lt; to the left of the base set, or another set, like so:</p>
+      <p>To solve this, are 'associatemes' -- aligned graphemes associated with their base grapheme, and other associated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single token. To set up associatemes, they must be stated in the <code class="example">graphemes</code> directive with the base associateme set inside curly braces, and each associateme set in curly braces with a &lt; to the left of the base set, or another set, like so:</p>
       
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">
   {</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span></div>

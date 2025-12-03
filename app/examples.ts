@@ -6,14 +6,14 @@ const examples: { [key: string]: string } = {
 categories:
   C = {t*9, tr} n {k*13, kr} m r s {p*12, pr} ch h w y
   L = ee oo aa ii uu
-  V = a i e o u L
+  V = a i e o u
   F = n r s
 
 ; A Unit provides abbreviation of parts of a word-shape.
 ; Here we are using <S> to define the main syllable.
 ; Items enclosed in '(' and ')' only appear 10% of the time by default.
 units:
-  $ = CV(F)
+  $ = C{V(F)*10,L}
 
 ; The first word-shape is picked the most often, the last, the least often.
 words:
@@ -36,8 +36,8 @@ yi -> 0
   tonal:
 `; A somewhat Yoruba-like tonal language
 categories:
-  I = k t ^ {p,f} n r b m s l d c ç ş h y w g {kp,gb}
-  C = t k {f,p} n r b m s d h l ŋ g c ş ç l y w {mb,nd,ŋg} {kp,gb,ŋgb}
+  I = k t ^ {p f} n r b m s l d c ç ş h y w g {kp gb}
+  C = t k {f p} n r b m s d h l ŋ g c ş ç l y w {mb nd ŋg} {kp gb ŋgb}
   V = a i e o u
   W = a i ẹ ọ u
   T = ^*3.7 &[Grave]*3 &[Acute]*3.3 ; Gives mid-tone, low-tone, high-tone
@@ -69,13 +69,13 @@ stage:
 ; and Phonological Unit Frequencies in Japanese... by Katsuo Tamaoka.
 
 categories:
-  I = k, ^, t, s, n, m, h, d, g, r, z, b, w, p
-  C = k, t, s, r, n, ^, h, m, d, g, z, b, w, p
+  I = k ^ t s n m h d g r z b w p
+  C = k t s r n ^ h m d g z b w p
 ; <ʀ> yields long vowels.
-  V = a, i, u, o, e, {oʀ, aʀ, iʀ, eʀ, uʀ, yu, yo, ya, {yoʀ, yuʀ, yaʀ}}
+  V = a i u o e {oʀ aʀ iʀ eʀ uʀ yu yo ya {yoʀ yuʀ yaʀ}}
 ; <ɴ> is the syllable final nasal.
 ; <ꞯ> yields geminate consonants.
-  F = ɴ, ꞯ
+  F = ɴ ꞯ
 
 units:
   F = IV(F) ; First syllable of slightly different consonant distribution.
@@ -91,8 +91,8 @@ graphemes:
   a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 stage:
-{a,e,i,o,u}+ > ^ / ʀ_ ; No vowels after a long vowel
-{a,e,i,o,u}?[3,] > {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
+{a,e,i,o,u}+ -> ^ / ʀ_ ; No vowels after a long vowel
+{a,e,i,o,u}?[3,] -> {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
 
 ; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
 <  i   u   e   o   ya   yu   yo
@@ -128,8 +128,7 @@ y -> ^ / sh_ / j_ / ch_
 aʀ eʀ iʀ oʀ uʀ -> aa ee ii oo uu ; Get long vowels
 
 ; Collapse aa ee ii oo uu words into short vowels.
-aa ee ii oo uu -> a e i o u / #_#
-}`,
+aa ee ii oo uu -> a e i o u / #_#`,
   australian: 
 `; This does not represent a single Australian language, it does something
 ; Australian looking. The glottal stop and lack of retroflex stops make it
@@ -150,9 +149,9 @@ aa ee ii oo uu -> a e i o u / #_#
 
 categories:
 ; Initials:
-  I = k, p, m, w, č, ŋ, y, t, ň, n, ʎ, t̪
+  I = k p m w č ŋ y t ň n ʎ t̪
 ; Medials
-  C = k, m, ṛ, l, r, n, č, p, ŋ, t, ň, t̪, w, y, {n̪*5, ʎ*5, ꞌ}
+  C = k m ṛ l r n č p ŋ t ň t̪ w y {n̪*5 ʎ*5 ꞌ}
 ; Clusters
   X = lk rk ṛk ŋk ṛm lm rm ṛn lč rč ṛč ňč kp mp lp rp ṛp tp
   Y = lŋ rŋ ṛŋ nt ṛt n̪t̪ lt̪ ln̪ n̪ꞌ t̪ꞌ
@@ -160,8 +159,8 @@ categories:
 ; Finals
   F = n l r ṛ 
 ; Vowels
-  V = a, i, u, {oʀ, eʀ, aʀ, iʀ, uʀ, ai}
-  W = a, i, u
+  V = a i u {oʀ eʀ aʀ iʀ uʀ ai}
+  W = a i u
 
 ; No monosyllabic words.
 
@@ -174,8 +173,8 @@ categories:
 units:
   First = {IW*12, a}
   Di-first = IW
-  Medial = {C*12,\`X*2,\`Y,\`Z}V
-  Last = {C*16,\`X*2,\`Y,\`Z}W(F)
+  Medial = {C*19,\`X*2,\`Y,\`Z}V
+  Last = {C*22,\`X*2,\`Y,\`Z}W(F)
 
 words:
   <First><Medial><Last>, <First><Medial><Medial><Last>,

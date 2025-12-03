@@ -7,6 +7,7 @@
 import Logger from "../logger.js";
 import Escape_Mapper from "../escape_mapper.js";
 import type { Token } from "../utils/types.js";
+import { SYNTAX_CHARS } from "../utils/types.js";
 import type { Token_Stream_Mode } from "../utils/types.js";
 import { graphemosis } from "../utils/utilities.js";
 
@@ -84,7 +85,12 @@ class Nesca_Grammar_Stream {
 
         let look_ahead = i + 1;
 
-        if (stream[look_ahead] === "[") {
+        if (stream[look_ahead] !== "[") {
+          this.logger.validation_error(
+            `Expected '[' after '%' for anythings-mark`,
+            line_num,
+          );
+        } else {
           look_ahead++;
           let garde_stream = "";
 
@@ -113,7 +119,7 @@ class Nesca_Grammar_Stream {
           let is_blocker = false;
 
           for (const group of raw_groups) {
-            if (group.startsWith("^")) {
+            if (group.startsWith("|")) {
               is_blocker = true;
               //group.pop // Skip the ^ marker itself
             }
@@ -267,41 +273,7 @@ class Nesca_Grammar_Stream {
         // It's a based-mark
       } else if (
         // Syntax character used wrongly
-        char == "⇒" ||
-        char == "→" ||
-        char == ">" ||
-        char == "{" ||
-        char == "}" ||
-        char == "[" ||
-        char == "]" ||
-        char == "(" ||
-        char == ")" ||
-        char == "<" ||
-        char === "^" ||
-        char == "/" ||
-        char === "!" ||
-        char === "?" ||
-        char == "_" ||
-        char == "#" ||
-        char == "+" ||
-        char == ":" ||
-        char == "*" ||
-        char === "&" ||
-        char === "%" ||
-        char == "|" ||
-        char === "~" ||
-        char == "@" ||
-        char === "=" ||
-        char === "1" ||
-        char === "2" ||
-        char === "3" ||
-        char === "4" ||
-        char === "5" ||
-        char === "6" ||
-        char === "7" ||
-        char === "8" ||
-        char === "9" ||
-        char === "0"
+        SYNTAX_CHARS.includes(char)
       ) {
         this.logger.validation_error(
           `Unexpected syntax character '${char}' in ${mode}`,
@@ -356,11 +328,24 @@ class Nesca_Grammar_Stream {
             line_num,
           );
         }
+        new_token.min = 1;
+        new_token.max = Infinity; // Default quantifier
+        i++;
+      }
+
+      if (stream[i] === "?") {
+        if (mode === "RESULT") {
+          this.logger.validation_error(
+            `Quantifier not allowed in '${mode}'`,
+            line_num,
+          );
+        }
         let look_ahead = i + 1;
         if (stream[look_ahead] !== "[") {
-          new_token.min = 1;
-          new_token.max = Infinity; // Default quantifier
-          i++;
+          this.logger.validation_error(
+            `Expected '[' after '?' for quantifier`,
+            line_num,
+          );
         } else {
           look_ahead += 1;
           let quantifier = "";

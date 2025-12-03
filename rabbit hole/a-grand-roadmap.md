@@ -116,22 +116,7 @@
 
 --------------
 
-- [ ] The anythings-mark is borked
-
-- [ ] Associatemes
-- [ ] Based-mark
-
-- [ ] Docs
-
-- [ ] Update docs say result feature matrix must be qualified
-- [ ] Rename units to units
-
-- [ ] group folders generation, transforming, utilities
-
-- [ ] A routine should look at and then make a transform 
-
-- [ ] Looking at invalid should look at imported list of syntax chars
-
-
-
-
+- [ ] Associatemes get from graphemes
+- [ ] Associatemes hook to getting transforms
+- [ ] Get if grapheme is based mark in grammar stream
+- [ ] If record based in transformation target, get assosiation for result

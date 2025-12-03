@@ -12,6 +12,7 @@ import type { Output_Mode } from "./utils/types";
 import CategoryResolver from "./resolvers/category_resolver";
 import GenerationResolver from "./resolvers/generation_resolver";
 import FeatureResolver from "./resolvers/feature_resolver";
+import CanonGraphemesResolver from "./resolvers/canon_graphemes_resolver";
 
 type generate_options = {
   file: string;
@@ -78,17 +79,23 @@ function generate({
       p.optionals_weight,
     );
 
+    const canon_graphemes_resolver = new CanonGraphemesResolver(
+      logger,
+      escape_mapper,
+      p.graphemes_pending,
+    );
+
     const feature_resolver = new FeatureResolver(
       logger,
       p.output_mode,
       escape_mapper,
       p.feature_pending,
-      p.graphemes,
+      canon_graphemes_resolver.graphemes,
     );
 
     const nesca_grammar_stream = new Nesca_Grammar_Stream(
       logger,
-      p.graphemes,
+      canon_graphemes_resolver.graphemes,
       escape_mapper,
     );
 
@@ -115,10 +122,10 @@ function generate({
 
     const transformer = new Transformer(
       logger,
-      p.graphemes,
+      canon_graphemes_resolver.graphemes,
       transform_resolver.transforms,
       p.output_mode,
-      p.associateme_mapper,
+      canon_graphemes_resolver.associateme_mapper,
     );
 
     const text_builder = new Text_Builder(

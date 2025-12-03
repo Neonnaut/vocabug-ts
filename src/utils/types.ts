@@ -103,11 +103,92 @@ export type Token =
       max: number | typeof Infinity;
     };
 
+export type Transform = {
+  routine: null | Routine;
+  target: Token[][];
+  result: Token[][];
+  conditions: { before: Token[]; after: Token[] }[];
+  exceptions: { before: Token[]; after: Token[] }[];
+  chance: number | null;
+  line_num: number;
+};
+
+export type Transform_Pending = {
+  routine: null | Routine;
+  target: string;
+  result: string;
+  conditions: string[];
+  exceptions: string[];
+  chance: number | null;
+  line_num: number;
+};
+
 export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 
 export type Output_Mode = "word-list" | "debug" | "paragraph" | "old-to-new";
 
 export type Distribution = "gusein-zade" | "zipfian" | "shallow" | "flat";
 
-export type Directive = "categories" | "words" | "units" | "alphabet" | "invisible" |
-"graphemes" | "features" | "feature-field" | "stage" | "none";
+export type Directive =
+  | "categories"
+  | "words"
+  | "units"
+  | "alphabet"
+  | "invisible"
+  | "graphemes"
+  | "features"
+  | "feature-field"
+  | "stage"
+  | "none";
+
+export type Routine =
+  | "decompose"
+  | "compose"
+  | "capitalise"
+  | "decapitalise"
+  | "to-uppercase"
+  | "to-lowercase"
+  | "xsampa-to-ipa"
+  | "ipa-to-xsampa"
+  | "roman-to-hangul"
+  | "reverse";
+
+export const SYNTAX_CHARS = [
+  "<",
+  "@",
+  "⇒",
+  "→",
+  "->",
+  ">>",
+  "_",
+  "{",
+  "}",
+  "[",
+  "]",
+  "(",
+  ")",
+  "^",
+  "0",
+  "/",
+  "!",
+  "#",
+  "$",
+  "+",
+  "?",
+  ":",
+  "*",
+  "&",
+  "%",
+  "|",
+  "~",
+  "=",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+];

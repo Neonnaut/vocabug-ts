@@ -30,12 +30,15 @@ class Word {
     let output: string | undefined = "";
 
     if (Word.output_mode == "debug") {
-      
       for (let i = 0; i < this.forms.length; i++) {
-        if (this.transformations[i]) {
-          output += `⟨${this.transformations[i]}⟩${this.line_nums[i]} ➤ ⟨${this.forms[i]}⟩\n`;
-        } else {
+        if (i == 0) {
+          // This is the generation line
+          output += `${this.transformations[i]} ➤ ⟨${this.forms[i]}⟩\n`;
+        } else if (!this.transformations[i]) {
+          // This is the last line
           output += `⟨${this.forms[i]}⟩\n`;
+        } else {
+          output += `${this.transformations[i]} ➤ ⟨${this.forms[i]}⟩ @ ln${this.line_nums[i]}\n`;
         }
       }
       return output;

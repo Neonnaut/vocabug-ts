@@ -78,7 +78,7 @@ function recursive_expansion(
               ...history,
               key,
             ]);
-            result += enclose_in_brackets ? `[${resolved}]` : resolved;
+            result += enclose_in_brackets ? `{${resolved}}` : resolved;
           }
           i += key.length;
           matched = true;

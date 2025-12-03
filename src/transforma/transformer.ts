@@ -5,14 +5,11 @@ import {
   reverse_items,
   graphemosis,
 } from "../utils/utilities";
-import type { Token, Output_Mode } from "../utils/types";
+import type { Token, Output_Mode, Routine, Transform } from "../utils/types";
 import Reference_Mapper from "./reference_mapper";
-
-import associateme_mapper from "./associateme_mapper";
 
 import { xsampa_to_ipa, ipa_to_xsampa } from "./xsampa";
 import { roman_to_hangul } from "./hangul";
-import Associateme_Mapper from "./associateme_mapper";
 
 type Match_Result = {
   start: number; // actual match start
@@ -31,34 +28,20 @@ type Replacement = {
 class Transformer {
   public logger: Logger;
 
-  public transforms: {
-    target: Token[][];
-    result: Token[][];
-    conditions: { before: Token[]; after: Token[] }[];
-    exceptions: { before: Token[]; after: Token[] }[];
-    chance: number | null;
-    line_num: number;
-  }[];
+  public transforms: Transform[];
 
   public graphemes: string[];
 
   private debug: boolean = false;
 
-  private associateme_mapper: Associateme_Mapper;
+  private associateme_mapper: Map<string, string[]>;
 
   constructor(
     logger: Logger,
     graphemes: string[],
-    transforms: {
-      target: Token[][];
-      result: Token[][];
-      conditions: { before: Token[]; after: Token[] }[];
-      exceptions: { before: Token[]; after: Token[] }[];
-      chance: number | null;
-      line_num: number;
-    }[],
+    transforms: Transform[],
     output_mode: Output_Mode,
-    associateme_mapper: Associateme_Mapper,
+    associateme_mapper: Map<string, string[]>,
   ) {
     this.logger = logger;
     this.graphemes = graphemes;
@@ -67,8 +50,8 @@ class Transformer {
     this.debug = output_mode === "debug";
   }
 
-  run_engine(
-    engine: string,
+  run_routine(
+    routine: string,
     word: Word,
     word_stream: string[],
     line_num: number,
@@ -76,7 +59,7 @@ class Transformer {
     const full_word = word_stream.join("");
 
     let modified_word = "";
-    switch (engine) {
+    switch (routine) {
       case "decompose":
         modified_word = full_word.normalize("NFD");
         break;
@@ -110,7 +93,11 @@ class Transformer {
       default:
         this.logger.validation_error("This should not have happened");
     }
-    word.record_transformation(`| ${engine}`, modified_word, line_num);
+    word.record_transformation(
+      `<routine = ${routine}>`,
+      modified_word,
+      line_num,
+    );
     return graphemosis(modified_word, this.graphemes);
   }
 
@@ -620,6 +607,7 @@ class Transformer {
     word: Word,
     word_stream: string[],
     transform: {
+      routine: null | Routine;
       target: Token[][];
       result: Token[][];
       conditions: { before: Token[]; after: Token[] }[];
@@ -628,22 +616,24 @@ class Transformer {
       line_num: number;
     },
   ): string[] {
-    const { target, result, conditions, exceptions, chance, line_num } =
-      transform;
+    const {
+      routine,
+      target,
+      result,
+      conditions,
+      exceptions,
+      chance,
+      line_num,
+    } = transform;
 
     // CHANCE CONDITION
     if (chance != null && Math.random() * 100 >= chance) {
       return word_stream;
     } // 🎲 Roll failed
 
-    // ENGINE
-    if (target[0][0].type == "routine") {
-      word_stream = this.run_engine(
-        target[0][0].base,
-        word,
-        word_stream,
-        line_num,
-      );
+    // ROUTINE
+    if (routine != null) {
+      word_stream = this.run_routine(routine, word, word_stream, line_num);
     }
 
     if (target.length !== result.length) {

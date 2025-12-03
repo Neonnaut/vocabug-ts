@@ -31,6 +31,7 @@ class Generation_Resolver {
 
     this.supra_builder = supra_builder;
     this.optionals_weight = optionals_weight;
+
     this.units = units;
     this.wordshape_distribution = wordshape_distribution;
 
@@ -104,7 +105,7 @@ class Generation_Resolver {
     );
     for (let i = 0; i < result_str.length; i++) {
       this.wordshapes.items.push(result_str[i]);
-      this.wordshapes.weights.push(result_num[i]); ///
+      this.wordshapes.weights.push(result_num[i]);
     }
   }
 
@@ -242,7 +243,7 @@ class Generation_Resolver {
     );
 
     // Remove dud units
-    const match = this.wordshape_pending.content.match(/\$[A-Z]/);
+    const match = this.wordshape_pending.content.match(/<[A-Za-z+$-]+>/);
     if (match) {
       this.logger.validation_error(
         `Nonexistent unit detected: '${match[0]}'`,
@@ -253,10 +254,7 @@ class Generation_Resolver {
 
   private expand_units() {
     for (const [key, value] of this.units.entries()) {
-      const expanded_content = recursive_expansion(
-        value.content,
-        this.units,
-      );
+      const expanded_content = recursive_expansion(value.content, this.units);
       this.units.set(key, {
         content: expanded_content,
         line_num: value.line_num, // Preserve original line_num
@@ -267,7 +265,7 @@ class Generation_Resolver {
   show_debug(): void {
     const units = [];
     for (const [key, value] of this.units) {
-      units.push(`  ${key} = ${value.content}`);
+      units.push(`  ${key.slice(1, -1)} = ${value.content}`);
     }
 
     const wordshapes = [];

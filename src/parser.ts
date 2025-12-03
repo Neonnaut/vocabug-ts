@@ -3,9 +3,13 @@ import Logger from "./logger";
 import Supra_Builder from "./generata/supra_builder";
 
 import { make_percentage, cappa } from "./utils/utilities";
-import type { Output_Mode, Distribution, Directive } from "./utils/types";
-
-import Associateme_Mapper from "./transforma/associateme_mapper";
+import type {
+  Output_Mode,
+  Distribution,
+  Directive,
+  Routine,
+  Transform_Pending,
+} from "./utils/types";
 
 class Parser {
   private logger: Logger;
@@ -31,25 +35,16 @@ class Parser {
 
   public feature_pending: Map<string, { content: string; line_num: number }>;
 
-  public transform_pending: {
-    target: string;
-    result: string;
-    conditions: string[];
-    exceptions: string[];
-    chance: number | null;
-    line_num: number;
-  }[];
+  public transform_pending: Transform_Pending[];
 
   public graphemes: string[];
 
-  public associateme_mapper: Associateme_Mapper;
+  public graphemes_pending: string = "";
 
   public alphabet: string[];
   public invisible: string[];
 
   private file_line_num = 0;
-  private file_array: string[] = [];
-
 
   constructor(
     logger: Logger,
@@ -120,18 +115,14 @@ class Parser {
     this.wordshape_distribution = "zipfian";
     this.wordshape_pending = { content: "", line_num: 0 };
 
-    this.graphemes = [];
-
-    this.associateme_mapper = new Associateme_Mapper();
-
     this.transform_pending = [];
-
     this.feature_pending = new Map();
 
     this.alphabet = [];
     this.invisible = [];
 
-    this.directive = "none";
+    this.graphemes_pending = "";
+    this.graphemes = [];
   }
 
   parse_file(file: string) {
@@ -141,6 +132,7 @@ class Parser {
     let my_directive: string = "none";
     let my_subdirective: string = "none";
     let my_header: string[] = [];
+    let my_clusterfield_transform: Transform_Pending[] = [];
 
     for (; this.file_line_num < file_array.length; ++this.file_line_num) {
       let line = file_array[this.file_line_num];
@@ -159,24 +151,40 @@ class Parser {
       }
 
       // check for decorator
-      if (line.startsWith("@")){
+      if (line.startsWith("@")) {
         my_decorator = this.parse_decorator(line, my_decorator);
         if (my_decorator != "none") {
+          my_header = [];
           continue; // It's a decorator
         }
       }
 
       // check for directive change
-      let temp_directive = this.parse_directive(line, my_decorator);
+      const temp_directive = this.parse_directive(line, my_decorator);
       if (temp_directive != "none") {
+        if (my_subdirective != "none") {
+          this.logger.validation_error(
+            `${my_subdirective} was not closed before directive change`,
+            this.file_line_num,
+          );
+        }
         my_directive = temp_directive;
+        my_decorator = "none";
         continue; // It's a directive change
+      }
+
+      // NO DIRECTIVE
+      if (my_directive === "none") {
+        this.logger.validation_error(
+          `Invalid syntax -- expected a decorator or directive`,
+          this.file_line_num,
+        );
       }
 
       // CATEGORIES
       if (my_directive === "categories") {
-        const [key, field, mode] = this.get_cat_seg_fea(line);
-        if (mode === "trash") {
+        const [key, field, valid] = this.get_cat_seg_fea(line, "category");
+        if (!valid) {
           this.logger.validation_error(
             `${line} is not a category declaration`,
             this.file_line_num,
@@ -187,7 +195,7 @@ class Parser {
           line_num: this.file_line_num,
         });
       }
-      
+
       // WORDS
       if (my_directive === "words") {
         if (!this.valid_words_brackets(line)) {
@@ -203,8 +211,8 @@ class Parser {
 
       // UNITS
       if (my_directive === "units") {
-        const [key, field, mode] = this.get_cat_seg_fea(line);
-        if (mode === "trash") {
+        const [key, field, valid] = this.get_cat_seg_fea(line, "unit");
+        if (!valid) {
           this.logger.validation_error(
             `${line} is not a unit declaration`,
             this.file_line_num,
@@ -222,10 +230,49 @@ class Parser {
             this.file_line_num,
           );
         }
-        this.units.set(key, {
-          content: field,
+        this.units.set(`<${key}>`, {
+          content: `${field}`,
           line_num: this.file_line_num,
         });
+      }
+
+      // FEATURES
+      if (my_directive === "features") {
+        const [key, field, valid] = this.get_cat_seg_fea(line, "feature");
+        if (!valid) {
+          this.logger.validation_error(
+            `${line} is not a feature declaration`,
+            this.file_line_num,
+          );
+        }
+        const graphemes = field.split(/[,\s]+/).filter(Boolean);
+        if (graphemes.length == 0) {
+          this.logger.validation_error(
+            `Feature ${key} had no graphemes`,
+            this.file_line_num,
+          );
+        }
+        this.feature_pending.set(key, {
+          content: graphemes.join(","),
+          line_num: this.file_line_num,
+        });
+      }
+
+      // FEATURE-FIELD
+      if (my_directive === "feature-field") {
+        if (my_header.length === 0) {
+          const top_row = line.split(/[,\s]+/).filter(Boolean);
+          if (top_row.length < 2) {
+            this.logger.validation_error(
+              `Feature-field header too short`,
+              this.file_line_num,
+            );
+          }
+          my_header = top_row;
+          continue;
+        } else {
+          this.parse_featurefield(line, my_header);
+        }
       }
 
       // ALPHABET
@@ -247,138 +294,131 @@ class Parser {
         // Add invisible items to this.invisible
         this.invisible.push(...invisible);
       }
-      
+
       // GRAPHEMES
       if (my_directive === "graphemes") {
-        
+        this.graphemes_pending += " " + line;
+        continue; // Added some graphemes
       }
 
-      // FEATURES !!!
-      if (my_directive === "features") {
-        const [key, field, mode] = this.get_cat_seg_fea(line);
-        if (mode === "trash") {
-          this.logger.validation_error(
-            `${line} is not a feature declaration`,
-            this.file_line_num,
-          );
-        }
-        const graphemes = field.split(/[,\s]+/).filter(Boolean);
-        if (graphemes.length == 0) {
-          this.logger.validation_error(
-            `Feature ${key} had no graphemes`,
-            this.file_line_num,
-          );
-        }
-        this.feature_pending.set(key, {
-          content: graphemes.join(","),
-          line_num: this.file_line_num,
-        });
-      }
-
-      // FEATURE-FIELD
-      if (my_directive === "feature-field") {
-        if (line.startsWith("+- ")) {
-          this.parse_featurefield(file_array);
-          continue;
-        }
-      }
-
-
+      // STAGE
       if (my_directive === "stage") {
-        // Lets do transforms !!
-        let line_value = line;
+        if (my_subdirective === "clusterfield") {
+          if (line.startsWith(">")) {
+            this.transform_pending.push(...my_clusterfield_transform);
+            my_subdirective = "none";
+            my_header = [];
+            my_clusterfield_transform = [];
+            continue;
+          }
 
-        if (line.startsWith("< ")) {
-          // Parse clusterfield
-          this.parse_clusterfield(file_array);
+          // Do actual line of clusterfield
+          my_clusterfield_transform = this.parse_clusterfield(
+            line,
+            my_header,
+            my_clusterfield_transform,
+          );
           continue;
-        }
-
-        if (line.startsWith("<routine ")) {
-          // Engine. Routine
-          line_value = line.substring(9).trim().toLowerCase();
-
-          const engine = line_value.replace(/\bcapitalize\b/g, "capitalise");
-
-          if (
-            engine === "decompose" ||
-            engine === "compose" ||
-            engine === "capitalise" ||
-            engine === "decapitalise" ||
-            engine === "to-uppercase" ||
-            engine === "to-lowercase" ||
-            engine === "xsampa-to-ipa" ||
-            engine === "ipa-to-xsampa" ||
-            engine === "roman-to-hangul" ||
-            engine === "reverse"
-          ) {
-            this.transform_pending.push({
-              target: `@routine${engine}`,
-              result: "\\",
-              conditions: [],
-              exceptions: [],
-              chance: null,
-              line_num: this.file_line_num,
-            });
-          } else {
+        } else if (line.startsWith("< ")) {
+          my_clusterfield_transform.push({
+            routine: null,
+            target: "",
+            result: "",
+            conditions: [],
+            exceptions: [],
+            chance: null,
+            line_num: this.file_line_num,
+          });
+          line = line.substring(2).trim(); // Remove '< ' from start
+          const top_row = line.split(/[,\s]+/).filter(Boolean);
+          if (top_row.length < 2) {
             this.logger.validation_error(
-              `Trash engine '${this.escape_mapper.restore_preserve_escaped_chars(engine)}' found`,
+              `Feature-field header too short`,
               this.file_line_num,
             );
           }
+          my_subdirective = "clusterfield";
+          my_header = top_row;
+          continue;
+        } else if (line.startsWith("<routine")) {
+          // Routine
+          const my_routine = this.parse_routine(line);
+          this.transform_pending.push({
+            routine: my_routine,
+            target: "\\",
+            result: "\\",
+            conditions: [],
+            exceptions: [],
+            chance: null,
+            line_num: this.file_line_num,
+          });
+          continue;
+        } else {
+          // Else it's a normal transform rule
+          const [target, result, conditions, exceptions] =
+            this.get_transform(line);
+
+          this.transform_pending.push({
+            routine: null,
+            target: target,
+            result: result,
+            conditions: conditions,
+            exceptions: exceptions,
+            chance: null,
+            line_num: this.file_line_num,
+          });
           continue;
         }
-
-        // Else it's a normal transform rule
-        const [target, result, conditions, exceptions, chance] =
-          this.get_transform(line_value);
-
-        this.transform_pending.push({
-          target: target,
-          result: result,
-          conditions: conditions,
-          exceptions: exceptions,
-          chance: chance,
-          line_num: this.file_line_num,
-        });
-        continue;
       }
+    }
+    // out of line loop now
+    if (my_decorator != "none") {
+      this.logger.validation_error(
+        `Decorator '${my_decorator}' was not followed by a directive`,
+        this.file_line_num,
+      );
     }
   }
 
   get_cat_seg_fea(
     input: string,
-  ): [string, string, "category" | "unit" | "feature" | "trash"] {
+    mode: "category" | "unit" | "feature",
+  ): [string, string, boolean] {
     const divider = "=";
 
     if (input === "") {
-      return ["", "", "trash"]; // Handle invalid inputs
+      return ["", "", false]; // Handle invalid inputs
     }
     const divided = input.split(divider);
     if (divided.length !== 2) {
-      return [input, "", "trash"]; // Ensure division results in exactly two parts
+      return [input, "", false]; // Ensure division results in exactly two parts
     }
     const key = divided[0].trim();
     const field = divided[1].trim();
     if (key === "" || field === "") {
-      return [input, "", "trash"]; // Handle empty parts
+      return [input, "", false]; // Handle empty parts
     }
 
     // Construct dynamic regexes using cappa
     const categoryRegex = new RegExp(`^${cappa}$`);
-    const unitRegex = new RegExp(`^\\$${cappa}$`);
+    const unitRegex = /^[A-Za-z+$-]+$/;
     const featureRegex = /^(\+|-|>)[a-zA-Z+-]+$/;
 
-    if (categoryRegex.test(key)) {
-      return [key, field, "category"];
+    if (mode === "category") {
+      if (categoryRegex.test(key)) {
+        return [key, field, true];
+      }
+    } else if (mode === "unit") {
+      if (unitRegex.test(key)) {
+        return [key, field, true];
+      }
+    } else if (mode === "feature") {
+      if (featureRegex.test(key)) {
+        return [key, field, true];
+      }
     }
-    if (unitRegex.test(key)) {
-      return [key, field, "unit"];
-    }
-    if (featureRegex.test(key)) {
-      return [key, field, "feature"];
-    }
-    return [input, "", "trash"];
+
+    return [input, "", false];
   }
 
   private parse_distribution(value: string): Distribution {
@@ -413,54 +453,54 @@ class Parser {
   }
 
   private parse_decorator(line: string, old_decorator: string): string {
-    let new_decorator: "none"|"words"|"categories" = "none"
-
-    line = line.substring(1) // remove at sign
+    let new_decorator: "none" | "words" | "categories" = "none";
+    line = line.substring(1); // remove '@' sign
     line = this.escape_mapper.restore_preserve_escaped_chars(line);
 
-    if (line === "words.") {
-      line = line.substring(6);
-      if (line === "distribution") {
-        line = line.substring(12).trim();
-        // ignore whitespace up to equals sign
-        if (line.startsWith("=")) {
-          line = line.substring(1).trim();
-          new_decorator = "words";
-          this.wordshape_distribution = this.parse_distribution(line);
-        }
-      } else if (line === "optionals-weight") {
-        line = line.substring(16).trim();
-        // ignore whitespace up to equals sign
-        if (line.startsWith("=")) {
-          line = line.substring(1).trim();
-          const optionals_weight = make_percentage(line);
-          if (optionals_weight == null) {
-            this.logger.validation_error(
-              `Invalid optionals-weight '${line}' -- expected a number between 1 and 100`,
-              this.file_line_num,
-            );
-          }
-          new_decorator = "words";
-          this.optionals_weight = optionals_weight;
-        }
-      }
+    // Count occurrences
+    const dotCount = (line.match(/\./g) || []).length;
+    const eqCount = (line.match(/=/g) || []).length;
 
-    } else if (line === "categories.") {
-      line = line.substring(11);
-      if (line === "distribution") {
-        line = line.substring(12).trim();
-        // ignore whitespace up to equals sign
+    if (dotCount !== 1 || eqCount !== 1) {
+      this.logger.validation_error(
+        `Invalid decorator format`,
+        this.file_line_num,
+      );
+    }
+
+    // Split at the first "."
+    const [my_directive, my_thing] = line.split(/\.(.+)/).filter(Boolean);
+
+    // Split the remainder at "="
+    let [my_property, my_value] = my_thing.split("=");
+    my_property = my_property.trim();
+    my_value = my_value.trim();
+
+    if (my_directive === "words") {
+      if (my_property === "distribution") {
+        this.wordshape_distribution = this.parse_distribution(my_value);
+        new_decorator = "words";
+      } else if (my_property === "optionals-weight") {
+        const optionals_weight = make_percentage(my_value);
+        if (optionals_weight == null) {
+          this.logger.validation_error(
+            `Invalid optionals-weight '${my_value}' -- expected a number between 1 and 100`,
+            this.file_line_num,
+          );
+        }
+        this.optionals_weight = optionals_weight;
+        new_decorator = "words";
+      }
+    } else if (my_directive === "categories") {
+      if (my_property === "distribution") {
+        this.wordshape_distribution = this.parse_distribution(my_value);
         new_decorator = "categories";
-        this.category_distribution = this.parse_distribution(line);
       }
     }
 
     // Errors
     if (new_decorator === "none") {
-      this.logger.validation_error(
-        `Invalid decorator`,
-        this.file_line_num,
-      );
+      this.logger.validation_error(`Invalid decorator`, this.file_line_num);
     } else if (old_decorator !== "none" && old_decorator !== new_decorator) {
       this.logger.validation_error(
         `Decorator mismatch -- expected '${old_decorator}' decorator after '${old_decorator}' decorator`,
@@ -497,77 +537,13 @@ class Parser {
     }
 
     // Errors
-    if (this.directive != "none" && this.directive != current_decorator) {
+    if (current_decorator != "none" && temp_directive != current_decorator) {
       this.logger.validation_error(
         `Directive mismatch -- expected '${current_decorator}' directive after '${current_decorator}' decorator`,
         this.file_line_num,
       );
     }
     return temp_directive;
-  }
-
-  private parse_graphemes_block(file_array: string[]) {
-    let line_value = "";
-    this.file_line_num++;
-
-    const my_graphemes: string[] = [];
-
-    for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-      line_value = file_array[this.file_line_num];
-      line_value = this.escape_mapper.escape_backslash_pairs(line_value);
-      line_value = line_value.replace(/;.*/u, "").trim(); // Remove comment!!
-      line_value = this.escape_mapper.escape_named_escape(line_value);
-      if (line_value === "END") {
-        break;
-      } // END !!
-
-      const line_graphemes = line_value.split(/[,\s]+/).filter(Boolean);
-      for (let i = 0; i < line_graphemes.length; i++) {
-        my_graphemes.push(
-          this.escape_mapper.restore_escaped_chars(line_graphemes[i]),
-        );
-      }
-    }
-    ////
-    if (my_graphemes.length == 0) {
-      this.logger.validation_error(
-        `'graphemes' was introduced but there were no graphemes listed -- expected a list of graphemes`,
-        this.file_line_num,
-      );
-    }
-    this.graphemes = Array.from(new Set(my_graphemes));
-  }
-
-  private parse_words_block(file_array: string[]) {
-    let line_value = "";
-    this.file_line_num++;
-
-    let my_first_line_num = 0;
-    const done_line_num = false;
-    let my_wordshape = "";
-
-    for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-      line_value = file_array[this.file_line_num];
-      line_value = this.escape_mapper.escape_backslash_pairs(line_value);
-      line_value = line_value.replace(/;.*/u, "").trim(); // Remove comment!!
-      line_value = this.escape_mapper.escape_named_escape(line_value);
-      if (line_value === "END") {
-        break;
-      } // END !!
-      line_value =
-        line_value.trimEnd().endsWith(",") || line_value.trimEnd().endsWith(" ")
-          ? line_value
-          : line_value + " ";
-      if (!done_line_num) {
-        my_first_line_num = this.file_line_num;
-      }
-
-      my_wordshape += line_value;
-    }
-    this.wordshape_pending = {
-      content: my_wordshape,
-      line_num: my_first_line_num,
-    };
   }
 
   private valid_words_brackets(str: string): boolean {
@@ -589,18 +565,118 @@ class Parser {
     return stack.length === 0; // Stack should be empty if balanced
   }
 
+  private parse_clusterfield(
+    line: string,
+    my_header: string[],
+    my_transforms: Transform_Pending[],
+  ): Transform_Pending[] {
+    if (my_transforms.length === 0) {
+      this.logger.validation_error(
+        `Clusterfield transform not started properly`,
+        this.file_line_num,
+      );
+    }
+    const my_transform = my_transforms[0];
+
+    /// -------------
+
+    if (line.startsWith("/") || line.startsWith("!")) {
+      const { conditions, exceptions } = this.get_environment(line);
+      my_transform.conditions.push(...conditions);
+      my_transform.exceptions.push(...exceptions);
+      return [my_transform];
+    }
+
+    //        my_header
+    // my_key my_row
+
+    // my_transform
+
+    const my_row = line.split(/[,\s]+/).filter(Boolean);
+    const my_key = my_row.shift();
+
+    if (my_row.length !== my_header.length || my_key === undefined) {
+      this.logger.validation_error(
+        `Cluster-field row length mismatch with header length -- expected row length of ${my_header.length} but got lenght of ${my_row.length}`,
+        this.file_line_num,
+      );
+    }
+
+    const my_target: string[] = [];
+    const my_result: string[] = [];
+    for (let i = 0; i < my_header.length; ++i) {
+      if (my_row[i] === "+") {
+        continue;
+      } else {
+        my_target.push(my_key + my_header[i]);
+        my_result.push(my_row[i]);
+      }
+    }
+    my_transform.target += my_target.join(", ");
+    my_transform.result += my_result.join(", ");
+    return [my_transform];
+  }
+
+  private parse_routine(line: string): Routine {
+    line = this.escape_mapper.restore_preserve_escaped_chars(line);
+
+    // Count occurrences
+    const eqCount = (line.match(/=/g) || []).length;
+    if (eqCount !== 1) {
+      this.logger.validation_error(
+        `Invalid routine format1 '${line}'`,
+        this.file_line_num,
+      );
+    }
+
+    // Split at "="
+    let [, right] = line.split("=");
+    right = right.trim();
+
+    const gtCount = (right.match(/>/g) || []).length;
+    if (gtCount !== 1) {
+      this.logger.validation_error(
+        `Invalid routine format2 '${line}'`,
+        this.file_line_num,
+      );
+    }
+
+    // Split at ">"
+    let [routine] = right.split(">");
+    routine = routine.trim();
+
+    routine = routine.replace(/\bcapitalize\b/g, "capitalise");
+    routine = routine.replace(/\broman-to-hangeul\b/g, "roman-to-hangul");
+
+    switch (routine) {
+      case "reverse":
+      case "compose":
+      case "decompose":
+      case "capitalise":
+      case "roman-to-hangul":
+      case "decapitalise":
+      case "to-uppercase":
+      case "to-lowercase":
+      case "xsampa-to-ipa":
+      case "ipa-to-xsampa":
+        return routine as Routine;
+    }
+    this.logger.validation_error(
+      `Invalid routine3 '${routine}'`,
+      this.file_line_num,
+    );
+  }
+
   // TRANSFORMS !!!
 
   // This is run on parsing file. We then have to run resolve_transforms aftter parse file
-  private get_transform(
-    input: string,
-  ): [string, string, string[], string[], number | null] {
+  private get_transform(input: string): [string, string, string[], string[]] {
     if (input === "") {
       this.logger.validation_error(`No input`, this.file_line_num);
     }
 
     input = input.replace(/\/\//g, "!"); // Replace '//' with '!'
-    const divided = input.split(/>|->|→|=>|⇒/);
+    const divided = input.split(/>>|->|→|=>|⇒/);
     if (divided.length === 1) {
       this.logger.validation_error(
         `No arrows in transform`,
@@ -661,20 +737,17 @@ class Parser {
         ? ""
         : divided[1].slice(delimiter_index).trim();
 
-    const { conditions, exceptions, chance } =
-      this.get_environment(environment);
+    const { conditions, exceptions } = this.get_environment(environment);
 
-    return [target, result, conditions, exceptions, chance];
+    return [target, result, conditions, exceptions];
   }
 
   private get_environment(environment_string: string): {
     conditions: string[];
     exceptions: string[];
-    chance: number | null;
   } {
     const conditions: string[] = [];
     const exceptions: string[] = [];
-    let chance: number | null = null;
 
     let buffer = "";
     let mode: "condition" | "exception" | "chance" = "condition";
@@ -696,13 +769,6 @@ class Parser {
         }
         buffer = "";
         mode = "exception";
-      } else if (ch === "?") {
-        if (buffer.trim()) {
-          const validated = this.validate_environment(buffer.trim(), mode);
-          (mode === "condition" ? conditions : exceptions).push(validated);
-        }
-        buffer = "";
-        mode = "chance";
       } else {
         buffer += ch;
       }
@@ -710,32 +776,14 @@ class Parser {
 
     if (buffer.trim()) {
       const unit = buffer.trim();
-      if (mode === "chance") {
-        const parsed = parseInt(unit, 10);
-        if (chance != null) {
-          this.logger.validation_error(
-            `Duplicate chance value '${unit}'`,
-            this.file_line_num,
-          );
-        }
-        if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-          chance = parsed;
-        } else {
-          this.logger.validation_error(
-            `Chance value "${unit}" must be between 0 and 100`,
-            this.file_line_num,
-          );
-        }
-      } else {
-        const validated = this.validate_environment(unit, mode);
-        (mode === "condition" ? conditions : exceptions).push(validated);
-      }
+
+      const validated = this.validate_environment(unit, mode);
+      (mode === "condition" ? conditions : exceptions).push(validated);
     }
 
     return {
       conditions: conditions,
       exceptions: exceptions,
-      chance: chance,
     };
   }
 
@@ -774,163 +822,48 @@ class Parser {
     return `${before}_${after}`;
   }
 
-  private parse_clusterfield(file_array: string[]) {
-    let line = file_array[this.file_line_num];
+  private parse_featurefield(line: string, top_row: string[]) {
+    const my_row = line.split(/[,\s]+/).filter(Boolean);
+    const my_key = my_row.shift();
+    if (my_row.length !== top_row.length || my_key === undefined) {
+      this.logger.validation_error(
+        `Feature-field row length mismatch with header length -- expected row length of ${top_row.length} but got lenght of ${my_row.length}`,
+        this.file_line_num,
+      );
+    }
 
-    line = this.escape_mapper.escape_backslash_pairs(line);
-    line = line.replace(/;.*/u, "").trim(); // Remove comment!!
-    line = this.escape_mapper.escape_named_escape(line);
+    const keyRegex = /^[a-zA-Z+-]+$/;
+    if (!keyRegex.test(my_key)) {
+      this.logger.validation_error(
+        `A feature in a feature-field must be of lowercase letters only.`,
+        this.file_line_num,
+      );
+    }
 
-    if (line === "") {
-      return;
-    } // Blank line. End clusterfield... early !!
-    if (line === "END") {
-      return;
-    } // END ... early !!
-    const top_row = line.split(/[,\s]+/).filter(Boolean);
-    top_row.shift();
+    const my_pro_graphemes: string[] = [];
+    const my_anti_graphemes: string[] = [];
     const row_length = top_row.length;
-    this.file_line_num++;
 
-    const concurrent_target: string[] = [];
-    const concurrent_result: string[] = [];
-
-    const my_conditions: string[] = [];
-    const my_exceptions: string[] = [];
-    let my_chance: number | null = null;
-
-    for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-      let line = file_array[this.file_line_num];
-
-      line = this.escape_mapper.escape_backslash_pairs(line);
-      line = line.replace(/;.*/u, "").trim(); // Remove comment!!
-      line = this.escape_mapper.escape_named_escape(line);
-
-      if (line === "") {
-        break;
-      } // Blank line. End clusterfield !!
-      if (line === "END") {
-        break;
-      } // END !!
-
-      if (line.startsWith("/") || line.startsWith("!")) {
-        const { conditions, exceptions, chance } = this.get_environment(line);
-        my_conditions.push(...conditions);
-        my_exceptions.push(...exceptions);
-        my_chance = chance;
+    for (let i = 0; i < row_length; ++i) {
+      if (my_row[i] === ".") {
         continue;
-      }
-
-      const row = line.split(/[,\s]+/).filter(Boolean);
-      const column = row[0];
-      row.shift();
-
-      if (row.length > row_length) {
-        this.logger.validation_error(
-          `Cluster-field row too long`,
-          this.file_line_num,
-        );
-      } else if (row.length < row_length) {
-        this.logger.validation_error(
-          `Cluster-field row too short`,
-          this.file_line_num,
-        );
-      }
-
-      for (let i = 0; i < row_length; ++i) {
-        if (row[i] === "+") {
-          continue;
-        } else {
-          concurrent_target.push(column + top_row[i]!);
-          concurrent_result.push(row[i]!);
-        }
+      } else if (my_row[i] === "+") {
+        my_pro_graphemes.push(top_row[i]);
+      } else if (my_row[i] === "-") {
+        my_anti_graphemes.push(top_row[i]);
       }
     }
-    this.transform_pending.push({
-      target: concurrent_target.join(","),
-      result: concurrent_result.join(","),
-      conditions: my_conditions,
-      exceptions: my_exceptions,
-      chance: my_chance,
-      line_num: this.file_line_num,
-    });
-  }
-
-  private parse_featurefield(file_array: string[]) {
-    let line = file_array[this.file_line_num];
-
-    line = this.escape_mapper.escape_backslash_pairs(line);
-    line = line.replace(/;.*/u, "").trim(); // Remove comment!!
-    line = this.escape_mapper.escape_named_escape(line);
-
-    if (line === "") {
-      return;
-    } // Blank line. End clusterfield... early !!
-    const top_row = line.split(/[,\s]+/).filter(Boolean);
-    top_row.shift(); // Erase +-
-    const row_length = top_row.length;
-    this.file_line_num++;
-
-    for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-      let line = file_array[this.file_line_num];
-
-      line = this.escape_mapper.escape_backslash_pairs(line);
-      line = line.replace(/;.*/u, "").trim(); // Remove comment!!
-      line = this.escape_mapper.escape_named_escape(line);
-
-      if (line === "") {
-        break;
-      } // Blank line. End clusterfield !!
-
-      const row = line.split(/[,\s]+/).filter(Boolean);
-      const column = row[0];
-      row.shift();
-
-      const featureRegex = /^[a-z]+$/;
-
-      if (!featureRegex.test(column)) {
-        this.logger.validation_error(
-          `A feature in a feature-field must be of lowercase letters only.`,
-          this.file_line_num,
-        );
-      }
-
-      if (row.length > row_length) {
-        this.logger.validation_error(
-          `Feature-field row too long`,
-          this.file_line_num,
-        );
-      } else if (row.length < row_length) {
-        this.logger.validation_error(
-          `Feature-field row too short`,
-          this.file_line_num,
-        );
-      }
-
-      const my_pro_graphemes: string[] = [];
-      const my_anti_graphemes: string[] = [];
-
-      for (let i = 0; i < row_length; ++i) {
-        if (row[i] === ".") {
-          continue;
-        } else if (row[i] === "+") {
-          my_pro_graphemes.push(top_row[i]);
-        } else if (row[i] === "-") {
-          my_anti_graphemes.push(top_row[i]);
-        }
-      }
-      if (my_pro_graphemes.length > 0) {
-        this.feature_pending.set(`+${column}`, {
-          content: my_pro_graphemes.join(","),
-          line_num: this.file_line_num,
-        });
-      }
-      if (my_anti_graphemes.length > 0) {
-        this.feature_pending.set(`-${column}`, {
-          content: my_anti_graphemes.join(","),
-          line_num: this.file_line_num,
-        });
-      }
+    if (my_pro_graphemes.length > 0) {
+      this.feature_pending.set(`+${my_key}`, {
+        content: my_pro_graphemes.join(","),
+        line_num: this.file_line_num,
+      });
+    }
+    if (my_anti_graphemes.length > 0) {
+      this.feature_pending.set(`-${my_key}`, {
+        content: my_anti_graphemes.join(","),
+        line_num: this.file_line_num,
+      });
     }
   }
 

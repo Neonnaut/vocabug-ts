@@ -66,6 +66,7 @@ class Category_Resolver {
         const expanded_content = recursive_expansion(
           value.content,
           this.category_pending,
+          true,
         );
         this.category_pending.set(key, {
           content: expanded_content,

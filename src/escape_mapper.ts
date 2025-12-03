@@ -140,7 +140,7 @@ class Escape_Mapper {
 
   escape_named_escape(input: string): string {
     return input.replace(
-      /@\[[A-Za-z]+\]/g,
+      /&\[[A-Za-z]+\]/g,
       (match) => escapeMap[match] ?? match,
     );
   }

@@ -1,7 +1,13 @@
 // Yikes, there is so much of this that I needed to put it in a separate file to resolver.
 import Logger from "../logger";
 import Nesca_Grammar_Stream from "./nesca_grammar_stream";
-import type { Token, Output_Mode } from "../utils/types";
+import type {
+  Token,
+  Output_Mode,
+  Routine,
+  Transform,
+  Transform_Pending,
+} from "../utils/types";
 
 class Transform_Resolver {
   private logger: Logger;
@@ -9,22 +15,8 @@ class Transform_Resolver {
 
   public nesca_grammar_stream: Nesca_Grammar_Stream;
   public categories: Map<string, string[]>;
-  public transform_pending: {
-    target: string;
-    result: string;
-    conditions: string[];
-    exceptions: string[];
-    chance: number | null;
-    line_num: number;
-  }[];
-  public transforms: {
-    target: Token[][];
-    result: Token[][];
-    conditions: { before: Token[]; after: Token[] }[];
-    exceptions: { before: Token[]; after: Token[] }[];
-    chance: number | null;
-    line_num: number;
-  }[] = [];
+  public transform_pending: Transform_Pending[];
+  public transforms: Transform[] = [];
 
   public features: Map<string, { graphemes: string[] }> = new Map();
 
@@ -36,6 +28,7 @@ class Transform_Resolver {
     nesca_grmmar_stream: Nesca_Grammar_Stream,
     categories: Map<string, string[]>,
     transform_pending: {
+      routine: null | Routine;
       target: string;
       result: string;
       conditions: string[];
@@ -190,6 +183,7 @@ class Transform_Resolver {
       }
 
       this.transforms.push({
+        routine: this.transform_pending[i].routine,
         target: tokenised_target_array,
         result: tokenised_result_array,
         conditions: new_conditions,
@@ -593,6 +587,13 @@ class Transform_Resolver {
     for (let i = 0; i < this.transforms.length; i++) {
       const my_transform = this.transforms[i];
 
+      if (my_transform.routine) {
+        transforms.push(
+          `  <routine = ${my_transform.routine}> @ ln:${my_transform.line_num}`,
+        );
+        continue;
+      }
+
       const my_target = [];
       for (let j = 0; j < my_transform.target.length; j++) {
         my_target.push(this.format_tokens(my_transform.target[j]));
@@ -602,7 +603,9 @@ class Transform_Resolver {
         my_result.push(this.format_tokens(my_transform.result[j]));
       }
 
-      const chance = my_transform.chance ? ` ? ${my_transform.chance}` : "";
+      const chance = my_transform.chance
+        ? ` CHANCE ${my_transform.chance}`
+        : "";
       let exceptions = "";
       for (let j = 0; j < my_transform.exceptions.length; j++) {
         exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
@@ -613,7 +616,7 @@ class Transform_Resolver {
       }
 
       transforms.push(
-        `  ⟨${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance}⟩:${my_transform.line_num}`,
+        `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num}`,
       );
     }
 
