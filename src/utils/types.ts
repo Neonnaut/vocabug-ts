@@ -1,3 +1,5 @@
+export type Association = { entry_id: number, base_id: number; variant_id: number, is_target: boolean }
+
 export type Token =
   | {
       type: "pending";
@@ -12,6 +14,7 @@ export type Token =
       max: number | typeof Infinity;
       escaped?: boolean;
       named_reference_bind?: string;
+      association?: Association;
     }
   | {
       type: "wildcard"; // *
@@ -192,3 +195,12 @@ export const SYNTAX_CHARS = [
   "8",
   "9",
 ];
+
+export type Carryover_Associations = { entry_id: number, base_id: number; variant_id: number }[];
+
+interface Associateme_Entry {
+  bases: string[];        // e.g. ["a","i","u"]
+  variants: string[][];   // includes bases as first variant, e.g. [ ["a","i","u"], ["á","í","ú"], ["à","ì","ù"] ]
+}
+
+export type Associateme_Mapper = Associateme_Entry[];

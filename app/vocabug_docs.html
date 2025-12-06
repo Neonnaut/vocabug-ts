@@ -905,7 +905,7 @@
       -->
 
       <h2 id="nescaTheException"><a class="head-num">15</a>The exception</h2>
-      <p>Exceptions are placed following an exclamation mark <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- when a transform has an exception, the target must meet the environment described in the exception to prevent execution:</p>
+      <p>Exceptions are placed following an exclamation mark <code class="example">!</code> and go after the condition, if there is one. Exceptions function exactly like the opposite of the condition -- when a rule has an exception, the target must meet the environment described in the exception to prevent execution:</p>
       <div class="prog-pre">aa <span class="link">-></span> a <span class="link">!</span> <span class="link">_</span><span class="regexp">#</span></div>
       <p>In the above example, the transformation will not execute if <code class="example">aa</code> is at the end of the word.</p>
       <p>If there are multiple exceptions, the transform must meet all of the exceptions for it not to execute.</p>
@@ -1370,18 +1370,18 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>The key behaviours of reference-capture are:</p>
       <ul class="paragraphian">
         <li>If there are no graphemes to be captured by the reference-capture, nothing is captured</li>
-        <li>A Reference forgets its reference-value in-between transforms. References do not persist between rules</li>
-        <li>You can have up to nine references per transform</li>
+        <li>A Reference forgets its reference-value in-between rules. References do not persist between rules</li>
+        <li>You can have up to nine references per rule</li>
         <li>A reference's reference-value can be overwritten with a new reference-capture</li>
         <li>For reference-capture in conditions, a grapheme is captured only if that condition is met</li>
       </ul>
 
-      <p>The captured grapheme can then be reproduced elsewhere in the transform with a 'reference-mark', even before the reference-capture. The reference-mark invokes the reference-key of a reference.</p>
+      <p>The captured grapheme can then be reproduced elsewhere in the rule with a 'reference-mark', even before the reference-capture. The reference-mark invokes the reference-key of a reference.</p>
 
       <p>The key behaviours of reference-mark are:</p>
       <ul class="paragraphian">
-        <li>A reference-mark may not be used in the <code class='example'>TARGET</code> of a transform.</li>
-        <li>In each condition or exception of a transform, a reference-mark cannot be used before content has been bound to its reference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference is not recursive in conditions and exceptions.</li>
+        <li>A reference-mark may not be used in the <code class='example'>TARGET</code> of a rule.</li>
+        <li>In each condition or exception of a rule, a reference-mark cannot be used before content has been bound to its reference with a reference-capture. For example <code class="example">a -> e / 1x=1_</code> is invalid, and so is <code class="example">a -> e / 1_x=1</code>. Reference is not recursive in conditions and exceptions.</li>
         <li>If a reference-mark is used where a reference-capture has not captured anything yet, it fails silently and outputs the number of the backrefence.</li>
       </ul>
 
@@ -1428,7 +1428,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         <li>This does not mean that we can have only one grouping set. For example <code class="example">{a,i,o}&lt;{á,í,ó}, {a,b,c}&lt;{x,y,z}</code> is valid</li>
       </ul>
 
-      <p>In a transform, you then put a tilde after the grapheme to mark it as a base associateme:</p>
+      <p>In a rule, you then put a tilde after the grapheme to mark it as a base associateme:</p>
       
 
             <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">

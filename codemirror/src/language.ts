@@ -45,7 +45,7 @@ const decoratorRules = [
 const graphemesRules = [
   { token: "escape",   regex: escapeRegex},
   { token: "link",     regex: /,/ },
-  { token: "regexp",   regex: /\<{|\}/ },
+  { token: "regexp",   regex: /\<{|\}|\{/ },
 ];
 
 const categoryRules = [

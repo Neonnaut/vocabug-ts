@@ -96,6 +96,7 @@ function generate({
     const nesca_grammar_stream = new Nesca_Grammar_Stream(
       logger,
       canon_graphemes_resolver.graphemes,
+      canon_graphemes_resolver.associateme_mapper,
       escape_mapper,
     );
 

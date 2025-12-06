@@ -8,21 +8,24 @@ import Logger from "../logger.js";
 import Escape_Mapper from "../escape_mapper.js";
 import type { Token } from "../utils/types.js";
 import { SYNTAX_CHARS } from "../utils/types.js";
-import type { Token_Stream_Mode } from "../utils/types.js";
+import type { Token_Stream_Mode, Associateme_Mapper } from "../utils/types.js";
 import { graphemosis } from "../utils/utilities.js";
 
 class Nesca_Grammar_Stream {
   public logger: Logger;
   public graphemes: string[];
+  public associateme_mapper: Associateme_Mapper;
   private escape_mapper: Escape_Mapper;
 
   constructor(
     logger: Logger,
     graphemes: string[],
+    associateme_mapper: Associateme_Mapper,
     escape_mapper: Escape_Mapper,
   ) {
     this.logger = logger;
     this.graphemes = graphemes;
+    this.associateme_mapper = associateme_mapper;
     this.escape_mapper = escape_mapper;
   }
 
@@ -270,7 +273,8 @@ class Nesca_Grammar_Stream {
         };
         i++;
       } else if (char === "~") {
-        // It's a based-mark
+        // It's a associateme-mark for null
+        i ++;
       } else if (
         // Syntax character used wrongly
         SYNTAX_CHARS.includes(char)
@@ -319,9 +323,11 @@ class Nesca_Grammar_Stream {
           tokens.push({ ...new_token });
           look_ahead++;
         }
-        i = look_ahead;
-      }
-      if (stream[i] === "+") {
+
+        new_token.min = 2;
+        new_token.max = 2; // Default quantifier
+        i++;
+      } else if (stream[i] === "+") {
         if (mode === "RESULT") {
           this.logger.validation_error(
             `Quantifier not allowed in '${mode}'`,
@@ -331,12 +337,10 @@ class Nesca_Grammar_Stream {
         new_token.min = 1;
         new_token.max = Infinity; // Default quantifier
         i++;
-      }
-
-      if (stream[i] === "?") {
+      } else if (stream[i] === "?") {
         if (mode === "RESULT") {
           this.logger.validation_error(
-            `Quantifier not allowed in '${mode}'`,
+            `Bounded quantifier not allowed in '${mode}'`,
             line_num,
           );
         }
@@ -404,6 +408,33 @@ class Nesca_Grammar_Stream {
           }
         }
       }
+      if (stream[i] === "~") {
+        if (new_token.type !== "grapheme") {
+          this.logger.validation_error(
+            `Associateme-mark only allowed after grapheme token`,
+            line_num,
+          );
+        }
+
+        const location = this.find_base_location(
+          this.associateme_mapper,
+          new_token.base
+        )
+        if (!location) {
+          this.logger.validation_error(
+            `Grapheme "${new_token.base}" with an asociateme-mark was not an associateme base`,
+            line_num,
+          );
+        }
+        const [ entry_id, base_id ] = location;
+        new_token.association = {
+          entry_id: entry_id,
+          base_id: base_id,
+          variant_id: 0, // Placeholder; to be filled during generation
+          is_target: mode === "TARGET",
+        };
+        i++;
+      }
 
       if (new_token.type !== "pending") {
         tokens.push(new_token);
@@ -411,6 +442,20 @@ class Nesca_Grammar_Stream {
     }
     return tokens;
   }
+
+  
+  find_base_location(mapper: Associateme_Mapper, grapheme: string): [number,number] | null {
+    for (let entry_id = 0; entry_id < mapper.length; entry_id++) {
+      const entry = mapper[entry_id];
+      for (let base_id = 0; base_id < entry.bases.length; base_id++) {
+        if (entry.bases[base_id] === grapheme) {
+          return [ entry_id, base_id ];
+        }
+      }
+    }
+    return null; // not found
+  }
+
 }
 
 export default Nesca_Grammar_Stream;

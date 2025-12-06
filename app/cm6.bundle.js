@@ -20684,7 +20684,7 @@ var cm6 = (function (exports) {
     var graphemesRules = [
         { token: "escape", regex: escapeRegex },
         { token: "link", regex: /,/ },
-        { token: "regexp", regex: /\<{|\}/ },
+        { token: "regexp", regex: /\<{|\}|\{/ },
     ];
     var categoryRules = [
         { token: "escape", regex: escapeRegex },

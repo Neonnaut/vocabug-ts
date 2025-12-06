@@ -373,7 +373,6 @@ class Transform_Resolver {
         }
       }
       // ✅ Category key expansion
-      // THIS THING
       if (this.categories.has(char)) {
         const prev = input[i - 1] ?? "";
         const next = input[i + 1] ?? "";
@@ -411,7 +410,6 @@ class Transform_Resolver {
         if (stream[i] === "]") {
           feature_mode = false;
           if (feature_matrix.length != 0) {
-            // THIS THING
 
             const prev = stream[feature_begin_index - 1] ?? "";
             const next = stream[i + 1] ?? "";
@@ -625,9 +623,22 @@ class Transform_Resolver {
       features.push(`  ${key} = ${value.graphemes.join(", ")}`);
     }
 
+    const parts: string[] = [];
+    for (const entry of this.nesca_grammar_stream.associateme_mapper) {
+      // Each variant group becomes {a,i,u}, {á,í,ú}, etc.
+      const variantStrings = entry.variants.map(group => `{${group.join(",")}}`);
+      // Join with "<"
+      const chain = "  " + variantStrings.join("<");
+      parts.push(chain);
+    }
+
+    let associatemes:string = parts.join("\n");
+
     const info: string =
       `Graphemes: ` +
       this.nesca_grammar_stream.graphemes.join(", ") +
+      `\nAssociatemes: \n` +
+      associatemes +
       `\nFeatures {\n` +
       features.join("\n") +
       `\n}` +

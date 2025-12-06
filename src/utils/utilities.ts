@@ -15,6 +15,10 @@ const get_last = <T = never>(arr: ArrayLike<T> | null | undefined) =>
   // This thing fetches the last item of an array
   arr?.[arr.length - 1];
 
+const get_first = <T = never>(arr: ArrayLike<T> | null | undefined) =>
+  // This thing fetches the first item of an array
+  arr?.[0];
+
 function capitalise(str: string): string {
   return str[0].toUpperCase() + str.slice(1);
 }
@@ -119,6 +123,7 @@ function graphemosis(input: string, canon_graphemes: string[]): string[] {
 export {
   cappa,
   get_last,
+  get_first,
   capitalise,
   make_percentage,
   swap_first_last_items,
