@@ -160,11 +160,11 @@ class Text_Builder {
         this.invisible,
       );
     }
+    this.create_record();
     if (this.output_mode === "paragraph") {
       return this.paragraphify(this.words);
     }
 
-    this.create_record();
     return this.words.join(this.word_divider);
   }
 

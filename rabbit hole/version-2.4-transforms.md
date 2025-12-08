@@ -1,14 +1,14 @@
-# Version 2
+# Version 2 transforms
 
 ## Cyrillic
 
+## Greek
+
+## Katakana
+
+## Hiragana
+
 ## IPA featurefield set
-
-## 1. Word classes
-
-Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
-
-They're not that useful here as you can just comment out a line in the words: block
 
 ## 2. Long form category keys
 
@@ -77,18 +77,6 @@ END
 ```
 In the above example we saved two rules as a macro under the name "resyllabify" and used that macro twice.
 
-## 6. Alternative graphs
-
-Tells what character + combining diacritic sequences to be treated as alternatives of another grapheme
-
-The left-most precomposed character is the thing being modified
-
-```
-graphemes: a <[á à ǎ â] b d e <[é è ě ê] f g h i <[í ì ǐ î] k l m n o <[ó ò ǒ ô] p r s t u <[ú ù ǔ û] w y
-```
-
-now `a > o` will target `a` with an acute accent.
-
 ## 7. Invisible graphemes
 
 This would "skip" graphemes in the TARGET, CONDITION and EXCEPTION, like so:
@@ -100,28 +88,6 @@ invisible-graphemes: .
   bat.ta > ba.da
 ; 'tt' becomes 'd'. Ignore any '.' between 't's
 ```
-
-## 9. Chance for individual optionals
-
-## 10. Promises
-
-This would ensure that if a the optional `y` appears, The only graphemes that would be in the pool for `V` would be `a,o,a`, avoiding a `yi` syllable inside generation.
-
-This would also work backwards and forwards:
-
-`words: C(j->{u,o,a})V`, `C({p,b,t,d,k,g}<-r)a`
-
-This represents an almost idealist view on word generation
-
-
-
-## 12. Lezer grammar
-
-Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
-
-## Rewrite of program in rust or haskel python, Kotlin
-
-## Use Vue for the UI
 
 ## word class
 
@@ -161,8 +127,6 @@ Ability to deactivate cleanup, or temporarily deactivate on a transform
 
 ## terminate at first replacement
 
-## transforms line wrap on -> / etc
-
 ## syllable level features
 
 ## feature target missmatch of features
@@ -173,25 +137,13 @@ Ability to deactivate cleanup, or temporarily deactivate on a transform
 
 ## then, else, if, blocks that can be nested
 
-## Add typo check on comments
-
 ## Able to chain changes: a -> e -> i
-
-## Associateme
 
 ## A way to do sandhi. For example: ^ -> n / a_#a 
 
 ## feature bundles... %manner = velar, labial
 
 ## root-nodes and nodes
-
-## Alter the anythings mark
-
-I need to change it from clunky syntax like `&[tr]*r`
-
-should be like: `&[^p r, ^t r, ^k r, p, t, k]r`
-
-means to match as many graphemes as possible unless its a `pr` sequence etc. stop matching once matching a `t`
 
 ## Change reference
 
@@ -229,28 +181,75 @@ Word-and-paradigm morphology
 ## reference factory
 `| a -> b, a -> shift-right, `
 
-## Escapes
-
-Right now, escape chars could interfere with PUA
-
-## Shortcuts
-
-- [ ] Alt + Z does line breaking
-- [ ] Alt + S does file saving
-- [ ] Alt + C does clear fields
-- [ ] Alt + G does generate
-- [ ] Alt + H does help
-
-# A decorator to disable a directive
-
-# Romance-like example
-
 # Change the syllable dividers in a decorator:
 
 @stage.syllable-dividers = {., '}
 
-# Ability to make infos!!
+## A way to do sandhi. For example: ^ -> n / a_#a 
 
-@meta.info = "message {version}"
+## feature geometry
 
----
+features {
+  voiced = abcde
+  unvoiced
+}
+
+feature-field {
+       |          |  m n p b t d k g s h l j
+MANNER | nasal    |  + + . . . . . . . . . .
+       | plosive  |  . . + + + + + + . . . .
+       | nasal    |  + + . . . . . . . . . .
+       | fricative|  . . . . . . . . + + - -
+       | approx   |  . . . . . . . . . . + +
+         @VOICE   |  Y Y - + - + - + N N Y Y
+PLACE  | labial   |  + . . . . . . . . . . .
+       | alveolar |  . + . . + + . . + . + .
+       | palatal  |  . . . . . . . . . . . +
+       | velar    |  . . . . . . + + . . . .
+       | glottal  |  . . . . . . . . . + . .
+}
+
+[voiced, stop] -> [nasal]
+
+stage {
+  @cluster-field {
+    EXAMPLE
+  }
+
+  @routine {
+    EXAMPLE
+  }
+
+  @transform.chance = 40%:
+  @transform.name = "thingy":
+}
+
+supraseme
+
+#5d4472
+
+
+Top level header
+@top reverse-sound-change
+Somehow do rule before, after, like auto syllabifying
+name of changes: eg: egyptian-to-blahblah. Also do parent
+
+Blocks:
+If, then, else
+Can be nested
+
+header:
+@transform "Name", -left-to-right, -right-to-left, -replace-once, -no-overlap, -is-engine
+                  -ltr             -rtl            -ro            -no          -ir
+
+@transform-macro 
+way to do word-class only 
+
+Feature geometry
+
+Autosegmental phonology
+
+Word-and-paradigm morphology
+
+`N -> [+nasal, b=PLACE] / _[+consonant a=PLACE]`
+`a -> b,`

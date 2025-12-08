@@ -14,10 +14,10 @@ function create_file_editor() {
             content = got_LocalStorage[0];
         } catch {
             localStorage.removeItem("vocabug");
-            content = examples.basic;
+            content = examples.default;
         }
     } else {
-        content = examples.basic;
+        content = examples.default;
     }
     if (localStorage.hasOwnProperty('colourScheme')) {
         if (localStorage.getItem('colourScheme') != 'dark-mode') {

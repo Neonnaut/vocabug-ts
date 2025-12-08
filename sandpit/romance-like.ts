@@ -1,6 +1,7 @@
 const examples: { [key: string]: string } = {
   romance:
-`; This should produce simplified Spanish-looking words
+`
+; This should produce simplified Spanish-looking words
 
 ; Initial-cluster: pl pr tr cl cr bl br dr gl gr
 ; All-consonant: t s k q d n b m p l r g h č f z
@@ -62,7 +63,8 @@ s  +  +  +  +  +  +  f  h  +  +  +  +  +  s  +  z
 ; Taco-taco, burrito-burrito
 k q č h ň ʎ j w -> c qu ch j ñ ll i u
 
-i > y / #_{V}~ / {V}~_{V}~`
+i > y / #_{V}~ / {V}~_{V}~
+`
 
 };
 

@@ -1,6 +1,7 @@
 const examples: { [key: string]: string } = {
   test: 
-`; This is a comment.
+`
+; This is a comment.
 abcdefg ; And this is a comment following junk.
 
 () {} {} ; <- These should self close.
@@ -245,7 +246,8 @@ BEGIN transform:
 
   ; /r/ dissimilation: [sərˈpraiz] -> [səˈpraiz].   [ˈfeb.ru.e.ri] -> [ˈfeb.ju.e.ri]
 
-END`
+END
+`
 
 };
 

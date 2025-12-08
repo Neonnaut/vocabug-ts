@@ -274,7 +274,7 @@ class Nesca_Grammar_Stream {
         i++;
       } else if (char === "~") {
         // It's a associateme-mark for null
-        i ++;
+        i++;
       } else if (
         // Syntax character used wrongly
         SYNTAX_CHARS.includes(char)
@@ -418,15 +418,15 @@ class Nesca_Grammar_Stream {
 
         const location = this.find_base_location(
           this.associateme_mapper,
-          new_token.base
-        )
+          new_token.base,
+        );
         if (!location) {
           this.logger.validation_error(
             `Grapheme "${new_token.base}" with an asociateme-mark was not an associateme base`,
             line_num,
           );
         }
-        const [ entry_id, base_id ] = location;
+        const [entry_id, base_id] = location;
         new_token.association = {
           entry_id: entry_id,
           base_id: base_id,
@@ -443,19 +443,20 @@ class Nesca_Grammar_Stream {
     return tokens;
   }
 
-  
-  find_base_location(mapper: Associateme_Mapper, grapheme: string): [number,number] | null {
+  find_base_location(
+    mapper: Associateme_Mapper,
+    grapheme: string,
+  ): [number, number] | null {
     for (let entry_id = 0; entry_id < mapper.length; entry_id++) {
       const entry = mapper[entry_id];
       for (let base_id = 0; base_id < entry.bases.length; base_id++) {
         if (entry.bases[base_id] === grapheme) {
-          return [ entry_id, base_id ];
+          return [entry_id, base_id];
         }
       }
     }
     return null; // not found
   }
-
 }
 
 export default Nesca_Grammar_Stream;

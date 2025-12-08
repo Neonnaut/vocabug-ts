@@ -2,11 +2,11 @@
 
 # Vocabug docs
 
-<b>Version: 0.4.0</b>
+<b>Version: 0.5.0</b>
 
 ## [1]()  About Vocabug
 
-This is the complete documentation for [Vocabug, version: 0.4.0](./vocabug.html). Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.
+This is the complete documentation for [Vocabug, version: 0.5.0](./vocabug.html). Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.
 
 This word generator is designed to be a successor to the Williams' [Lexifer](https://github.com/bbrk24/lexifer-ts) and to the legendary [Awkwords](https://github.com/nai888/awkwords). You can find Vocabug's repository [here](https://github.com/Neonnaut/vocabug-ts). If you want a "modern" user interface, albeit with limited features, check out [Vocabug-lite](https://neonnaut.neocities.org/vocabug-lite).
 

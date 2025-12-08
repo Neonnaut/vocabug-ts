@@ -1,4 +1,9 @@
-export type Association = { entry_id: number, base_id: number; variant_id: number, is_target: boolean }
+export type Association = {
+  entry_id: number;
+  base_id: number;
+  variant_id: number;
+  is_target: boolean;
+};
 
 export type Token =
   | {
@@ -158,6 +163,7 @@ export type Routine =
 
 export const SYNTAX_CHARS = [
   "<",
+  ">",
   "@",
   "⇒",
   "→",
@@ -196,11 +202,15 @@ export const SYNTAX_CHARS = [
   "9",
 ];
 
-export type Carryover_Associations = { entry_id: number, base_id: number; variant_id: number }[];
+export type Carryover_Associations = {
+  entry_id: number;
+  base_id: number;
+  variant_id: number;
+}[];
 
 interface Associateme_Entry {
-  bases: string[];        // e.g. ["a","i","u"]
-  variants: string[][];   // includes bases as first variant, e.g. [ ["a","i","u"], ["á","í","ú"], ["à","ì","ù"] ]
+  bases: string[]; // e.g. ["a","i","u"]
+  variants: string[][]; // includes bases as first variant, e.g. [ ["a","i","u"], ["á","í","ú"], ["à","ì","ù"] ]
 }
 
 export type Associateme_Mapper = Associateme_Entry[];

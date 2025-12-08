@@ -410,7 +410,6 @@ class Transform_Resolver {
         if (stream[i] === "]") {
           feature_mode = false;
           if (feature_matrix.length != 0) {
-
             const prev = stream[feature_begin_index - 1] ?? "";
             const next = stream[i + 1] ?? "";
 
@@ -575,6 +574,10 @@ class Transform_Resolver {
         } else if ("min" in t) {
           s += `+[${t.min}${t.max !== Infinity ? "," + t.max : ""}]`;
         }
+
+        if ("association" in t) {
+          s += `~`;
+        }
         return s;
       })
       .join(" ");
@@ -626,13 +629,15 @@ class Transform_Resolver {
     const parts: string[] = [];
     for (const entry of this.nesca_grammar_stream.associateme_mapper) {
       // Each variant group becomes {a,i,u}, {á,í,ú}, etc.
-      const variantStrings = entry.variants.map(group => `{${group.join(",")}}`);
+      const variantStrings = entry.variants.map(
+        (group) => `{${group.join(",")}}`,
+      );
       // Join with "<"
       const chain = "  " + variantStrings.join("<");
       parts.push(chain);
     }
 
-    let associatemes:string = parts.join("\n");
+    const associatemes: string = parts.join("\n");
 
     const info: string =
       `Graphemes: ` +

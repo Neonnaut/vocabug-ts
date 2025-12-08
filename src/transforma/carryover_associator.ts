@@ -2,7 +2,7 @@ import { get_first } from "../utils/utilities";
 import type { Association, Associateme_Mapper } from "../utils/types";
 
 class Carryover_Associator {
-  private caryover_list: { entry_id: number, variant_id: number }[]
+  private caryover_list: { entry_id: number; variant_id: number }[];
 
   constructor() {
     this.caryover_list = [];
@@ -18,19 +18,30 @@ class Carryover_Associator {
   // first item in carryover_list entry and variant
   // If not null, removes first item from carryover_list
   // return null or found grapheme
-  get_result_associateme(association: Association, associateme_mapper: Associateme_Mapper ): string | null {
+  get_result_associateme(
+    association: Association,
+    associateme_mapper: Associateme_Mapper,
+  ): string | null {
     // Get entry_id and variant_id from first item in carryover_associator
     const item = this.find_first_item();
     if (!item) {
       return null;
     }
-    var [entry_id, variant_id] = item;
+    const [entry_id, variant_id] = item;
     // get base_id from my_result_token
     const base_id = association.base_id;
 
     // Find grapheme in associateme_mapper with entry_id, base_id, variant_id
-    const my_grapheme = this.find_grapheme(entry_id, base_id, variant_id, associateme_mapper);
+    const my_grapheme = this.find_grapheme(
+      entry_id,
+      base_id,
+      variant_id,
+      associateme_mapper,
+    );
     if (!my_grapheme) {
+      return null;
+    }
+    if (entry_id != association.entry_id) {
       return null;
     }
     this.remove_first_item();
@@ -52,7 +63,6 @@ class Carryover_Associator {
     variant_id: number,
     associateme_mapper: Associateme_Mapper,
   ): string | null {
-
     // Find grapheme in associateme_mapper with entry_id, base_id, variant_id
 
     // Guard: entry_id must be valid

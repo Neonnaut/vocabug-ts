@@ -4,25 +4,25 @@ So... here we are, Nesca uses its own domain specific language (DSL) for matchin
 |------------|----------|------------------------------------|
 | \<, ^      | #_       | Start of word                      |
 | \\>, $     | _#       | End of word                        |
-|            |          | Whitespace                         |
-| ?=         | /_T      | Lookahead assertion                |
-| ?!         | !_T      | Negative lookahead                 |
-| ?<=        | /T_      | Lookbehind assertion               |
-| ?!= or ?<! | !T_      | Negative lookbehind                |
+|            | &[Space] | Whitespace                         |
+| ?=         | / _x     | Lookahead assertion                |
+| ?!         | ! _x     | Negative lookahead                 |
+| ?<=        | / x_     | Lookbehind assertion               |
+| ?!= or ?<! | ! x_     | Negative lookbehind                |
 | ?>         |          | Once-only Subexp­ression            |
 | ?()        |          | Condition [if then]                |
 | ?()\|      |          | Condition [if then else]           |
 | ?#         | ;        | Comment                            |
-| \1         | <        | Target-mark                      |
+| \1         | &T       | Target-mark                      |
 |            | :        | Geminate                           |
-| *          | (T+)     | 0 or more                          |
+| *          | (x+)     | 0 or more                          |
 | +          | +        | 1 or more                          |
 | .          | *        | Any character except new line (\n) |
-| .+?        | &        | Any series of characters ungreedy  |
-| ?          | (T)      | 0 or 1                             |
-| {3}        | +{3}     | Exactly 3                          |
-| {3,}       | +{3,}    | 3 or more                          |
-| {3,5}      | +{3,5}   | 3, 4 or 5                          |
+| .+?        | %[]      | Any series of characters ungreedy  |
+| ?          | (x)      | 0 or 1                             |
+| {3}        | ?[3]     | Exactly 3                          |
+| {3,}       | ?[3,]    | 3 or more                          |
+| {3,5}      | ?[3,5]   | 3, 4 or 5                          |
 | \          | \        | Escape following character         |
 | (a\|b)     | [a, b]   | a or b                             |
 | [^abc]     |          | Not (a or b or c)                  |
@@ -44,9 +44,9 @@ TOKEN,TOKEN,TOKEN    TOKEN
 | 0       | NO     | YES    | NO     | NO    | IF MODE IS NOT RESULT
 | #       | NO     | NO     | YES    | YES   | IF MODE IS TARGET OR RESULT
 | :       | YES    | YES    | YES    | YES   |
-| +, { }  | YES    | NO     | YES    | YES   | IF MODE IS RESULT
+| +, ?    | YES    | NO     | YES    | YES   | IF MODE IS RESULT
 | *       | YES    | NO     | YES    | YES   | IF MODE IS RESULT
-| …{ or   | YES    | NO     | YES    | YES   | IF MODE IS RESULT
+| %  or   | YES    | NO     | YES    | YES   | IF MODE IS RESULT
 
 
 |                        | TARGET | RESULT | BEFORE | AFTER |

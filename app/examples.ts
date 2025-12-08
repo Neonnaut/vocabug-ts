@@ -1,5 +1,5 @@
 const examples: { [key: string]: string } = {
-  basic: 
+  default: 
 `; A Category is a group of graphemes assigned to a key.
 ; By default, graphemes in a category furthest to the right
 ; are picked more often than graphemes to the left.
@@ -40,7 +40,7 @@ categories:
   C = t k {f p} n r b m s d h l ŋ g c ş ç l y w {mb nd ŋg} {kp gb ŋgb}
   V = a i e o u
   W = a i ẹ ọ u
-  T = ^*3.7 &[Grave]*3 &[Acute]*3.3 ; Gives mid-tone, low-tone, high-tone
+  T = ^*3.7 &[Acute]*3.3 &[Grave]*3 ; Gives mid-tone, low-tone, high-tone
 
 units:
 ; + ATR harmony 
@@ -59,11 +59,13 @@ words:
   <A>    <Z>
 
 graphemes:
-  ẹ́ ọ́ ẹ̀ ọ̀ kp gb
+  {a e ẹ i o ọ u}<{á é ẹ́ í ó ọ́ ú}<{à è ẹ̀ ì ò ọ̀ ù} kp gb
 
 stage:
 ; Combine vowels and diacritics into one character, if possible.
-<routine = compose>`,
+  <routine = compose>
+; Palatalise c after <i> and its tonal variants
+  c -> ç / _i~`,
   japanese: 
 `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
 ; and Phonological Unit Frequencies in Japanese... by Katsuo Tamaoka.

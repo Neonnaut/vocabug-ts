@@ -3949,6 +3949,10 @@ const get_last = (arr) => (
   // This thing fetches the last item of an array
   arr == null ? void 0 : arr[arr.length - 1]
 );
+const get_first = (arr) => (
+  // This thing fetches the first item of an array
+  arr == null ? void 0 : arr[0]
+);
 function capitalise(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
@@ -5855,6 +5859,64 @@ function combine_jamo(initial, medial, final) {
   const syllable_code = base_code + initial_offset * 588 + medial_offset * 28 + final_offset;
   return String.fromCharCode(syllable_code);
 }
+class Carryover_Associator {
+  constructor() {
+    __publicField(this, "caryover_list");
+    this.caryover_list = [];
+  }
+  // Called when a word's grapheme in TARGET matches a rule's grapheme with associateme-mark
+  set_item(entry_id, variant_id) {
+    this.caryover_list.push({ entry_id, variant_id });
+  }
+  // Get grapheme from
+  // result token base and
+  // first item in carryover_list entry and variant
+  // If not null, removes first item from carryover_list
+  // return null or found grapheme
+  get_result_associateme(association, associateme_mapper) {
+    const item = this.find_first_item();
+    if (!item) {
+      return null;
+    }
+    const [entry_id, variant_id] = item;
+    const base_id = association.base_id;
+    const my_grapheme = this.find_grapheme(
+      entry_id,
+      base_id,
+      variant_id,
+      associateme_mapper
+    );
+    if (!my_grapheme) {
+      return null;
+    }
+    if (entry_id != association.entry_id) {
+      return null;
+    }
+    this.remove_first_item();
+    return my_grapheme;
+  }
+  find_first_item() {
+    const item = get_first(this.caryover_list);
+    return item ? [item.entry_id, item.variant_id] : void 0;
+  }
+  remove_first_item() {
+    this.caryover_list.shift();
+  }
+  find_grapheme(entry_id, base_id, variant_id, associateme_mapper) {
+    if (entry_id < 0 || entry_id >= associateme_mapper.length) {
+      return null;
+    }
+    const entry = associateme_mapper[entry_id];
+    if (variant_id < 0 || variant_id >= entry.variants.length) {
+      return null;
+    }
+    const variantGroup = entry.variants[variant_id];
+    if (base_id < 0 || base_id >= variantGroup.length) {
+      return null;
+    }
+    return variantGroup[base_id];
+  }
+}
 class Transformer {
   constructor(logger, graphemes, transforms, output_mode, associateme_mapper) {
     __publicField(this, "logger");
@@ -5912,13 +5974,14 @@ class Transformer {
     );
     return graphemosis(modified_word, this.graphemes);
   }
-  target_to_word_match(word_tokens, raw_target, reference_mapper) {
+  target_to_word_match(word_tokens, raw_target, reference_mapper, carryover_associator) {
     for (let j = 0; j <= word_tokens.length; j++) {
       const result = this.match_pattern_at(
         word_tokens,
         raw_target,
         j,
         reference_mapper,
+        carryover_associator,
         word_tokens.length
       );
       if (result !== null) {
@@ -5927,12 +5990,30 @@ class Transformer {
     }
     return [0, 0, []];
   }
-  result_former(raw_result, target_stream, reference_mapper) {
+  result_former(raw_result, target_stream, reference_mapper, carryover_associator) {
     const replacement_stream = [];
     for (let j = 0; j < raw_result.length; j++) {
       const my_result_token = raw_result[j];
       if (my_result_token.type === "grapheme") {
-        replacement_stream.push(my_result_token.base);
+        if (my_result_token.association) {
+          const my_grapheme = carryover_associator.get_result_associateme(
+            my_result_token.association,
+            this.associateme_mapper
+          );
+          if (my_grapheme === null) {
+            for (let k = 0; k < my_result_token.min; k++) {
+              replacement_stream.push(my_result_token.base);
+            }
+          } else {
+            for (let k = 0; k < my_result_token.min; k++) {
+              replacement_stream.push(my_grapheme);
+            }
+          }
+        } else {
+          for (let k = 0; k < my_result_token.min; k++) {
+            replacement_stream.push(my_result_token.base);
+          }
+        }
       } else if (my_result_token.type === "target-mark") {
         for (let k = 0; k < target_stream.length; k++) {
           replacement_stream.push(target_stream[k]);
@@ -5957,8 +6038,33 @@ class Transformer {
     reference_mapper.reset_capture_stream_index();
     return replacement_stream;
   }
+  resolve_association(mapper, grapheme) {
+    for (let entry_id = 0; entry_id < mapper.length; entry_id++) {
+      const entry = mapper[entry_id];
+      for (let variant_id = 0; variant_id < entry.variants.length; variant_id++) {
+        const group = entry.variants[variant_id];
+        for (let base_id = 0; base_id < group.length; base_id++) {
+          if (group[base_id] === grapheme) {
+            return { entry_id, base_id, variant_id };
+          }
+        }
+      }
+    }
+    return null;
+  }
+  get_variant_id_for_base(mapper, entry_id, base_id, grapheme) {
+    if (entry_id < 0 || entry_id >= mapper.length) return null;
+    const entry = mapper[entry_id];
+    if (base_id < 0 || base_id >= entry.bases.length) return null;
+    for (let variant_id = 0; variant_id < entry.variants.length; variant_id++) {
+      if (entry.variants[variant_id][base_id] === grapheme) {
+        return variant_id;
+      }
+    }
+    return null;
+  }
   // BEFORE and AFTER and TARGET use this
-  match_pattern_at(stream, pattern, start, reference_mapper, max_end, target_stream) {
+  match_pattern_at(stream, pattern, start, reference_mapper, carryover_associator, max_end, target_stream) {
     let i = start;
     let j = 0;
     const matched = [];
@@ -5972,15 +6078,43 @@ class Transformer {
       const max = token.max;
       const max_available = max_end !== void 0 ? Math.min(max, max_end - i) : max;
       if (token.type === "grapheme") {
-        let count = 0;
-        while (count < max_available && stream[i + count] === token.base) {
-          count++;
+        if (token.association) {
+          let count = 0;
+          const baseEntryId = token.association.entry_id;
+          const baseBaseId = token.association.base_id;
+          while (count < token.max && i + count < stream.length) {
+            const grapheme = stream[i + count];
+            const variant_id = this.get_variant_id_for_base(
+              this.associateme_mapper,
+              baseEntryId,
+              baseBaseId,
+              grapheme
+            );
+            if (variant_id !== null) {
+              if (token.association.is_target && carryover_associator) {
+                carryover_associator.set_item(baseEntryId, variant_id);
+              }
+              count++;
+            } else {
+              break;
+            }
+          }
+          if (count < token.min) {
+            return null;
+          }
+          matched.push(...stream.slice(i, i + count));
+          i += count;
+        } else {
+          let count = 0;
+          while (count < max_available && stream[i + count] === token.base) {
+            count++;
+          }
+          if (count < min) {
+            return null;
+          }
+          matched.push(...stream.slice(i, i + count));
+          i += count;
         }
-        if (count < min) {
-          return null;
-        }
-        matched.push(...stream.slice(i, i + count));
-        i += count;
       } else if (token.type === "target-mark") {
         if (!target_stream || target_stream.length === 0) {
           this.logger.validation_error(
@@ -6135,6 +6269,7 @@ class Transformer {
         before_tokens,
         i,
         reference_mapper,
+        null,
         startIdx,
         target_stream
       );
@@ -6153,6 +6288,7 @@ class Transformer {
       after_tokens,
       after_start,
       reference_mapper,
+      null,
       word_stream.length,
       target_stream
     );
@@ -6273,6 +6409,7 @@ class Transformer {
     const replacements = [];
     for (let i = 0; i < target.length; i++) {
       const reference_mapper = new Reference_Mapper();
+      const carryover_associator = new Carryover_Associator();
       const raw_target = target[i];
       const raw_result = result[i];
       let mode = "replacement";
@@ -6281,7 +6418,12 @@ class Transformer {
       } else if (raw_result[0].type === "reject") {
         mode = "reject";
       } else {
-        this.target_to_word_match(word_stream, raw_target, reference_mapper);
+        this.target_to_word_match(
+          word_stream,
+          raw_target,
+          reference_mapper,
+          carryover_associator
+        );
       }
       if (raw_target[0].type === "insertion") {
         if (mode === "deletion" || mode === "reject") {
@@ -6301,7 +6443,8 @@ class Transformer {
           const my_replacement_stream = this.result_former(
             raw_result,
             word_stream,
-            reference_mapper
+            reference_mapper,
+            carryover_associator
           );
           const matched_conditions = [];
           let passes = conditions.length === 0;
@@ -6339,7 +6482,8 @@ class Transformer {
           const second_replacement_stream = this.result_former(
             raw_result,
             word_stream,
-            reference_mapper
+            reference_mapper,
+            carryover_associator
           );
           replacements.push({
             index_span: insert_index,
@@ -6356,7 +6500,8 @@ class Transformer {
           const [match_index, match_length, matched_stream] = this.target_to_word_match(
             word_stream.slice(cursor),
             raw_target,
-            reference_mapper
+            reference_mapper,
+            carryover_associator
           );
           if (match_length === 0) {
             cursor++;
@@ -6419,7 +6564,8 @@ class Transformer {
             const my_replacement_stream = this.result_former(
               raw_result,
               matched_stream,
-              reference_mapper
+              reference_mapper,
+              carryover_associator
             );
             replacements.push({
               index_span: global_index,
@@ -6476,6 +6622,18 @@ class Transformer {
       }
     }
     return word;
+  }
+  get_variant_id(mapper, grapheme, baseToken) {
+    const { entry_id, base_id } = baseToken;
+    if (entry_id < 0 || entry_id >= mapper.length) return null;
+    const entry = mapper[entry_id];
+    if (base_id < 0 || base_id >= entry.bases.length) return null;
+    for (let variant_id = 0; variant_id < entry.variants.length; variant_id++) {
+      if (entry.variants[variant_id][base_id] === grapheme) {
+        return variant_id;
+      }
+    }
+    return null;
   }
 }
 function collator(logger, words, custom_alphabet, invisible = []) {
@@ -6738,7 +6896,7 @@ Invisible: ` + this.invisible.join(", ");
     this.logger.diagnostic(info);
   }
 }
-const VOCABUG_VERSION = "0.4.0";
+const VOCABUG_VERSION = "0.5.0";
 class Logger {
   constructor() {
     __publicField(this, "errors");
@@ -7506,7 +7664,18 @@ class Transform_Resolver {
     for (const [key, value] of this.features) {
       features.push(`  ${key} = ${value.graphemes.join(", ")}`);
     }
+    const parts = [];
+    for (const entry of this.nesca_grammar_stream.associateme_mapper) {
+      const variantStrings = entry.variants.map(
+        (group) => `{${group.join(",")}}`
+      );
+      const chain = "  " + variantStrings.join("<");
+      parts.push(chain);
+    }
+    const associatemes = parts.join("\n");
     const info = `Graphemes: ` + this.nesca_grammar_stream.graphemes.join(", ") + `
+Associatemes: 
+` + associatemes + `
 Features {
 ` + features.join("\n") + `
 }
@@ -7556,12 +7725,14 @@ const SYNTAX_CHARS = [
   "9"
 ];
 class Nesca_Grammar_Stream {
-  constructor(logger, graphemes, escape_mapper) {
+  constructor(logger, graphemes, associateme_mapper, escape_mapper) {
     __publicField(this, "logger");
     __publicField(this, "graphemes");
+    __publicField(this, "associateme_mapper");
     __publicField(this, "escape_mapper");
     this.logger = logger;
     this.graphemes = graphemes;
+    this.associateme_mapper = associateme_mapper;
     this.escape_mapper = escape_mapper;
   }
   main_parser(stream, mode, line_num) {
@@ -7772,8 +7943,9 @@ class Nesca_Grammar_Stream {
           max: 1
         };
         i++;
-      } else if (char === "~") ;
-      else if (
+      } else if (char === "~") {
+        i++;
+      } else if (
         // Syntax character used wrongly
         SYNTAX_CHARS.includes(char)
       ) {
@@ -7816,9 +7988,10 @@ class Nesca_Grammar_Stream {
           tokens.push({ ...new_token });
           look_ahead++;
         }
-        i = look_ahead;
-      }
-      if (stream[i] === "+") {
+        new_token.min = 2;
+        new_token.max = 2;
+        i++;
+      } else if (stream[i] === "+") {
         if (mode === "RESULT") {
           this.logger.validation_error(
             `Quantifier not allowed in '${mode}'`,
@@ -7828,11 +8001,10 @@ class Nesca_Grammar_Stream {
         new_token.min = 1;
         new_token.max = Infinity;
         i++;
-      }
-      if (stream[i] === "?") {
+      } else if (stream[i] === "?") {
         if (mode === "RESULT") {
           this.logger.validation_error(
-            `Quantifier not allowed in '${mode}'`,
+            `Bounded quantifier not allowed in '${mode}'`,
             line_num
           );
         }
@@ -7898,11 +8070,49 @@ class Nesca_Grammar_Stream {
           }
         }
       }
+      if (stream[i] === "~") {
+        if (new_token.type !== "grapheme") {
+          this.logger.validation_error(
+            `Associateme-mark only allowed after grapheme token`,
+            line_num
+          );
+        }
+        const location = this.find_base_location(
+          this.associateme_mapper,
+          new_token.base
+        );
+        if (!location) {
+          this.logger.validation_error(
+            `Grapheme "${new_token.base}" with an asociateme-mark was not an associateme base`,
+            line_num
+          );
+        }
+        const [entry_id, base_id] = location;
+        new_token.association = {
+          entry_id,
+          base_id,
+          variant_id: 0,
+          // Placeholder; to be filled during generation
+          is_target: mode === "TARGET"
+        };
+        i++;
+      }
       if (new_token.type !== "pending") {
         tokens.push(new_token);
       }
     }
     return tokens;
+  }
+  find_base_location(mapper, grapheme) {
+    for (let entry_id = 0; entry_id < mapper.length; entry_id++) {
+      const entry = mapper[entry_id];
+      for (let base_id = 0; base_id < entry.bases.length; base_id++) {
+        if (entry.bases[base_id] === grapheme) {
+          return [entry_id, base_id];
+        }
+      }
+    }
+    return null;
   }
 }
 class Category_Resolver {
@@ -8400,17 +8610,17 @@ class Canon_Graphemes_Resolver {
     __publicField(this, "escape_mapper");
     __publicField(this, "graphemes_pending");
     __publicField(this, "graphemes");
-    __publicField(this, "associateme_mapper", /* @__PURE__ */ new Map());
+    __publicField(this, "associateme_mapper");
     this.logger = logger;
     this.escape_mapper = escape_mapper;
     this.graphemes_pending = graphemes_pending;
     this.graphemes = [];
-    this.associateme_mapper = /* @__PURE__ */ new Map();
+    this.associateme_mapper = [];
     this.resolve_canon_graphemes();
     this.resolve_associatemes();
   }
   resolve_canon_graphemes() {
-    const new_graphemes = this.graphemes_pending.replace(/(<\{|\})/g, "");
+    const new_graphemes = this.graphemes_pending.replace(/(<\{|\})/g, ",");
     const graphemes = new_graphemes.split(/[,\s]+/).filter(Boolean);
     for (let i = 0; i < graphemes.length; i++) {
       graphemes[i] = this.escape_mapper.restore_escaped_chars(graphemes[i]);
@@ -8418,12 +8628,49 @@ class Canon_Graphemes_Resolver {
     this.graphemes = Array.from(new Set(graphemes));
   }
   resolve_associatemes() {
-    const new_graphemes = this.graphemes_pending.replace(/(<\{|\})/g, "");
-    const graphemes = new_graphemes.split(/[,\s]+/).filter(Boolean);
-    for (let i = 0; i < graphemes.length; i++) {
-      graphemes[i] = this.escape_mapper.restore_escaped_chars(graphemes[i]);
+    const mapper = [];
+    const input = this.graphemes_pending ?? "";
+    const setRegex = /\{[^}]+\}(?:\s*<\s*\{[^}]+\})*/g;
+    const matches = [...input.matchAll(setRegex)];
+    let scrubbed = input;
+    for (const m of matches) {
+      scrubbed = scrubbed.replace(m[0], "");
     }
-    this.graphemes = Array.from(new Set(graphemes));
+    if (scrubbed.includes("<")) {
+      this.logger.validation_error(
+        `Stray "<" found outside of a valid associateme entry`
+      );
+    }
+    for (const m of matches) {
+      const segment = m[0];
+      const groups = segment.split("<").map(
+        (g) => g.replace(/[{}]/g, "").trim().split(/[,\s]+/).map((x) => x.trim()).filter((x) => x.length > 0)
+      );
+      if (groups.length === 0) {
+        this.logger.validation_error(
+          `A base associateme was empty in the graphemes directive`
+        );
+      }
+      const bases = groups[0];
+      if (bases.length === 0) {
+        this.logger.validation_error(
+          `A base associateme was empty in the graphemes directive`
+        );
+      }
+      const expectedLen = bases.length;
+      for (let i = 0; i < groups.length; i++) {
+        const g = groups[i];
+        if (g.length !== expectedLen) {
+          const label = i === 0 ? "bases" : `variant ${i}`;
+          this.logger.validation_error(
+            `Mismatched associateme entry variant group length in "${segment}": ${label} had a length of ${g.length} -- expected length of ${expectedLen}`
+          );
+        }
+      }
+      const variants = [...groups];
+      mapper.push({ bases, variants });
+    }
+    this.associateme_mapper = mapper;
   }
 }
 function generate({
@@ -8484,6 +8731,7 @@ function generate({
     const nesca_grammar_stream = new Nesca_Grammar_Stream(
       logger,
       canon_graphemes_resolver.graphemes,
+      canon_graphemes_resolver.associateme_mapper,
       escape_mapper
     );
     const transform_resolver = new Transform_Resolver(

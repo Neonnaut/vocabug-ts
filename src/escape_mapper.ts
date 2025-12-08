@@ -1,3 +1,5 @@
+import { SYNTAX_CHARS } from "./utils/types";
+
 const escapeMap: Record<string, string> = {
   "&[Space]": "\u0020",
   "&[Tab]": "\u0009",
@@ -48,44 +50,6 @@ const escapeMap: Record<string, string> = {
   "&[LeftBracketBelow]": "\u0349", // ◌͉
 };
 
-const transform_syntax_chars = [
-  "[",
-  "]",
-  "{",
-  "}",
-  "(",
-  ")",
-  "@",
-  ">",
-  "⇒",
-  "→",
-  "/",
-  "?",
-  "!",
-  "_",
-  "#",
-  "+",
-  ":",
-  "*",
-  "&",
-  "|",
-  "<",
-  "~",
-  "%",
-  "$",
-  "=",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "0",
-];
-
 class Escape_Mapper {
   private map: Map<string, string>;
   public counter: number;
@@ -115,7 +79,7 @@ class Escape_Mapper {
   }
 
   escape_special_chars(input: string): string {
-    const special_chars = new Set(transform_syntax_chars);
+    const special_chars = new Set(SYNTAX_CHARS);
     const reverse = new Map<string, string>(); // original char → placeholder
 
     const result = input

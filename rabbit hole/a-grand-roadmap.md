@@ -119,4 +119,4 @@
 - [x] Associatemes get from graphemes
 - [x] Associatemes hook to getting transforms
 - [x] Get if grapheme is based mark in grammar stream
-- [ ] If record based in transformation target, get assosiation for result
+- [x] If record based in transformation target, get assosiation for result

@@ -6,7 +6,11 @@ import {
   graphemosis,
 } from "../utils/utilities";
 import type {
-  Token, Output_Mode, Routine, Transform, Associateme_Mapper, Association
+  Token,
+  Output_Mode,
+  Routine,
+  Transform,
+  Associateme_Mapper,
 } from "../utils/types";
 import Reference_Mapper from "./reference_mapper";
 
@@ -37,14 +41,14 @@ class Transformer {
 
   private debug: boolean = false;
 
-  private associateme_mapper: Associateme_Mapper
+  private associateme_mapper: Associateme_Mapper;
 
   constructor(
     logger: Logger,
     graphemes: string[],
     transforms: Transform[],
     output_mode: Output_Mode,
-    associateme_mapper: Associateme_Mapper
+    associateme_mapper: Associateme_Mapper,
   ) {
     this.logger = logger;
     this.graphemes = graphemes;
@@ -108,7 +112,7 @@ class Transformer {
     word_tokens: string[],
     raw_target: Token[],
     reference_mapper: Reference_Mapper,
-    carryover_associator: Carryover_Associator
+    carryover_associator: Carryover_Associator,
   ): [number, number, string[]] {
     for (let j = 0; j <= word_tokens.length; j++) {
       const result = this.match_pattern_at(
@@ -130,7 +134,7 @@ class Transformer {
     raw_result: Token[],
     target_stream: string[],
     reference_mapper: Reference_Mapper,
-    carryover_associator: Carryover_Associator
+    carryover_associator: Carryover_Associator,
   ): string[] {
     const replacement_stream: string[] = [];
     for (let j = 0; j < raw_result.length; j++) {
@@ -140,16 +144,18 @@ class Transformer {
         if (my_result_token.association) {
           // Has association
           // THIS
-          const my_grapheme:string|null = carryover_associator.get_result_associateme(
-            my_result_token.association, this.associateme_mapper
-          );
+          const my_grapheme: string | null =
+            carryover_associator.get_result_associateme(
+              my_result_token.association,
+              this.associateme_mapper,
+            );
 
           // No grapheme found in associateme_mapper, push unaltered base
           if (my_grapheme === null) {
             for (let k: number = 0; k < my_result_token.min; k++) {
               replacement_stream.push(my_result_token.base);
             }
-          // Else push found grapheme
+            // Else push found grapheme
           } else {
             for (let k: number = 0; k < my_result_token.min; k++) {
               replacement_stream.push(my_grapheme);
@@ -160,7 +166,6 @@ class Transformer {
             replacement_stream.push(my_result_token.base);
           }
         }
-        
       } else if (my_result_token.type === "target-mark") {
         for (let k: number = 0; k < target_stream.length; k++) {
           replacement_stream.push(target_stream[k]);
@@ -193,11 +198,15 @@ class Transformer {
 
   resolve_association(
     mapper: Associateme_Mapper,
-    grapheme: string
+    grapheme: string,
   ): { entry_id: number; base_id: number; variant_id: number } | null {
     for (let entry_id = 0; entry_id < mapper.length; entry_id++) {
       const entry = mapper[entry_id];
-      for (let variant_id = 0; variant_id < entry.variants.length; variant_id++) {
+      for (
+        let variant_id = 0;
+        variant_id < entry.variants.length;
+        variant_id++
+      ) {
         const group = entry.variants[variant_id];
         for (let base_id = 0; base_id < group.length; base_id++) {
           if (group[base_id] === grapheme) {
@@ -209,6 +218,25 @@ class Transformer {
     return null;
   }
 
+  get_variant_id_for_base(
+    mapper: Associateme_Mapper,
+    entry_id: number,
+    base_id: number,
+    grapheme: string,
+  ): number | null {
+    // bounds guard
+    if (entry_id < 0 || entry_id >= mapper.length) return null;
+    const entry = mapper[entry_id];
+    if (base_id < 0 || base_id >= entry.bases.length) return null;
+
+    // check all variants in the same column (includes bases at variant_id = 0)
+    for (let variant_id = 0; variant_id < entry.variants.length; variant_id++) {
+      if (entry.variants[variant_id][base_id] === grapheme) {
+        return variant_id;
+      }
+    }
+    return null;
+  }
 
   // BEFORE and AFTER and TARGET use this
   match_pattern_at(
@@ -249,34 +277,43 @@ class Transformer {
 
       if (token.type === "grapheme") {
         if (token.association) {
-          // THIS
-
-          // THIS: loop through min..max and push to matched
+          // Association branch: consume only if stream[i + count] is a valid variant
           let count = 0;
-          while (count < token.max && (i + count) < stream.length) {
+
+          // Require token.association to supply the base coordinates
+          const baseEntryId = token.association.entry_id;
+          const baseBaseId = token.association.base_id;
+
+          while (count < token.max && i + count < stream.length) {
             const grapheme = stream[i + count];
 
-            // resolve grapheme against associateme_mapper
-            const assoc = this.resolve_association(this.associateme_mapper, grapheme);
+            // Is this grapheme a variant of the given base column?
+            const variant_id = this.get_variant_id_for_base(
+              this.associateme_mapper,
+              baseEntryId,
+              baseBaseId,
+              grapheme,
+            );
 
-            if (assoc) {
-              // record entry_id/base_id/variant_id
+            if (variant_id !== null) {
+              // record entry_id/variant_id if the associator wants targets
               if (token.association.is_target && carryover_associator) {
-                carryover_associator.set_item(assoc.entry_id, assoc.variant_id);
+                carryover_associator.set_item(baseEntryId, variant_id);
               }
-              // also push grapheme into matched
-              matched.push(grapheme);
+              count++; // consume this grapheme
+            } else {
+              break; // stop on first non-variant
             }
-
-            count++;
           }
+
           // enforce minimum requirement
           if (count < token.min) {
             return null;
           }
-          // advance stream index
-          i += count;
 
+          // push consumed graphemes and advance index
+          matched.push(...stream.slice(i, i + count));
+          i += count;
         } else {
           // no association
           let count = 0;
@@ -749,7 +786,12 @@ class Transformer {
       } else {
         // NORMAL GRAPHEME STREAM
         // Just get the references in replace_stream
-        this.target_to_word_match(word_stream, raw_target, reference_mapper, carryover_associator);
+        this.target_to_word_match(
+          word_stream,
+          raw_target,
+          reference_mapper,
+          carryover_associator,
+        );
       }
 
       // NOW, Go through TARGET
@@ -778,7 +820,7 @@ class Transformer {
             raw_result,
             word_stream,
             reference_mapper,
-            carryover_associator
+            carryover_associator,
           );
 
           // Get environment bindings 1
@@ -824,7 +866,7 @@ class Transformer {
             raw_result,
             word_stream,
             reference_mapper,
-            carryover_associator
+            carryover_associator,
           );
 
           replacements.push({
@@ -845,7 +887,7 @@ class Transformer {
               word_stream.slice(cursor),
               raw_target,
               reference_mapper,
-              carryover_associator
+              carryover_associator,
             );
 
           if (match_length === 0) {
@@ -922,7 +964,7 @@ class Transformer {
               raw_result,
               matched_stream,
               reference_mapper,
-              carryover_associator
+              carryover_associator,
             );
 
             replacements.push({
@@ -987,11 +1029,10 @@ class Transformer {
     return word;
   }
 
-  
   get_variant_id(
     mapper: Associateme_Mapper,
     grapheme: string,
-    baseToken: { entry_id: number; base_id: number }
+    baseToken: { entry_id: number; base_id: number },
   ): number | null {
     const { entry_id, base_id } = baseToken;
 
@@ -1011,7 +1052,6 @@ class Transformer {
     }
     return null; // not found
   }
-
 }
 
 export default Transformer;
