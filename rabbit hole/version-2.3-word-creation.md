@@ -1,4 +1,6 @@
-## 1. Word classes
+# Version 2 word-creation
+
+## Word classes
 
 Like the so called "categories" in lexifer.ts. I could put them in the Words: block.
 
@@ -6,7 +8,7 @@ They're not that useful here as you can just comment out a line in the words: bl
 
 generated words would have meta information that they were in a pos or word class
 
-Tranforms could then have a condition that 
+Tranforms could then have a condition that targets that word with a word class
 
 ## 2. Long form category keys
 

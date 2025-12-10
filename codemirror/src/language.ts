@@ -26,7 +26,7 @@ const escapeRegex = /\\[^\s]|&\[(?:Space|Tab|Newline|Acute|DoubleAcute|Grave|Dou
 
 const routineRules = [
   {
-    token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|reverse)/
+    token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|roman-to-hangeul|reverse)/
   },
   { token: "link", regex: /=/ },
   { token: "meta", regex: />/}
@@ -74,7 +74,7 @@ const transformRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: />>|->|=>|⇒|→|\/|!|,|_/ },
   { token: "operator", regex: /0|\^/ }, 
-  { token: "regexp",   regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~/ },
+  { token: "regexp",   regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~|\|/ },
   { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
 ];
 
@@ -82,14 +82,14 @@ const clusterRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\/|!|_|\+/ },
   { token: "operator", regex: /0|\^/ },
-  { token: "regexp",   regex: /&=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\?|\*|:|%|~/ },
+  { token: "regexp",   regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~|\|/ },
   { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
 ];
 
 const featureFieldRules = [
   { token: "escape",   regex: escapeRegex },
   { token: "link",     regex: /,|\./ },
-  { token: "operator", regex: /\+/ },
+  { token: "attributeName", regex: /\+/ },
   { token: "regexp",   regex: /-/ }
 ];
 
@@ -229,7 +229,6 @@ const parser: StreamParser<State> = {
                 let match = stream.match(catRegex) as RegExpMatchArray;
                 if (match) {
                     state.catList.push(match[1]);
-                    state.unitList.push(match[1]);
                     state.we_on_newline = false;
                     return "tagName";
                 }

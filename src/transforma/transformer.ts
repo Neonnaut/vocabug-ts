@@ -754,6 +754,7 @@ class Transformer {
     // ROUTINE
     if (routine != null) {
       word_stream = this.run_routine(routine, word, word_stream, line_num);
+      return word_stream;
     }
 
     if (target.length !== result.length) {

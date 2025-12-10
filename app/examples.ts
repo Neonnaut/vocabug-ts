@@ -10,7 +10,7 @@ categories:
   F = n r s
 
 ; A Unit provides abbreviation of parts of a word-shape.
-; Here we are using <S> to define the main syllable.
+; Here we are using <$> to define the main syllable.
 ; Items enclosed in '(' and ')' only appear 10% of the time by default.
 units:
   $ = C{V(F)*10,L}
@@ -25,11 +25,11 @@ graphemes:
   ee, oo, aa, ii, uu, ch
 
 ; Vocabug uses 'transforms' to change words, or outright reject them.
-; Transforms are all placed inside the 'stage' directive
+; Transforms are all placed inside the 'stage' directive.
 stage:
 nn, nm, np, sh, ss -> ny, m, mp, s, s
-aa, ee, ii, oo, uu -> a, e, i, o, u / #_#
-yi -> 0
+{V}: -> {V} / #_# ; Words that are a long vowel become short.
+yi -> 0 ; Remove words with <yi>
 
 ; Click the green 'Generate' button in the taskbar below to generate words!!
 ; Read the instructions linked above, or by clicking '?' in the taskbar below`,
@@ -64,8 +64,8 @@ graphemes:
 stage:
 ; Combine vowels and diacritics into one character, if possible.
   <routine = compose>
-; Palatalise c after <i> and its tonal variants
-  c -> ç / _i~`,
+; Palatalise <c> and <s> after <i> and its tonal variants.
+  c s -> ç ş / _i~`,
   japanese: 
 `; Japanese-like based on interpreting wikipedia.org/wiki/Japanese_phonology 
 ; and Phonological Unit Frequencies in Japanese... by Katsuo Tamaoka.
@@ -73,30 +73,34 @@ stage:
 categories:
   I = k ^ t s n m h d g r z b w p
   C = k t s r n ^ h m d g z b w p
+  V = a i u o e ; - The short vowels.
 ; <ʀ> yields long vowels.
-  V = a i u o e {oʀ aʀ iʀ eʀ uʀ yu yo ya {yoʀ yuʀ yaʀ}}
+  W = a i u o e {oʀ aʀ iʀ eʀ uʀ yu yo ya {yoʀ yuʀ yaʀ}}
 ; <ɴ> is the syllable final nasal.
-; <ꞯ> yields geminate consonants.
-  F = ɴ ꞯ
+; <ɢ> yields geminate consonants.
+  F = ɴ ɢ
 
 units:
-  F = IV(F) ; First syllable of slightly different consonant distribution.
-  $ = CV(F) ; Gives type C(y)V(ʀ)(ɴ,ꞯ).
+  F = IW(F) ; First syllable of slightly different consonant distribution.
+  $ = CW(F) ; Gives type C(y)V(ʀ)(ɴ,ɢ)
+  L = CW(ɴ) ; Last syllable of type C(y)V(ʀ)(ɴ)
 
-; Where light syllable is (C)V, and heavy is (C){VF,Vʀ(F)}.
+; Where light syllable is (C)V, and heavy is (C){VF,Vʀ(F)}
 ; The final two syllables are least likely to be light + heavy...
 
 words:
-  <F><$><$> <F><$><$><$> <F> <F><$><$><$><$> <F><$>
+  <F><$><L> <F><$><$><L> <F> <F><$><$><$><L> <F><L>
 
 graphemes:
   a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 stage:
-{a,e,i,o,u}+ -> ^ / ʀ_ ; No vowels after a long vowel
-{a,e,i,o,u}?[3,] -> {a,e,i,o,u}: ; Sequence of 3+ vowels becomes 2
+{V}+ -> ^ / ʀ_ ; No vowels after a long vowel.
+{V}?[3,] -> {V}: ; Sequence of 3+ vowels becomes 2.
 
-; "Yotsugana": <dz> and <dj> neutralise to <z> and <j>
+ɢ -> ɴ / _{V}
+
+; "Yotsugana": <dz> and <dy> neutralise to <z> and <j>.
 <  i   u   e   o   ya   yu   yo
 s  shi +   +   +   sha  shu  sho
 z  ji  +   +   +   ja   ju   jo 
@@ -107,13 +111,13 @@ w  i   yu  yo  yo  ya   yu   yo
 ɴ  n'a n'u n'e n'o n'ya n'yu n'yo
 >
 
-; <ɴ> assimilation, and <ꞯ> gemination.
+; <ɴ> assimilation, and <ɢ> gemination.
 < ch   sh    ts   j  k   g  s   z  t   d  n  h   b  p   m  r  l  f   w
-ꞯ ꞯtch ꞯshsh ꞯtts j  ꞯkk g  ꞯss z  ꞯtt d  n  ꞯpp b  ꞯpp m  r  l  ꞯpp ꞯpp
+ɢ ɢtch ɢshsh ɢtts j  ɢkk g  ɢss z  ɢtt d  n  ɢpp b  ɢpp m  r  l  ɢpp ɢpp
 ɴ nch  nsh   nts  nj nk  ng ns  nz nt  nd nn nh  mb mp  mm nr nl nf  nw
 >
 
-ʀꞯ ɴ ꞯ -> ^ n ^ ; <ʀ> + <ꞯ> is illegal.
+ʀɢ ɴ ɢ -> ^ n ^ ; <ʀ> + <ɢ> is illegal.
 
 ; Vowel sequences:
 <  a   i   u   e  o
@@ -127,16 +131,13 @@ o  oʀ  +   +   +  o
 
 y -> ^ / sh_ / j_ / ch_
 
-aʀ eʀ iʀ oʀ uʀ -> aa ee ii oo uu ; Get long vowels
+ʀ -> ^ / #*_# ; Collapse long vowel words into short vowel words.
 
-; Collapse aa ee ii oo uu words into short vowels.
-aa ee ii oo uu -> a e i o u / #_#`,
+{V}ʀ -> {V}: ; Get long vowels.`,
   australian: 
 `; This does not represent a single Australian language, it does something
 ; Australian looking. The glottal stop and lack of retroflex stops make it
 ; not an 'average' Australian language word list, but not unusual.
-
-; <ʀ> is vowel length and <\`> is for coda-matching.
 
 ; CONSONANTS:
 ; p t̪ t   č k ꞌ
@@ -148,6 +149,13 @@ aa ee ii oo uu -> a e i o u / #_#`,
 ; i ii    u uu
 ;   ee      oo
 ; a aa ai
+
+; <ʀ> is vowel length and <\`> is for coda-matching.
+; Words begin with <a> or a consonant that is not <l, r, ṛ, n̪>
+; No monosyllabic words. Disylabic words DON'T begin with <a>
+; Medial Singleton consonants are unrestricted.
+; There are intervocalic clusters.
+; Words end with <a, i, u> or <n, ň, l, r, ṛ,>
 
 categories:
 ; Initials:
@@ -164,19 +172,12 @@ categories:
   V = a i u {oʀ eʀ aʀ iʀ uʀ ai}
   W = a i u
 
-; No monosyllabic words.
-
-; Words begin with a consonant that is not <l, r, ṛ, n̪> or <a>.
-; Disylabic words DON'T begin with <a>.
-; Medial syllables are unrestricted
-; There are intervocalic clusters.
-; Words end with <a, i, u> or <n, ň, l, r, ṛ,>.
-
 units:
   First = {IW*12, a}
   Di-first = IW
-  Medial = {C*19,\`X*2,\`Y,\`Z}V
-  Last = {C*22,\`X*2,\`Y,\`Z}W(F)
+  Clusters = {\`X*2,\`Y,\`Z}
+  Medial = {C*19, <Clusters>}V
+  Last = {C*22,<Clusters>}{W*11,VF}
 
 words:
   <First><Medial><Last>, <First><Medial><Medial><Last>,
@@ -187,22 +188,22 @@ graphemes:
   a aʀ e eʀ i iʀ o oʀ u uʀ p t̪ t č k ꞌ m n̪ n ň ŋ r ṛ y w l ʎ }
 
 stage:
-; ʀestrict the occurance of <ai>.
-<  ꞌ  č  ŋ  ň  y  w  ʎ  ṛ  \`
-ai aꞌ ač aŋ aň ay aw aʎ aṛ a\`
->
+; ʀestrict the occurance of <ai>
+  <  ꞌ  č  ŋ  ň  y  w  ʎ  ṛ  \`
+  ai aꞌ ač aŋ aň ay aw aʎ aṛ a\`
+  >
 
-; Long vowels become short before a consonant cluster or <ꞌ>.
-ʀ -> ^ / _\` / _ꞌ
+; Long vowels become short before a consonant cluster or <ꞌ>
+  ʀ -> ^ / _\` / _ꞌ
 
 ; <yi>, <ʎi> and <wu> are rejected.
-yi ʎi wu yiʀ ʎiʀ wuʀ -> 0
+  yi ʎi wu yiʀ ʎiʀ wuʀ -> 0
 
 ; ʀomaniser:
-\` -> ^
-oʀ eʀ iʀ uʀ aʀ -> oo ee ii uu aa
-r ṛ n̪ t̪ -> rr r nh th
-ň ʎ č ŋ -> ny ly j ng`,
+  \` -> ^
+  oʀ eʀ iʀ uʀ aʀ -> oo ee ii uu aa
+  r ṛ n̪ t̪ -> rr r nh th
+  ň ʎ č ŋ -> ny ly j ng`,
 };
 
 export { examples };

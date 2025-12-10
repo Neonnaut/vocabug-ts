@@ -1,20 +1,54 @@
 # Version 2 transforms
 
-## Cyrillic
+## 1. Stage decorators
 
-## Greek
+### Change the syllable dividers in a decorator:
 
-## Katakana
+@stage.syllable-dividers = {., '}
 
-## Hiragana
+## 1. Decorator for individual transform
 
-## IPA featurefield set
+### Give name
 
-## 2. Long form category keys
+@"Name here yeah yeah"
+
+These printed out in debug mode
+
+### left-to-right
+
+@"Name" -left-to-right -ltr
+
+### right-to-left
+
+@"Name" -right-to-left -rtl     
+
+### replace once
+
+@"Name" -replace-once -ro
+
+### No overlap
+
+@"Name" -no-overlap -no
+
+
+## 2. Routine
+
+### Cyrillic
+
+### Greek
+
+### Katakana
+
+### Hiragana
+
+### IPA featurefield set
+
+
+## 3. Long form category keys
 
 Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
 
-## 3. Positioner
+## 4. Positioner
 
 Positioners, enclosed in `@[` and `]`, allows a grapheme to the left of it to be captured only when it is the Nth in the word:
 
@@ -30,17 +64,18 @@ If we want to match the last occurence of a grapheme in a word, use `-1`. For th
 ; sososo ==> sososx
 ```
 
-## 4. If then else block
+## 5. If then else block
 
 If block
 Using an If block, You can make transformations execute on a word if, or if not, other transformation(s) were applied to the word.
 
 It should feel familiar to anyone who knows a bit about programming languages
 
-`BEGIN if:` starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.
-`then:` is where you put transforms that will execute if the transformations in if: did apply
-`else:` is is where you put transforms that will execute if the transformations in if: did not meet a `CONDITION` or were blocked by an `EXCEPTION`
-END is the end of the block
+- `<if` starts the if block and where transforms will be listened to and trigger other events on the word if, or if not, it is executed on that word.
+- `<then` is where you put transforms that will execute if the transformations in if: did apply
+- `<else` is is where you put transforms that will execute if the transformations in if: did not meet a `CONDITION` or were blocked by an `EXCEPTION`
+- `>` Ends
+
 For example:
 
 ```
@@ -58,15 +93,14 @@ For example:
 
 Note: The above example is actually quite bogus if it were a historical sound change. Sound change in natural diachronics has no memory. We can have "two-part" sound-changes such as this triggered metathesis, but a sound change executing on a word because another sound change did not apply to the word does not occur, at least not in real-life natural human languages.
 
-## 5. Rule macro
+## 6. Rule macro
 
 Rule macro saves rules to be used later in the definition-build as many times as needed. The rules inside the define-rule-macro: block do not run until invoked using do-rule-macro:
 
 ```
-BEGIN def-rule-macro resyllabify:
+macro "resyllabify":
   i -> j / _[a,e,o,u]
   u -> w / _[a,e,i,o]
-END
 ```
 
 ```
@@ -89,53 +123,33 @@ invisible-graphemes: .
 ; 'tt' becomes 'd'. Ignore any '.' between 't's
 ```
 
-## word class
+## 8. word class
 
 generated words would have meta information that they were in a pos or word class
 
-Tranforms could then have a condition that 
+Tranforms could then have a condition that
 
-## Automatic Syllables 
+`<word-class-condition = noun`
+`x -> y
 
-cons . vowel vowel . cons
+## 9. Automatic Syllables 
+
+C . V V . C
 
 reluctance - makes 
 
 multiple syllable shapes
 
-
-
-## Structured syllable rule
-
-## Naming rules
-
-Ability to give each transform a name. The name would be printed out in debug mode
-
-## Reversable
-
-## abanana rule, no overlappinng
-
-## Right-to-left
-
-## Left-to-right
-
-## Clean-up
+## 10. Clean-up
 
 A cleanup rule, marked with the modifier cleanup after the rule name, applies after every subsequent rule:
 
 Ability to deactivate cleanup, or temporarily deactivate on a transform
 
-## terminate at first replacement
-
-## syllable level features
-
-## feature target missmatch of features
 
 ## syllable reference
 
 ## Probably do spaces between graphemes and tokens to do sequences
-
-## then, else, if, blocks that can be nested
 
 ## Able to chain changes: a -> e -> i
 
@@ -153,22 +167,6 @@ now I can have infinite number of references
 
 ## Headers
 
-Top level header
-@top reverse-sound-change
-Somehow do rule before, after, like auto syllabifying
-name of changes: eg: egyptian-to-blahblah. Also do parent
-
-Blocks:
-If, then, else
-Can be nested
-
-header:
-@transform "Name", -left-to-right, -right-to-left, -replace-once, -no-overlap, -is-engine
-                  -ltr             -rtl            -ro            -no          -ir
-
-@transform-macro 
-way to do word-class only 
-
 Feature geometry
 
 Autosegmental phonology
@@ -181,9 +179,7 @@ Word-and-paradigm morphology
 ## reference factory
 `| a -> b, a -> shift-right, `
 
-# Change the syllable dividers in a decorator:
 
-@stage.syllable-dividers = {., '}
 
 ## A way to do sandhi. For example: ^ -> n / a_#a 
 
@@ -228,22 +224,6 @@ supraseme
 
 #5d4472
 
-
-Top level header
-@top reverse-sound-change
-Somehow do rule before, after, like auto syllabifying
-name of changes: eg: egyptian-to-blahblah. Also do parent
-
-Blocks:
-If, then, else
-Can be nested
-
-header:
-@transform "Name", -left-to-right, -right-to-left, -replace-once, -no-overlap, -is-engine
-                  -ltr             -rtl            -ro            -no          -ir
-
-@transform-macro 
-way to do word-class only 
 
 Feature geometry
 

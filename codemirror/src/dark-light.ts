@@ -148,7 +148,7 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#000000" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#74747eff"},
+  { tag: t.comment, color: "#7e7474ff"},
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
@@ -159,11 +159,11 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   // LIGHT BLUE / commas, equals sign, colon
   { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, 
 
-  // CYAN / 0, ->, +, -
-  { tag: t.operator, color: "#024bba", fontWeight: "bold"}, 
+  // CYAN / 0, ^
+  { tag: t.operator, color: "#16657fff", fontWeight: "bold"}, 
 
   // PINK / #, +, *, (, {, [
-  { tag: t.regexp, color: "#990085ff" },
+  { tag: t.regexp, color: "#8400b8ff" },
 
   // ORANGE / Categories
   { tag: t.tagName, color: "#7f5700ff" },
@@ -242,7 +242,7 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   { tag: t.variableName, color: "#000000" },
 
   // Comment / GREEN / #
-  { tag: t.comment, color: "#74747eff"},
+  { tag: t.comment, color: "#7e7474ff"},
 
   // Escape char / CREAM ON BLACK
   { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
@@ -254,10 +254,10 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   { tag: t.link, color: "#0066b9ff" , fontWeight: "bold" }, 
 
   // CYAN / 0, ->, +, -
-  { tag: t.operator, color: "#024bba", fontWeight: "bold"}, 
+  { tag: t.operator, color: "#16657fff", fontWeight: "bold"}, 
 
   // PINK / #, +, *, (, {, [
-  { tag: t.regexp, color: "#b8009fff" },
+  { tag: t.regexp, color: "#8400b8ff" },
 
   // ORANGE / Categories
   { tag: t.tagName, color: "#b07c0bff" },

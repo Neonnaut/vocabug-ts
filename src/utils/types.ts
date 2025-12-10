@@ -176,7 +176,6 @@ export const SYNTAX_CHARS = [
   "]",
   "(",
   ")",
-  "^",
   "0",
   "/",
   "!",
@@ -201,6 +200,8 @@ export const SYNTAX_CHARS = [
   "8",
   "9",
 ];
+
+export const SYNTAX_CHARS_AND_CARET: string[] = [...SYNTAX_CHARS, "^"];
 
 export type Carryover_Associations = {
   entry_id: number;

@@ -9,6 +9,7 @@ const examples: { [key: string]: string } = {
 ; ts, ks,
 ; s, x,
 ; m, n,
+; r
 ; w, j,
 
 pp, tt, kk,
@@ -20,6 +21,11 @@ mm, nn,
 ; e, i, ø, y,
 
 (s)CVMXs
+
+#(s)CV                                                   sksa
+-(N, s, h, ', r)XV                                       kamkka, kaska
+-(N, s, h, ', r)CV(t, k, ts, ks, s, n, nt, nk, nts)#     skank
+
 `
 
 };

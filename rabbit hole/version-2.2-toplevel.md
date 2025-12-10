@@ -6,7 +6,7 @@
 
 Right now, escape chars could interfere with PUA
 
-# Ability to make infos!!
+## Ability to make infos!!
 
 @meta.info = "message {version}"
 
@@ -15,6 +15,6 @@ Right now, escape chars could interfere with PUA
 @meta.title = "languageX"
 @meta.domain = "neonnaut.neocities.com"
 
-# A decorator to disable a directive
+## A decorator to disable a directive
 
 @directive.disabled = true

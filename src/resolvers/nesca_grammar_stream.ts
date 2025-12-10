@@ -7,7 +7,7 @@
 import Logger from "../logger.js";
 import Escape_Mapper from "../escape_mapper.js";
 import type { Token } from "../utils/types.js";
-import { SYNTAX_CHARS } from "../utils/types.js";
+import { SYNTAX_CHARS_AND_CARET } from "../utils/types.js";
 import type { Token_Stream_Mode, Associateme_Mapper } from "../utils/types.js";
 import { graphemosis } from "../utils/utilities.js";
 
@@ -277,7 +277,7 @@ class Nesca_Grammar_Stream {
         i++;
       } else if (
         // Syntax character used wrongly
-        SYNTAX_CHARS.includes(char)
+        SYNTAX_CHARS_AND_CARET.includes(char)
       ) {
         this.logger.validation_error(
           `Unexpected syntax character '${char}' in ${mode}`,
@@ -317,13 +317,6 @@ class Nesca_Grammar_Stream {
       // ✅ Modifier parsing (applies to any token type except word-boundary, reject, deletion, insertion)
 
       if (stream[i] === ":") {
-        tokens.push({ ...new_token });
-        let look_ahead = i + 1;
-        while (stream[look_ahead] == ":") {
-          tokens.push({ ...new_token });
-          look_ahead++;
-        }
-
         new_token.min = 2;
         new_token.max = 2; // Default quantifier
         i++;

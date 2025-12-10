@@ -17949,14 +17949,30 @@ var cm6 = (function (exports) {
         "&.cm-focused .cm-matchingBracket": { backgroundColor: "#328c8252" },
         "&.cm-focused .cm-nonmatchingBracket": { backgroundColor: "#bb555544" }
     });
-    const DefaultScanDist = 10000, DefaultBrackets = "()[]{}";
+    function customRenderMatch(match, state) {
+      const from = match.start.from;
+      const char = state.doc.sliceString(from, from + 1);
+      const prevChar = state.doc.sliceString(from - 1, from);
+      const nextChar = from + 1 < state.doc.length
+      ? state.doc.sliceString(from + 1, from + 2)
+      : "";
+
+      
+      if (char === ">" && prevChar === "-") return [];
+      if (char === ">" && prevChar === ">") return [];
+      if (char === ">" && nextChar === ">") return [];
+
+      // Otherwise, use the default
+      return defaultRenderMatch(match);
+    }
+    const DefaultScanDist = 10000, DefaultBrackets = "()[]{}<>";
     const bracketMatchingConfig = /*@__PURE__*/Facet.define({
         combine(configs) {
             return combineConfig(configs, {
                 afterCursor: true,
                 brackets: DefaultBrackets,
                 maxScanDistance: DefaultScanDist,
-                renderMatch: defaultRenderMatch
+                renderMatch: customRenderMatch
             });
         }
     });
@@ -20103,7 +20119,7 @@ var cm6 = (function (exports) {
     const indentWithTab = { key: "Tab", run: indentMore, shift: indentLess };
 
     const defaults = {
-        brackets: ["(", "[", "{"],
+        brackets: ["(", "[", "{", "<"],
         before: ")]}:;>",
         stringPrefixes: []
     };
@@ -20544,17 +20560,17 @@ var cm6 = (function (exports) {
     var xcodeLightStyle = [
         { tag: tags.variableName, color: "#000000" },
         // Comment / GREEN / #
-        { tag: tags.comment, color: "#74747eff" },
+        { tag: tags.comment, color: "#7e7474ff" },
         // Escape char / CREAM ON BLACK
         { tag: tags.escape, color: "#000000", backgroundColor: "#e8d9cc" },
         // Directive / RED / words: alphabet: etc.
         { tag: [tags.meta, tags.name], color: "#a11c08ff" },
         // LIGHT BLUE / commas, equals sign, colon
         { tag: tags.link, color: "#0066b9ff", fontWeight: "bold" },
-        // CYAN / 0, ->, +, -
-        { tag: tags.operator, color: "#024bba", fontWeight: "bold" },
+        // CYAN / 0, ^
+        { tag: tags.operator, color: "#16657fff", fontWeight: "bold" },
         // PINK / #, +, *, (, {, [
-        { tag: tags.regexp, color: "#990085ff" },
+        { tag: tags.regexp, color: "#8400b8ff" },
         // ORANGE / Categories
         { tag: tags.tagName, color: "#7f5700ff" },
         // Weights
@@ -20620,7 +20636,7 @@ var cm6 = (function (exports) {
     var xcodeWarmStyle = [
         { tag: tags.variableName, color: "#000000" },
         // Comment / GREEN / #
-        { tag: tags.comment, color: "#74747eff" },
+        { tag: tags.comment, color: "#7e7474ff" },
         // Escape char / CREAM ON BLACK
         { tag: tags.escape, color: "#000000", backgroundColor: "#e8d9cc" },
         // Directive / RED / words: alphabet: etc.
@@ -20628,9 +20644,9 @@ var cm6 = (function (exports) {
         // LIGHT BLUE / commas, equals sign, colon
         { tag: tags.link, color: "#0066b9ff", fontWeight: "bold" },
         // CYAN / 0, ->, +, -
-        { tag: tags.operator, color: "#024bba", fontWeight: "bold" },
+        { tag: tags.operator, color: "#16657fff", fontWeight: "bold" },
         // PINK / #, +, *, (, {, [
-        { tag: tags.regexp, color: "#b8009fff" },
+        { tag: tags.regexp, color: "#8400b8ff" },
         // ORANGE / Categories
         { tag: tags.tagName, color: "#b07c0bff" },
         // Weights
@@ -20667,7 +20683,7 @@ var cm6 = (function (exports) {
     var escapeRegex = /\\[^\s]|&\[(?:Space|Tab|Newline|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek|VerticalLineBelow|VerticalLineAbove|DoubleVerticalLineBelow|PlusSignBelow|PlusSignStandalone|uptackBelow|UpTackStandalone|LeftTackBelow|rightTackBelow|DownTackBelow|DownTackStandalone|BreveBelow|InvertedBreveBelow|MacronBelow|MacronBelowStandalone|BridgeBelow|BridgeAbove|InvertedBridgeBelow|SquareBelow|SeagullBelow|LeftBracketBelow)\]/;
     var routineRules = [
         {
-            token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|reverse)/
+            token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|roman-to-hangeul|reverse)/
         },
         { token: "link", regex: /=/ },
         { token: "meta", regex: />/ }
@@ -20709,20 +20725,20 @@ var cm6 = (function (exports) {
         { token: "escape", regex: escapeRegex },
         { token: "link", regex: />>|->|=>|⇒|→|\/|!|,|_/ },
         { token: "operator", regex: /0|\^/ },
-        { token: "regexp", regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~/ },
+        { token: "regexp", regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~|\|/ },
         { token: "tagName", regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
     ];
     var clusterRules = [
         { token: "escape", regex: escapeRegex },
         { token: "link", regex: /,|\/|!|_|\+/ },
         { token: "operator", regex: /0|\^/ },
-        { token: "regexp", regex: /&=|=[1-9]|\[|\]|\(|\)|\{|\}|#|\$|\+|\?|\*|:|%|~/ },
+        { token: "regexp", regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~|\|/ },
         { token: "tagName", regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
     ];
     var featureFieldRules = [
         { token: "escape", regex: escapeRegex },
         { token: "link", regex: /,|\./ },
-        { token: "operator", regex: /\+/ },
+        { token: "attributeName", regex: /\+/ },
         { token: "regexp", regex: /-/ }
     ];
     var parser = {
@@ -20837,7 +20853,6 @@ var cm6 = (function (exports) {
                     var match = stream.match(catRegex);
                     if (match) {
                         state.catList.push(match[1]);
-                        state.unitList.push(match[1]);
                         state.we_on_newline = false;
                         return "tagName";
                     }

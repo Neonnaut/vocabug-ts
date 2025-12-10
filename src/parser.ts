@@ -162,6 +162,10 @@ class Parser {
       // check for directive change
       const temp_directive = this.parse_directive(line, my_decorator);
       if (temp_directive != "none") {
+        if (my_clusterfield_transform.length > 0) {
+          //////
+        }
+
         if (my_subdirective != "none") {
           this.logger.validation_error(
             `${my_subdirective} was not closed before directive change`,
@@ -578,6 +582,9 @@ class Parser {
     }
     const my_transform = my_transforms[0];
 
+    my_transform.target += ", ";
+    my_transform.result += ", ";
+
     /// -------------
 
     if (line.startsWith("/") || line.startsWith("!")) {
@@ -851,6 +858,11 @@ class Parser {
         my_pro_graphemes.push(top_row[i]);
       } else if (my_row[i] === "-") {
         my_anti_graphemes.push(top_row[i]);
+      } else {
+        this.logger.validation_error(
+          `Feature-field values must be either '+', '-', or '.' -- found '${my_row[i]}' instead.`,
+          this.file_line_num,
+        );
       }
     }
     if (my_pro_graphemes.length > 0) {

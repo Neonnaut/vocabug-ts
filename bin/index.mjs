@@ -5728,19 +5728,19 @@ const medials = {
   // ㅛ
   yu: 17,
   // ㅠ
-  yè: 3,
+  yẹ: 3,
   // ㅒ
   ya: 2,
   // ㅑ
   ye: 7,
   // ㅖ
-  yò: 6,
+  yọ: 6,
   // ㅕ
   wa: 9,
   // ㅘ
-  wè: 10,
+  wẹ: 10,
   // ㅙ
-  wò: 14,
+  wọ: 14,
   // ㅝ
   we: 15,
   // ㅞ
@@ -5750,11 +5750,11 @@ const medials = {
   // ㅗ
   u: 13,
   // ㅜ
-  è: 1,
+  ẹ: 1,
   // ㅐ
   a: 0,
   // ㅏ
-  ò: 4,
+  ọ: 4,
   // ㅓ
   e: 5,
   // ㅔ
@@ -6399,6 +6399,7 @@ class Transformer {
     }
     if (routine != null) {
       word_stream = this.run_routine(routine, word, word_stream, line_num);
+      return word_stream;
     }
     if (target.length !== result.length) {
       this.logger.validation_error(
@@ -6842,10 +6843,10 @@ class Text_Builder {
         this.invisible
       );
     }
+    this.create_record();
     if (this.output_mode === "paragraph") {
       return this.paragraphify(this.words);
     }
-    this.create_record();
     return this.words.join(this.word_divider);
   }
   paragraphify(words) {
@@ -6968,6 +6969,46 @@ class Logger {
     this.diagnostics.push(diagnostic);
   }
 }
+const SYNTAX_CHARS = [
+  "<",
+  ">",
+  "@",
+  "⇒",
+  "→",
+  "->",
+  ">>",
+  "_",
+  "{",
+  "}",
+  "[",
+  "]",
+  "(",
+  ")",
+  "0",
+  "/",
+  "!",
+  "#",
+  "$",
+  "+",
+  "?",
+  ":",
+  "*",
+  "&",
+  "%",
+  "|",
+  "~",
+  "=",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+];
+const SYNTAX_CHARS_AND_CARET = [...SYNTAX_CHARS, "^"];
 const escapeMap = {
   "&[Space]": " ",
   "&[Tab]": "	",
@@ -7038,43 +7079,6 @@ const escapeMap = {
   "&[LeftBracketBelow]": "͉"
   // ◌͉
 };
-const transform_syntax_chars = [
-  "[",
-  "]",
-  "{",
-  "}",
-  "(",
-  ")",
-  "@",
-  ">",
-  "⇒",
-  "→",
-  "/",
-  "?",
-  "!",
-  "_",
-  "#",
-  "+",
-  ":",
-  "*",
-  "&",
-  "|",
-  "<",
-  "~",
-  "%",
-  "$",
-  "=",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "0"
-];
 class Escape_Mapper {
   constructor() {
     __publicField(this, "map");
@@ -7098,7 +7102,7 @@ class Escape_Mapper {
     return result;
   }
   escape_special_chars(input) {
-    const special_chars = new Set(transform_syntax_chars);
+    const special_chars = new Set(SYNTAX_CHARS);
     const reverse = /* @__PURE__ */ new Map();
     const result = input.split("").map((char) => {
       if (special_chars.has(char)) {
@@ -7626,6 +7630,9 @@ class Transform_Resolver {
       } else if ("min" in t) {
         s += `+[${t.min}${t.max !== Infinity ? "," + t.max : ""}]`;
       }
+      if ("association" in t) {
+        s += `~`;
+      }
       return s;
     }).join(" ");
   }
@@ -7685,45 +7692,6 @@ Transforms {
     this.logger.diagnostic(info);
   }
 }
-const SYNTAX_CHARS = [
-  "<",
-  "@",
-  "⇒",
-  "→",
-  "->",
-  ">>",
-  "_",
-  "{",
-  "}",
-  "[",
-  "]",
-  "(",
-  ")",
-  "^",
-  "0",
-  "/",
-  "!",
-  "#",
-  "$",
-  "+",
-  "?",
-  ":",
-  "*",
-  "&",
-  "%",
-  "|",
-  "~",
-  "=",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9"
-];
 class Nesca_Grammar_Stream {
   constructor(logger, graphemes, associateme_mapper, escape_mapper) {
     __publicField(this, "logger");
@@ -7947,7 +7915,7 @@ class Nesca_Grammar_Stream {
         i++;
       } else if (
         // Syntax character used wrongly
-        SYNTAX_CHARS.includes(char)
+        SYNTAX_CHARS_AND_CARET.includes(char)
       ) {
         this.logger.validation_error(
           `Unexpected syntax character '${char}' in ${mode}`,
