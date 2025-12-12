@@ -22,7 +22,7 @@ function toolbar_func(view: EditorView) {
 
     const generate_btn = document.createElement("button");
     generate_btn.textContent = "Generate";
-    generate_btn.id = "generate-words";
+    generate_btn.classList.add("generate-words", "green-btn");
     generate_btn.onclick = () => {
     };
     dom.appendChild(generate_btn);
@@ -48,10 +48,14 @@ function toolbar_func(view: EditorView) {
 
     const help_btn = document.createElement("button");
     help_btn.innerHTML = "<i class='fa fa-question'></i>";
-    help_btn.onclick = () => {
+    help_btn.addEventListener("mousedown", (event: MouseEvent) => {
+        if (event.button === 2) {
+            return;
+        }
+
         // Open help page in new tab
         window.open("./vocabug_docs", "_blank");
-    };
+    });
     dom.appendChild(help_btn);
 
     return {

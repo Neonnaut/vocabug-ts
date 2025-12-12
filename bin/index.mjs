@@ -4143,6 +4143,7 @@ class Parser {
       }
       const temp_directive = this.parse_directive(line, my_decorator);
       if (temp_directive != "none") {
+        if (my_clusterfield_transform.length > 0) ;
         if (my_subdirective != "none") {
           this.logger.validation_error(
             `${my_subdirective} was not closed before directive change`,
@@ -4230,7 +4231,7 @@ class Parser {
       }
       if (my_directive === "feature-field") {
         if (my_header.length === 0) {
-          const top_row = line.split(/[,\s]+/).filter(Boolean);
+          const top_row = line.split(/[\s]+/).filter(Boolean);
           if (top_row.length < 2) {
             this.logger.validation_error(
               `Feature-field header too short`,
@@ -4278,7 +4279,7 @@ class Parser {
           continue;
         } else if (line.startsWith("< ")) {
           my_clusterfield_transform.push({
-            routine: null,
+            t_type: "cluster-field",
             target: "",
             result: "",
             conditions: [],
@@ -4287,7 +4288,7 @@ class Parser {
             line_num: this.file_line_num
           });
           line = line.substring(2).trim();
-          const top_row = line.split(/[,\s]+/).filter(Boolean);
+          const top_row = line.split(/[\s]+/).filter(Boolean);
           if (top_row.length < 2) {
             this.logger.validation_error(
               `Feature-field header too short`,
@@ -4300,7 +4301,7 @@ class Parser {
         } else if (line.startsWith("<routine")) {
           const my_routine = this.parse_routine(line);
           this.transform_pending.push({
-            routine: my_routine,
+            t_type: my_routine,
             target: "\\",
             result: "\\",
             conditions: [],
@@ -4312,7 +4313,7 @@ class Parser {
         } else {
           const [target, result, conditions, exceptions] = this.get_transform(line);
           this.transform_pending.push({
-            routine: null,
+            t_type: "rule",
             target,
             result,
             conditions,
@@ -4409,6 +4410,13 @@ class Parser {
         this.wordshape_distribution = this.parse_distribution(my_value);
         new_decorator = "words";
       } else if (my_property === "optionals-weight") {
+        if (!my_value.endsWith("%")) {
+          this.logger.validation_error(
+            `Invalid optionals-weight '${my_value}' -- expected a percentage value ending with '%'`,
+            this.file_line_num
+          );
+        }
+        my_value = my_value.slice(0, -1).trim();
         const optionals_weight = make_percentage(my_value);
         if (optionals_weight == null) {
           this.logger.validation_error(
@@ -4493,13 +4501,9 @@ class Parser {
       );
     }
     const my_transform = my_transforms[0];
-    if (line.startsWith("/") || line.startsWith("!")) {
-      const { conditions, exceptions } = this.get_environment(line);
-      my_transform.conditions.push(...conditions);
-      my_transform.exceptions.push(...exceptions);
-      return [my_transform];
-    }
-    const my_row = line.split(/[,\s]+/).filter(Boolean);
+    my_transform.target += ", ";
+    my_transform.result += ", ";
+    const my_row = line.split(/[\s]+/).filter(Boolean);
     const my_key = my_row.shift();
     if (my_row.length !== my_header.length || my_key === void 0) {
       this.logger.validation_error(
@@ -4535,7 +4539,7 @@ class Parser {
     const gtCount = (right2.match(/>/g) || []).length;
     if (gtCount !== 1) {
       this.logger.validation_error(
-        `Invalid routine format2 '${line}'`,
+        `Invalid routine format '${line}'`,
         this.file_line_num
       );
     }
@@ -4557,7 +4561,7 @@ class Parser {
         return routine;
     }
     this.logger.validation_error(
-      `Invalid routine3 '${routine}'`,
+      `Invalid routine '${routine}'`,
       this.file_line_num
     );
   }
@@ -4596,11 +4600,9 @@ class Parser {
     }
     const slash_index = divided[1].indexOf("/");
     const bang_index = divided[1].indexOf("!");
-    const question_index = divided[1].indexOf("?");
     const delimiter_index = Math.min(
       slash_index === -1 ? Infinity : slash_index,
-      bang_index === -1 ? Infinity : bang_index,
-      question_index === -1 ? Infinity : question_index
+      bang_index === -1 ? Infinity : bang_index
     );
     const result = delimiter_index === Infinity ? divided[1].trim() : divided[1].slice(0, delimiter_index).trim();
     if (result == "") {
@@ -4655,17 +4657,6 @@ class Parser {
     };
   }
   validate_environment(unit, kind) {
-    if (kind === "chance") {
-      const parsed = parseInt(unit, 10);
-      if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-        return unit;
-      } else {
-        this.logger.validation_error(
-          `Chance "${unit}" must be a number between 0 and 100`,
-          this.file_line_num
-        );
-      }
-    }
     const parts = unit.split("_");
     if (parts.length !== 2) {
       this.logger.validation_error(
@@ -4683,7 +4674,7 @@ class Parser {
     return `${before}_${after}`;
   }
   parse_featurefield(line, top_row) {
-    const my_row = line.split(/[,\s]+/).filter(Boolean);
+    const my_row = line.split(/[\s]+/).filter(Boolean);
     const my_key = my_row.shift();
     if (my_row.length !== top_row.length || my_key === void 0) {
       this.logger.validation_error(
@@ -4708,6 +4699,11 @@ class Parser {
         my_pro_graphemes.push(top_row[i]);
       } else if (my_row[i] === "-") {
         my_anti_graphemes.push(top_row[i]);
+      } else {
+        this.logger.validation_error(
+          `Feature-field values must be either '+', '-', or '.' -- found '${my_row[i]}' instead.`,
+          this.file_line_num
+        );
       }
     }
     if (my_pro_graphemes.length > 0) {
@@ -5864,7 +5860,7 @@ class Carryover_Associator {
     __publicField(this, "caryover_list");
     this.caryover_list = [];
   }
-  // Called when a word's grapheme in TARGET matches a rule's grapheme with associateme-mark
+  // Called when a word's grapheme in TARGET matches a rule's grapheme with based-mark
   set_item(entry_id, variant_id) {
     this.caryover_list.push({ entry_id, variant_id });
   }
@@ -6001,7 +5997,12 @@ class Transformer {
             this.associateme_mapper
           );
           if (my_grapheme === null) {
-            for (let k = 0; k < my_result_token.min; k++) {
+            if (my_result_token.max === Infinity) {
+              this.logger.validation_error(
+                "This should no have happened: infinite max grapheme??"
+              );
+            }
+            for (let k = 0; k < my_result_token.max; k++) {
               replacement_stream.push(my_result_token.base);
             }
           } else {
@@ -6385,20 +6386,12 @@ class Transformer {
     return normalized;
   }
   apply_transform(word, word_stream, transform) {
-    const {
-      routine,
-      target,
-      result,
-      conditions,
-      exceptions,
-      chance,
-      line_num
-    } = transform;
+    const { t_type, target, result, conditions, exceptions, chance, line_num } = transform;
     if (chance != null && Math.random() * 100 >= chance) {
       return word_stream;
     }
-    if (routine != null) {
-      word_stream = this.run_routine(routine, word, word_stream, line_num);
+    if (t_type != "rule" && t_type != "cluster-field") {
+      word_stream = this.run_routine(t_type, word, word_stream, line_num);
       return word_stream;
     }
     if (target.length !== result.length) {
@@ -6602,7 +6595,7 @@ class Transformer {
       if (word.rejected) {
         break;
       }
-      if (t.target.length == 0) {
+      if (t.target.length == 0 && (t.t_type === "rule" || t.t_type === "cluster-field")) {
         continue;
       }
       tokens = this.apply_transform(word, tokens, t);
@@ -6897,7 +6890,7 @@ Invisible: ` + this.invisible.join(", ");
     this.logger.diagnostic(info);
   }
 }
-const VOCABUG_VERSION = "0.5.0";
+const VOCABUG_VERSION = "0.5.1";
 class Logger {
   constructor() {
     __publicField(this, "errors");
@@ -6963,7 +6956,7 @@ class Logger {
     }
   }
   info(info) {
-    this.infos.push(`Vocabug version ${VOCABUG_VERSION}: ${info}`);
+    this.infos.push(`Vocabug ver. ${VOCABUG_VERSION}: ${info}`);
   }
   diagnostic(diagnostic) {
     this.diagnostics.push(diagnostic);
@@ -7226,6 +7219,35 @@ class Transform_Resolver {
   resolve_transforms() {
     for (let i = 0; i < this.transform_pending.length; i++) {
       this.line_num = this.transform_pending[i].line_num;
+      if (this.transform_pending[i].t_type === "cluster-field") {
+        this.transforms.push({
+          t_type: this.transform_pending[i].t_type,
+          target: this.get_cluser_field_graphemes(
+            this.transform_pending[i].target,
+            "TARGET"
+          ),
+          result: this.get_cluser_field_graphemes(
+            this.transform_pending[i].result,
+            "RESULT"
+          ),
+          conditions: [],
+          exceptions: [],
+          chance: null,
+          line_num: this.line_num
+        });
+        continue;
+      } else if (this.transform_pending[i].t_type !== "rule") {
+        this.transforms.push({
+          t_type: this.transform_pending[i].t_type,
+          target: [],
+          result: [],
+          conditions: [],
+          exceptions: [],
+          chance: null,
+          line_num: this.line_num
+        });
+        continue;
+      }
       const target = this.transform_pending[i].target;
       const target_with_cat = this.categories_into_transform(target);
       const target_with_fea = this.features_into_transform(target_with_cat);
@@ -7322,7 +7344,7 @@ class Transform_Resolver {
         }
       }
       this.transforms.push({
-        routine: this.transform_pending[i].routine,
+        t_type: this.transform_pending[i].t_type,
         target: tokenised_target_array,
         result: tokenised_result_array,
         conditions: new_conditions,
@@ -7636,13 +7658,27 @@ class Transform_Resolver {
       return s;
     }).join(" ");
   }
+  get_cluser_field_graphemes(input, mode) {
+    const streams = input.split(/[,]+/).filter(Boolean);
+    const tokenised_array = [];
+    for (let j = 0; j < streams.length; j++) {
+      const stream = streams[j].trim();
+      const tokens = this.nesca_grammar_stream.cluster_parser(
+        stream,
+        mode,
+        this.line_num
+      );
+      tokenised_array.push(tokens);
+    }
+    return tokenised_array;
+  }
   show_debug() {
     const transforms = [];
     for (let i = 0; i < this.transforms.length; i++) {
       const my_transform = this.transforms[i];
-      if (my_transform.routine) {
+      if (my_transform.t_type != "rule" && my_transform.t_type != "cluster-field") {
         transforms.push(
-          `  <routine = ${my_transform.routine}> @ ln:${my_transform.line_num}`
+          `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num}`
         );
         continue;
       }
@@ -7950,12 +7986,6 @@ class Nesca_Grammar_Stream {
         }
       }
       if (stream[i] === ":") {
-        tokens.push({ ...new_token });
-        let look_ahead = i + 1;
-        while (stream[look_ahead] == ":") {
-          tokens.push({ ...new_token });
-          look_ahead++;
-        }
         new_token.min = 2;
         new_token.max = 2;
         i++;
@@ -7970,12 +8000,6 @@ class Nesca_Grammar_Stream {
         new_token.max = Infinity;
         i++;
       } else if (stream[i] === "?") {
-        if (mode === "RESULT") {
-          this.logger.validation_error(
-            `Bounded quantifier not allowed in '${mode}'`,
-            line_num
-          );
-        }
         let look_ahead = i + 1;
         if (stream[look_ahead] !== "[") {
           this.logger.validation_error(
@@ -8019,6 +8043,12 @@ class Nesca_Grammar_Stream {
                 line_num
               );
             }
+            if (max === Infinity && mode === "RESULT") {
+              this.logger.validation_error(
+                `In '${mode}', '${new_token.base}' cannot be reproduced an infinite amount of times`,
+                line_num
+              );
+            }
             new_token.min = min;
             new_token.max = max;
           } else {
@@ -8041,7 +8071,7 @@ class Nesca_Grammar_Stream {
       if (stream[i] === "~") {
         if (new_token.type !== "grapheme") {
           this.logger.validation_error(
-            `Associateme-mark only allowed after grapheme token`,
+            `Based-mark only allowed after grapheme token`,
             line_num
           );
         }
@@ -8051,7 +8081,7 @@ class Nesca_Grammar_Stream {
         );
         if (!location) {
           this.logger.validation_error(
-            `Grapheme "${new_token.base}" with an asociateme-mark was not an associateme base`,
+            `Grapheme "${new_token.base}" with a based-mark was not an associateme base`,
             line_num
           );
         }
@@ -8064,6 +8094,72 @@ class Nesca_Grammar_Stream {
           is_target: mode === "TARGET"
         };
         i++;
+      }
+      if (new_token.type !== "pending") {
+        tokens.push(new_token);
+      }
+    }
+    return tokens;
+  }
+  cluster_parser(stream, mode, line_num) {
+    let i = 0;
+    const tokens = [];
+    if (stream === "^") {
+      if (mode === "RESULT") {
+        return [{ type: "deletion", base: "^" }];
+      } else {
+        this.logger.validation_error(
+          `Unexpected character '${stream}' in mode '${mode}'`,
+          line_num
+        );
+      }
+    } else if (stream === "0") {
+      if (mode !== "RESULT") {
+        this.logger.validation_error(
+          `Reject not allowed in '${mode}'`,
+          line_num
+        );
+      }
+      return [{ type: "reject", base: "0" }];
+    }
+    while (i < stream.length) {
+      let new_token = { type: "pending", base: "", min: 1, max: 1 };
+      const char = stream[i];
+      if (/\s/.test(char)) {
+        i++;
+        continue;
+      }
+      if (char === "^" || char === "0") {
+        this.logger.validation_error(
+          `Unexpected character '${char}' in cluster-field`,
+          line_num
+        );
+      }
+      const escaped_stream = this.escape_mapper.restore_escaped_chars(stream);
+      let is_escaped = false;
+      if (escaped_stream[i] !== stream[i]) {
+        is_escaped = true;
+      }
+      let matched = false;
+      for (const g of this.graphemes.sort((a, b) => b.length - a.length)) {
+        if (escaped_stream.startsWith(g, i)) {
+          new_token = { type: "grapheme", base: g, min: 1, max: 1 };
+          i += g.length;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        new_token = {
+          type: "grapheme",
+          base: escaped_stream[i],
+          min: 1,
+          max: 1
+        };
+        i++;
+      }
+      if (is_escaped && new_token.type === "grapheme") {
+        new_token.escaped = true;
       }
       if (new_token.type !== "pending") {
         tokens.push(new_token);

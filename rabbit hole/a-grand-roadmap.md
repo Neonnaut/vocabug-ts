@@ -120,3 +120,7 @@
 - [x] Associatemes hook to getting transforms
 - [x] Get if grapheme is based mark in grammar stream
 - [x] If record based in transformation target, get assosiation for result
+
+- [x] Can use bounded quant in target
+
+- [x] fix clusterfield

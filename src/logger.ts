@@ -76,7 +76,7 @@ class Logger {
   }
 
   info(info: string): void {
-    this.infos.push(`Vocabug version ${VOCABUG_VERSION}: ${info}`);
+    this.infos.push(`Vocabug ver. ${VOCABUG_VERSION}: ${info}`);
   }
   diagnostic(diagnostic: string): void {
     this.diagnostics.push(diagnostic);

@@ -83,7 +83,13 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.strong, color: "#bee79d", fontStyle: "italic" },
 
   // distribution etc
-  { tag: t.attributeName, color: "#bee79d" }
+  { tag: t.attributeName, color: "#bee79d" },
+
+  // + sign
+  { tag: t.bitwiseOperator, color: "#8eea7eff", fontstyle: "bold" },
+
+  // - sign
+  { tag: t.processingInstruction, color: "#ea7eb9ff", fontstyle: "bold" }
 ];
 
 export const xcodeDarkInit = (options?: Partial<CreateThemeOptions>) => {
@@ -172,7 +178,14 @@ export const xcodeLightStyle: CreateThemeOptions["styles"] = [
   { tag: t.strong, color: "#12770aff", fontStyle: "italic" },
 
   // distribution etc
-  { tag: t.attributeName, color: "#12770aff" }
+  { tag: t.attributeName, color: "#12770aff" },
+
+  // + sign
+  { tag: t.bitwiseOperator, color: "#12770aff", fontstyle: "bold" },
+
+  // - sign
+  { tag: t.processingInstruction, color: "#bb0067ff", fontstyle: "bold" }
+
 ];
 
 export function xcodeLightInit(options?: Partial<CreateThemeOptions>) {
@@ -266,7 +279,13 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   { tag: t.strong, color: "#338f2cff", fontStyle: "italic" },
 
   // distribution etc
-  { tag: t.attributeName, color: "#338f2cff" }
+  { tag: t.attributeName, color: "#338f2cff" },
+
+  // + sign
+  { tag: t.bitwiseOperator, color: "#338f2cff", fontstyle: "bold" },
+
+  // - sign
+  { tag: t.processingInstruction, color: "#bb0067ff", fontstyle: "bold" }
 ];
 
 export function xcodeWarmInit(options?: Partial<CreateThemeOptions>) {

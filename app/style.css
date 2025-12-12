@@ -515,6 +515,9 @@ pre.example {
   color:var(--prog-weight);
   font-style: italic;
 }
+.prog-pre .attribute {
+  color:var(--prog-attribute);
+}
 
 abbr:hover {
   cursor: help;
@@ -1191,14 +1194,14 @@ font-family: "Charis SIL", "Doulos SIL", Gentium, Arial, Serif;
   }
 }
 
-.cm-toolbar #generate-words, .cm-toolbar #apply-words {
+.cm-toolbar .green-btn {
     color: var(--info-text);
 }
 .cm-toolbar button:hover:not(:disabled) {
   background: #8080803a;
   cursor: pointer;
 }
-.cm-toolbar button:disabled, .cm-toolbar #generate-words:disabled {
+.cm-toolbar button:disabled, .cm-toolbar .green-btn:disabled {
   color: var(--disabled-button-text);
 }
 .cm-toolbar input[type="number"] {

@@ -80,21 +80,19 @@ const transformRules = [
 
 const clusterRules = [
   { token: "escape",   regex: escapeRegex },
-  { token: "link",     regex: /,|\/|!|_|\+/ },
   { token: "operator", regex: /0|\^/ },
-  { token: "regexp",   regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~|\|/ },
-  { token: "tagName",  regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
+  { token: "bitwiseOperator",   regex: /\+/ },
 ];
 
 const featureFieldRules = [
   { token: "escape",   regex: escapeRegex },
-  { token: "link",     regex: /,|\./ },
+  { token: "link",     regex: /\./ },
   { token: "attributeName", regex: /\+/ },
-  { token: "regexp",   regex: /-/ }
+  { token: "processingInstruction",   regex: /-/ }
 ];
 
 type State = {
-  directive: ('none'|'decorator'|'categories'|'words'|'units'|'list'|'graphemes'|'stage'|'features'|'feature-field'
+  directive: ('none'|'decorator'|'categories'|'words'|'units'|'list'|'graphemes'|'stage'|'features'|'feature-field'|'feature-field-header'
   );
   sub_directive: ('none'|'routine'|'cluster-block');
   feature_matrix: boolean;
@@ -105,6 +103,7 @@ type State = {
   featureList: string[];
 
   we_on_newline: boolean;
+header_for_feature_field: number;
   insideUnit: boolean;
 };
 
@@ -121,6 +120,7 @@ const parser: StreamParser<State> = {
         unitList: [],
         featureList: [],
         we_on_newline: true,
+        header_for_feature_field: 0,
         insideUnit: false
     }},
     token: function (stream, state) {
@@ -183,8 +183,9 @@ const parser: StreamParser<State> = {
             }
             // Feature-field
             if (stream.match(/(feature-field)(?=:\s*(?:;|$))/)) {
-                state.directive = "feature-field";
+                state.directive = "feature-field-header";
                 state.doIndent = true;
+                state.header_for_feature_field = 0;
                 return "meta";
             }
             // Stage
@@ -295,14 +296,26 @@ const parser: StreamParser<State> = {
                         return rule.token;
                     }
                 }
-                for (const unito of state.unitList) {
-                    if (stream.match(unito)) {
-                        return "tagName";
+
+                // THIS
+
+                if (state.insideUnit) {
+                    for (const unito of state.unitList) {
+                        const regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");
+                        if (stream.match(regex)) {
+                            state.insideUnit = false;
+                            return "tagName";
+                        }
                     }
-                }
-                for (const cato of state.catList) {
-                    if (stream.match(cato)) {
-                        return "tagName";
+                } else if (stream.match(/</)) {
+                    state.insideUnit = true
+                    return "regexp";
+                } else {
+
+                    for (const cato of state.catList) {
+                        if (stream.match(cato)) {
+                            return "tagName";
+                        }
                     }
                 }
             }
@@ -365,9 +378,25 @@ const parser: StreamParser<State> = {
             }
         }
 
+        if (state.directive == 'feature-field-header') {
+
+            if (state.header_for_feature_field >= 1) {
+                console.log("f-f");
+                state.directive = "feature-field";
+                // DO NOT return here: let the rest of the tokenizer
+                // see this token with the new directive
+            } else {
+                if (state.we_on_newline) {
+                    state.header_for_feature_field += 1;
+                }
+                state.we_on_newline = false;
+                return "variableName";
+            }
+        }
+
         // FEATURES-FIELD
         if (state.directive == 'feature-field') {
-            if (stream.sol()) {
+            if (state.we_on_newline) {
                 const Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/)
                 if (Fmatch) {
                     state.featureList.push('+' + Fmatch[0]);
@@ -375,7 +404,7 @@ const parser: StreamParser<State> = {
                     return 'tagName'
                 }
             }
-
+            state.we_on_newline = false;
             for (const rule of featureFieldRules) {
                 if (stream.match(rule.regex)) {
                     return rule.token;
@@ -401,9 +430,11 @@ const parser: StreamParser<State> = {
                 }
 
                 // End of clusterfield
-                if (stream.match(/>(?=\s*($|;))/)) {
-                    state.sub_directive = 'none';
-                    return "meta";
+                if (state.sub_directive == 'cluster-block') {
+                    if (stream.match(/>(?=\s*($|;))/)) {
+                        state.sub_directive = 'none';
+                        return "meta";
+                    }
                 }
 
                 // Routine

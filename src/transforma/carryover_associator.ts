@@ -8,7 +8,7 @@ class Carryover_Associator {
     this.caryover_list = [];
   }
 
-  // Called when a word's grapheme in TARGET matches a rule's grapheme with associateme-mark
+  // Called when a word's grapheme in TARGET matches a rule's grapheme with based-mark
   set_item(entry_id: number, variant_id: number) {
     this.caryover_list.push({ entry_id, variant_id });
   }

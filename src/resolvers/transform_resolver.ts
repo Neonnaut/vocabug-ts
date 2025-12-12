@@ -4,7 +4,6 @@ import Nesca_Grammar_Stream from "./nesca_grammar_stream";
 import type {
   Token,
   Output_Mode,
-  Routine,
   Transform,
   Transform_Pending,
 } from "../utils/types";
@@ -27,15 +26,7 @@ class Transform_Resolver {
     output_mode: Output_Mode,
     nesca_grmmar_stream: Nesca_Grammar_Stream,
     categories: Map<string, string[]>,
-    transform_pending: {
-      routine: null | Routine;
-      target: string;
-      result: string;
-      conditions: string[];
-      exceptions: string[];
-      chance: number | null;
-      line_num: number;
-    }[],
+    transform_pending: Transform_Pending[],
     features: Map<string, { graphemes: string[] }>,
   ) {
     this.logger = logger;
@@ -58,6 +49,37 @@ class Transform_Resolver {
 
     for (let i = 0; i < this.transform_pending.length; i++) {
       this.line_num = this.transform_pending[i].line_num;
+
+      if (this.transform_pending[i].t_type === "cluster-field") {
+        this.transforms.push({
+          t_type: this.transform_pending[i].t_type,
+          target: this.get_cluser_field_graphemes(
+            this.transform_pending[i].target,
+            "TARGET",
+          ),
+          result: this.get_cluser_field_graphemes(
+            this.transform_pending[i].result,
+            "RESULT",
+          ),
+          conditions: [],
+          exceptions: [],
+          chance: null,
+          line_num: this.line_num,
+        });
+        continue;
+      } else if (this.transform_pending[i].t_type !== "rule") {
+        // Routine type
+        this.transforms.push({
+          t_type: this.transform_pending[i].t_type,
+          target: [],
+          result: [],
+          conditions: [],
+          exceptions: [],
+          chance: null,
+          line_num: this.line_num,
+        });
+        continue;
+      }
 
       const target = this.transform_pending[i].target; // string
 
@@ -183,7 +205,7 @@ class Transform_Resolver {
       }
 
       this.transforms.push({
-        routine: this.transform_pending[i].routine,
+        t_type: this.transform_pending[i].t_type,
         target: tokenised_target_array,
         result: tokenised_result_array,
         conditions: new_conditions,
@@ -583,14 +605,37 @@ class Transform_Resolver {
       .join(" ");
   }
 
+  get_cluser_field_graphemes(
+    input: string,
+    mode: "RESULT" | "TARGET",
+  ): Token[][] {
+    const streams: string[] = input.split(/[,]+/).filter(Boolean);
+
+    const tokenised_array: Token[][] = [];
+    for (let j = 0; j < streams.length; j++) {
+      const stream = streams[j].trim();
+
+      const tokens = this.nesca_grammar_stream.cluster_parser(
+        stream,
+        mode,
+        this.line_num,
+      );
+      tokenised_array.push(tokens);
+    }
+    return tokenised_array;
+  }
+
   show_debug(): void {
     const transforms = [];
     for (let i = 0; i < this.transforms.length; i++) {
       const my_transform = this.transforms[i];
 
-      if (my_transform.routine) {
+      if (
+        my_transform.t_type != "rule" &&
+        my_transform.t_type != "cluster-field"
+      ) {
         transforms.push(
-          `  <routine = ${my_transform.routine}> @ ln:${my_transform.line_num}`,
+          `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num + 1}`,
         );
         continue;
       }
@@ -617,7 +662,7 @@ class Transform_Resolver {
       }
 
       transforms.push(
-        `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num}`,
+        `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num + 1}`,
       );
     }
 

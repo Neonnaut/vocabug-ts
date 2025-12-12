@@ -112,7 +112,7 @@ export type Token =
     };
 
 export type Transform = {
-  routine: null | Routine;
+  t_type: "rule" | "cluster-field" | Routine;
   target: Token[][];
   result: Token[][];
   conditions: { before: Token[]; after: Token[] }[];
@@ -122,7 +122,7 @@ export type Transform = {
 };
 
 export type Transform_Pending = {
-  routine: null | Routine;
+  t_type: "rule" | "cluster-field" | Routine;
   target: string;
   result: string;
   conditions: string[];

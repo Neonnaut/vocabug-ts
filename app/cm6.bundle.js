@@ -20503,7 +20503,11 @@ var cm6 = (function (exports) {
         // Weights
         { tag: tags.strong, color: "#bee79d", fontStyle: "italic" },
         // distribution etc
-        { tag: tags.attributeName, color: "#bee79d" }
+        { tag: tags.attributeName, color: "#bee79d" },
+        // + sign
+        { tag: tags.bitwiseOperator, color: "#8eea7eff", fontstyle: "bold" },
+        // - sign
+        { tag: tags.processingInstruction, color: "#ea7eb9ff", fontstyle: "bold" }
     ];
     var xcodeDarkInit = function (options) {
         var _a = options || {}, _b = _a.theme, theme = _b === void 0 ? "dark" : _b, _c = _a.settings, settings = _c === void 0 ? {} : _c, _d = _a.styles, styles = _d === void 0 ? [] : _d;
@@ -20576,7 +20580,11 @@ var cm6 = (function (exports) {
         // Weights
         { tag: tags.strong, color: "#12770aff", fontStyle: "italic" },
         // distribution etc
-        { tag: tags.attributeName, color: "#12770aff" }
+        { tag: tags.attributeName, color: "#12770aff" },
+        // + sign
+        { tag: tags.bitwiseOperator, color: "#12770aff", fontstyle: "bold" },
+        // - sign
+        { tag: tags.processingInstruction, color: "#bb0067ff", fontstyle: "bold" }
     ];
     function xcodeLightInit(options) {
         var _a = options || {}, _b = _a.theme, theme = _b === void 0 ? "light" : _b, _c = _a.settings, settings = _c === void 0 ? {} : _c, _d = _a.styles, styles = _d === void 0 ? [] : _d;
@@ -20652,7 +20660,11 @@ var cm6 = (function (exports) {
         // Weights
         { tag: tags.strong, color: "#338f2cff", fontStyle: "italic" },
         // distribution etc
-        { tag: tags.attributeName, color: "#338f2cff" }
+        { tag: tags.attributeName, color: "#338f2cff" },
+        // + sign
+        { tag: tags.bitwiseOperator, color: "#338f2cff", fontstyle: "bold" },
+        // - sign
+        { tag: tags.processingInstruction, color: "#bb0067ff", fontstyle: "bold" }
     ];
     function xcodeWarmInit(options) {
         var _a = options || {}, _b = _a.theme, theme = _b === void 0 ? "light" : _b, _c = _a.settings, settings = _c === void 0 ? {} : _c, _d = _a.styles, styles = _d === void 0 ? [] : _d;
@@ -20730,16 +20742,14 @@ var cm6 = (function (exports) {
     ];
     var clusterRules = [
         { token: "escape", regex: escapeRegex },
-        { token: "link", regex: /,|\/|!|_|\+/ },
         { token: "operator", regex: /0|\^/ },
-        { token: "regexp", regex: /&=|=[1-9]|\]|\(|\)|\{|\}|#|\$|\+|\?\[|\*|:|%\[|~|\|/ },
-        { token: "tagName", regex: /1|2|3|4|5|6|7|8|9|&T|&M|&E/ }
+        { token: "bitwiseOperator", regex: /\+/ },
     ];
     var featureFieldRules = [
         { token: "escape", regex: escapeRegex },
-        { token: "link", regex: /,|\./ },
+        { token: "link", regex: /\./ },
         { token: "attributeName", regex: /\+/ },
-        { token: "regexp", regex: /-/ }
+        { token: "processingInstruction", regex: /-/ }
     ];
     var parser = {
         name: "dsl",
@@ -20754,6 +20764,7 @@ var cm6 = (function (exports) {
                 unitList: [],
                 featureList: [],
                 we_on_newline: true,
+                header_for_feature_field: 0,
                 insideUnit: false
             };
         },
@@ -20814,8 +20825,9 @@ var cm6 = (function (exports) {
                 }
                 // Feature-field
                 if (stream.match(/(feature-field)(?=:\s*(?:;|$))/)) {
-                    state.directive = "feature-field";
+                    state.directive = "feature-field-header";
                     state.doIndent = true;
+                    state.header_for_feature_field = 0;
                     return "meta";
                 }
                 // Stage
@@ -20924,16 +20936,27 @@ var cm6 = (function (exports) {
                             return rule.token;
                         }
                     }
-                    for (var _k = 0, _l = state.unitList; _k < _l.length; _k++) {
-                        var unito = _l[_k];
-                        if (stream.match(unito)) {
-                            return "tagName";
+                    // THIS
+                    if (state.insideUnit) {
+                        for (var _k = 0, _l = state.unitList; _k < _l.length; _k++) {
+                            var unito = _l[_k];
+                            var regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");
+                            if (stream.match(regex)) {
+                                state.insideUnit = false;
+                                return "tagName";
+                            }
                         }
                     }
-                    for (var _m = 0, _o = state.catList; _m < _o.length; _m++) {
-                        var cato = _o[_m];
-                        if (stream.match(cato)) {
-                            return "tagName";
+                    else if (stream.match(/</)) {
+                        state.insideUnit = true;
+                        return "regexp";
+                    }
+                    else {
+                        for (var _m = 0, _o = state.catList; _m < _o.length; _m++) {
+                            var cato = _o[_m];
+                            if (stream.match(cato)) {
+                                return "tagName";
+                            }
                         }
                     }
                 }
@@ -20996,9 +21019,24 @@ var cm6 = (function (exports) {
                     }
                 }
             }
+            if (state.directive == 'feature-field-header') {
+                if (state.header_for_feature_field >= 1) {
+                    console.log("f-f");
+                    state.directive = "feature-field";
+                    // DO NOT return here: let the rest of the tokenizer
+                    // see this token with the new directive
+                }
+                else {
+                    if (state.we_on_newline) {
+                        state.header_for_feature_field += 1;
+                    }
+                    state.we_on_newline = false;
+                    return "variableName";
+                }
+            }
             // FEATURES-FIELD
             if (state.directive == 'feature-field') {
-                if (stream.sol()) {
+                if (state.we_on_newline) {
                     var Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/);
                     if (Fmatch) {
                         state.featureList.push('+' + Fmatch[0]);
@@ -21006,6 +21044,7 @@ var cm6 = (function (exports) {
                         return 'tagName';
                     }
                 }
+                state.we_on_newline = false;
                 for (var _u = 0, featureFieldRules_1 = featureFieldRules; _u < featureFieldRules_1.length; _u++) {
                     var rule = featureFieldRules_1[_u];
                     if (stream.match(rule.regex)) {
@@ -21027,9 +21066,11 @@ var cm6 = (function (exports) {
                         return "meta";
                     }
                     // End of clusterfield
-                    if (stream.match(/>(?=\s*($|;))/)) {
-                        state.sub_directive = 'none';
-                        return "meta";
+                    if (state.sub_directive == 'cluster-block') {
+                        if (stream.match(/>(?=\s*($|;))/)) {
+                            state.sub_directive = 'none';
+                            return "meta";
+                        }
                     }
                     // Routine
                     if (stream.match(/<routine/)) {
@@ -21126,7 +21167,7 @@ var cm6 = (function (exports) {
         dom.appendChild(num_words_textbox);
         var generate_btn = document.createElement("button");
         generate_btn.textContent = "Generate";
-        generate_btn.id = "generate-words";
+        generate_btn.classList.add("generate-words", "green-btn");
         generate_btn.onclick = function () {
         };
         dom.appendChild(generate_btn);
@@ -21148,10 +21189,13 @@ var cm6 = (function (exports) {
         dom.appendChild(clear_btn);
         var help_btn = document.createElement("button");
         help_btn.innerHTML = "<i class='fa fa-question'></i>";
-        help_btn.onclick = function () {
+        help_btn.addEventListener("mousedown", function (event) {
+            if (event.button === 2) {
+                return;
+            }
             // Open help page in new tab
             window.open("./vocabug_docs", "_blank");
-        };
+        });
         dom.appendChild(help_btn);
         return {
             dom: dom,

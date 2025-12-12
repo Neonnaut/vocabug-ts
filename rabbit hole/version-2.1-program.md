@@ -4,6 +4,8 @@
 
 Currently, the interface uses StreamLanguage, instead of the significantly harder to code, "Lezer" grammar syntax. A Lezer highlighter would still be nice.
 
+## Autocomplete suggestions
+
 ## Rewrite program in Rust or Haskel Python, Kotlin, Typescript
 
 Leaning towards Kotlin. Need to figure out "DSL"
@@ -31,3 +33,7 @@ Red squiggly underline on comments. Need to process with typo.js after editor
 ## Romance-like example
 
 ## BTX example
+
+## "AI" generate a def file, like Gleb
+
+This would choose a word template, and syllable template, then populate the categories with suitable graphemes. Suitable small transforms would be chosen as well.

@@ -273,7 +273,7 @@ class Nesca_Grammar_Stream {
         };
         i++;
       } else if (char === "~") {
-        // It's a associateme-mark for null
+        // It's a based-mark for null
         i++;
       } else if (
         // Syntax character used wrongly
@@ -331,12 +331,6 @@ class Nesca_Grammar_Stream {
         new_token.max = Infinity; // Default quantifier
         i++;
       } else if (stream[i] === "?") {
-        if (mode === "RESULT") {
-          this.logger.validation_error(
-            `Bounded quantifier not allowed in '${mode}'`,
-            line_num,
-          );
-        }
         let look_ahead = i + 1;
         if (stream[look_ahead] !== "[") {
           this.logger.validation_error(
@@ -381,6 +375,12 @@ class Nesca_Grammar_Stream {
                 line_num,
               );
             }
+            if (max === Infinity && mode === "RESULT") {
+              this.logger.validation_error(
+                `In '${mode}', '${new_token.base}' cannot be reproduced an infinite amount of times`,
+                line_num,
+              );
+            }
             new_token.min = min;
             new_token.max = max;
           } else {
@@ -404,7 +404,7 @@ class Nesca_Grammar_Stream {
       if (stream[i] === "~") {
         if (new_token.type !== "grapheme") {
           this.logger.validation_error(
-            `Associateme-mark only allowed after grapheme token`,
+            `Based-mark only allowed after grapheme token`,
             line_num,
           );
         }
@@ -415,7 +415,7 @@ class Nesca_Grammar_Stream {
         );
         if (!location) {
           this.logger.validation_error(
-            `Grapheme "${new_token.base}" with an asociateme-mark was not an associateme base`,
+            `Grapheme "${new_token.base}" with a based-mark was not an associateme base`,
             line_num,
           );
         }
@@ -427,6 +427,84 @@ class Nesca_Grammar_Stream {
           is_target: mode === "TARGET",
         };
         i++;
+      }
+
+      if (new_token.type !== "pending") {
+        tokens.push(new_token);
+      }
+    }
+    return tokens;
+  }
+
+  cluster_parser(
+    stream: string,
+    mode: Token_Stream_Mode,
+    line_num: number,
+  ): Token[] {
+    let i = 0;
+    const tokens: Token[] = [];
+
+    if (stream === "^") {
+      if (mode === "RESULT") {
+        return [{ type: "deletion", base: "^" }];
+      } else {
+        this.logger.validation_error(
+          `Unexpected character '${stream}' in mode '${mode}'`,
+          line_num,
+        );
+      }
+    } else if (stream === "0") {
+      if (mode !== "RESULT") {
+        this.logger.validation_error(
+          `Reject not allowed in '${mode}'`,
+          line_num,
+        );
+      }
+      return [{ type: "reject", base: "0" }];
+    }
+
+    while (i < stream.length) {
+      let new_token: Token = { type: "pending", base: "", min: 1, max: 1 };
+      const char = stream[i];
+
+      if (/\s/.test(char)) {
+        i++;
+        continue;
+      }
+
+      if (char === "^" || char === "0") {
+        this.logger.validation_error(
+          `Unexpected character '${char}' in cluster-field`,
+          line_num,
+        );
+      }
+
+      // GRAPHEME match
+      const escaped_stream = this.escape_mapper.restore_escaped_chars(stream);
+      let is_escaped = false;
+      if (escaped_stream[i] !== stream[i]) {
+        is_escaped = true;
+      }
+      let matched = false;
+      for (const g of this.graphemes.sort((a, b) => b.length - a.length)) {
+        if (escaped_stream.startsWith(g, i)) {
+          new_token = { type: "grapheme", base: g, min: 1, max: 1 };
+          i += g.length;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        new_token = {
+          type: "grapheme",
+          base: escaped_stream[i],
+          min: 1,
+          max: 1,
+        };
+        i++;
+      }
+      if (is_escaped && new_token.type === "grapheme") {
+        new_token.escaped = true; // Mark as escaped
       }
 
       if (new_token.type !== "pending") {

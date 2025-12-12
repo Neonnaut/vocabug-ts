@@ -35,7 +35,7 @@
         <img src="./img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
 
         <h1 style="margin-bottom: 10px;">Vocabug<br>docs</h1>
-        <b>Version: 0.5.0</b>
+        <b>Ver. 0.5.1</b>
       </div>
       <br>
 
@@ -140,8 +140,6 @@
         </ol>
         </li>
 
-        <li><a href="#nescaClusterfield">Cluster-field</a></li>
-
         <li><a href="#nescaWildcardsAndQuantifiers">Wildcards and quantifiers</a>
         <ol class="nice-list">
           <li><a href="#nescaQuantifier">Quantifier</a></li>
@@ -156,6 +154,8 @@
           </li>
         </ol>
         </li>
+
+        <li><a href="#nescaClusterfield">Cluster-field</a></li>
 
         <li><a href="#nescaAdvancedRules">Advanced rules</a>
           <ol class="nice-list">
@@ -178,7 +178,7 @@
       </ol>
 
       <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
-      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version: 0.5.0</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
+      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version 0.5.1</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a constructed language, original nicknames or passwords, or just for fun.</p>
 
       <p>This word generator is designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find Vocabug's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. You can also install Vocabug to be used in your own projects or as a command-line-interface <a href="https://www.npmjs.com/package/vocabug">here</a>. If you want a "modern" user interface, albeit with limited features, check out <a href="https://neonnaut.neocities.org/vocabug-lite">Vocabug-lite</a>.</p>
 
@@ -243,7 +243,7 @@
       <p>Decorators change a property of a directive to modify the directive's behaviour.</p>
 
       <p>Decorators start on a new line above the directive they are modifying with an at sign <code class="example">@</code>, followed by the directive, a <code class="example">.</code>, the property, optional whitespace, <code class="example">=</code>, optional whitespace, and then the new value of the property. For example:</p>
-      <div class="prog-pre"><code class="link">@</code><code class="directive">words</code><code class="link">.</code><code class="directive">distribution</code> <code class="link">=</code> <code class="operator">flat</code><br><code class="directive">words</code><code class="link">:</code><br>  example<br></div>
+      <div class="prog-pre"><code class="link">@</code><code class="directive">words</code><code class="link">.</code><code class="directive">distribution</code> <code class="link">=</code> <code class="attribute">flat</code><br><code class="directive">words</code><code class="link">:</code><br>  example<br></div>
       
       <h3 id="vocComments"><a class="head-num">3.1</a>Comments</h3>
       <p>If a line contains a semicolon <code class="example">;</code> everything after it on that line is ignored and not interpreted as Vocabug syntax -- unless <code class="example">;</code> is <a href="#vocEscapeWord">escaped</a>. You can use this to leave notes about what something does or why you made certain decisions.</p>
@@ -450,7 +450,7 @@
           </tr>
           <tr>
             <td><code class="example">~</code></td>
-            <td><a href="#nescaAssociatemes">Associateme-mark</a></td>
+            <td><a href="#nescaAssociatemes">Based-mark</a></td>
           </tr> 
 
           
@@ -679,13 +679,13 @@
         
       <h3 id="vocCategoryinCategory"><a class="head-num">4.1</a>Categories inside categories and set-categories</h3>
       <p>You can use categories inside categories, as long as the referenced category has previously been defined. For example:</p>
-      <div class="prog-pre"><code class="regexp">@</code><code class="directive">categories</code><code class="link">.</code><code class="directive">distribution</code> <code class="link">=</code> <code class="operator">flat</code>
+      <div class="prog-pre"><code class="regexp">@</code><code class="directive">categories</code><code class="link">.</code><code class="directive">distribution</code> <code class="link">=</code> <code class="attribute">flat</code>
 <span class="directive">categories</span><code class="link">:</code>
   <span class="catkey">L</span> <span class="link">=</span> aa<span class="link">,</span> ii<span class="link">,</span> ee<span class="link">,</span> oo
   <span class="catkey">V</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> e<span class="link">,</span> o<span class="link">,</span> <span class="catkey">L</span></div>
       <p>In the example above, <code class="example">V</code> has a 20% chance of being a long vowel.</p>
       <p>You can also enclose a set of graphemes in curly braces <code class="example">{</code> and <code class="example">}</code>. This is called a 'set-category'. This set will be treated as if it were a reference to a category in terms of frequency. For example, we could write the same example as this:</p>
-      <div class="prog-pre"><code class="regexp">@</code><code class="directive">categories</code><code class="link">.</code><code class="directive">distribution</code> <code class="link">=</code> <code class="operator">flat</code>
+      <div class="prog-pre"><code class="regexp">@</code><code class="directive">categories</code><code class="link">.</code><code class="directive">distribution</code> <code class="link">=</code> <code class="attribute">flat</code>
 <span class="directive">categories</span><code class="link">:</code>
   <span class="catkey">V</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> e<span class="link">,</span> o<span class="link">,</span> <span class="cm-matchingBracket"><span class="regexp">{</span></span>aa<span class="link">,</span> ii<span class="link">,</span> ee<span class="link">,</span> oo<span class="cm-matchingBracket"><span class="regexp">}</span></span></div>
       <p>Assigning weights to categories in categories and set-categories is possible.</p>
@@ -750,7 +750,7 @@
       <h4 id="vocOptionalsWeight"><a class="head-num">5.4.1</a>Optionals weight</h4>
       <p>By default, an optional-set has a 10% chance of being included in the word. You can change this probability with a decorator.</p>
 
-      <div class="prog-pre"><code class="regexp">@</code><code class="directive">words</code><code class="link">.</code><code class="directive">optionals-weight</code> <code class="link">=</code> <code class="operator">10%</code><br><code class="directive">words</code><code class="link">:</code><br>  example</div>
+      <div class="prog-pre"><code class="regexp">@</code><code class="directive">words</code><code class="link">.</code><code class="directive">optionals-weight</code> <code class="link">=</code> <code class="attribute">10%</code><br><code class="directive">words</code><code class="link">:</code><br>  example</div>
 
       <h3 id="vocSupraSet"><a class="head-num">5.5</a>Supra-set</h3>
       <p>A 'supra-set', is applied over the entire word, and there can only be one supra set. Square brackets <code class="example">[</code> and <code class="example">]</code>, denotes each item in the supra-set and their location in the word. The items of a supra-set can only be a category, or the null grapheme <code class="example">^</code>. Only one item in the supra-set will be picked for that generated word.</p>
@@ -941,7 +941,7 @@
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">:</span>
   a<span class="link">,</span> b<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> t
 <span class="directive">features</span><span class="link">:</span>
-  <span class="catkey">&gt;voice</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o</div>
+  <span class="catkey">&gt;vowel</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o</div>
       <p>Is equivalent to the below example:</p>
       <div class="prog-pre"><span class="directive">features</span><span class="link">:</span>
   <span class="catkey">+vowel</span> <span class="link">=</span> a<span class="link">,</span> i<span class="link">,</span> o<br>  <span class="catkey">-vowel</span> <span class="link">=</span> b<span class="link">,</span> h<span class="link">,</span> k<span class="link">,</span> n<span class="link">,</span> t</div>
@@ -981,26 +981,26 @@
       <p>For example:</p>
       <div class="prog-pre"><code class='directive'>feature-field</code><code class="link">:</code>
            m n p b t d k g s h l j
-voice      <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code>
-plosive    <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
-nasal      <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
-fricative  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
-approx     <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code>
-labial     <code class='operator'>+</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
-alveolar   <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code>
-palatal    <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code>
-velar      <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
-glottal    <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+voice      <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code>
+plosive    <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+nasal      <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+fricative  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+approx     <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code>
+labial     <code class="attribute">+</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+alveolar   <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code>
+palatal    <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code>
+velar      <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+glottal    <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
 
 
 <code class='directive'>feature-field</code><code class="link">:</code>
        a e i o
-high   <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code>
-mid    <code class='regexp'>-</code> <code class='operator'>+</code> <code class='regexp'>-</code> <code class='operator'>+</code>
-low    <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
-front  <code class='regexp'>-</code> <code class='operator'>+</code> <code class='operator'>+</code> <code class='regexp'>-</code>
-back   <code class='operator'>+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code>
-round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='operator'>+</code></div>
+high   <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code>
+mid    <code class='regexp'>-</code> <code class="attribute">+</code> <code class='regexp'>-</code> <code class="attribute">+</code>
+low    <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code>
+front  <code class='regexp'>-</code> <code class="attribute">+</code> <code class="attribute">+</code> <code class='regexp'>-</code>
+back   <code class="attribute">+</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code>
+round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='regexp'>-</code> <code class="attribute">+</code></div>
       <ul class="paragraphian">
         <li>A <code class="example">+</code> means to mark the grapheme by that feature's pro-feature</li>
         <li>A <code class="example">-</code> means to mark the grapheme by that feature's anti-feature</li>
@@ -1030,30 +1030,14 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
       <div class="prog-pre"><span class="comment">; Merge [x], [xw], [ħ] and [ħw] into [k]</span><br>  <span class="regexp">{</span>x<span class="link">,</span> ħ<span class="regexp">}</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
       <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
 
-      <h2 id="nescaClusterfield"><a class="head-num">19</a>Cluster-field</h2>
-      <p>Cluster-field is a way to target sequences of graphemes and change them. They are laid out as tables, and start with <code class="example">&lt;</code> followed by a space. The first part of a sequence is in the first column, and the second part is in the first row. The clusterfield ends with a <code class="example">&gt;</code> on its own line. For example:</p>
-      <div class="prog-pre"><span class="directive">&lt;</span> p  t  k  m  n
-m <span class="link">+</span>  nt nk <span class="link">+</span>  mm 
-n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="link">+</span>
-<span class="directive">&gt;</span></div>
-
-      <ul class="paragraphian">
-        <li>In this example, <code class="example">np</code> becomes <i>mp</i> and <code class="example">mt</code> becomes <i>nt</i></li>
-        <li><code class="example">+</code> means to not change the target cluster at all</li>
-        <li>Cluster-fields can use <code class="example">0</code> to reject the word if it contains that sequence</li>
-        <li>Cluster-fields can use <code class="example">^</code> to delete the target sequence</li>
-        <li>These are executed concurrently just like concurrent changes. Their order does not matter</li>
-        <li>Cluster-fields can also use conditions and exceptions, just put them on their own line</li>
-      </ul>
-
-      <h2 id="nescaWildcardsAndQuantifiers"><a class="head-num">20</a>Wildcards and quantifiers</h2>
+      <h2 id="nescaWildcardsAndQuantifiers"><a class="head-num">19</a>Wildcards and quantifiers</h2>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
 
-      <h3 id="nescaQuantifier"><a class="head-num">20.1</a>Quantifier</h3>
+      <h3 id="nescaQuantifier"><a class="head-num">19.1</a>Quantifier</h3>
       <p>Quantifier, using <code class="example">+</code>, will match once or as many times as possible to the grapheme to the left of it. Quantifier cannot be used in <code class="example">REPLACEMENT</code>:</p>
       <div class="prog-pre">  a<span class="regexp">+</span> <span class="link">-></span> o<br><code class="comment">; raraaaaa ==> roro</code></div>
 
-      <h3 id="nescaBoundedQuantifier"><a class="head-num">20.2</a>Bounded quantifier</h3>
+      <h3 id="nescaBoundedQuantifier"><a class="head-num">19.2</a>Bounded quantifier</h3>
       <p>The bounded quantifier matches as many times its digit(s), enclosed in <code class="example">?[</code> and <code class="example">]</code>, to the things to the left.</p>
       <div class="prog-pre"><span class="comment">; Change [o] into [x] only when preceded by three [r]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">?[</span>3<span class="regexp">]</span><span class="link">_</span>
 <code class="comment">; ororrro ==> ororrrx</code></div>
@@ -1071,7 +1055,9 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible [o]s into [x]</span><br>  o<span class="regexp">?[</span>4<span class="regexp"><span class="link">,</span>]</span> <span class="link">-></span> x
 <code class="comment">; toootooooo ==> toootx</code></div>
 
-      <h3 id="nescaGeminateMark"><a class="head-num">20.3</a>Geminate-mark</h3>
+      <p>A bounded quantifier can be used in <code class="example">REPLACEMENT</code> as long as there is a definite maximum quantity. Or in other words, you cannot produce an infinite amount of something!</p>
+
+      <h3 id="nescaGeminateMark"><a class="head-num">19.3</a>Geminate-mark</h3>
       <p>Geminate-mark using colon <code class="example">:</code>, will duplicate the grapheme, or grapheme from a set or category, to the left of it. In other words, you can capture an item only when it is geminated using the geminate-mark:</p>
       <div class="prog-pre">  a<span class="regexp">:</span> <span class="link">-></span> o<br><code class="comment">; aaata => oata</code></div>
 
@@ -1079,23 +1065,23 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
 
       <div class="prog-pre">  a <span class="link">-></span> a<span class="regexp">:</span><br><code class="comment">; tat => taat</code></div>
 
-      <h3 id="nescaKleeneStar"><a class="head-num">20.4</a>Kleene-star</h3>
+      <h3 id="nescaKleeneStar"><a class="head-num">19.4</a>Kleene-star</h3>
       <p>Occasionally, you may want to match a grapheme whether it exists, there is one of it, or there is multiple of it consecutively, known as a "Kleene-star". There is <b>no</b> dedicated character for a Kleene star. Instead, you wrap the content followed by a quantifier, in an optionalator:</p>
       <div class="prog-pre">  u<span class="regexp">(</span>a<span class="regexp">+)</span> <span class="link">-></span> o<br><code class="comment">; ruaruaaaaa ==> roro</code></div>
 
-      <h3 id="nescaWildcard"><a class="head-num">20.5</a>Wildcard</h3>
+      <h3 id="nescaWildcard"><a class="head-num">19.5</a>Wildcard</h3>
       <p>Wildcard, using asterisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">REPLACEMENT</code>:</p>
       <div class="prog-pre"><code class="comment">; Any grapheme becomes [x] when any grapheme follows it</code><br>  <span class="regexp">*</span> <span class="link">-></span> x <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; aomp ==> xxxp</code></div>
       <p>Wildcard can be placed by itself inside an <a href="#nescaOptionalatorSet">optionalator</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
 
-      <h3 id="nescaAnythingsMark"><a class="head-num">20.6</a>Anythings-mark</h3>
+      <h3 id="nescaAnythingsMark"><a class="head-num">19.6</a>Anythings-mark</h3>
       <p>The anythings-mark uses percent sign <code class="example">%</code> and a pair of square brackets <code class="example">[</code> and <code class="example">]</code>. It will match as many (but not zero) times to any grapheme. For example:</p>
       <div class="prog-pre">  b<span class="regexp">%[]</span> <span class="link">-></span> x<br><code class="comment">; abitto => ax</code></div>
       <p>As we can see, the rule matched <code class="example">b</code> and greedily matched every and any grapheme after it.</p>
       <p>The example below uses an anythings-mark in the condition:</p>
       <div class="prog-pre"><span class="comment">; Simulate spreading of nasality to vowels</span><br>  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">%[]</span><span class="link">_</span> <br><span class="comment">; pabãdruliga ==> pabãdrũlĩgã</span></div>
 
-      <h3 id="nescaLaziness"><a class="head-num">20.6.1</a>Laziness and cowardliness</h3>
+      <h3 id="nescaLaziness"><a class="head-num">19.6.1</a>Laziness and cowardliness</h3>
       <p>By listing graphemes and grapheme sequences inside the square brackets, we can alter the "greedy" behaviour of an anythings-mark with degrees of "laziness" and 'cowardliness'.</p>
 
       <p><b>Consuming negative lookahead, AKA "laziness"</b>:</p>
@@ -1121,6 +1107,21 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <p>Sometimes it is necessary for graphemes to block the spread <i>without</i> having them be consumed, which I have dubbed 'cowardliness'. To do this put a pipe <code class="example">|</code> between the lazy and cowardly items. For example we might want the graphemes <code class="example">k</code> or <code class="example">g</code> to prevent the rightward spread of nasal vowels to non nasal vowels:</p>
       
       <div class="prog-pre">  a<span class="link">,</span> i<span class="link">,</span> u <span class="link">-></span> ã<span class="link">,</span> ĩ<span class="link">,</span> ũ <span class="link">/</span> <span class="regexp">{</span>ã<span class="link">,</span> ĩ<span class="link">,</span> ũ<span class="regexp">}</span><span class="regexp">%[</span><span class="link">|</span> k<span class="link">,</span> g<span class="regexp">]</span><span class="link">_</span><br><span class="comment">; pabãdruliga ==> pabãdrũlĩga</span></div>
+
+      <h2 id="nescaClusterfield"><a class="head-num">19</a>Cluster-field</h2>
+      <p>Cluster-field is a way to target sequences of graphemes and change them. They are laid out as tables, and start with <code class="example">&lt;</code> followed by a space. The first part of a sequence is in the first column, and the second part is in the first row. The clusterfield ends with a <code class="example">&gt;</code> on its own line. For example:</p>
+      <div class="prog-pre"><span class="directive">&lt;</span> p  t  k  m  n
+m <span class="attribute">+</span>  nt nk <span class="attribute">+</span>  mm 
+n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <span class="attribute">+</span>
+<span class="directive">&gt;</span></div>
+
+      <ul class="paragraphian">
+        <li>In this example, <code class="example">np</code> becomes <i>mp</i> and <code class="example">mt</code> becomes <i>nt</i></li>
+        <li>These are executed concurrently just like concurrent changes. Their order does not matter</li>
+        <li><code class="example">+</code> means to not change the target cluster at all</li>
+        <li>Cluster-fields can use <code class="example">0</code> to reject the word if it contains that sequence</li>
+        <li>Cluster-fields can use <code class="example">^</code> to delete the target sequence</li>
+      </ul>
 
       <h2 id="nescaAdvancedRules"><a class="head-num">21</a>Advanced transforms</h2>
 
@@ -1416,7 +1417,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
       <div class="prog-pre">  <span class="regexp">{</span>a<span class="link">,</span> á<span class="link">,</span> à<span class="regexp">}</span> <span class="link">-&gt;</span> <span class="regexp">{</span>e<span class="link">,</span> é<span class="link">,</span> è<span class="regexp">}</span><br><span class="comment">; daná ==&gt; dené</span></div>
 
       <p>This workaround uses alternators, but lacks semantic clarity and scalability, and is outright tedious.</p>
-      <p>To solve this, are 'associatemes' -- aligned graphemes associated with their base grapheme, and other associated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single token. To set up associatemes, they must be stated in the <code class="example">graphemes</code> directive with the base associateme set inside curly braces, and each associateme set in curly braces with a &lt; to the left of the base set, or another set, like so:</p>
+      <p>To solve this, are 'associatemes' -- aligned variant graphemes associated with their base grapheme, and other associated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single token. To set up associatemes, they must be stated in the <code class="example">graphemes</code> directive with the base associateme set of an entry inside curly braces, and each variant set in curly braces with a &lt; to the left of the base set, or another variant set, like so:</p>
       
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">
   {</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span></div>
@@ -1428,7 +1429,7 @@ n mp <span class="link">+</span>  <span class="link">+</span>  nn <span class="l
         <li>This does not mean that we can have only one grouping set. For example <code class="example">{a,i,o}&lt;{á,í,ó}, {a,b,c}&lt;{x,y,z}</code> is valid</li>
       </ul>
 
-      <p>In a rule, you then put a tilde after the grapheme to mark it as a base associateme:</p>
+      <p>In a rule, you then put a tilde after the grapheme to mark it as a base associateme. This is called a 'based-mark'. For example:</p>
       
 
             <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">

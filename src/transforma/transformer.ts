@@ -8,7 +8,6 @@ import {
 import type {
   Token,
   Output_Mode,
-  Routine,
   Transform,
   Associateme_Mapper,
 } from "../utils/types";
@@ -152,7 +151,12 @@ class Transformer {
 
           // No grapheme found in associateme_mapper, push unaltered base
           if (my_grapheme === null) {
-            for (let k: number = 0; k < my_result_token.min; k++) {
+            if (my_result_token.max === Infinity) {
+              this.logger.validation_error(
+                "This should no have happened: infinite max grapheme??",
+              );
+            }
+            for (let k: number = 0; k < my_result_token.max; k++) {
               replacement_stream.push(my_result_token.base);
             }
             // Else push found grapheme
@@ -726,25 +730,10 @@ class Transformer {
   apply_transform(
     word: Word,
     word_stream: string[],
-    transform: {
-      routine: null | Routine;
-      target: Token[][];
-      result: Token[][];
-      conditions: { before: Token[]; after: Token[] }[];
-      exceptions: { before: Token[]; after: Token[] }[];
-      chance: number | null;
-      line_num: number;
-    },
+    transform: Transform,
   ): string[] {
-    const {
-      routine,
-      target,
-      result,
-      conditions,
-      exceptions,
-      chance,
-      line_num,
-    } = transform;
+    const { t_type, target, result, conditions, exceptions, chance, line_num } =
+      transform;
 
     // CHANCE CONDITION
     if (chance != null && Math.random() * 100 >= chance) {
@@ -752,8 +741,8 @@ class Transformer {
     } // 🎲 Roll failed
 
     // ROUTINE
-    if (routine != null) {
-      word_stream = this.run_routine(routine, word, word_stream, line_num);
+    if (t_type != "rule" && t_type != "cluster-field") {
+      word_stream = this.run_routine(t_type, word, word_stream, line_num);
       return word_stream;
     }
 
@@ -1005,7 +994,10 @@ class Transformer {
       if (word.rejected) {
         break;
       }
-      if (t.target.length == 0) {
+      if (
+        t.target.length == 0 &&
+        (t.t_type === "rule" || t.t_type === "cluster-field")
+      ) {
         continue;
       }
       tokens = this.apply_transform(word, tokens, t);

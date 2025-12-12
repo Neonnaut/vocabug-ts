@@ -265,7 +265,7 @@ class Parser {
       // FEATURE-FIELD
       if (my_directive === "feature-field") {
         if (my_header.length === 0) {
-          const top_row = line.split(/[,\s]+/).filter(Boolean);
+          const top_row = line.split(/[\s]+/).filter(Boolean);
           if (top_row.length < 2) {
             this.logger.validation_error(
               `Feature-field header too short`,
@@ -325,7 +325,7 @@ class Parser {
           continue;
         } else if (line.startsWith("< ")) {
           my_clusterfield_transform.push({
-            routine: null,
+            t_type: "cluster-field",
             target: "",
             result: "",
             conditions: [],
@@ -334,7 +334,7 @@ class Parser {
             line_num: this.file_line_num,
           });
           line = line.substring(2).trim(); // Remove '< ' from start
-          const top_row = line.split(/[,\s]+/).filter(Boolean);
+          const top_row = line.split(/[\s]+/).filter(Boolean);
           if (top_row.length < 2) {
             this.logger.validation_error(
               `Feature-field header too short`,
@@ -348,7 +348,7 @@ class Parser {
           // Routine
           const my_routine = this.parse_routine(line);
           this.transform_pending.push({
-            routine: my_routine,
+            t_type: my_routine,
             target: "\\",
             result: "\\",
             conditions: [],
@@ -363,7 +363,7 @@ class Parser {
             this.get_transform(line);
 
           this.transform_pending.push({
-            routine: null,
+            t_type: "rule",
             target: target,
             result: result,
             conditions: conditions,
@@ -485,6 +485,13 @@ class Parser {
         this.wordshape_distribution = this.parse_distribution(my_value);
         new_decorator = "words";
       } else if (my_property === "optionals-weight") {
+        if (!my_value.endsWith("%")) {
+          this.logger.validation_error(
+            `Invalid optionals-weight '${my_value}' -- expected a percentage value ending with '%'`,
+            this.file_line_num,
+          );
+        }
+        my_value = my_value.slice(0, -1).trim(); // Remove '%' sign
         const optionals_weight = make_percentage(my_value);
         if (optionals_weight == null) {
           this.logger.validation_error(
@@ -587,19 +594,12 @@ class Parser {
 
     /// -------------
 
-    if (line.startsWith("/") || line.startsWith("!")) {
-      const { conditions, exceptions } = this.get_environment(line);
-      my_transform.conditions.push(...conditions);
-      my_transform.exceptions.push(...exceptions);
-      return [my_transform];
-    }
-
     //        my_header
     // my_key my_row
 
     // my_transform
 
-    const my_row = line.split(/[,\s]+/).filter(Boolean);
+    const my_row = line.split(/[\s]+/).filter(Boolean);
     const my_key = my_row.shift();
 
     if (my_row.length !== my_header.length || my_key === undefined) {
@@ -643,7 +643,7 @@ class Parser {
     const gtCount = (right.match(/>/g) || []).length;
     if (gtCount !== 1) {
       this.logger.validation_error(
-        `Invalid routine format2 '${line}'`,
+        `Invalid routine format '${line}'`,
         this.file_line_num,
       );
     }
@@ -669,7 +669,7 @@ class Parser {
         return routine as Routine;
     }
     this.logger.validation_error(
-      `Invalid routine3 '${routine}'`,
+      `Invalid routine '${routine}'`,
       this.file_line_num,
     );
   }
@@ -713,12 +713,10 @@ class Parser {
 
     const slash_index = divided[1].indexOf("/");
     const bang_index = divided[1].indexOf("!");
-    const question_index = divided[1].indexOf("?");
 
     const delimiter_index = Math.min(
       slash_index === -1 ? Infinity : slash_index,
       bang_index === -1 ? Infinity : bang_index,
-      question_index === -1 ? Infinity : question_index,
     );
 
     const result =
@@ -757,7 +755,7 @@ class Parser {
     const exceptions: string[] = [];
 
     let buffer = "";
-    let mode: "condition" | "exception" | "chance" = "condition";
+    let mode: "condition" | "exception" = "condition";
 
     for (let i = 0; i < environment_string.length; i++) {
       const ch = environment_string[i];
@@ -796,20 +794,8 @@ class Parser {
 
   private validate_environment(
     unit: string,
-    kind: "condition" | "exception" | "chance",
+    kind: "condition" | "exception",
   ): string {
-    if (kind === "chance") {
-      const parsed = parseInt(unit, 10);
-      if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-        return unit;
-      } else {
-        this.logger.validation_error(
-          `Chance "${unit}" must be a number between 0 and 100`,
-          this.file_line_num,
-        );
-      }
-    }
-
     const parts = unit.split("_");
     if (parts.length !== 2) {
       this.logger.validation_error(
@@ -830,7 +816,7 @@ class Parser {
   }
 
   private parse_featurefield(line: string, top_row: string[]) {
-    const my_row = line.split(/[,\s]+/).filter(Boolean);
+    const my_row = line.split(/[\s]+/).filter(Boolean);
     const my_key = my_row.shift();
     if (my_row.length !== top_row.length || my_key === undefined) {
       this.logger.validation_error(

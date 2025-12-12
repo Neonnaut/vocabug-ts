@@ -144,42 +144,50 @@ window.addEventListener("load", () => {
             }
         }
     });
+    
+    // Generate button(s)
+    document.querySelectorAll(".generate-words")?.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const generate_buttons = Array.from(document.querySelectorAll(".generate-words")) as HTMLButtonElement[];
+            const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
 
-    // Generate button
-    document.getElementById("generate-words")?.addEventListener("click", function () {
-        const generate_button = this as HTMLButtonElement;
-        const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
-        generate_button.disabled = true;
+            // Disable all generate buttons
+            generate_buttons.forEach(b => b.disabled = true);
 
-        const output_message_html = `<p class='info-message'>Generating words... This may take up to 30 seconds</p>`;
-        output_message.innerHTML = output_message_html;
+            const output_message_html = `<p class='info-message'>Generating words... This may take up to 30 seconds</p>`;
+            output_message.innerHTML = output_message_html;
 
-        try {
-            w.postMessage({
-                file: editor.state.doc.toString(),
-                num_of_words: (document.getElementById('num-of-words') as HTMLInputElement)?.value || "",
-                mode: (document.getElementById("my_mode") as HTMLSelectElement)?.value || "",
-                remove_duplicates: (document.getElementById('remove-duplicates') as HTMLInputElement)?.checked || false,
-                force_word_limit: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
-                
-                sort_words: (document.getElementById('sort-words') as HTMLInputElement)?.checked || false,
-                word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
-            });
-            w.onerror = function (e: ErrorEvent) {
-                generate_button.disabled = false;
-                output_message.innerHTML = `<p class='error-message'>${e.message}</p>`;
+            try {
+                w.postMessage({
+                    file: editor.state.doc.toString(),
+                    num_of_words: (document.getElementById('num-of-words') as HTMLInputElement)?.value || "",
+                    mode: (document.getElementById("my_mode") as HTMLSelectElement)?.value || "",
+                    remove_duplicates: (document.getElementById('remove-duplicates') as HTMLInputElement)?.checked || false,
+                    force_word_limit: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
+                    sort_words: (document.getElementById('sort-words') as HTMLInputElement)?.checked || false,
+                    word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
+                });
+
+                w.onerror = function (e: ErrorEvent) {
+                    // Re-enable all generate buttons
+                    generate_buttons.forEach(b => b.disabled = false);
+
+                    output_message.innerHTML = `<p class='error-message'>${e.message}</p>`;
+                    output_message.focus();
+                };
+
+            } catch (e) {
+                // Re-enable all generate buttons
+                generate_buttons.forEach(b => b.disabled = false);
+
+                const error_message = e instanceof Error ? e.message : String(e);
+                output_message.innerHTML = `<p class='error-message'>${error_message}</p>`;
                 output_message.focus();
-            };
-
-        } catch (e) {
-            generate_button.disabled = false;
-            const error_message = e instanceof Error ? e.message : String(e);
-            output_message.innerHTML = `<p class='error-message'>${error_message}</p>`;
-            output_message.focus();
-        }
+            }
+        });
     });
 
-    // After generating words 
+    // After generating words
     w.onmessage = (e: MessageEvent) => {
         const output_words_field = document.getElementById('voc-output-words-field') as HTMLInputElement;
         const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
@@ -187,16 +195,15 @@ window.addEventListener("load", () => {
         const num_of_words_input = document.getElementById('num-of-words') as HTMLInputElement;
         const word_divider_input = document.getElementById('word-divider') as HTMLInputElement;
         const mode_input = document.getElementById('my_mode') as HTMLSelectElement;
-        const generate_words_button = document.getElementById("generate-words") as HTMLButtonElement;
+
+        const generate_buttons = Array.from(document.querySelectorAll(".generate-words")) as HTMLButtonElement[];
 
         if (output_words_field) {
-            // Transfer words to the output
             output_words_field.value = e.data.words;
             output_words_field.focus();
         }
 
         const filename = filename_input?.value || "";
-
         let output_message_html = '';
 
         if (e.data.warning_messages.length != 0) {
@@ -222,15 +229,20 @@ window.addEventListener("load", () => {
                 console.debug(message);
             }
         }
+
         output_message.innerHTML = output_message_html;
 
         // Store file contents in local storage to be retrieved on page refresh
-        localStorage.setItem('vocabug', JSON.stringify([e.data.file,
-            filename, num_of_words_input?.value, mode_input?.value, word_divider_input?.value]));
+        localStorage.setItem('vocabug', JSON.stringify([
+            e.data.file,
+            filename,
+            num_of_words_input?.value,
+            mode_input?.value,
+            word_divider_input?.value
+        ]));
 
-        if (generate_words_button) {
-            generate_words_button.disabled = false;
-        }
+        // Re-enable all generate buttons
+        generate_buttons.forEach(b => b.disabled = false);
     };
 
     // Copy results button

@@ -2,6 +2,8 @@
 
 ## 1. Stage decorators
 
+@stage.name = "Latin to Italian"
+
 ### Change the syllable dividers in a decorator:
 
 @stage.syllable-dividers = {., '}
@@ -233,3 +235,6 @@ Word-and-paradigm morphology
 
 `N -> [+nasal, b=PLACE] / _[+consonant a=PLACE]`
 `a -> b,`
+
+## word based exceptions
+
