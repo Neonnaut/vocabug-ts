@@ -233,6 +233,7 @@ window.addEventListener("load", () => {
         }
 
         output_message.innerHTML += output_message_html;
+        output_message.focus();
 
         // Store file contents in local storage to be retrieved on page refresh
         localStorage.setItem('vocabug', JSON.stringify([
