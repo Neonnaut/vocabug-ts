@@ -21194,7 +21194,7 @@ var cm6 = (function (exports) {
                 return;
             }
             // Open help page in new tab
-            window.open("./vocabug_docs", "_blank");
+            window.open("./vocabug_docs.html", "_blank");
         });
         dom.appendChild(help_btn);
         return {
