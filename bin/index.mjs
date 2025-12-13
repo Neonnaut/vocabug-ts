@@ -8738,7 +8738,7 @@ class Canon_Graphemes_Resolver {
     this.associateme_mapper = mapper;
   }
 }
-const VOCABUG_VERSION = "0.5.1";
+const VOCABUG_VERSION = "1.0.0";
 function generate({
   file,
   num_of_words = 100,

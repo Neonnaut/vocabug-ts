@@ -1,2 +1,2 @@
 // Auto-generated -- do not edit.
-export const VOCABUG_VERSION = "0.5.1";
+export const VOCABUG_VERSION = "1.0.0";
