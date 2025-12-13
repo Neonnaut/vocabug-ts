@@ -29,8 +29,7 @@
     "build:win": "tsc.cmd",
     "build:cli": "vite build --config bin/vite.config.js",
     "build": "node build.js",
-    
-    "build:b": "tsc && npx terser dist/index.js -m reserved='[generate]' --ecma 2022 --toplevel -c unsafe,unsafe_symbols,top_retain='generate' -o dist/vocabug.min.js"
+    "build:cm6" : "cd codemirror && npx rollup src/editor.ts -f iife -o ../app/cm6.bundle.js -p @rollup/plugin-node-resolve -p @rollup/plugin-typescript --output.name cm6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

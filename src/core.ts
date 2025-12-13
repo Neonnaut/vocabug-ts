@@ -13,6 +13,7 @@ import CategoryResolver from "./resolvers/category_resolver";
 import GenerationResolver from "./resolvers/generation_resolver";
 import FeatureResolver from "./resolvers/feature_resolver";
 import CanonGraphemesResolver from "./resolvers/canon_graphemes_resolver";
+import { VOCABUG_VERSION } from "./utils/vocabug-version";
 
 type generate_options = {
   file: string;
@@ -23,6 +24,10 @@ type generate_options = {
   sort_words?: boolean;
   word_divider?: string;
 };
+
+function make_introduction() {
+  return `Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...`;
+}
 
 function generate({
   file,
@@ -165,4 +170,4 @@ function generate({
   };
 }
 
-export { generate };
+export { generate, make_introduction };

@@ -121,10 +121,9 @@ class Text_Builder {
   create_record() {
     // Send some good info about the generation results
     const ms = Date.now() - this.build_start;
-    const display =
-      ms >= 1000
-        ? `${(ms / 1000).toFixed(ms % 1000 === 0 ? 0 : 1)} s`
-        : `${ms} ms`;
+    const seconds = Math.ceil(ms / 100) / 10;
+    const s = seconds.toFixed(seconds % 1 === 0 ? 0 : 1);
+    const display = s === "1" ? `${s} second` : `${s} seconds`;
 
     const records: string[] = [];
 

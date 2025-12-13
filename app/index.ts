@@ -4,6 +4,8 @@ const cm6 = (window as any).cm6; // This was global. Stops TS from complaining
 
 const w = new Worker('./worker.js', { type: 'module' });
 
+import { VOCABUG_VERSION } from '../src/utils/vocabug-version';
+
 function create_file_editor() {
     // Work out content and theme of file editor
     let content = '';
@@ -154,7 +156,7 @@ window.addEventListener("load", () => {
             // Disable all generate buttons
             generate_buttons.forEach(b => b.disabled = true);
 
-            const output_message_html = `<p class='info-message'>Generating words... This may take up to 30 seconds</p>`;
+            const output_message_html = `<p class='grey-message'>Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...</p>`;
             output_message.innerHTML = output_message_html;
 
             try {
@@ -230,7 +232,7 @@ window.addEventListener("load", () => {
             }
         }
 
-        output_message.innerHTML = output_message_html;
+        output_message.innerHTML += output_message_html;
 
         // Store file contents in local storage to be retrieved on page refresh
         localStorage.setItem('vocabug', JSON.stringify([

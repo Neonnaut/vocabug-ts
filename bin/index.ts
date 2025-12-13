@@ -8,8 +8,7 @@ import { hideBin } from 'yargs/helpers';
 import type { Arguments } from 'yargs';
 
 import { generate } from '../src/core';
-
-
+import { VOCABUG_VERSION } from '../src/utils/vocabug-version';
 
 
 type CLI_Args = Arguments<{
@@ -126,6 +125,8 @@ if (!filePath) {
 const file_text = fs.readFileSync(filePath, argv.encoding);
 
 try {
+  console.log(`Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...`);
+
   const run = 
       generate({
       file: file_text,
@@ -146,9 +147,11 @@ try {
   for (const info of run.infos) {
     console.info(info);
   }
-  console.log(
-    run.text
-  );
+  if (run.text.length === 0) {
+    console.log(
+      run.text
+    );
+  }
 } catch {
   process.exitCode = 1;
   console.error(`Error: Could not find file '${argv._[0]}'.`);

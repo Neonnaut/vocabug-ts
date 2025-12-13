@@ -6806,7 +6806,9 @@ class Text_Builder {
   }
   create_record() {
     const ms = Date.now() - this.build_start;
-    const display = ms >= 1e3 ? `${(ms / 1e3).toFixed(ms % 1e3 === 0 ? 0 : 1)} s` : `${ms} ms`;
+    const seconds = Math.ceil(ms / 100) / 10;
+    const s = seconds.toFixed(seconds % 1 === 0 ? 0 : 1);
+    const display = s === "1" ? `${s} second` : `${s} seconds`;
     const records = [];
     if (this.words.length == 1) {
       records.push(`1 word generated`);
@@ -6890,7 +6892,6 @@ Invisible: ` + this.invisible.join(", ");
     this.logger.diagnostic(info);
   }
 }
-const VOCABUG_VERSION = "0.5.1";
 class Logger {
   constructor() {
     __publicField(this, "errors");
@@ -6956,7 +6957,7 @@ class Logger {
     }
   }
   info(info) {
-    this.infos.push(`Vocabug ver. ${VOCABUG_VERSION}: ${info}`);
+    this.infos.push(`${info}`);
   }
   diagnostic(diagnostic) {
     this.diagnostics.push(diagnostic);
@@ -7678,7 +7679,7 @@ class Transform_Resolver {
       const my_transform = this.transforms[i];
       if (my_transform.t_type != "rule" && my_transform.t_type != "cluster-field") {
         transforms.push(
-          `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num}`
+          `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num + 1}`
         );
         continue;
       }
@@ -7700,7 +7701,7 @@ class Transform_Resolver {
         conditions += ` / ${this.format_tokens(my_transform.conditions[j].before)}_${this.format_tokens(my_transform.conditions[j].after)}`;
       }
       transforms.push(
-        `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num}`
+        `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num + 1}`
       );
     }
     const features = [];
@@ -8737,6 +8738,7 @@ class Canon_Graphemes_Resolver {
     this.associateme_mapper = mapper;
   }
 }
+const VOCABUG_VERSION = "0.5.1";
 function generate({
   file,
   num_of_words = 100,
@@ -8927,6 +8929,7 @@ if (!filePath) {
 }
 const file_text = fs.readFileSync(filePath, argv.encoding);
 try {
+  console.log(`Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...`);
   const run = generate({
     file: file_text,
     num_of_words: argv.num_of_words,
@@ -8945,9 +8948,11 @@ try {
   for (const info of run.infos) {
     console.info(info);
   }
-  console.log(
-    run.text
-  );
+  if (run.text.length === 0) {
+    console.log(
+      run.text
+    );
+  }
 } catch {
   process.exitCode = 1;
   console.error(`Error: Could not find file '${argv._[0]}'.`);

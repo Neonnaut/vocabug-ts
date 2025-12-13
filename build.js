@@ -17,6 +17,9 @@ function main() {
   const output = `// Auto-generated -- do not edit.\nexport const VOCABUG_VERSION = '${projectVersion}';\n`;
   writeFileSync(resolve('./src/utils/vocabug-version.ts'), output);
 
+  log("creating codemirror bundle...")
+  run("npm run build:cm6")
+
   log("Running EsLint...");
   run("npm run lint");
 

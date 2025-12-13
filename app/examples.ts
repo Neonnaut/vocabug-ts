@@ -6,14 +6,14 @@ const examples: { [key: string]: string } = {
 categories:
   C = {t*9, tr} n {k*13, kr} m r s {p*12, pr} ch h w y
   L = ee oo aa ii uu
-  V = a i e o u
+  V = a i e o u L
   F = n r s
 
 ; A Unit provides abbreviation of parts of a word-shape.
 ; Here we are using <$> to define the main syllable.
 ; Items enclosed in '(' and ')' only appear 10% of the time by default.
 units:
-  $ = C{V(F)*10,L}
+  $ = CV(F)
 
 ; The first word-shape is picked the most often, the last, the least often.
 words:
