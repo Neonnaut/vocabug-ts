@@ -266,6 +266,14 @@ window.addEventListener("load", () => {
         }
     });
 
+    document.getElementById("help-button")?.addEventListener("mousedown", (event: MouseEvent) => {
+        if (event.button === 2) {
+            return;
+        }
+        // Open help page in new tab
+        window.open("./vocabug_docs.html", "_blank");
+    });
+
     // Clear button
     const clear_button = document.getElementById("clear-editor") as HTMLButtonElement | null;
     clear_button?.addEventListener("click", () => {

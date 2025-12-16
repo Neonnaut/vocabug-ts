@@ -26,7 +26,7 @@ const escapeRegex = /\\[^\s]|&\[(?:Space|Tab|Newline|Acute|DoubleAcute|Grave|Dou
 
 const routineRules = [
   {
-    token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|roman-to-hangeul|reverse)/
+    token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|latin-to-hangul|latin-to-hangeul|hangul-to-latin|hangeul-to-latin|greek-to-latin|latin-to-greek|reverse)/
   },
   { token: "link", regex: /=/ },
   { token: "meta", regex: />/}
@@ -164,7 +164,7 @@ const parser: StreamParser<State> = {
                 return "meta";
             }
             // Alphabet, Invisible
-            if (stream.match(/(alphabet|invisible)(?=:\s*(?:;|$))/)) {
+            if (stream.match(/(alphabet|invisible|syllable-boundaries)(?=:\s*(?:;|$))/)) {
                 state.directive = 'list';
                 state.doIndent = true;
                 return "meta";

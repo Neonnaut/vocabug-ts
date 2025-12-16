@@ -153,9 +153,14 @@ a -> e / r%[|yoog]_
   <routine = decapitalise>
   <routine = to-uppercase>
   <routine = to-lowercase>
+
+  <routine = latin-to-hangul>
+  <routine = hangul-to-latin>
+  <routine = latin-to-greek>
+  <routine = greek-to-latin>
   <routine = xsampa-to-ipa>
   <routine = ipa-to-xsampa>
-  <routine = roman-to-hangul>
+
   <routine = reverse>
 
 ; Target-mark

@@ -17,4 +17,4 @@ Right now, escape chars could interfere with PUA
 
 ## A decorator to disable a directive
 
-@directive.disabled = true
+@directive.disabled

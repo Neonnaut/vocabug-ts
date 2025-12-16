@@ -112,6 +112,7 @@ function generate({
       category_resolver.trans_categories,
       p.transform_pending,
       feature_resolver.features,
+      p.syllable_boundaries,
     );
 
     // Phew! done resolving things
@@ -129,6 +130,7 @@ function generate({
     const transformer = new Transformer(
       logger,
       canon_graphemes_resolver.graphemes,
+      transform_resolver.syllable_boundaries,
       transform_resolver.transforms,
       p.output_mode,
       canon_graphemes_resolver.associateme_mapper,

@@ -1,4 +1,4 @@
-const roman_to_cyrillic: Record<string, string> = {
+const latin_to_cyrillic: Record<string, string> = {
   "a":"а",
   "e":"е",
   "i":"и",

@@ -144,6 +144,7 @@ export type Directive =
   | "alphabet"
   | "invisible"
   | "graphemes"
+  | "syllable-boundaries"
   | "features"
   | "feature-field"
   | "stage"
@@ -158,7 +159,10 @@ export type Routine =
   | "to-lowercase"
   | "xsampa-to-ipa"
   | "ipa-to-xsampa"
-  | "roman-to-hangul"
+  | "latin-to-hangul"
+  | "hangul-to-latin"
+  | "greek-to-latin"
+  | "latin-to-greek"
   | "reverse";
 
 export const SYNTAX_CHARS = [

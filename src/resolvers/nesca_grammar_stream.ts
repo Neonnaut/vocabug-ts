@@ -109,33 +109,54 @@ class Nesca_Grammar_Stream {
             this.logger.validation_error(`Unclosed blocker`, line_num);
           }
 
-          //  Parse stream into consume and blocked_by
+          // Parse stream into consume and blocked_by
 
           const consume: string[][] = [];
           const blocked_by: string[][] = [];
 
-          const raw_groups = garde_stream
-            .split(",")
-            .map((group) => group.trim())
+          const parts = garde_stream
+            .split("|")
+            .map((part) => part.trim())
             .filter(Boolean);
 
-          let is_blocker = false;
+          if (parts.length > 2) {
+            throw new Error("Invalid garde_stream: more than one '|' found");
+          }
 
-          for (const group of raw_groups) {
-            if (group.startsWith("|")) {
-              is_blocker = true;
-              //group.pop // Skip the ^ marker itself
-            }
+          const [consume_part, blocked_part] = parts;
 
-            const graphemes = graphemosis(group, this.graphemes)
-              .map((g) => this.escape_mapper.restore_escaped_chars(g))
+          // Process consume part (split by commas)
+          if (consume_part) {
+            const consume_groups = consume_part
+              .split(",")
+              .map((group) => group.trim())
               .filter(Boolean);
 
-            if (graphemes.length > 0) {
-              if (is_blocker) {
-                blocked_by.push(graphemes);
-              } else {
+            for (const group of consume_groups) {
+              const graphemes = graphemosis(group, this.graphemes)
+                .map((g) => this.escape_mapper.restore_escaped_chars(g))
+                .filter(Boolean);
+
+              if (graphemes.length > 0) {
                 consume.push(graphemes);
+              }
+            }
+          }
+
+          // Process blocked_by part (if present)
+          if (blocked_part) {
+            const blocked_groups = blocked_part
+              .split(",")
+              .map((group) => group.trim())
+              .filter(Boolean);
+
+            for (const group of blocked_groups) {
+              const graphemes = graphemosis(group, this.graphemes)
+                .map((g) => this.escape_mapper.restore_escaped_chars(g))
+                .filter(Boolean);
+
+              if (graphemes.length > 0) {
+                blocked_by.push(graphemes);
               }
             }
           }
@@ -146,6 +167,7 @@ class Nesca_Grammar_Stream {
           if (blocked_by.length !== 0) {
             new_token.blocked_by = blocked_by;
           }
+
           look_ahead++; // Consume closing bracket
           i = look_ahead;
         }

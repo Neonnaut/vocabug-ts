@@ -39,6 +39,8 @@ class Parser {
 
   public graphemes: string[];
 
+  public syllable_boundaries: string[];
+
   public graphemes_pending: string = "";
 
   public alphabet: string[];
@@ -123,6 +125,7 @@ class Parser {
 
     this.graphemes_pending = "";
     this.graphemes = [];
+    this.syllable_boundaries = [];
   }
 
   parse_file(file: string) {
@@ -283,7 +286,9 @@ class Parser {
       if (my_directive === "alphabet") {
         const alphabet = line.split(/[,\s]+/).filter(Boolean);
         for (let i = 0; i < alphabet.length; i++) {
-          alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]);
+          alphabet[i] = this.escape_mapper
+            .restore_escaped_chars(alphabet[i])
+            .trim();
         }
         // Add alphabet items to this.alphabet
         this.alphabet.push(...alphabet);
@@ -293,7 +298,9 @@ class Parser {
       if (my_directive === "invisible") {
         const invisible = line.split(/[,\s]+/).filter(Boolean);
         for (let i = 0; i < invisible.length; i++) {
-          invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]);
+          invisible[i] = this.escape_mapper
+            .restore_escaped_chars(invisible[i])
+            .trim();
         }
         // Add invisible items to this.invisible
         this.invisible.push(...invisible);
@@ -303,6 +310,16 @@ class Parser {
       if (my_directive === "graphemes") {
         this.graphemes_pending += " " + line;
         continue; // Added some graphemes
+      }
+
+      // SYLLABLE-BOUNDARIES
+      if (my_directive === "syllable-boundaries") {
+        const sybo = line.split(/[,\s]+/).filter(Boolean);
+        for (let i = 0; i < sybo.length; i++) {
+          sybo[i] = this.escape_mapper.restore_escaped_chars(sybo[i]).trim();
+        }
+        // Add syllable boundaries to this.syllable_boundaries
+        this.syllable_boundaries.push(...sybo);
       }
 
       // STAGE
@@ -536,6 +553,8 @@ class Parser {
       temp_directive = "invisible";
     } else if (line === "graphemes:") {
       temp_directive = "graphemes";
+    } else if (line === "syllable-boundaries:") {
+      temp_directive = "syllable-boundaries";
     } else if (line === "features:") {
       temp_directive = "features";
     } else if (line === "feature-field:") {
@@ -653,17 +672,20 @@ class Parser {
     routine = routine.trim();
 
     routine = routine.replace(/\bcapitalize\b/g, "capitalise");
-    routine = routine.replace(/\broman-to-hangeul\b/g, "roman-to-hangul");
+    routine = routine.replace(/\blatin-to-hangeul\b/g, "latin-to-hangul");
 
     switch (routine) {
       case "reverse":
       case "compose":
       case "decompose":
       case "capitalise":
-      case "roman-to-hangul":
       case "decapitalise":
       case "to-uppercase":
       case "to-lowercase":
+      case "latin-to-hangul":
+      case "hangul-to-latin":
+      case "greek-to-latin":
+      case "latin-to-greek":
       case "xsampa-to-ipa":
       case "ipa-to-xsampa":
         return routine as Routine;

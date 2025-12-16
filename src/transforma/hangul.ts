@@ -40,7 +40,7 @@ const finals: Record<string, number> = {
 
 const medials: Record<string, number> = {
   uí: 16, // ㅟ
-  ùí: 19, // ㅢ
+  ụí: 19, // ㅢ
   yo: 12, // ㅛ
   yu: 17, // ㅠ
   yẹ: 3, // ㅒ
@@ -58,7 +58,7 @@ const medials: Record<string, number> = {
   a: 0, // ㅏ
   ọ: 4, // ㅓ
   e: 5, // ㅔ
-  ù: 18, // ㅡ
+  ụ: 18, // ㅡ
   i: 20, // ㅣ
 };
 
@@ -68,7 +68,7 @@ const compatibility_jamos = [
   0x314e,
 ];
 
-function roman_to_hangul(input: string): string {
+function latin_to_hangul(input: string): string {
   let output: string = "";
 
   // Preload token lists for greedy matching
@@ -169,4 +169,47 @@ function combine_jamo(initial: number, medial: number, final: number): string {
   return String.fromCharCode(syllable_code);
 }
 
-export { roman_to_hangul };
+// Build inverse maps
+const inv_initials: Record<number, string> = {};
+for (const [k, v] of Object.entries(initials)) inv_initials[v] = k;
+
+const inv_medials: Record<number, string> = {};
+for (const [k, v] of Object.entries(medials)) inv_medials[v] = k;
+
+const inv_finals: Record<number, string> = {};
+for (const [k, v] of Object.entries(finals)) inv_finals[v] = k;
+
+function hangul_to_latin(input: string): string {
+  let out = "";
+
+  for (const ch of input) {
+    const code = ch.charCodeAt(0);
+
+    // If not a Hangul syllable block, pass through
+    if (code < 0xac00 || code > 0xd7a3) {
+      out += ch;
+      continue;
+    }
+
+    const S = code - 0xac00;
+
+    const initial_index = Math.floor(S / 588);
+    const medial_index = Math.floor((S % 588) / 28);
+    const final_index = S % 28;
+
+    // Map back to roman tokens
+    const initial_token =
+      initial_index === 11 ? "" : (inv_initials[initial_index] ?? "");
+
+    const medial_token = inv_medials[medial_index] ?? "";
+
+    const final_token =
+      final_index === 0 ? "" : (inv_finals[final_index] ?? "");
+
+    out += initial_token + medial_token + final_token;
+  }
+
+  return out;
+}
+
+export { hangul_to_latin, latin_to_hangul };

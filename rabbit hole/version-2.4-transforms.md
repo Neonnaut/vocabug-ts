@@ -10,7 +10,7 @@
 
 ## 1. Decorator for individual transform
 
-### Give name
+### Give name for each transform
 
 @"Name here yeah yeah"
 
@@ -36,8 +36,6 @@ These printed out in debug mode
 ## 2. Routine
 
 ### Cyrillic
-
-### Greek
 
 ### Katakana
 
@@ -129,7 +127,7 @@ invisible-graphemes: .
 
 generated words would have meta information that they were in a pos or word class
 
-Tranforms could then have a condition that
+Tranforms could then have a condition that targets the class of word
 
 `<word-class-condition = noun`
 `x -> y

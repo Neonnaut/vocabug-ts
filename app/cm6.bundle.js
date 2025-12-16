@@ -20695,7 +20695,7 @@ var cm6 = (function (exports) {
     var escapeRegex = /\\[^\s]|&\[(?:Space|Tab|Newline|Acute|DoubleAcute|Grave|DoubleGrave|Circumflex|Caron|Breve|InvertedBreve|TildeAbove|TildeBelow|Macron|Dot|DotBelow|Diaeresis|DiaeresisBelow|Ring|RingBelow|Horn|Hook|CommaAbove|CommaBelow|Cedilla|Ogonek|VerticalLineBelow|VerticalLineAbove|DoubleVerticalLineBelow|PlusSignBelow|PlusSignStandalone|uptackBelow|UpTackStandalone|LeftTackBelow|rightTackBelow|DownTackBelow|DownTackStandalone|BreveBelow|InvertedBreveBelow|MacronBelow|MacronBelowStandalone|BridgeBelow|BridgeAbove|InvertedBridgeBelow|SquareBelow|SeagullBelow|LeftBracketBelow)\]/;
     var routineRules = [
         {
-            token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|roman-to-hangul|roman-to-hangeul|reverse)/
+            token: "attributeName", regex: /\s+(compose|decompose|capitalise|decapitalise|capitalize|decapitalize|to-uppercase|to-lowercase|xsampa-to-ipa|ipa-to-xsampa|latin-to-hangul|latin-to-hangeul|hangul-to-latin|hangeul-to-latin|greek-to-latin|latin-to-greek|reverse)/
         },
         { token: "link", regex: /=/ },
         { token: "meta", regex: />/ }
@@ -20806,7 +20806,7 @@ var cm6 = (function (exports) {
                     return "meta";
                 }
                 // Alphabet, Invisible
-                if (stream.match(/(alphabet|invisible)(?=:\s*(?:;|$))/)) {
+                if (stream.match(/(alphabet|invisible|syllable-boundaries)(?=:\s*(?:;|$))/)) {
                     state.directive = 'list';
                     state.doIndent = true;
                     return "meta";
@@ -21151,26 +21151,16 @@ var cm6 = (function (exports) {
     function toolbar_func(view) {
         var dom = document.createElement("div");
         dom.className = "cm-toolbar";
-        var num_label = document.createElement("label");
-        num_label.textContent = "Nº of Words:";
-        num_label.htmlFor = "num-of-words";
-        dom.appendChild(num_label);
-        var num_words_textbox = document.createElement("input");
-        num_words_textbox.type = "number";
-        num_words_textbox.min = "1";
-        num_words_textbox.max = "9999";
-        num_words_textbox.placeholder = "100";
-        num_words_textbox.autocomplete = "off";
-        num_words_textbox.id = "num-of-words";
-        num_words_textbox.onclick = function () {
-        };
-        dom.appendChild(num_words_textbox);
         var generate_btn = document.createElement("button");
         generate_btn.textContent = "Generate";
         generate_btn.classList.add("generate-words", "green-btn");
         generate_btn.onclick = function () {
         };
         dom.appendChild(generate_btn);
+        var clear_btn = document.createElement("button");
+        clear_btn.innerHTML = "<i class='fa fa-trash'></i>";
+        clear_btn.id = "clear-editor";
+        dom.appendChild(clear_btn);
         var config_btn = document.createElement("button");
         config_btn.innerHTML = "<i class='fa fa-gear'></i>";
         config_btn.onclick = function () {
@@ -21183,20 +21173,6 @@ var cm6 = (function (exports) {
             window.location.href = '#file-save-load';
         };
         dom.appendChild(open_btn);
-        var clear_btn = document.createElement("button");
-        clear_btn.innerHTML = "<i class='fa fa-trash'></i>";
-        clear_btn.id = "clear-editor";
-        dom.appendChild(clear_btn);
-        var help_btn = document.createElement("button");
-        help_btn.innerHTML = "<i class='fa fa-question'></i>";
-        help_btn.addEventListener("mousedown", function (event) {
-            if (event.button === 2) {
-                return;
-            }
-            // Open help page in new tab
-            window.open("./vocabug_docs.html", "_blank");
-        });
-        dom.appendChild(help_btn);
         return {
             dom: dom,
             top: false

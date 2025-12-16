@@ -58,27 +58,34 @@
         <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea>
         <input type="submit" class="styled-button generate-words" class="generate-words" value="Generate">        
         <input type="submit" class="styled-button" id="output-words-copy" value="Copy words">
+        <input type="submit" class="styled-button" id="help-button" value="Help">
         
         <div id='prog-output-message' style="border: 2px solid #000;"><p class="grey-message">Information may be shown here...</p></div>
     
         <fieldset style="float: left;" id="config">
           <legend>Config</legend>
-
-          <label for="word-divider">Word divider:</label>
-          <input type="text" autocomplete="off" id="word-divider" style="width: 100px;">
-  
           <div>
             <div style="float:left; display: inline; margin: 4px 10px 2px 0;">
               <label for="my_mode">Mode:</label>
-              <select id="my_mode" aria-label="Generation mode">
+              <select id="my_mode" aria-label="Generation mode" style="margin-bottom: 2px;">
                 <option value="word-list" selected>Word-list</option>
                 <option value="debug">Debug</option>
                 <option value="paragraph">Paragraph</option>
-              </select>
+              </select> <br>
+
+                        <label for="num-of-words">Nº Words:</label>
+          <input type="number" style="width:52px; margin-bottom:2px;" min="1" max="9999" placeholder="100" autocomplete="off" id="num-of-words"><br>
+  
+
+          <label for="word-divider">Divider:</label>
+          <input type="text" autocomplete="off" id="word-divider" style="width: 70px; ">
+
+
+
             </div>
             <div style="float: left; display: inline; margin: 4px 10px 2px 0;">
               <input type="checkbox" id="remove-duplicates" checked>
-              <label for="remove-duplicates">Remove duplicates</label><br>
+              <label for="remove-duplicates">No duplicates</label><br>
   
               <input type="checkbox" id="force-words">
               <label for="force-words">Force word limit</label><br>
@@ -223,6 +230,7 @@
       <button class="vowelX keyboard-button" title="i with macron" value="&#x012B;">&#x012B;</button>
       <button class="vowelX keyboard-button" title="i with tilde" value="&#x0129;">&#x0129;</button>
       <button class="vowelX keyboard-button" title="i with ogonek" value="&#x012F;">&#x012F;</button>
+      <button class="vowelX keyboard-button" title="i with underdot" value="&#7883;">&#7883;</button>
       <button class="vowelX keyboard-button" title="dotless i" value="&#x0131;">&#x0131;</button>
       <button class="vowelX keyboard-button" title="i with diaeresis" value="&#x00EF;">&#x00EF;</button>
       <button class="cons keyboard-button" title="palatalized" value="&#x02B2;">&#9676;&#x02B2;</button>
@@ -276,7 +284,6 @@
       <button class="vowelX keyboard-button" title="o with hook" value="&#x01A1;">&#x01A1;</button>
       
       <button class="consN keyboard-button" title="small caps P" value="&#7448;">&#7448;</button>
-      <button class="consN keyboard-button" title="small caps Q" value="&#42927;">&#42927;</button>
       
       <button class="cons keyboard-button" title="voiced alveolar tap" value="&#x027E;">&#x027E;</button>
       <button class="cons keyboard-button" title="voiced alveolar approximant" value="&#x0279;">&#x0279;</button>
@@ -312,6 +319,7 @@
       <button class="vowelX keyboard-button" title="u with macron" value="&#x016B;">&#x016B;</button>
       <button class="vowelX keyboard-button" title="u with tilde" value="&#x0169;">&#x0169;</button>
       <button class="vowelX keyboard-button" title="u with ogonek" value="&#x0173;">&#x0173;</button>
+      <button class="vowelX keyboard-button" title="u with underdot" value="&#7909;">&#7909;</button>
       <button class="vowelX keyboard-button" title="u with diaeresis" value="&#x00FC;">&#x00FC;</button>
           
       <button class="vowelX keyboard-button" title="u with hook" value="&#x01B0;">&#x01B0;</button>
@@ -368,8 +376,6 @@
       <button class="consN special-button keyboard-button" title="tilde" value="&#x007E;">&#x007E;</button>
       <button class="consN keyboard-button" title="zero (nonIPA)" value="&#x2205;">&#x2205;</button>
       <button class="consN keyboard-button" title="rightwards arrow (nonIPA)" value="&#x2192;">&#x2192;</button>
-
-      <button class="consN keyboard-button" title="Greek capital Pi" value="&#928;">&#928;</button>
             
       <button class="consN keyboard-button" title="superscript 1 (nonIPA)" value="&#x00B9;">&#9676;&#x00B9;</button>
       <button class="consN keyboard-button" title="superscript 2 (nonIPA)" value="&#x00B2;">&#9676;&#x00B2;</button>

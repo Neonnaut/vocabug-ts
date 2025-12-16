@@ -4051,6 +4051,7 @@ class Parser {
     __publicField(this, "feature_pending");
     __publicField(this, "transform_pending");
     __publicField(this, "graphemes");
+    __publicField(this, "syllable_boundaries");
     __publicField(this, "graphemes_pending", "");
     __publicField(this, "alphabet");
     __publicField(this, "invisible");
@@ -4112,6 +4113,7 @@ class Parser {
     this.invisible = [];
     this.graphemes_pending = "";
     this.graphemes = [];
+    this.syllable_boundaries = [];
   }
   parse_file(file) {
     const file_array = file.split("\n");
@@ -4247,20 +4249,27 @@ class Parser {
       if (my_directive === "alphabet") {
         const alphabet = line.split(/[,\s]+/).filter(Boolean);
         for (let i = 0; i < alphabet.length; i++) {
-          alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]);
+          alphabet[i] = this.escape_mapper.restore_escaped_chars(alphabet[i]).trim();
         }
         this.alphabet.push(...alphabet);
       }
       if (my_directive === "invisible") {
         const invisible = line.split(/[,\s]+/).filter(Boolean);
         for (let i = 0; i < invisible.length; i++) {
-          invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]);
+          invisible[i] = this.escape_mapper.restore_escaped_chars(invisible[i]).trim();
         }
         this.invisible.push(...invisible);
       }
       if (my_directive === "graphemes") {
         this.graphemes_pending += " " + line;
         continue;
+      }
+      if (my_directive === "syllable-boundaries") {
+        const sybo = line.split(/[,\s]+/).filter(Boolean);
+        for (let i = 0; i < sybo.length; i++) {
+          sybo[i] = this.escape_mapper.restore_escaped_chars(sybo[i]).trim();
+        }
+        this.syllable_boundaries.push(...sybo);
       }
       if (my_directive === "stage") {
         if (my_subdirective === "clusterfield") {
@@ -4457,6 +4466,8 @@ class Parser {
       temp_directive = "invisible";
     } else if (line === "graphemes:") {
       temp_directive = "graphemes";
+    } else if (line === "syllable-boundaries:") {
+      temp_directive = "syllable-boundaries";
     } else if (line === "features:") {
       temp_directive = "features";
     } else if (line === "feature-field:") {
@@ -4546,16 +4557,19 @@ class Parser {
     let [routine] = right2.split(">");
     routine = routine.trim();
     routine = routine.replace(/\bcapitalize\b/g, "capitalise");
-    routine = routine.replace(/\broman-to-hangeul\b/g, "roman-to-hangul");
+    routine = routine.replace(/\blatin-to-hangeul\b/g, "latin-to-hangul");
     switch (routine) {
       case "reverse":
       case "compose":
       case "decompose":
       case "capitalise":
-      case "roman-to-hangul":
       case "decapitalise":
       case "to-uppercase":
       case "to-lowercase":
+      case "latin-to-hangul":
+      case "hangul-to-latin":
+      case "greek-to-latin":
+      case "latin-to-greek":
       case "xsampa-to-ipa":
       case "ipa-to-xsampa":
         return routine;
@@ -5718,7 +5732,7 @@ const finals = {
 const medials = {
   uí: 16,
   // ㅟ
-  ùí: 19,
+  ụí: 19,
   // ㅢ
   yo: 12,
   // ㅛ
@@ -5754,7 +5768,7 @@ const medials = {
   // ㅓ
   e: 5,
   // ㅔ
-  ù: 18,
+  ụ: 18,
   // ㅡ
   i: 20
   // ㅣ
@@ -5780,7 +5794,7 @@ const compatibility_jamos = [
   12621,
   12622
 ];
-function roman_to_hangul(input) {
+function latin_to_hangul(input) {
   let output = "";
   const init_tokens = Object.keys(initials);
   const medial_tokens = Object.keys(medials);
@@ -5855,6 +5869,97 @@ function combine_jamo(initial, medial, final) {
   const syllable_code = base_code + initial_offset * 588 + medial_offset * 28 + final_offset;
   return String.fromCharCode(syllable_code);
 }
+const inv_initials = {};
+for (const [k, v] of Object.entries(initials)) inv_initials[v] = k;
+const inv_medials = {};
+for (const [k, v] of Object.entries(medials)) inv_medials[v] = k;
+const inv_finals = {};
+for (const [k, v] of Object.entries(finals)) inv_finals[v] = k;
+function hangul_to_latin(input) {
+  let out = "";
+  for (const ch of input) {
+    const code = ch.charCodeAt(0);
+    if (code < 44032 || code > 55203) {
+      out += ch;
+      continue;
+    }
+    const S = code - 44032;
+    const initial_index = Math.floor(S / 588);
+    const medial_index = Math.floor(S % 588 / 28);
+    const final_index = S % 28;
+    const initial_token = initial_index === 11 ? "" : inv_initials[initial_index] ?? "";
+    const medial_token = inv_medials[medial_index] ?? "";
+    const final_token = final_index === 0 ? "" : inv_finals[final_index] ?? "";
+    out += initial_token + medial_token + final_token;
+  }
+  return out;
+}
+const latin_to_greek_code_map = {
+  a: "α",
+  á: "ά",
+  à: "ὰ",
+  e: "ε",
+  é: "έ",
+  è: "ὲ",
+  ẹ: "η",
+  ẹ́: "ή",
+  ẹ̀: "ὴ",
+  i: "ι",
+  í: "ί",
+  ì: "ὶ",
+  o: "ο",
+  ó: "ό",
+  ò: "ὸ",
+  ọ: "ω",
+  ọ́: "ώ",
+  ọ̀: "ὼ",
+  u: "υ",
+  ú: "ύ",
+  ù: "ὺ",
+  b: "β",
+  d: "δ",
+  f: "φ",
+  g: "γ",
+  k: "κ",
+  l: "λ",
+  m: "μ",
+  n: "ν",
+  p: "π",
+  r: "ρ",
+  s: "σ",
+  t: "τ",
+  x: "χ",
+  z: "ζ",
+  h: "ͱ",
+  č: "ͷ",
+  c: "ϛ",
+  q: "ξ",
+  þ: "θ",
+  ṕ: "ψ",
+  š: "ϸ",
+  w: "ϝ",
+  j: "ϳ"
+};
+const greek_to_latin_code_map = Object.fromEntries(
+  Object.entries(latin_to_greek_code_map).map(([latin, greek]) => [
+    greek,
+    latin
+  ])
+);
+function latin_to_greek(input) {
+  let out = "";
+  for (const char of input) {
+    out += latin_to_greek_code_map[char] ?? char;
+  }
+  return out;
+}
+function greek_to_latin(input) {
+  let out = "";
+  for (const char of input) {
+    out += greek_to_latin_code_map[char] ?? char;
+  }
+  return out;
+}
 class Carryover_Associator {
   constructor() {
     __publicField(this, "caryover_list");
@@ -5914,14 +6019,16 @@ class Carryover_Associator {
   }
 }
 class Transformer {
-  constructor(logger, graphemes, transforms, output_mode, associateme_mapper) {
+  constructor(logger, graphemes, syllable_boundaries, transforms, output_mode, associateme_mapper) {
     __publicField(this, "logger");
     __publicField(this, "transforms");
     __publicField(this, "graphemes");
+    __publicField(this, "syllable_boundaries");
     __publicField(this, "debug", false);
     __publicField(this, "associateme_mapper");
     this.logger = logger;
     this.graphemes = graphemes;
+    this.syllable_boundaries = syllable_boundaries;
     this.transforms = transforms;
     this.associateme_mapper = associateme_mapper;
     this.debug = output_mode === "debug";
@@ -5957,8 +6064,17 @@ class Transformer {
       case "ipa-to-xsampa":
         modified_word = ipa_to_xsampa(full_word);
         break;
-      case "roman-to-hangul":
-        modified_word = roman_to_hangul(full_word);
+      case "latin-to-hangul":
+        modified_word = latin_to_hangul(full_word);
+        break;
+      case "hangul-to-latin":
+        modified_word = hangul_to_latin(full_word);
+        break;
+      case "latin-to-greek":
+        modified_word = latin_to_greek(full_word);
+        break;
+      case "greek-to-latin":
+        modified_word = greek_to_latin(full_word);
         break;
       default:
         this.logger.validation_error("This should not have happened");
@@ -6176,8 +6292,8 @@ class Transformer {
         i += available;
       } else if (token.type === "syllable-boundary") {
         let count = 0;
-        if (stream[i] === ".") {
-          while (count < max_available && stream[i + count] === ".") {
+        if (this.syllable_boundaries.includes(stream[i])) {
+          while (count < max_available && stream[i + count] === stream[i]) {
             count++;
           }
           if (count < min) {
@@ -7196,13 +7312,14 @@ class Supra_Builder {
   }
 }
 class Transform_Resolver {
-  constructor(logger, output_mode, nesca_grmmar_stream, categories, transform_pending, features) {
+  constructor(logger, output_mode, nesca_grmmar_stream, categories, transform_pending, features, syllable_boundaries) {
     __publicField(this, "logger");
     __publicField(this, "output_mode");
     __publicField(this, "nesca_grammar_stream");
     __publicField(this, "categories");
     __publicField(this, "transform_pending");
     __publicField(this, "transforms", []);
+    __publicField(this, "syllable_boundaries");
     __publicField(this, "features", /* @__PURE__ */ new Map());
     __publicField(this, "line_num");
     this.logger = logger;
@@ -7211,6 +7328,7 @@ class Transform_Resolver {
     this.categories = categories;
     this.transform_pending = transform_pending;
     this.features = features;
+    this.syllable_boundaries = syllable_boundaries.length === 0 ? ["."] : syllable_boundaries;
     this.line_num = 0;
     this.resolve_transforms();
     if (this.output_mode === "debug") {
@@ -7635,7 +7753,7 @@ class Transform_Resolver {
         }
         if ("blocked_by" in t && t.blocked_by) {
           const groups = t.blocked_by.map((group) => group.join("")).join(", ");
-          s += `^[${groups}]`;
+          s += `|[${groups}]`;
         }
       }
       if ("escaped" in t && t.escaped) {
@@ -7718,6 +7836,7 @@ class Transform_Resolver {
     }
     const associatemes = parts.join("\n");
     const info = `Graphemes: ` + this.nesca_grammar_stream.graphemes.join(", ") + `
+Syllable Boundaries: ` + this.syllable_boundaries.join(", ") + `
 Associatemes: 
 ` + associatemes + `
 Features {
@@ -7806,18 +7925,26 @@ class Nesca_Grammar_Stream {
           }
           const consume = [];
           const blocked_by = [];
-          const raw_groups = garde_stream.split(",").map((group) => group.trim()).filter(Boolean);
-          let is_blocker = false;
-          for (const group of raw_groups) {
-            if (group.startsWith("|")) {
-              is_blocker = true;
-            }
-            const graphemes = graphemosis(group, this.graphemes).map((g) => this.escape_mapper.restore_escaped_chars(g)).filter(Boolean);
-            if (graphemes.length > 0) {
-              if (is_blocker) {
-                blocked_by.push(graphemes);
-              } else {
+          const parts = garde_stream.split("|").map((part) => part.trim()).filter(Boolean);
+          if (parts.length > 2) {
+            throw new Error("Invalid garde_stream: more than one '|' found");
+          }
+          const [consume_part, blocked_part] = parts;
+          if (consume_part) {
+            const consume_groups = consume_part.split(",").map((group) => group.trim()).filter(Boolean);
+            for (const group of consume_groups) {
+              const graphemes = graphemosis(group, this.graphemes).map((g) => this.escape_mapper.restore_escaped_chars(g)).filter(Boolean);
+              if (graphemes.length > 0) {
                 consume.push(graphemes);
+              }
+            }
+          }
+          if (blocked_part) {
+            const blocked_groups = blocked_part.split(",").map((group) => group.trim()).filter(Boolean);
+            for (const group of blocked_groups) {
+              const graphemes = graphemosis(group, this.graphemes).map((g) => this.escape_mapper.restore_escaped_chars(g)).filter(Boolean);
+              if (graphemes.length > 0) {
+                blocked_by.push(graphemes);
               }
             }
           }
@@ -8806,7 +8933,8 @@ function generate({
       nesca_grammar_stream,
       category_resolver.trans_categories,
       p.transform_pending,
-      feature_resolver.features
+      feature_resolver.features,
+      p.syllable_boundaries
     );
     const word_builder = new Word_Builder(
       escape_mapper,
@@ -8820,6 +8948,7 @@ function generate({
     const transformer = new Transformer(
       logger,
       canon_graphemes_resolver.graphemes,
+      transform_resolver.syllable_boundaries,
       transform_resolver.transforms,
       p.output_mode,
       canon_graphemes_resolver.associateme_mapper

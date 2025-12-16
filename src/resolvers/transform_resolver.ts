@@ -17,6 +17,8 @@ class Transform_Resolver {
   public transform_pending: Transform_Pending[];
   public transforms: Transform[] = [];
 
+  public syllable_boundaries: string[];
+
   public features: Map<string, { graphemes: string[] }> = new Map();
 
   private line_num: number;
@@ -28,6 +30,7 @@ class Transform_Resolver {
     categories: Map<string, string[]>,
     transform_pending: Transform_Pending[],
     features: Map<string, { graphemes: string[] }>,
+    syllable_boundaries: string[],
   ) {
     this.logger = logger;
     this.output_mode = output_mode;
@@ -36,6 +39,8 @@ class Transform_Resolver {
     this.categories = categories;
     this.transform_pending = transform_pending;
     this.features = features;
+    this.syllable_boundaries =
+      syllable_boundaries.length === 0 ? ["."] : syllable_boundaries;
     this.line_num = 0;
 
     this.resolve_transforms();
@@ -576,7 +581,7 @@ class Transform_Resolver {
             const groups = t.blocked_by
               .map((group) => group.join("")) // join inner items
               .join(", "); // join groups with ,
-            s += `^[${groups}]`;
+            s += `|[${groups}]`;
           }
         }
 
@@ -687,6 +692,8 @@ class Transform_Resolver {
     const info: string =
       `Graphemes: ` +
       this.nesca_grammar_stream.graphemes.join(", ") +
+      `\nSyllable Boundaries: ` +
+      this.syllable_boundaries.join(", ") +
       `\nAssociatemes: \n` +
       associatemes +
       `\nFeatures {\n` +

@@ -114,7 +114,13 @@
         <ol class="nice-list">
           <li><a href="#nescaMultipleCondition">Multiple conditions in one rule</a></li>
           <li><a href="#nescaWordBoundary">Word boundary</a></li>
-          <li><a href="#nescaSyllableBoundary">Syllable boundary</a></li>
+          <li><a href="#nescaSyllableBoundary">Syllable boundary</a>
+            <ol class="nice-list">
+              <li><a href="#nescaSyllableBoundariesDirective">Syllable boundaries directive</a></li>
+            </ol>
+          </li>
+          
+          
         </ol>
         </li>
 
@@ -186,34 +192,34 @@
       <ul class="paragraphian">
         <li>The textbox at the top of the program is the 'definition-build editor'. A definition-build defines the graphemes, frequencies, word-shapes and transforms that generate the final words. There will already be a default definition-build in the definition-build editor, or the previous definition-build that generated words</li>
         
-        <li>Use the <code class="example">Number of words</code> textbox to choose the number of words to generate. The default number is 100</li>
-        
-        <li>Use the <code class="example">Generate</code> button to see Vocabug produce words</li>
+        <li>Use the <code class="example">Generate</code> button to see Vocabug produce words. Yes, there are two generate buttons.</li>
+
+        <li>The <i class="fa fa-trash"></i> button clears the definition-build editor and the generated words</li>
         
         <li>The <i class="fa fa-cog"></i> and <i class="fa fa-folder"></i> button will jump to the configuration and file save / load options, respectfully</li>
-        
-        
-        <li>The <i class="fa fa-trash"></i> button clears the definition-build editor and the generated words</li>
-
-        <li>The <i class="fa fa-question"></i> button shows this document</li>
 
         <li>The generated words appear in a textbox below the editor</li>
 
         <li>Use the <code class="example">Copy words</code> button to copy the generated words to the clipboard</li>
+
+        <li>The <code class="example">Help</code> button shows this document</li>
 
         <li>Below the copy words button is an 'output terminal'. It provides useful information about the generation run</li>
       </ul>
 
       <h3 id="vocOptions"><a class="head-num">2.1</a>Options</h3>
       <ul class="paragraphian">
-        <li>The <code class="example">Word divider</code> textbox sets the delimiter, or in other words, what the content will be between each word in the output. It is a space "<code class="example"> </code>" by default. Use <code class="example">\n</code> to get one word for each line</li>
-                
-        <li><code class="example">Word-list mode</code> will produce a list of words</li>
-        
-        <li><code class="example">Debug mode</code> will show, line by line, each step in creating each word</li>
 
-        <li><code class="example">Paragraph mode</code> will produce words that look vaguely like sentences by injecting punctuation into the word list and capitalising the first word of each sentence</li>
+      <li><code class="example">Word-list mode</code> will produce a list of words</li>
         
+      <li><code class="example">Debug mode</code> will show, line by line, each step in creating each word</li>
+
+      <li><code class="example">Paragraph mode</code> will produce words that look vaguely like sentences by injecting punctuation into the word list and capitalising the first word of each sentence</li>
+
+      <li>Use the <code class="example">Number of words</code> textbox to choose the number of words to generate. The default number is 100</li>
+
+      <li>The <code class="example">Divider</code> textbox sets the delimiter, or in other words, what the content will be between each word in the output. It is a space "<code class="example"> </code>" by default. Use <code class="example">\n</code> to get one word for each line</li>
+                
         <li><code class="example">Remove duplicates</code> will make sure all words generated are unique</li>
         <li><code class="example">Force words</code> will force the generator to try and generate the complete number of words requested within 30 seconds, despite the number of rejections / duplicates removed</li>
         <li><code class="example">Sort words</code> sorts the words in alphabetical order, or the order defined in the <code class="example">alphabet:</code> directive</li>
@@ -807,7 +813,7 @@
       <p>This would order generated words like so: <code class="example">cat</code>, <code class="example">chat</code>, <code class="example">cumin</code>, <code class="example">frog</code>, <code class="example">tray</code>, <code class="example">t'a</code>, <code class="example">yanny</code></p>
 
       <h2 id="vocInvisibility"><a class="head-num">9</a>The invisible directive</h2>
-      <p>Sometimes you will want characters, such as syllable dividers, to be invisible to alphabetisation. You can do this by listing these characters in the invisible: directive.</p>
+      <p>Sometimes you will want characters, such as syllable dividers, to be invisible to alphabetisation. You can do this by listing these characters in the invisible directive.</p>
       <div class="prog-pre"><span class="directive">invisible</span><code class="link">:</code>
   .<span class="link">,</span> '</div>
       <p> This will make these generated words: <code class="example">za'ta</code>, <code class="example">'ba.ta</code>, <code class="example">'za.ta</code> be reordered into: <code class="example">'ba.ta</code>, <code class="example">za'ta</code>, <code class="example">'za.ta</code></p>
@@ -842,21 +848,21 @@
         <li><code class="example">REPLACEMENT</code> is what <code class="example">TARGET</code> is changing into, or in other words, replacing</li>
       </ul>
       <p>Let's look at a simple unconditional rule:</p>
-      <div class="prog-pre"><span class="comment">; Replace every [o] with [x]</span><br>  o <span class="link">-></span> x<br><span class="comment">; bodido ==> bxdidx</span></div>
+      <div class="prog-pre"><span class="comment">; Replace every &lt;o&gt; with &lt;x&gt;</span><br>  o <span class="link">-></span> x<br><span class="comment">; bodido ==> bxdidx</span></div>
       <p>In this rule, we see every instance of <code class="example">o</code> become <code class="example">x</code>.</p>
 
       <h3 id="nescaConcurrentChange"><a class="head-num">12.1</a>Concurrent change</h3>
       <p>Concurrent change is achieved by listing multiple graphemes in <code class="example">TARGET</code> separated by commas, and listing the same amount of replacement graphemes in <code class="example">REPLACEMENT</code> separated by commas. Changes in a concurrent change execute at the same time:</p>
-      <div class="prog-pre"><span class="comment">; Switch [o] and [a] around</span><br>  o<span class="link">,</span> a <span class="link">-></span> a<span class="link">,</span> o<br><span class="comment">; boda ==> bado</span></div>
+      <div class="prog-pre"><span class="comment">; Switch &lt;o&gt; and &lt;a&gt; around</span><br>  o<span class="link">,</span> a <span class="link">-></span> a<span class="link">,</span> o<br><span class="comment">; boda ==> bado</span></div>
       <p>Notice that the above example is different to the example below:</p>
       <div class="prog-pre">  o <span class="link">-></span> a<br>  a <span class="link">-></span> o<br><span class="comment">; boda ==> bodo</span></div>
       <p>where each change is on its own line. We can see <code class="example">o</code> merge with <code class="example">a</code>, then <code class="example">a</code> becomes <code class="example">o</code>.</p>
 
       <h3 id="nescaMergingChange"><a class="head-num">12.2</a>Merging change</h3>
       <p>Instead of listing each <code class="example">REPLACEMENT</code> in a concurrent change, we can instead list just one that all the <code class="example">TARGET</code>s will merge into:</p>
-      <div class="prog-pre"><span class="comment">; Merge [o] and [a] into [x]</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<br><span class="comment">; boda ==> bxdx</span></div>
+      <div class="prog-pre"><span class="comment">; Merge &lt;o&gt; and &lt;a&gt; into &lt;x&gt;</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<br><span class="comment">; boda ==> bxdx</span></div>
       <p>This is equivalent to:</p>
-      <div class="prog-pre"><span class="comment">; Merge [o] and [a] into [x]</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<span class="link">,</span> x<br><span class="comment">; boda ==> bxdx</span></div>
+      <div class="prog-pre"><span class="comment">; Merge &lt;o&gt; and &lt;a&gt; into &lt;x&gt;</span><br>  o<span class="link">,</span> a <span class="link">-></span> x<span class="link">,</span> x<br><span class="comment">; boda ==> bxdx</span></div>
 
       <h3 id="nescaReject"><a class="head-num">12.3</a>Reject</h3>
       <p>To remove, or in other words, reject a word, you use a zero <code class="example">0</code> in <code class="example">REPLACEMENT</code>:</p>
@@ -865,11 +871,11 @@
 
       <h2 id="nescaInsertionAndDeletion"><a class="head-num">13</a>Insertion and deletion</h2>
       <p>Insertion requires a <a href="#nescaTheCondition">condition</a> to be present, and for a caret <code class="example">^</code> to be present in <code class="example">TARGET</code>, representing nothing.</p>
-      <div class="prog-pre"><span class="comment">; Insert [a] in between [b] and [t]</span>
+      <div class="prog-pre"><span class="comment">; Insert &lt;a&gt; in between &lt;b&gt; and &lt;t&gt;</span>
   <span class="operator">^</span> <span class="link">-></span> a <span class="link">/</span> b<span class="link">_</span>t
 <span class="comment">; bt ==> bat</span></div>
       <p>Deletion happens when <code class="example">^</code> is present in <code class="example">REPLACEMENT</code>:</p>
-      <div class="prog-pre"><span class="comment">; Delete every [b]</span>
+      <div class="prog-pre"><span class="comment">; Delete every &lt;b&gt;</span>
   b <span class="link">-></span> <span class="operator">^</span>
 <span class="comment">; bubda ==> uda</span></div>
 
@@ -883,19 +889,26 @@
         <li><code class="example">AFTER</code> is anything in the word after the target</li>
       </ul>
       <p>For example:</p>
-      <div class="prog-pre"><span class="comment">; Change [o] into [x] only when it is between [p]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<br><span class="comment">; opoptot ==> opxptot</span></div>
+      <div class="prog-pre"><span class="comment">; Change &lt;o&gt; into &lt;x&gt; only when it is between &lt;p&gt;s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<br><span class="comment">; opoptot ==> opxptot</span></div>
 
       <h3 id="nescaMultipleCondition"><a class="head-num">14.1</a>Multiple conditions in one rule</h3>
       <p>Multiple conditions for a single rule can be made by separating each condition with additional forward slashes. The change will happen if it meets either, or both of the conditions:</p>
-      <div class="prog-pre"><span class="comment">; Change [o] into [x] only when it is between [p]s or [t]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p <span class="link">/</span> t<span class="link">_</span>t<br><span class="comment">; opoptot ==> opxptxt</span></div>
+      <div class="prog-pre"><span class="comment">; Change &lt;o&gt; into &lt;x&gt; only when it is between &lt;p&gt;s or &lt;t&gt;s</span><br>  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p <span class="link">/</span> t<span class="link">_</span>t<br><span class="comment">; opoptot ==> opxptxt</span></div>
       
       <h3 id="nescaWordBoundary"><a class="head-num">14.2</a>Word boundary</h3>
       <p>Hash <code class="example">#</code> matches to word boundaries. Either the beginning of the word if it is in <code class="example">BEFORE</code>, or the end of the word if it is in <code class="example">AFTER</code></p>
       <div class="prog-pre">  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<span class="regexp">#</span><br><span class="comment">; opoppop ==> opoppxp</span></div>
 
       <h3 id="nescaSyllableBoundary"><a class="head-num">14.3</a>Syllable boundary</h3>
-      <p>Dollar-sign <code class="example">$</code> matches to either the character <code class="example">.</code> or if no match, tries to match word boundaries. Either the beginning of the word if it is in <code class="example">BEFORE</code>, or the end of the word if it is in <code class="example">AFTER</code></p>
+      <p>Dollar-sign <code class="example">$</code> matches to either the character <code class="example">.</code>, to any of the syllable-divider graphemes stated in the <code class="example">syllable-boundary</code> directive, or if no match, tries to match word boundaries. Either the beginning of the word if it is in <code class="example">BEFORE</code>, or the end of the word if it is in <code class="example">AFTER</code></p>
       <div class="prog-pre">  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<span class="regexp">$</span><br><span class="comment">; o.pop.pop ==> o.pxp.pxp</span></div>
+
+      <h4 id="nescaSyllableBoundariesDirective"><a class="head-num">14.3.1</a>Syllable boundaries directive</h4>
+      <p>The syllable-boundaries directive lets you define which graphemes are to be treated as a syllable-boundary:</p>
+      <div class="prog-pre"><span class="directive">syllable-boundaries</span><code class="link">:</code>
+  .<span class="link">,</span> '
+<span class="directive">stage</span><span class="link">:</span>
+  o <span class="link">-></span> x <span class="link">/</span> p<span class="link">_</span>p<span class="regexp">$</span><br><span class="comment">; o.pop'pop ==> o.pxp'pxp</span></div>
 
       <!--
       <h3 id="nescaChanceCondition"><a class="head-num">14.4</a>The chance condition</h3>
@@ -1025,9 +1038,9 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
 
       <h3 id="nescaOptionalatorSet"><a class="head-num">18.2</a>Optionalator-set</h3>
       <p>Items in an optionalator, enclosed in <code class="example">(</code> and <code class="example">)</code> can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Merge [x] and [xw] into [k]</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
+      <div class="prog-pre"><span class="comment">; Merge &lt;x&gt; and &lt;xw&gt; into &lt;k&gt;</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
       <p>Optional-set can also attach to an alternator-set:</p>
-      <div class="prog-pre"><span class="comment">; Merge [x], [xw], [ħ] and [ħw] into [k]</span><br>  <span class="regexp">{</span>x<span class="link">,</span> ħ<span class="regexp">}</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
+      <div class="prog-pre"><span class="comment">; Merge &lt;x&gt;, &lt;xw&gt;, &lt;ħ&gt; and &lt;ħw&gt; into &lt;k&gt;</span><br>  <span class="regexp">{</span>x<span class="link">,</span> ħ<span class="regexp">}</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
       <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
 
       <h2 id="nescaWildcardsAndQuantifiers"><a class="head-num">19</a>Wildcards and quantifiers</h2>
@@ -1039,20 +1052,20 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
 
       <h3 id="nescaBoundedQuantifier"><a class="head-num">19.2</a>Bounded quantifier</h3>
       <p>The bounded quantifier matches as many times its digit(s), enclosed in <code class="example">?[</code> and <code class="example">]</code>, to the things to the left.</p>
-      <div class="prog-pre"><span class="comment">; Change [o] into [x] only when preceded by three [r]s</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">?[</span>3<span class="regexp">]</span><span class="link">_</span>
+      <div class="prog-pre"><span class="comment">; Change &lt;o&gt; into &lt;x&gt; only when preceded by three &lt;r&gt;s</span><br>  o <span class="link">-></span> x <span class="link">/</span> r<span class="regexp">?[</span>3<span class="regexp">]</span><span class="link">_</span>
 <code class="comment">; ororrro ==> ororrrx</code></div>
 
       <p>The digits in the quantifier can also be a range:</p>
-      <div class="prog-pre"><span class="comment">; Change a sequence of 2 to 4 [o]s into [x]</span><br>  o<span class="regexp">?[</span>2<span class="link">,</span>4<span class="regexp">]</span> <span class="link">-></span> x
+      <div class="prog-pre"><span class="comment">; Change a sequence of 2 to 4 &lt;o&gt;s into &lt;x&gt;</span><br>  o<span class="regexp">?[</span>2<span class="link">,</span>4<span class="regexp">]</span> <span class="link">-></span> x
 <code class="comment">; tootooooo ==> txtxo</code></div>
 
 
       <p>At the beginning of the list, <code class="example">,</code> represents all the possible numbers lower than the number to the right, not including zero.</p>
-      <div class="prog-pre"><span class="comment">; Change a sequence of 1 to 4 [o]s into [x]</span><br>  o<span class="regexp">?[</span><span class="link">,</span>4<span class="regexp">]</span> <span class="link">-></span> x
+      <div class="prog-pre"><span class="comment">; Change a sequence of 1 to 4 &lt;o&gt;s into &lt;x&gt;</span><br>  o<span class="regexp">?[</span><span class="link">,</span>4<span class="regexp">]</span> <span class="link">-></span> x
 <code class="comment">; tootooooo ==> txtx</code></div>
 
       <p>And finally at the end of the list, <code class="example">,</code> represents all possible numbers larger than the number to the the left</p>
-        <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible [o]s into [x]</span><br>  o<span class="regexp">?[</span>4<span class="regexp"><span class="link">,</span>]</span> <span class="link">-></span> x
+        <div class="prog-pre"><span class="comment">; Change a sequence of 4 to as many as possible &lt;o&gt;s into &lt;x&gt;</span><br>  o<span class="regexp">?[</span>4<span class="regexp"><span class="link">,</span>]</span> <span class="link">-></span> x
 <code class="comment">; toootooooo ==> toootx</code></div>
 
       <p>A bounded quantifier can be used in <code class="example">REPLACEMENT</code> as long as there is a definite maximum quantity. Or in other words, you cannot produce an infinite amount of something!</p>
@@ -1071,7 +1084,7 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
 
       <h3 id="nescaWildcard"><a class="head-num">19.5</a>Wildcard</h3>
       <p>Wildcard, using asterisk <code class="example">*</code>, will match once to any grapheme. Wildcard does not match word boundaries. Wildcard cannot be used in <code class="example">REPLACEMENT</code>:</p>
-      <div class="prog-pre"><code class="comment">; Any grapheme becomes [x] when any grapheme follows it</code><br>  <span class="regexp">*</span> <span class="link">-></span> x <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; aomp ==> xxxp</code></div>
+      <div class="prog-pre"><code class="comment">; Any grapheme becomes &lt;x&gt; when any grapheme follows it</code><br>  <span class="regexp">*</span> <span class="link">-></span> x <span class="link">/</span> <span class="link">_</span><span class="regexp">*</span><br><code class="comment">; aomp ==> xxxp</code></div>
       <p>Wildcard can be placed by itself inside an <a href="#nescaOptionalatorSet">optionalator</a> <code class="example">(*)</code>, thereby allowing it to match nothing as well.</p>
 
       <h3 id="nescaAnythingsMark"><a class="head-num">19.6</a>Anythings-mark</h3>
@@ -1098,7 +1111,7 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
 
       <p>Sets, categories and features can also be used when monitoring for laziness and cowardliness:</p>
 
-            <div class="prog-pre"><span class="comment">; capture up to a plosive + [r] cluster</span>
+            <div class="prog-pre"><span class="comment">; capture up to a plosive + &lt;r&gt; cluster</span>
   <span class="regexp">%[</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span> <span class="link">-></span> x 
 <span class="comment">; kotatros -> xos</span></div> 
 
@@ -1138,123 +1151,123 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
         <li><code class="example">to-lowercase</code> will convert all characters of a word to lowercase</li>
         <li><code class="example">reverse</code> will reverse the order of graphemes in a word</li>
         
-        <li><code class="example">xsampa-to-ipa</code> will convert characters of a word written in X-SAMPA into IPA</li>
+        <li><code class="example">xsampa-to-ipa</code> will convert characters of a word written in X-Sampa into IPA. <code class="example">ipa-to-xsampa</code> will convert them back
         
+          <details class="dropdown-group">
+            <summary class="dropdown-btn">Reveal</summary>
 
-        <li><code class="example">ipa-to-xsampa</code> will convert characters of a word written in IPA into X-SAMPA
-        
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th>X-SAMPA</th>
+                  <th>IPA</th>
+                </tr>
+              </thead>
+            <tbody>
+              <tr><td>b_&lt;</td><td>ɓ</td></tr>
+              <tr><td>d_&lt;</td><td>ɗ</td></tr>
+              <tr><td>d`</td><td>ɖ</td></tr>
+              <tr><td>g_&lt;</td><td>ɠ</td></tr>
+              <tr><td>h\</td><td>ɦ</td></tr>
+              <tr><td>j\</td><td>ʝ</td></tr>
+              <tr><td>l\</td><td>ɺ</td></tr>
+              <tr><td>l`</td><td>ɭ</td></tr>
+              <tr><td>n`</td><td>ɳ</td></tr>
+              <tr><td>p\</td><td>ɸ</td></tr>
+              <tr><td>r\</td><td>ɹ</td></tr>
+              <tr><td>r\`</td><td>ɻ</td></tr>
+              <tr><td>r`</td><td>ɽ</td></tr>
+              <tr><td>s\</td><td>ɕ</td></tr>
+              <tr><td>s`</td><td>ʂ</td></tr>
+              <tr><td>t`</td><td>ʈ</td></tr>
+              <tr><td>x\</td><td>ɧ</td></tr>
+              <tr><td>z\</td><td>ʑ</td></tr>
+              <tr><td>z`</td><td>ʐ</td></tr>
+              <tr><td>A</td><td>ɑ</td></tr>
+              <tr><td>B</td><td>β</td></tr>
+              <tr><td>B\</td><td>ʙ</td></tr>
+              <tr><td>C</td><td>ç</td></tr>
+              <tr><td>D</td><td>ð</td></tr>
+              <tr><td>E</td><td>ɛ</td></tr>
+              <tr><td>F</td><td>ɱ</td></tr>
+              <tr><td>G</td><td>ɣ</td></tr>
+              <tr><td>G\</td><td>ɢ</td></tr>
+              <tr><td>G\_&lt;</td><td>ʛ</td></tr>
+              <tr><td>H</td><td>ɥ</td></tr>
+              <tr><td>H\</td><td>ʜ</td></tr>
+              <tr><td>I</td><td>ɪ</td></tr>
+              <tr><td>J</td><td>ɲ</td></tr>
+              <tr><td>J\</td><td>ɟ</td></tr>
+              <tr><td>J\_&lt;</td><td>ʄ</td></tr>
+              <tr><td>K</td><td>ɬ</td></tr>
+              <tr><td>K\</td><td>ɮ</td></tr>
+              <tr><td>L</td><td>ʎ</td></tr>
+              <tr><td>L\</td><td>ʟ</td></tr>
+              <tr><td>M</td><td>ɯ</td></tr>
+              <tr><td>M\</td><td>ɰ</td></tr>
+              <tr><td>N</td><td>ŋ</td></tr>
+              <tr><td>N\</td><td>ɴ</td></tr>
+              <tr><td>O</td><td>ɔ</td></tr>
+              <tr><td>O\</td><td>ʘ</td></tr>
+              <tr><td>v\</td><td>ʋ</td></tr>
+              <tr><td>P</td><td>ʋ</td></tr>
+              <tr><td>Q</td><td>ɒ</td></tr>
+              <tr><td>R</td><td>ʁ</td></tr>
+              <tr><td>R\</td><td>ʀ</td></tr>
+              <tr><td>S</td><td>ʃ</td></tr>
+              <tr><td>T</td><td>θ</td></tr>
+              <tr><td>U</td><td>ʊ</td></tr>
+              <tr><td>V</td><td>ʌ</td></tr>
+              <tr><td>W</td><td>ʍ</td></tr>
+              <tr><td>X</td><td>χ</td></tr>
+              <tr><td>X\</td><td>ħ</td></tr>
+              <tr><td>Y</td><td>ʏ</td></tr>
+              <tr><td>Z</td><td>ʒ</td></tr>
+              <tr><td>"</td><td>ˈ◌</td></tr>
+              <tr><td>%</td><td>ˌ◌</td></tr>
+              <tr><td>:</td><td>◌ː</td></tr>
+              <tr><td>:\</td><td>◌ˑ</td></tr>
+              <tr><td>@</td><td>ə</td></tr>
+              <tr><td>@\</td><td>ɘ</td></tr>
+              <tr><td>@`</td><td>ɚ</td></tr>
+              <tr><td>{</td><td>æ</td></tr>
+              <tr><td>}</td><td>ʉ</td></tr>
+              <tr><td>1</td><td>ɨ</td></tr>
+              <tr><td>2</td><td>ø</td></tr>
+              <tr><td>3</td><td>ɜ</td></tr>
+              <tr><td>3\</td><td>ɞ</td></tr>
+              <tr><td>4</td><td>ɾ</td></tr>
+              <tr><td>5</td><td>ɫ</td></tr>
+              <tr><td>6</td><td>ɐ</td></tr>
+              <tr><td>7</td><td>ɤ</td></tr>
+              <tr><td>8</td><td>ɵ</td></tr>
+              <tr><td>9</td><td>œ</td></tr>
+              <tr><td>&</td><td>ɶ</td></tr>
+              <tr><td>?</td><td>ʔ</td></tr>
+              <tr><td>?\</td><td>ʕ</td></tr>
+              <tr><td>&lt;\</td><td>ʢ</td></tr>
+              <tr><td>>\</td><td>ʡ</td></tr>
+              <tr><td>^</td><td>ꜛ</td></tr>
+              <tr><td>!</td><td>ꜜ</td></tr>
+              <tr><td>!\</td><td>ǃ</td></tr>
+              <tr><td>|</td><td>|</td></tr>
+              <tr><td>|\</td><td>ǀ</td></tr>
+              <tr><td>||</td><td>‖</td></tr>
+              <tr><td>|\\|\</td><td>ǁ</td></tr>
+              <tr><td>=\</td><td>ǂ</td></tr>
+              <tr><td>-\</td><td>‿</td></tr>
+
+            </tbody>
+            </table>
+          </details>
+
+        </li>
+
+        <li><code class="example">latin-to-hangul</code> converts, or rather, transliterates characters written in an arbitrary romanisation into Hangul Jamo blocks. <code class="example">hangul-to-latin</code> converts them back.
         <details class="dropdown-group">
         <summary class="dropdown-btn">Reveal</summary>
 
-        <table class="styled-table"><thead>
-          <tr>
-            <th>IPA</th>
-            <th>X-SAMPA</th>
-          </tr></thead>
-        <tbody>
-          <tr><td>b_&lt;</td><td>ɓ</td></tr>
-          <tr><td>d_&lt;</td><td>ɗ</td></tr>
-          <tr><td>d`</td><td>ɖ</td></tr>
-          <tr><td>g_&lt;</td><td>ɠ</td></tr>
-          <tr><td>h\</td><td>ɦ</td></tr>
-          <tr><td>j\</td><td>ʝ</td></tr>
-          <tr><td>l\</td><td>ɺ</td></tr>
-          <tr><td>l`</td><td>ɭ</td></tr>
-          <tr><td>n`</td><td>ɳ</td></tr>
-          <tr><td>p\</td><td>ɸ</td></tr>
-          <tr><td>r\</td><td>ɹ</td></tr>
-          <tr><td>r\`</td><td>ɻ</td></tr>
-          <tr><td>r`</td><td>ɽ</td></tr>
-          <tr><td>s\</td><td>ɕ</td></tr>
-          <tr><td>s`</td><td>ʂ</td></tr>
-          <tr><td>t`</td><td>ʈ</td></tr>
-          <tr><td>x\</td><td>ɧ</td></tr>
-          <tr><td>z\</td><td>ʑ</td></tr>
-          <tr><td>z`</td><td>ʐ</td></tr>
-          <tr><td>A</td><td>ɑ</td></tr>
-          <tr><td>B</td><td>β</td></tr>
-          <tr><td>B\</td><td>ʙ</td></tr>
-          <tr><td>C</td><td>ç</td></tr>
-          <tr><td>D</td><td>ð</td></tr>
-          <tr><td>E</td><td>ɛ</td></tr>
-          <tr><td>F</td><td>ɱ</td></tr>
-          <tr><td>G</td><td>ɣ</td></tr>
-          <tr><td>G\</td><td>ɢ</td></tr>
-          <tr><td>G\_&lt;</td><td>ʛ</td></tr>
-          <tr><td>H</td><td>ɥ</td></tr>
-          <tr><td>H\</td><td>ʜ</td></tr>
-          <tr><td>I</td><td>ɪ</td></tr>
-          <tr><td>J</td><td>ɲ</td></tr>
-          <tr><td>J\</td><td>ɟ</td></tr>
-          <tr><td>J\_&lt;</td><td>ʄ</td></tr>
-          <tr><td>K</td><td>ɬ</td></tr>
-          <tr><td>K\</td><td>ɮ</td></tr>
-          <tr><td>L</td><td>ʎ</td></tr>
-          <tr><td>L\</td><td>ʟ</td></tr>
-          <tr><td>M</td><td>ɯ</td></tr>
-          <tr><td>M\</td><td>ɰ</td></tr>
-          <tr><td>N</td><td>ŋ</td></tr>
-          <tr><td>N\</td><td>ɴ</td></tr>
-          <tr><td>O</td><td>ɔ</td></tr>
-          <tr><td>O\</td><td>ʘ</td></tr>
-          <tr><td>v\</td><td>ʋ</td></tr>
-          <tr><td>P</td><td>ʋ</td></tr>
-          <tr><td>Q</td><td>ɒ</td></tr>
-          <tr><td>R</td><td>ʁ</td></tr>
-          <tr><td>R\</td><td>ʀ</td></tr>
-          <tr><td>S</td><td>ʃ</td></tr>
-          <tr><td>T</td><td>θ</td></tr>
-          <tr><td>U</td><td>ʊ</td></tr>
-          <tr><td>V</td><td>ʌ</td></tr>
-          <tr><td>W</td><td>ʍ</td></tr>
-          <tr><td>X</td><td>χ</td></tr>
-          <tr><td>X\</td><td>ħ</td></tr>
-          <tr><td>Y</td><td>ʏ</td></tr>
-          <tr><td>Z</td><td>ʒ</td></tr>
-          <tr><td>"</td><td>ˈ◌</td></tr>
-          <tr><td>%</td><td>ˌ◌</td></tr>
-          <tr><td>:</td><td>◌ː</td></tr>
-          <tr><td>:\</td><td>◌ˑ</td></tr>
-          <tr><td>@</td><td>ə</td></tr>
-          <tr><td>@\</td><td>ɘ</td></tr>
-          <tr><td>@`</td><td>ɚ</td></tr>
-          <tr><td>{</td><td>æ</td></tr>
-          <tr><td>}</td><td>ʉ</td></tr>
-          <tr><td>1</td><td>ɨ</td></tr>
-          <tr><td>2</td><td>ø</td></tr>
-          <tr><td>3</td><td>ɜ</td></tr>
-          <tr><td>3\</td><td>ɞ</td></tr>
-          <tr><td>4</td><td>ɾ</td></tr>
-          <tr><td>5</td><td>ɫ</td></tr>
-          <tr><td>6</td><td>ɐ</td></tr>
-          <tr><td>7</td><td>ɤ</td></tr>
-          <tr><td>8</td><td>ɵ</td></tr>
-          <tr><td>9</td><td>œ</td></tr>
-          <tr><td>&</td><td>ɶ</td></tr>
-          <tr><td>?</td><td>ʔ</td></tr>
-          <tr><td>?\</td><td>ʕ</td></tr>
-          <tr><td>&lt;\</td><td>ʢ</td></tr>
-          <tr><td>>\</td><td>ʡ</td></tr>
-          <tr><td>^</td><td>ꜛ</td></tr>
-          <tr><td>!</td><td>ꜜ</td></tr>
-          <tr><td>!\</td><td>ǃ</td></tr>
-          <tr><td>|</td><td>|</td></tr>
-          <tr><td>|\</td><td>ǀ</td></tr>
-          <tr><td>||</td><td>‖</td></tr>
-          <tr><td>|\\|\</td><td>ǁ</td></tr>
-          <tr><td>=\</td><td>ǂ</td></tr>
-          <tr><td>-\</td><td>‿</td></tr>
-
-        </tbody></table>
-      </details>
-
-      </li>
-
-        <li><code class="example">roman-to-hangul</code> converts, or rather, transliterates characters written in an arbitrary romanisation to Hangul Jamo blocks.
-        <details class="dropdown-group">
-        <summary class="dropdown-btn">Reveal</summary>
-
-        <table class="styled-table">
+          <table class="styled-table">
           <caption>Initial and final jamo</caption>
           <thead>
             <tr>
@@ -1284,9 +1297,9 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
             <tr><td>x</td><td>ㅎ</td><td>ㅎ</td></tr>
             <tr><td>gn</td><td></td><td>ㅇ</td></tr>
           </tbody>
-        </table>
+          </table>
 
-        <table class="styled-table">
+          <table class="styled-table">
           <caption>Medial jamo</caption>
           <thead>
             <tr>
@@ -1301,7 +1314,7 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
             <tr><td>e</td><td>ㅔ</td></tr>
             <tr><td>o</td><td>ㅗ</td></tr>
             <tr><td>u</td><td>ㅜ</td></tr>
-            <tr><td>ù</td><td>ㅡ</td></tr>
+            <tr><td>ụ</td><td>ㅡ</td></tr>
             <tr><td>i</td><td>ㅣ</td></tr>
             <tr><td>wa</td><td>ㅘ</td></tr>
             <tr><td>wẹ</td><td>ㅙ</td></tr>
@@ -1309,7 +1322,7 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
             <tr><td>we</td><td>ㅞ</td></tr>
             <tr><td>wi</td><td>ㅚ</td></tr>
             <tr><td>uí</td><td>ㅟ</td></tr>
-            <tr><td>ùí</td><td>ㅢ</td></tr>
+            <tr><td>ụí</td><td>ㅢ</td></tr>
             <tr><td>ya</td><td>ㅑ</td></tr>
             <tr><td>yẹ</td><td>ㅒ</td></tr>
             <tr><td>yọ</td><td>ㅕ</td></tr>
@@ -1317,10 +1330,78 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
             <tr><td>yo</td><td>ㅛ</td></tr>
             <tr><td>yu</td><td>ㅠ</td></tr>
           </tbody>
-        </table>
-      </details>
-          <p>When there is no initial to be found, the jamo will have an initial Ieung. Forming an initial of the next jamo is preferred over creating a final for the current jamo.</p>
+          </table>
+          </details>
+          <p>When there is no initial to be found, the jamo will have an initial Ieung. Forming an initial of the next jamo is preferred over creating a final for the current jamo</p>
       </li>
+
+      <li><code class="example">latin-to-greek</code> converts, or rather, transliterates characters written in an arbitrary romanisation into greek letters. <code class="example">greek-to-latin</code> converts them back
+        <details class="dropdown-group">
+        <summary class="dropdown-btn">Reveal</summary>
+
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Latin</th>
+              <th>Greek</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>a</td><td>α</td></tr>
+            <tr><td>á</td><td>ά</td></tr>
+            <tr><td>à</td><td>ὰ</td></tr>
+            <tr><td>e</td><td>ε</td></tr>
+            <tr><td>é</td><td>έ</td></tr>
+            <tr><td>è</td><td>ὲ</td></tr>
+            <tr><td>ẹ</td><td>η</td></tr>
+            <tr><td>ẹ́</td><td>ή</td></tr>
+            <tr><td>ẹ̀</td><td>ὴ</td></tr>
+            <tr><td>i</td><td>ι</td></tr>
+            <tr><td>í</td><td>ί</td></tr>
+            <tr><td>ì</td><td>ὶ</td></tr>
+            <tr><td>o</td><td>ο</td></tr>
+            <tr><td>ó</td><td>ό</td></tr>
+            <tr><td>ò</td><td>ὸ</td></tr>
+            <tr><td>ọ</td><td>ω</td></tr>
+            <tr><td>ọ́</td><td>ώ</td></tr>
+            <tr><td>ọ̀</td><td>ὼ</td></tr>
+            <tr><td>u</td><td>υ</td></tr>
+            <tr><td>ú</td><td>ύ</td></tr>
+            <tr><td>ù</td><td>ὺ</td></tr>
+
+            <tr><td>b</td><td>β</td></tr>
+            <tr><td>d</td><td>δ</td></tr>
+            <tr><td>f</td><td>φ</td></tr>
+            <tr><td>g</td><td>γ</td></tr>
+            <tr><td>k</td><td>κ</td></tr>
+            <tr><td>l</td><td>λ</td></tr>
+            <tr><td>m</td><td>μ</td></tr>
+            <tr><td>n</td><td>ν</td></tr>
+            <tr><td>p</td><td>π</td></tr>
+            <tr><td>r</td><td>ρ</td></tr>
+            <tr><td>s</td><td>σ</td></tr>
+            <tr><td>t</td><td>τ</td></tr>
+            <tr><td>x</td><td>χ</td></tr>
+            <tr><td>z</td><td>ζ</td></tr>
+            <tr><td>q</td><td>ξ</td></tr>
+            <tr><td>þ</td><td>θ</td></tr>
+            <tr><td>ṕ</td><td>ψ</td></tr>
+
+            <tr><td>c</td><td>ϛ</td></tr>
+            <tr><td>č</td><td>ͷ</td></tr>
+            <tr><td>h</td><td>ͱ</td></tr>
+            <tr><td>j</td><td>ϳ</td></tr>
+            <tr><td>š</td><td>ϸ</td></tr>
+            <tr><td>w</td><td>ϝ</td></tr>
+
+          </tbody>
+        </table>
+
+
+        </details>
+          
+      </li>
+
       </ul>
 
       <h3 id="nescaTargetMark"><a class="head-num">21.2</a>Target-mark</h3>
@@ -1351,7 +1432,7 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
 
       <p>One use for it is a trick to make one-place long-distance metathesis work, for example:</p>
 
-      <div class="prog-pre"><span class="comment">; The [r] of a plosive + [r] cluster is moved</span>
+      <div class="prog-pre"><span class="comment">; The &lt;r&gt; of a plosive + &lt;r&gt; cluster is moved</span>
 <span class="comment">; between a word initial plosive and a vowel</span>
   <span class="catkey">&E</span><span class="regexp">{</span>a<span class="link">,</span>e<span class="link">,</span>i<span class="link">,</span>o<span class="link">,</span>u<span class="regexp">}</span><span class="regexp">&[<span class="operator">^</span></span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r <span class="link">-></span> <span class="catkey">&M</span> <span class="link">/</span> <span class="regexp">#</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span><span class="link">_</span>
 <span class="comment">; kotatros -> krotatos</span></div>
@@ -1388,13 +1469,13 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
 
       <p>Here are some examples:</p>
 
-      <div class="prog-pre"><span class="comment">; Delete [ʔ] between identical vowels</span>
+      <div class="prog-pre"><span class="comment">; Delete &lt;ʔ&gt; between identical vowels</span>
   ʔ <span class="link">-&gt;</span> <span class="operator">^</span> <span class="regexp">/</span> <span class="catkey">[+vowel]</span><span class="regexp">=1</span><span class="link">_</span><span class="catkey">1</span>
 <span class="comment">; baʔaʔe ==> baaʔe</span></div>
 
       <p>In the rule above, we are binding the <code class='example'>[+vowel]</code> feature-matrix to the reference <code class='example'>1</code>, by appending <code class='example'>=1</code> to it. Whatever this grapheme from <code class='example'>[+vowel]</code> is when the condition is met, is captured as the value of <code class='example'>1</code>. Then the value of backrefence <code class='example'>1</code> is inserted into <code class='example'>AFTER</code> by invoking its reference-mark.</p>
 
-      <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of [ʔ] final words</span>
+      <div class="prog-pre"><span class="comment">; Insert an 'echo vowel' at the end of &lt;ʔ&gt; final words</span>
   <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
 <span class="comment">; foobaʔ ==&gt; foobaʔa</span></div>
 
@@ -1406,7 +1487,7 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
 
       <p>To start capturing a sequence, you use a 'start-reference-capture', <code class="example">&=</code> before the graphmemes to be captured. Then at the end of the graphemes to be captured, a 'reference-capture' is used to bind those graphemes to a reference:</p>
 
-      <div class="prog-pre"><span class="comment">; Insert an 'echo double vowel' at the end of vowel + vowel + [ʔ] final words</span>
+      <div class="prog-pre"><span class="comment">; Insert an 'echo double vowel' at the end of vowel + vowel + &lt;ʔ&gt; final words</span>
   <span class="operator">^</span> <span class="link">-&gt;</span> <span class="catkey">1</span> <span class="regexp">/</span> <span class="regexp">&=</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">{</span><span class="catkey">V</span><span class="regexp">}</span><span class="regexp">=1</span>ʔ<span class="link">_</span><span class="regexp">#</span>
 <span class="comment">; foobaaʔ ==&gt; foobaaʔaa</span></div>
       
@@ -1420,7 +1501,7 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
       <p>To solve this, are 'associatemes' -- aligned variant graphemes associated with their base grapheme, and other associated graphemes -- other SCAs might use the terms "floating diacritics" or "autosegmentals". These allow you to target all forms of a grapheme with a single token. To set up associatemes, they must be stated in the <code class="example">graphemes</code> directive with the base associateme set of an entry inside curly braces, and each variant set in curly braces with a &lt; to the left of the base set, or another variant set, like so:</p>
       
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">
-  {</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span></div>
+  {</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span></div>
 
       <p>The behaviour of associatemes are:</p>
       <ul class="paragraphian">
@@ -1433,7 +1514,7 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
       
 
             <div class="prog-pre"><span class="directive">graphemes</span><span class="link">: <span class="regexp">
-  {</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span></span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span>
+  {</span></span>a<span class="link">,</span> e<span class="link">,</span> i<span class="link">,</span> o<span class="link">,</span> u<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span>á<span class="link">,</span> é<span class="link">,</span> í<span class="link">,</span> ó<span class="link">,</span> ú<span class="regexp">}</span><span class="regexp">&lt;</span><span class="regexp">{</span>à<span class="link">,</span> è<span class="link">,</span> ì<span class="link">,</span> ò<span class="link">,</span> ù<span class="regexp">}</span>
 <span class="directive">stage</span><span class="link">:</span>
   a<span class="regexp">~</span> <span class="link">-&gt;</span> e<span class="regexp">~</span><br><span class="comment">; daná ==&gt; dené</span></div>
       

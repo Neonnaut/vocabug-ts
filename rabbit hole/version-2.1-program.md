@@ -6,7 +6,9 @@ Currently, the interface uses StreamLanguage, instead of the significantly harde
 
 ## Autocomplete suggestions
 
-## Rewrite program in Rust or Haskel Python, Kotlin, Typescript
+So .... after I type "routine =" or "directive.distribution =", it would show context menu of options 
+
+## Rewrite program in Rust or Haskell, Python, Kotlin, Typescript
 
 Leaning towards Kotlin. Need to figure out "DSL"
 

@@ -14,7 +14,8 @@ import type {
 import Reference_Mapper from "./reference_mapper";
 
 import { xsampa_to_ipa, ipa_to_xsampa } from "./xsampa";
-import { roman_to_hangul } from "./hangul";
+import { latin_to_hangul, hangul_to_latin } from "./hangul";
+import { latin_to_greek, greek_to_latin } from "./greek";
 import Carryover_Associator from "./carryover_associator";
 
 type Match_Result = {
@@ -38,6 +39,8 @@ class Transformer {
 
   public graphemes: string[];
 
+  private syllable_boundaries: string[];
+
   private debug: boolean = false;
 
   private associateme_mapper: Associateme_Mapper;
@@ -45,12 +48,14 @@ class Transformer {
   constructor(
     logger: Logger,
     graphemes: string[],
+    syllable_boundaries: string[],
     transforms: Transform[],
     output_mode: Output_Mode,
     associateme_mapper: Associateme_Mapper,
   ) {
     this.logger = logger;
     this.graphemes = graphemes;
+    this.syllable_boundaries = syllable_boundaries;
     this.transforms = transforms;
     this.associateme_mapper = associateme_mapper;
     this.debug = output_mode === "debug";
@@ -93,8 +98,17 @@ class Transformer {
       case "ipa-to-xsampa":
         modified_word = ipa_to_xsampa(full_word);
         break;
-      case "roman-to-hangul":
-        modified_word = roman_to_hangul(full_word);
+      case "latin-to-hangul":
+        modified_word = latin_to_hangul(full_word);
+        break;
+      case "hangul-to-latin":
+        modified_word = hangul_to_latin(full_word);
+        break;
+      case "latin-to-greek":
+        modified_word = latin_to_greek(full_word);
+        break;
+      case "greek-to-latin":
+        modified_word = greek_to_latin(full_word);
         break;
       default:
         this.logger.validation_error("This should not have happened");
@@ -421,9 +435,9 @@ class Transformer {
       } else if (token.type === "syllable-boundary") {
         let count = 0;
 
-        if (stream[i] === ".") {
+        if (this.syllable_boundaries.includes(stream[i])) {
           // syllable-boundary in pattern represents a '.'
-          while (count < max_available && stream[i + count] === ".") {
+          while (count < max_available && stream[i + count] === stream[i]) {
             count++;
           }
           if (count < min) {
