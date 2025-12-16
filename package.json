@@ -2,7 +2,7 @@
   "name": "vocabug",
   "version": "1.0.1",
   "type": "module",
-  "description": "Word generator program for conlangers",
+  "description": "Word / vocabulary generator program",
   "author": "Neonnaut",
   "license": "MIT",
   "homepage": "https://neonnaut.neocities.org/",
@@ -14,8 +14,10 @@
     "url": "https://github.com/Neonnaut/vocabug-ts/issues"
   },
   "keywords": [
-    "conlanging",
+    "conlang",
+    "word generator",
     "wordgen",
+    "words",
     "vocabulary",
     "vocabug"
   ],
@@ -27,7 +29,7 @@
     "build:app": "vite build --config app/vite.config.js",
     "build:ts": "tsc && vite build",
     "build:win": "tsc.cmd",
-    "build:cli": "vite build --config bin/vite.config.js",
+    "build:cli": "tsup bin/index.ts --format esm --no-dts --no-minify --target node18 --out-dir bin",
     "build": "node build.js",
     "build:cm6": "cd codemirror && npx rollup src/editor.ts -f iife -o ../app/cm6.bundle.js -p @rollup/plugin-node-resolve -p @rollup/plugin-typescript --output.name cm6"
   },
@@ -43,7 +45,9 @@
     "globals": "^16.4.0",
     "jiti": "^2.6.1",
     "prettier": "3.6.2",
+    "rollup": "^4.53.5",
     "terser": "^5.44.0",
+    "tsup": "^8.5.1",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.46.0",
     "vite": "^6.3.5",
@@ -66,7 +70,7 @@
     "README"
   ],
   "bin": {
-    "vocabug": "./bin/index.cjs"
+    "vocabug": "./bin/index.js"
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
