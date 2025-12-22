@@ -20450,7 +20450,7 @@ var cm6 = (function (exports) {
     };
     var Darky = EditorView.theme({
         "&": {
-            fontSize: "12pt",
+            fontSize: "11pt",
             color: "#eeeeeeff"
         },
         ".cm-gutters": {
@@ -20528,7 +20528,7 @@ var cm6 = (function (exports) {
     };
     var Lighty = EditorView.theme({
         "&": {
-            fontSize: "12pt",
+            fontSize: "11pt",
             color: "#000000"
         },
         ".cm-gutters": {
@@ -20605,7 +20605,7 @@ var cm6 = (function (exports) {
     };
     var Warmy = EditorView.theme({
         "&": {
-            fontSize: "12pt",
+            fontSize: "11pt",
             color: "#181e20ff;"
         },
         ".cm-gutters": {
@@ -20936,7 +20936,6 @@ var cm6 = (function (exports) {
                             return rule.token;
                         }
                     }
-                    // THIS
                     if (state.insideUnit) {
                         for (var _k = 0, _l = state.unitList; _k < _l.length; _k++) {
                             var unito = _l[_k];
@@ -21158,7 +21157,7 @@ var cm6 = (function (exports) {
         };
         dom.appendChild(generate_btn);
         var clear_btn = document.createElement("button");
-        clear_btn.innerHTML = "<i class='fa fa-trash'></i>";
+        clear_btn.innerHTML = "<i class='fa fa-trash-can'></i>";
         clear_btn.id = "clear-editor";
         dom.appendChild(clear_btn);
         var config_btn = document.createElement("button");

@@ -12,7 +12,7 @@ function toolbar_func(view: EditorView) {
     dom.appendChild(generate_btn);
 
     const clear_btn = document.createElement("button");
-    clear_btn.innerHTML = "<i class='fa fa-trash'></i>";
+    clear_btn.innerHTML = "<i class='fa fa-trash-can'></i>";
     clear_btn.id = "clear-editor"
     dom.appendChild(clear_btn);
 

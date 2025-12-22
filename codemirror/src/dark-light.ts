@@ -19,7 +19,7 @@ export const defaultSettingsXcodeDark: CreateThemeOptions["settings"] = {
 
 const Darky = EditorView.theme({
   "&": {
-    fontSize: "12pt",
+    fontSize: "11pt",
     color: "#eeeeeeff"
   },
   ".cm-gutters": {
@@ -116,7 +116,7 @@ export const defaultSettingsXcodeLight: CreateThemeOptions["settings"] = {
 
 const Lighty = EditorView.theme({
   "&": {
-    fontSize: "12pt",
+    fontSize: "11pt",
     color: "#000000"
   },
   ".cm-gutters": {
@@ -212,7 +212,7 @@ export const defaultSettingsXcodeWarm: CreateThemeOptions["settings"] = {
 
 const Warmy = EditorView.theme({
   "&": {
-    fontSize: "12pt",
+    fontSize: "11pt",
     color: "#181e20ff;"
   },
   ".cm-gutters": {

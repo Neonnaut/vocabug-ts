@@ -13,7 +13,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
   <!-- Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <!-- Icons -->
 
 </head>
@@ -21,7 +21,6 @@
   <nav id="myNav">
     <ol class="breadcrumbs">
       <li>
-        <a href="/"><img alt="neocities favicon" src="./img/neonnaut.png"></a>
       </li>
       <li style="float: right;">
         <button id="main_menu"><i class="fa fa-bars"></i> Menu</button>
@@ -35,7 +34,7 @@
         <img src="./img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
 
         <h1 style="margin-bottom: 10px;">Vocabug<br>docs</h1>
-        <b>Version 1.0.1</b>
+        <b>Version 1.0.2</b>
       </div>
       <br>
 
@@ -126,6 +125,13 @@
 
         <li><a href="#nescaTheException">The exception</a></li>
 
+        <li><a href="#nescaAltAndOpt">Alternator and Optionalator</a>
+        <ol class="nice-list">
+          <li><a href="#nescaAlternatorSet">Alternator-set</a></li>
+          <li><a href="#nescaOptionalatorSet">Optionalator-set</a></li>
+        </ol>
+        </li>
+
         <li><a href="#nescaUsingCategories">Using categories</a></li>
 
         <li><a href="#nescaFeatures">Features</a>
@@ -136,13 +142,6 @@
           <li><a href="#nescaFeatureInFeature">Referencing features inside features</a></li>
           <li><a href="#nescaUsingFeatures">Using features</a></li>
           <li><a href="#nescaFeatureField">The feature-field directive</a></li>
-        </ol>
-        </li>
-
-        <li><a href="#nescaAltAndOpt">Alternator and Optionalator</a>
-        <ol class="nice-list">
-          <li><a href="#nescaAlternatorSet">Alternator-set</a></li>
-          <li><a href="#nescaOptionalatorSet">Optionalator-set</a></li>
         </ol>
         </li>
 
@@ -184,7 +183,7 @@
       </ol>
 
       <h2 id="vocAbout"><a class="head-num">1</a>About Vocabug</h2>
-      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version 1.0.1</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a fictional language, original nicknames or passwords, or just for fun.</p>
+      <p>This is the complete documentation for <a href="./vocabug.html">Vocabug, version 1.0.2</a>. Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a fictional language, original nicknames or passwords, or just for fun.</p>
 
       <p>This word generator is designed to be a successor to the Williams' <a href="https://github.com/bbrk24/lexifer-ts">Lexifer</a> and to the legendary <a href="https://github.com/nai888/awkwords">Awkwords</a>. You can find Vocabug's repository <a href="https://github.com/Neonnaut/vocabug-ts">here</a>. You can also install Vocabug to be used in your own projects or as a command-line-interface <a href="https://www.npmjs.com/package/vocabug">here</a>. If you would prefer a more typical user interface with simple syntax, please check out Vocabug-lite <a href="https://neonnaut.neocities.org/vocabug-lite">here</a>.</p>
 
@@ -194,13 +193,15 @@
         
         <li>Use the <code class="example">Generate</code> button to see Vocabug produce words. Yes, there are two generate buttons.</li>
 
-        <li>The <i class="fa fa-trash"></i> button clears the definition-build editor and the generated words</li>
+        <li>The <i class="fa fa-trash-can"></i> button clears the definition-build editor and the generated words</li>
         
         <li>The <i class="fa fa-cog"></i> and <i class="fa fa-folder"></i> button will jump to the configuration and file save / load options, respectfully</li>
 
         <li>The generated words appear in a textbox below the editor</li>
 
-        <li>Use the <code class="example">Copy words</code> button to copy the generated words to the clipboard</li>
+        <li>Use the <i class="fa fa-copy"></i> button to copy the generated words to the clipboard</li>
+
+        <li>Use the <i class="fa fa-download"></i> button to download the generated words to your system</li>
 
         <li>The <code class="example">Help</code> button shows this document</li>
 
@@ -258,7 +259,7 @@
       <p>Graphemes are indivisible meaningful characters that make a generated word in Vocabug. Phonemes can be thought of as graphemes. If we use English words <code class="example">sky</code> and <code class="example">shy</code> as examples to illustrate this, <code class="example">sky</code> is made up by the graphemes <code class="example">s</code> + <code class="example">k</code> + <code class="example">y</code>, while <code class="example">shy</code> is made up by <code class="example">sh</code> + <code class="example">y</code>.</p>
 
       <h3 id="vocEscapingCharacters"><a class="head-num">3.3</a>Escaping characters</h3>
-      <p>A single-length character following the syntax character <code class="example">\</code> ignores any meaning it might have had in the generator, including backslashes themselves. This way, anything including capital letters that have already been defined as categories, brackets, even spaces can be graphemes.</p>
+      <p>A single-length character following the syntax character <code class="example">\</code> ignores any meaning it might have had in the generator, including backslashes themselves. This way, anything including capital letters that have already been defined as categories and brackets (but not whitespace) can be graphemes.</p>
 
       <h4 id="vocEscapeWord"><a class="head-num">3.3.1</a>Word creation character escape</h4>
       <p>These are the characters you must escape if you want to use them in <a href="#vocCategories">categories</a>, <a href="#vocUnits">units</a> and the <a href="#vocWords">words</a> directive:</p>
@@ -924,32 +925,52 @@
       <p>If there are multiple exceptions, the transform must meet all of the exceptions for it not to execute.</p>
       <p>An alternative to using an exclamation mark is to use two forward slashes <code class="example">//</code>.</p>
 
-      <h2 id="nescaUsingCategories"><a class="head-num">16</a>Using categories</h2>
+      <h2 id="nescaAltAndOpt"><a class="head-num">16</a>Alternator and Optionalator</h2>
+      <p>These are sets just like the sets in word-creation, but they cannot be nested.</p>
+
+      <h3 id="nescaAlternatorSet"><a class="head-num">16.1</a>Alternator-set</h3>
+      <p>Enclosed in curly braces, <code class="example">{</code> and <code class="example">}</code>, only one Item in an alternator set will be part of each sequence. For example:</p>
+      <div class="prog-pre">  p<span class="regexp">{</span>w<span class="link">,</span> j<span class="regexp">}</span> <span class="link">-></span> pp</div>
+      <p>The above example is equivalent to:</p>
+      <div class="prog-pre">  pw<span class="link">,</span> pj <span class="link">-></span> pp</div>
+      <p>These can also be used in exceptions and conditions:</p>
+      <div class="prog-pre">  a <span class="link">-></span> e <span class="link">/</span> <span class="regexp">{</span>b<span class="link">,</span> d<span class="regexp">}</span><span class="link">_</span></div>
+
+      <h3 id="nescaOptionalatorSet"><a class="head-num">16.2</a>Optionalator-set</h3>
+      <p>Items in an optionalator, enclosed in <code class="example">(</code> and <code class="example">)</code> can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
+      <div class="prog-pre"><span class="comment">; Merge &lt;x&gt; and &lt;xw&gt; into &lt;k&gt;</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
+      <p>Optional-set can also attach to an alternator-set:</p>
+      <div class="prog-pre"><span class="comment">; Merge &lt;x&gt;, &lt;xw&gt;, &lt;ħ&gt; and &lt;ħw&gt; into &lt;k&gt;</span><br>  <span class="regexp">{</span>x<span class="link">,</span> ħ<span class="regexp">}</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
+      <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
+
+      <h2 id="nescaUsingCategories"><a class="head-num">17</a>Using categories</h2>
       <p>You can reference categories in transforms. The category will behave in the same way as an alternator set:</p>
       <div class="prog-pre"><span class="directive">categories</span><span class="link">:</span>
   <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z<br><span class="directive">stage</span><span class="link">:</span><br>  <span class="catkey">B</span> <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xapay ==> apa</code></div>
 
-      <p>If the category is part of a target, it MUST be inside an alternator set:</p>
+      <p>If the category is inside a set, it MUST be listed as an item on its own:</p>
       <div class="prog-pre"><span class="directive">categories</span><span class="link">:</span>
-  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y<span class="link">,</span> z
+  <span class="catkey">B</span> <span class="link">=</span> x<span class="link">,</span> y
 <span class="directive">stage</span><span class="link">:</span>
-  <span class="regexp">{</span><span class="catkey">B</span><span class="regexp">}</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvapay ==> apay</code></div>
+  <span class="regexp">{</span><span class="catkey">B</span><span class="link">,</span> z<span class="regexp">}</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvayazv ==> aya</code></div>
 
-      <h2 id="nescaFeatures"><a class="head-num">17</a>Features</h2>
+<p>This is to say <code class="example">{Bz}v -> ^</code> is invalid.</p>
+
+      <h2 id="nescaFeatures"><a class="head-num">18</a>Features</h2>
       <p>Let's say you had the grapheme, or rather, phoneme /i/ and wanted to capture it by its distinctive vowel features, <code class="example">+high</code>, <code class="example">-round</code> and <code class="example">+front</code>, and turn it into a phoneme marked with <code class="example">+high</code>, <code class="example">-round</code> and <code class="example">+back</code> features, perhaps /ɯ/. Vocabug's features directive and feature matrices let you do this. Vocabug's features can be described as binary and 'non-carryover'.</p>
       <p>The key of all features must consist of lowercase letters a to z, uppercase letters a to z, <code class="example">.</code>, <code class="example">-</code> or <code class="example">+</code></p>
 
-      <h3 id="nescaProFeature"><a class="head-num">17.1</a>Pro-feature</h3>
+      <h3 id="nescaProFeature"><a class="head-num">18.1</a>Pro-feature</h3>
       <p>A feature prepended with a plus sign <code class="example">+</code> is a 'pro-feature'. For example <code class="example">+voice</code>. We can define a set of graphemes that are marked by this feature by using this pro-feature. For example:</p>
       <div class="prog-pre"><span class="directive">features</span><span class="link">:</span>
   <span class="catkey">+voice</span> <span class="link">=</span> b<span class="link">,</span> d<span class="link">,</span> g<span class="link">,</span> v<span class="link">,</span> z</div>
 
-      <h3 id="nescaAntiFeature"><a class="head-num">17.2</a>Anti-feature</h3>
+      <h3 id="nescaAntiFeature"><a class="head-num">18.2</a>Anti-feature</h3>
       <p>A feature prepended with a minus sign <code class="example">-</code> is an 'anti-feature'. For example <code class="example">-voice</code>. We can define a set of graphemes that are marked by a lack of this feature by using this anti-feature. For example:</p>
       <div class="prog-pre"><span class="directive">features</span><span class="link">:</span>
   <span class="catkey">-voice</span> <span class="link">=</span> p<span class="link">,</span> t<span class="link">,</span> k<span class="link">,</span> f<span class="link">,</span> s</div>
 
-      <h3 id="nescaParaFeature"><a class="head-num">17.3</a>Para-feature</h3>
+      <h3 id="nescaParaFeature"><a class="head-num">18.3</a>Para-feature</h3>
       <p>A feature prepended with a greater-than-sign <code class="example">&gt;</code> is a 'para-feature'. A para-feature is simply a pro-feature where the graphemes marked as the anti-feature of this feature are the graphemes in the <code class="example">graphemes:</code> directive that are not not marked by this para-feature:</p>
       <div class="prog-pre"><span class="directive">graphemes</span><span class="link">:</span>
   a<span class="link">,</span> b<span class="link">,</span> h<span class="link">,</span> i<span class="link">,</span> k<span class="link">,</span> n<span class="link">,</span> o<span class="link">,</span> t
@@ -961,7 +982,7 @@
 
       <p>'Where does this leave graphemes that are not marked by either the pro-feature or the anti-feature of a feature?', you might ask. Such graphemes are <em>unmarked</em> by that feature.</p>
 
-      <h3 id="nescaFeatureInFeature"><a class="head-num">17.4</a>Referencing features inside features</h3>
+      <h3 id="nescaFeatureInFeature"><a class="head-num">18.4</a>Referencing features inside features</h3>
 
       <p>Features can be referenced inside features. For example:</p>
       <div class="prog-pre"><span class="directive">features</span><span class="link">:</span>
@@ -969,7 +990,7 @@
 
       <p>Use a caret in front of a grapheme to ensure that that grapheme is not part of the pro/anti/para-feature. In the example above, the pro-feature '<code class="example">+non-yod</code>' is composed of the graphemes <code class="example">a</code> and <code class="example">o</code> -- the grapheme <code class="example">i</code> is not part of this pro-feature. Due to the recursive nature of nested features, this removed grapheme will be removed... aggressively. For example, If <code class="example">+non-yod</code> were to be referenced in a different feature, that feature would always not have <code class="example">i</code> as a grapheme.</p>
 
-      <h3 id="nescaUsingFeatures"><a class="head-num">17.5</a>Using Features</h3>
+      <h3 id="nescaUsingFeatures"><a class="head-num">18.5</a>Using Features</h3>
 
       <p>To capture graphemes that are marked by features in a transform, the features must be listed in a 'feature-matrix' surrounded by <code class="example">[</code> and <code class="example">]</code>. The graphemes in a word must be marked by each pro-/anti-feature in the feature-matrix to be captured. For example if a feature-matrix <code class="example">[+high, +back]</code> captures the graphemes: <code class="example">u, ɯ</code>, another feature-matrix <code class="example">[+high, +back, -round]</code> would capture <code class="example">ɯ</code> only.</p>
       <p>The very simple example below is written to change all voiceless graphemes that have a voiced counterpart into their voiced counterparts:</p>
@@ -986,9 +1007,15 @@
 
       <p>It should be noted that feature-matrices in <code class="example">TARGET</code> have no carryover to feature-matrices in <code class="example">REPLACEMENT</code>. For example, in a bogus rule such as <code class="example">o -> [+high]</code> Vocabug will <b>not</b> try to transform <code class="example">&lt;o&gt;</code> into it's [+high] counterpart, it will try and replace <code class="example">&lt;o&gt;</code> with some grapheme marked as <code class="example">[+high]</code> and will probably fail unless only one grapheme is marked as <code class="example">[+high]</code>.</p>
 
-      <p>If the feature-matrix is part of a target, i.e: it has tokens on either side of it, it MUST be inside an alternator set.</p>
+            <p>If the category is inside a set, it MUST be listed as an item on its own:</p>
+      <div class="prog-pre"><span class="directive">features</span><span class="link">:</span>
+  <span class="catkey">+example</span> <span class="link">=</span> x<span class="link">,</span> y
+<span class="directive">stage</span><span class="link">:</span>
+  <span class="regexp">{</span><code class='regexp'>[</code><span class="catkey">+example</span><code class='regexp'>]</code><span class="link">,</span> z<span class="regexp">}</span>v <span class="link">-></span> <span class="operator">^</span><br><code class="comment">; xvayazv ==> aya</code></div>
 
-      <h3 id="nescaFeatureField"><a class="head-num">17.6</a>The feature-field directive</h3>
+<p>This is to say <code class="example">{[+voiced]z}v -> ^</code> is invalid.</p>
+
+      <h3 id="nescaFeatureField"><a class="head-num">18.6</a>The feature-field directive</h3>
       <p>Feature-fields allow graphemes to be easily marked by multiple features in table format.</p>
       <p>The graphemes being marked by the features are listed on the first row. The features are listed in the first column.</p>
       <p>For example:</p>
@@ -1026,22 +1053,7 @@ round  <code class='regexp'>-</code> <code class='regexp'>-</code> <code class='
         <li><code class="example">[+voiced, +labial, +plosive]</code> captures the grapheme <code class="example">b</code></li>
       </ul>
 
-      <h2 id="nescaAltAndOpt"><a class="head-num">18</a>Alternator and Optionalator</h2>
-      <p>These cannot be nested.</p>
 
-      <h3 id="nescaAlternatorSet"><a class="head-num">18.1</a>Alternator-set</h3>
-      <p>Enclosed in curly braces, <code class="example">{</code> and <code class="example">}</code>, only one Item in an alternator set will be part of each sequence. For example:</p>
-      <div class="prog-pre">  p<span class="regexp">{</span>w<span class="link">,</span> j<span class="regexp">}</span> <span class="link">-></span> pp</div>
-      <p>The above example is equivalent to:</p>
-      <div class="prog-pre">  pw<span class="link">,</span> pj <span class="link">-></span> pp</div>
-      <p>These can also be used in exceptions and conditions.</p>
-
-      <h3 id="nescaOptionalatorSet"><a class="head-num">18.2</a>Optionalator-set</h3>
-      <p>Items in an optionalator, enclosed in <code class="example">(</code> and <code class="example">)</code> can be captured whether or not they appear as part of a grapheme or as part of a sequence of graphemes:</p>
-      <div class="prog-pre"><span class="comment">; Merge &lt;x&gt; and &lt;xw&gt; into &lt;k&gt;</span><br>  x<span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaħa</span></div>
-      <p>Optional-set can also attach to an alternator-set:</p>
-      <div class="prog-pre"><span class="comment">; Merge &lt;x&gt;, &lt;xw&gt;, &lt;ħ&gt; and &lt;ħw&gt; into &lt;k&gt;</span><br>  <span class="regexp">{</span>x<span class="link">,</span> ħ<span class="regexp">}</span><span class="regexp">(</span>w<span class="regexp">)</span> <span class="link">-></span> k<br><span class="comment">; xwaxaħa ==> kakaka</span></div>
-      <p>Optionalator-set cannot be used on its own, it must be connected to other content.</p>
 
       <h2 id="nescaWildcardsAndQuantifiers"><a class="head-num">19</a>Wildcards and quantifiers</h2>
       <p>Wildcards and the like in this section are special tokens that can represent arbitrary amounts of arbitrary graphemes, which is especially useful when you don't know precisely how many, or of what kind of grapheme there will be between two target graphemes in a word.</p>
@@ -1436,11 +1448,6 @@ n mp <span class="attribute">+</span>  <span class="attribute">+</span>  nn <spa
 <span class="comment">; between a word initial plosive and a vowel</span>
   <span class="catkey">&E</span><span class="regexp">{</span>a<span class="link">,</span>e<span class="link">,</span>i<span class="link">,</span>o<span class="link">,</span>u<span class="regexp">}</span><span class="regexp">&[<span class="operator">^</span></span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r<span class="regexp">]</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span>r <span class="link">-></span> <span class="catkey">&M</span> <span class="link">/</span> <span class="regexp">#</span><span class="regexp">{</span>p<span class="link">,</span>t<span class="link">,</span>k<span class="regexp">}</span><span class="link">_</span>
 <span class="comment">; kotatros -> krotatos</span></div>
-
-      <p>Another use for it is in a romanisation or deromanisation system using a cluster-field:</p>
-
-      <div class="prog-pre"><span class="directive">&</span>  p  t  k  j  y
-<span class="catkey">&E</span> p  t  c  y  ü</div>
 
       <h3 id="nescaReference"><a class="head-num">21.5</a>Reference</h3>
       <p>Sometimes graphemes must be copied or asserted to be a certain grapheme between other graphemes. This is the purpose of 'reference'. Reference is fairly straightforward, but there is a lot of jargon and different behaviour between fields to explain.</p>

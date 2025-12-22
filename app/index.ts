@@ -266,6 +266,26 @@ window.addEventListener("load", () => {
         }
     });
 
+    // Download results button
+    document.getElementById("output-words-download")?.addEventListener("click", () => {
+        const output_words_field = document.getElementById("voc-output-words-field") as HTMLTextAreaElement;
+        
+        if (output_words_field && output_words_field.value !== "") {
+            const file_content = output_words_field.value;
+            const blob = new Blob([file_content], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+
+            const raw_name = file_name_input?.value || "";
+            const download_name = raw_name === "" ? "vocabug_output_words.txt" : `${raw_name}_output_words.txt`;
+
+            link.download = download_name;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+    });
+
+    // Help button
     document.getElementById("help-button")?.addEventListener("mousedown", (event: MouseEvent) => {
         if (event.button === 2) {
             return;

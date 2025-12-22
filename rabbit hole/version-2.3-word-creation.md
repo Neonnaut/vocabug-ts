@@ -10,6 +10,10 @@ generated words would have meta information that they were in a pos or word clas
 
 Tranforms could then have a condition that targets that word with a word class
 
+@words.class = nouns
+
+>
+
 ## 2. Long form category keys
 
 Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.

@@ -7,10 +7,17 @@ const examples: { [key: string]: string } = {
 
 ; p, t, k, ʔ,
 ; ts, ks,
-; s, x,
+; s, h,
 ; m, n,
 ; r
 ; w, j,
+
+C0 is <s>
+
+C1 starts with a consonant that is not <h, ʔ, r>
+c2 is <j>
+V is <a, e, i, o, u, ɯ, ø, y>
+
 
 pp, tt, kk,
 tts, kks,

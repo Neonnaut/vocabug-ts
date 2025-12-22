@@ -44,7 +44,9 @@ function final_sentence(items) {
   return `${all_but_last} and ${last}`;
 }
 function recursive_expansion(input, mappings, enclose_in_brackets = false) {
-  const mapping_keys = [...mappings.keys()].sort((a, b) => b.length - a.length);
+  const mapping_keys = [...mappings.keys()].sort(
+    (a, b) => b.length - a.length
+  );
   const resolve_mapping = (str, history = []) => {
     let result = "", i = 0;
     while (i < str.length) {
@@ -944,7 +946,8 @@ function flat_distribution(no_of_items) {
 function get_distribution(n, default_distribution) {
   if (n == 1) return [1];
   if (default_distribution === "zipfian") return zipfian_distribution(n);
-  if (default_distribution === "gusein-zade") return guseinzade_distribution(n);
+  if (default_distribution === "gusein-zade")
+    return guseinzade_distribution(n);
   if (default_distribution === "shallow") return shallow_distribution(n);
   return flat_distribution(n);
 }
@@ -1018,7 +1021,9 @@ var Word_Builder = class {
       const candidates = group.slice(1, -1).split(/[,\s]+/).filter(Boolean);
       const include = Math.random() * 100 < optionals_weight;
       if (include && candidates.length > 0) {
-        const uses_explicit_weights = candidates.some((c) => c.includes("*"));
+        const uses_explicit_weights = candidates.some(
+          (c) => c.includes("*")
+        );
         const dist_type = uses_explicit_weights ? "flat" : distribution;
         outputs = this.extract_value_and_weight(candidates, dist_type);
         const selected = weighted_random_pick(outputs[0], outputs[1]);
@@ -1047,7 +1052,9 @@ var Word_Builder = class {
   extract_value_and_weight(input_list, default_distribution) {
     let my_values = [];
     let my_weights = [];
-    const all_default_weights = input_list.every((item) => !item.includes("*"));
+    const all_default_weights = input_list.every(
+      (item) => !item.includes("*")
+    );
     if (all_default_weights) {
       my_values = input_list;
       my_weights = get_distribution(input_list.length, default_distribution);
@@ -2202,7 +2209,7 @@ var Transformer = class {
           if (my_grapheme === null) {
             if (my_result_token.max === Infinity) {
               this.logger.validation_error(
-                "This should no have happened: infinite max grapheme??"
+                "This should not have happened: infinite max grapheme??"
               );
             }
             for (let k = 0; k < my_result_token.max; k++) {
@@ -2228,7 +2235,9 @@ var Transformer = class {
         ]);
         replacement_stream.push(...my_metathesis_graphemes);
       } else if (my_result_token.type === "reference-start-capture") {
-        reference_mapper.set_capture_stream_index(replacement_stream.length);
+        reference_mapper.set_capture_stream_index(
+          replacement_stream.length
+        );
       } else if (my_result_token.type === "reference-capture") {
         reference_mapper.capture_reference(
           my_result_token.key,
@@ -2589,7 +2598,15 @@ var Transformer = class {
     return normalized;
   }
   apply_transform(word, word_stream, transform) {
-    const { t_type, target, result, conditions, exceptions, chance, line_num } = transform;
+    const {
+      t_type,
+      target,
+      result,
+      conditions,
+      exceptions,
+      chance,
+      line_num
+    } = transform;
     if (chance != null && Math.random() * 100 >= chance) {
       return word_stream;
     }
@@ -3141,9 +3158,9 @@ var Logger = class {
   validation_error(message, line_num = null) {
     const err = new this.Validation_Error(message);
     if (line_num || line_num === 0) {
-      this.errors.push(`Error: ${message} @ line ${line_num + 1}`);
+      this.errors.push(`Error: ${message} @ line ${line_num + 1}.`);
     } else {
-      this.errors.push(`Error: ${message}`);
+      this.errors.push(`Error: ${message}.`);
     }
     throw err;
   }
@@ -3163,13 +3180,13 @@ var Logger = class {
   }
   warn(warn, line_num = null) {
     if (line_num || line_num === 0) {
-      this.warnings.push(`Warning: ${warn} @ line ${line_num + 1}`);
+      this.warnings.push(`Warning: ${warn} @ line ${line_num + 1}.`);
     } else {
-      this.warnings.push(`Warning: ${warn}`);
+      this.warnings.push(`Warning: ${warn}.`);
     }
   }
   info(info) {
-    this.infos.push(`${info}`);
+    this.infos.push(`${info}.`);
   }
   diagnostic(diagnostic) {
     this.diagnostics.push(diagnostic);
@@ -3521,16 +3538,24 @@ var Transform_Resolver = class {
             this.line_num
           );
         }
+        if (!this.valid_environment(my_condition)) {
+          this.logger.validation_error(
+            `Found separators outside sets in condition "${my_condition}"`,
+            this.line_num
+          );
+        }
         const alt_opt_condition = this.resolve_alt_opt(my_condition);
         for (let k = 0; k < alt_opt_condition[0].length; k++) {
-          const split_condition = alt_opt_condition[0][k].split("_");
+          const [before_str, after_str] = this.environment_helper(
+            alt_opt_condition[0][k]
+          );
           const before = this.nesca_grammar_stream.main_parser(
-            split_condition[0],
+            before_str,
             "BEFORE",
             this.line_num
           );
           const after = this.nesca_grammar_stream.main_parser(
-            split_condition[1],
+            after_str,
             "AFTER",
             this.line_num
           );
@@ -3550,16 +3575,24 @@ var Transform_Resolver = class {
             this.line_num
           );
         }
+        if (!this.valid_environment(my_exception)) {
+          this.logger.validation_error(
+            `Found separators outside sets in condition "${my_exception}"`,
+            this.line_num
+          );
+        }
         const alt_opt_exception = this.resolve_alt_opt(my_exception);
         for (let k = 0; k < alt_opt_exception[0].length; k++) {
-          const split_exception = alt_opt_exception[0][k].split("_");
+          const [before_str, after_str] = this.environment_helper(
+            alt_opt_exception[0][k]
+          );
           const before = this.nesca_grammar_stream.main_parser(
-            split_exception[0],
+            before_str,
             "BEFORE",
             this.line_num
           );
           const after = this.nesca_grammar_stream.main_parser(
-            split_exception[1],
+            after_str,
             "AFTER",
             this.line_num
           );
@@ -3580,6 +3613,10 @@ var Transform_Resolver = class {
       });
     }
     return this.transforms;
+  }
+  environment_helper(input) {
+    const [left = "", right = ""] = input.split("_", 2);
+    return [left.trim(), right.trim()];
   }
   // 🧱 Internal: Split input into top-level chunks
   split_top_level(str) {
@@ -3640,7 +3677,7 @@ var Transform_Resolver = class {
         const has_outside_content = /[^\s,]/.test(before) || /[^\s,]/.test(after);
         if (!has_outside_content && char === ")") {
           this.logger.validation_error(
-            "Optionalator must be part of a larger token",
+            "Optionalator must be part of a larger sequence",
             this.line_num
           );
         }
@@ -3650,7 +3687,6 @@ var Transform_Resolver = class {
       this.logger.validation_error("Unclosed bracket", this.line_num);
     }
   }
-  // 🔄 Internal: Expand a single chunk
   expand_chunk(chunk) {
     this.check_grammar_rules(chunk);
     const regex = /([^{(})]+)|(\{[^}]+\})|(\([^)]+\))/g;
@@ -3658,12 +3694,12 @@ var Transform_Resolver = class {
     const expansions = parts.map((part) => {
       if (part.startsWith("{")) {
         return part.slice(1, -1).split(/[\s,]+/);
-      } else if (part.startsWith("(")) {
-        const val = part.slice(1, -1);
-        return [val, ""];
-      } else {
-        return [part];
       }
+      if (part.startsWith("(")) {
+        const vals = part.slice(1, -1).split(/[\s,]+/);
+        return ["", ...vals];
+      }
+      return [part];
     });
     return expansions.reduce(
       (acc, curr) => {
@@ -3711,30 +3747,28 @@ var Transform_Resolver = class {
     const length = input.length;
     for (let i = 0; i < length; i++) {
       const char = input[i];
-      if (char === "<") {
-        if (/^[A-Z]$/.test(input[i + 1])) {
-          output += char + input[i + 1];
-          i += 1;
-          continue;
-        }
+      if (char === "<" && /^[A-Z]$/.test(input[i + 1])) {
+        output += char + input[i + 1];
+        i += 1;
+        continue;
       }
       if (this.categories.has(char)) {
-        const prev = input[i - 1] ?? "";
-        const next = input[i + 1] ?? "";
-        const is_boundary_before = i === 0 || " ,([{)}]".includes(prev);
-        const is_boundary_after = i === length - 1 || " ,([{)}]".includes(next);
-        if (is_boundary_before && is_boundary_after) {
-          const entry = this.categories.get(char);
-          output += entry.filter((g) => !["^"].some((b) => g.includes(b))).join(", ");
-        } else {
-          this.logger.validation_error(
-            `Category key "${char}" is adjacent to other content`,
-            this.line_num
-          );
+        const entry = this.categories.get(char);
+        const expanded = entry.filter((g) => !g.includes("^")).join(", ");
+        const isParenWrapped = this.check_bracket_context(
+          input,
+          i,
+          i,
+          "category"
+        );
+        if (isParenWrapped) {
+          output += `${expanded}`;
+          continue;
         }
-      } else {
-        output += char;
+        output += `{${expanded}}`;
+        continue;
       }
+      output += char;
     }
     return output;
   }
@@ -3743,42 +3777,42 @@ var Transform_Resolver = class {
     const output = [];
     let feature_mode = false;
     let feature_matrix = "";
-    let feature_begin_index = 0;
-    for (let i = 0; i < stream.length; i++) {
+    let sq_start_index = 0;
+    for (let i = 0; i < length; i++) {
+      const char = stream[i];
       if (feature_mode) {
-        if (stream[i] === "]") {
+        if (char === "]") {
           feature_mode = false;
-          if (feature_matrix.length != 0) {
-            const prev = stream[feature_begin_index - 1] ?? "";
-            const next = stream[i + 1] ?? "";
-            const is_boundary_before = i === 0 || " ,([{)}]".includes(prev);
-            const is_boundary_after = i === length - 1 || " ,([{)}]".includes(next);
-            if (is_boundary_before && is_boundary_after) {
-              output.push(`${this.get_graphemes_from_matrix(feature_matrix)}`);
-            } else {
-              this.logger.validation_error(
-                `Feature "[${feature_matrix}]" is adjacent to other content`,
-                this.line_num
-              );
+          if (feature_matrix.length !== 0) {
+            const resolved = this.get_graphemes_from_matrix(feature_matrix);
+            const isParenWrapped = this.check_bracket_context(
+              stream,
+              sq_start_index,
+              i,
+              "feature"
+            );
+            if (isParenWrapped) {
+              output.push(`${resolved}`);
+              continue;
             }
+            output.push(`{${resolved}}`);
+            continue;
           }
           feature_matrix = "";
           continue;
         }
-        feature_matrix += stream[i];
+        feature_matrix += char;
         continue;
       }
-      if (stream[i] === "[") {
-        feature_begin_index = i;
-        if (stream[i + 1] === "+" || stream[i + 1] === "-") {
+      if (char === "[") {
+        sq_start_index = i;
+        const next = stream[i + 1];
+        if (next === "+" || next === "-") {
           feature_mode = true;
-          continue;
-        } else {
-          output.push("[");
           continue;
         }
       }
-      output.push(stream[i]);
+      output.push(char);
     }
     if (feature_mode) {
       this.logger.validation_error(
@@ -3788,13 +3822,57 @@ var Transform_Resolver = class {
     }
     return output.join("");
   }
+  check_bracket_context(stream, start, end, mode) {
+    const length = stream.length;
+    const stack = [];
+    for (let i = 0; i < length; i++) {
+      const ch = stream[i];
+      if (ch === "(" || ch === "{") {
+        stack.push({ kind: ch, index: i });
+      } else if (ch === ")" || ch === "}") {
+        stack.pop();
+      }
+      if (i === start) break;
+    }
+    const inside = stack.at(-1);
+    if (!inside) return false;
+    const open = inside.index;
+    const close = this.find_matching_bracket(stream, open);
+    const tokenStart = start;
+    const tokenEnd = end;
+    const left = tokenStart - 1;
+    const right = tokenEnd + 1;
+    const leftIsBoundary = left <= open || stream[left] === "," || stream[left] === " ";
+    const rightIsBoundary = right >= close || stream[right] === "," || stream[right] === " ";
+    if (!leftIsBoundary || !rightIsBoundary) {
+      this.logger.validation_error(
+        `A ${mode} is adjacent to other content inside a set`,
+        this.line_num
+      );
+    }
+    return true;
+  }
+  find_matching_bracket(stream, openIndex) {
+    const open = stream[openIndex];
+    const close = open === "(" ? ")" : open === "{" ? "}" : "";
+    let depth = 0;
+    for (let i = openIndex; i < stream.length; i++) {
+      if (stream[i] === open) depth++;
+      else if (stream[i] === close) depth--;
+      if (depth === 0) return i;
+    }
+    return -1;
+  }
   get_graphemes_from_matrix(feature_matrix) {
     const keys = feature_matrix.split(",").map((k) => k.trim());
     const grapheme_sets = [];
     for (const key of keys) {
       const entry = this.features.get(key);
       if (!entry) {
-        this.logger.validation_error(`Unknown feature '${key}'`, this.line_num);
+        this.logger.validation_error(
+          `Unknown feature '${key}'`,
+          this.line_num
+        );
       }
       grapheme_sets.push(entry.graphemes);
     }
@@ -3849,6 +3927,88 @@ var Transform_Resolver = class {
       }
     }
     return stack.length === 0;
+  }
+  valid_environment(input) {
+    let depth = 0;
+    for (let i = 0; i < input.length; i++) {
+      const ch = input[i];
+      if ("{(".includes(ch)) depth++;
+      else if ("})".includes(ch)) depth--;
+      if (depth === 0) {
+        if (ch === " ") {
+          const prev = input[i - 1];
+          const next = input[i + 1];
+          const allowedAroundUnderscore = prev === "_" || next === "_";
+          if (!allowedAroundUnderscore) {
+            return false;
+          }
+        }
+        if (ch === ",") {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  valid_cat_fea(stream) {
+    const out = [];
+    const stack = [];
+    const length = stream.length;
+    let sq_mode = false;
+    let sq_content = "";
+    let sq_start_index = 0;
+    for (let i = 0; i < length; i++) {
+      const ch = stream[i];
+      if (!sq_mode) {
+        if (ch === "(" || ch === "{") {
+          stack.push(ch);
+          out.push(ch);
+          continue;
+        }
+        if (ch === ")" || ch === "}") {
+          stack.pop();
+          out.push(ch);
+          continue;
+        }
+      }
+      if (!sq_mode && ch === "[") {
+        sq_mode = true;
+        sq_content = "";
+        sq_start_index = i;
+        continue;
+      }
+      if (sq_mode) {
+        if (ch === "]") {
+          sq_mode = false;
+          const inside = stack.at(-1);
+          if (inside === "(" || inside === "{") {
+            const prev = stream[sq_start_index - 1];
+            const next = stream[i + 1];
+            const looks_like_paren_wrapper = inside === "(" && prev === "(" && next === ")";
+            if (!looks_like_paren_wrapper) {
+              this.logger.validation_error(
+                `Square bracket set "[${sq_content}]" is not allowed inside ${inside}`,
+                this.line_num
+              );
+            }
+            out.push(sq_content);
+            continue;
+          }
+          out.push(`{${sq_content}}`);
+          continue;
+        }
+        sq_content += ch;
+        continue;
+      }
+      out.push(ch);
+    }
+    if (sq_mode) {
+      this.logger.validation_error(
+        "Unclosed square bracket set",
+        this.line_num
+      );
+    }
+    return out.join("");
   }
   format_tokens(seq) {
     return seq.map((t) => {
@@ -4037,7 +4197,9 @@ var Nesca_Grammar_Stream = class {
           const blocked_by = [];
           const parts = garde_stream.split("|").map((part) => part.trim()).filter(Boolean);
           if (parts.length > 2) {
-            throw new Error("Invalid garde_stream: more than one '|' found");
+            throw new Error(
+              "Invalid garde_stream: more than one '|' found"
+            );
           }
           const [consume_part, blocked_part] = parts;
           if (consume_part) {
@@ -4100,7 +4262,12 @@ var Nesca_Grammar_Stream = class {
             line_num
           );
         }
-        new_token = { type: "syllable-boundary", base: "$", min: 1, max: 1 };
+        new_token = {
+          type: "syllable-boundary",
+          base: "$",
+          min: 1,
+          max: 1
+        };
         tokens.push(new_token);
         i++;
         continue;
@@ -4122,7 +4289,12 @@ var Nesca_Grammar_Stream = class {
               line_num
             );
           }
-          new_token = { type: "metathesis-mark", base: "&M", min: 1, max: 1 };
+          new_token = {
+            type: "metathesis-mark",
+            base: "&M",
+            min: 1,
+            max: 1
+          };
           i = look_ahead;
         } else if (stream[look_ahead] === "E") {
           if (mode !== "TARGET") {
@@ -4202,7 +4374,9 @@ var Nesca_Grammar_Stream = class {
           is_escaped = true;
         }
         let matched = false;
-        for (const g of this.graphemes.sort((a, b) => b.length - a.length)) {
+        for (const g of this.graphemes.sort(
+          (a, b) => b.length - a.length
+        )) {
           if (escaped_stream.startsWith(g, i)) {
             new_token = { type: "grapheme", base: g, min: 1, max: 1 };
             i += g.length;
@@ -4534,7 +4708,8 @@ var Category_Resolver = class {
           if (expr[i] === "*") {
             i++;
             let w = "";
-            while (i < expr.length && /[\d.]/.test(expr[i])) w += expr[i++];
+            while (i < expr.length && /[\d.]/.test(expr[i]))
+              w += expr[i++];
             weight = parseFloat(w || "1");
           }
           tokens.push({ group: content, weight });
@@ -4571,7 +4746,10 @@ var Category_Resolver = class {
           entries.push({ key: key.trim(), weight: final_weight });
         } else {
           const inner_entries = evaluate(token.group, 1);
-          const total = inner_entries.reduce((sum, e) => sum + e.weight, 0);
+          const total = inner_entries.reduce(
+            (sum, e) => sum + e.weight,
+            0
+          );
           for (const { key, weight } of inner_entries) {
             const scaled = weight / total * token.weight * token_weight;
             entries.push({ key, weight: scaled });
@@ -4786,7 +4964,10 @@ var Generation_Resolver = class {
   }
   expand_units() {
     for (const [key, value] of this.units.entries()) {
-      const expanded_content = recursive_expansion(value.content, this.units);
+      const expanded_content = recursive_expansion(
+        value.content,
+        this.units
+      );
       this.units.set(key, {
         content: expanded_content,
         line_num: value.line_num
@@ -4899,7 +5080,9 @@ var Resolver = class {
         );
       }
       for (let i = 0; i < x_filtered.length; i++) {
-        x_filtered[i] = this.escape_mapper.escape_special_chars(x_filtered[i]);
+        x_filtered[i] = this.escape_mapper.escape_special_chars(
+          x_filtered[i]
+        );
       }
       this.features.set(key, { graphemes: x_filtered });
     }
@@ -4990,7 +5173,7 @@ var Canon_Graphemes_Resolver = class {
 var canon_graphemes_resolver_default = Canon_Graphemes_Resolver;
 
 // src/utils/vocabug-version.ts
-var VOCABUG_VERSION = "1.0.1";
+var VOCABUG_VERSION = "1.0.2";
 
 // src/core.ts
 function generate({

@@ -297,8 +297,6 @@ const parser: StreamParser<State> = {
                     }
                 }
 
-                // THIS
-
                 if (state.insideUnit) {
                     for (const unito of state.unitList) {
                         const regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");

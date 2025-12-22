@@ -15,7 +15,7 @@
   <script src="./cm6.bundle.js"></script>
 
   <!-- Fonts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <!-- Icons -->
 
 </head>
@@ -23,7 +23,7 @@
   <nav id="myNav">
     <ol class="breadcrumbs">
       <li>
-        <a href="/"><img alt="neocities favicon" src="./img/neonnaut.png"></a>
+
       </li>
       <li style="float: right;">
         <button id="main_menu"><i class="fa fa-bars"></i> Menu</button>
@@ -40,7 +40,7 @@
         <h1 style="margin: 15px 0 10px 0; padding-top: 10px;">Vocabug</h1>
 
         <div style="padding-left: 5px;">
-          <b>Version 1.0.1</b><br>
+          <b>Version 1.0.2</b><br>
           <a href="./vocabug_docs.html">Read the documentation here</a>
         </div>
       </div>
@@ -57,8 +57,11 @@
   
         <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea>
         <input type="submit" class="styled-button generate-words" class="generate-words" value="Generate">        
-        <input type="submit" class="styled-button" id="output-words-copy" value="Copy words">
         <input type="submit" class="styled-button" id="help-button" value="Help">
+
+        <button class="styled-button" id="output-words-copy"><i class="fa fa-copy"></i></button>
+
+        <button class="styled-button" id="output-words-download"><i class="fa fa-download"></i></button>
         
         <div id='prog-output-message' style="border: 2px solid #000;"><p class="grey-message">Information may be shown here...</p></div>
     

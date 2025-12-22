@@ -28,7 +28,7 @@ graphemes:
 ; Transforms are all placed inside the 'stage' directive.
 stage:
 nn, nm, np, sh, ss -> ny, m, mp, s, s
-{V}: -> {V} / #_# ; Words that are a long vowel become short.
+V: -> V / #_# ; Words that are a long vowel become short.
 yi -> 0 ; Remove words with <yi>
 
 ; Click the green 'Generate' button in the taskbar below to generate words!!
@@ -40,7 +40,7 @@ categories:
   C = t k {f p} n r b m s d h l ŋ g c ş ç l y w {mb nd ŋg} {kp gb ŋgb}
   V = a i e o u
   W = a i ẹ ọ u
-  T = ^*3.7 &[Acute]*3.3 &[Grave]*3 ; Gives mid-tone, low-tone, high-tone
+  T = ^*3.7 &[Acute]*3.3 &[Grave]*3 ; Gives mid-tone, high-tone, low-tone
 
 units:
 ; + ATR harmony 
@@ -95,10 +95,10 @@ graphemes:
   a b ch d e f g h i j k l m n o p r s sh t ts u w y z
 
 stage:
-{V}+ -> ^ / ʀ_ ; No vowels after a long vowel.
-{V}?[3,] -> {V}: ; Sequence of 3+ vowels becomes 2.
+V+ -> ^ / ʀ_ ; No vowels after a long vowel.
+V?[3,] -> V: ; Sequence of 3+ vowels becomes 2.
 
-ɢ -> ɴ / _{V}
+ɢ -> ɴ / _V
 
 ; "Yotsugana": <dz> and <dy> neutralise to <z> and <j>.
 <  i   u   e   o   ya   yu   yo
@@ -133,7 +133,7 @@ y -> ^ / sh_ / j_ / ch_
 
 ʀ -> ^ / #*_# ; Collapse long vowel words into short vowel words.
 
-{V}ʀ -> {V}: ; Get long vowels.`,
+Vʀ -> V: ; Get long vowels.`,
   australian: 
 `; This does not represent a single Australian language, it does something
 ; Australian looking. The glottal stop and lack of retroflex stops make it
@@ -155,7 +155,7 @@ y -> ^ / sh_ / j_ / ch_
 ; No monosyllabic words. Disylabic words DON'T begin with <a>
 ; Medial Singleton consonants are unrestricted.
 ; There are intervocalic clusters.
-; Words end with <a, i, u> or <n, ň, l, r, ṛ,>
+; Words end with <a, i, u> or <n, ň, l, r, ṛ>
 
 categories:
 ; Initials:
@@ -185,25 +185,20 @@ words:
   <First><Medial><Medial><Medial><Medial><Last>
 
 graphemes:
-  a aʀ e eʀ i iʀ o oʀ u uʀ p t̪ t č k ꞌ m n̪ n ň ŋ r ṛ y w l ʎ }
+  t̪ č n̪ ň ṛ
 
 stage:
-; ʀestrict the occurance of <ai>
-  <  ꞌ  č  ŋ  ň  y  w  ʎ  ṛ  \`
-  ai aꞌ ač aŋ aň ay aw aʎ aṛ a\`
-  >
+i -> ^ / a_{\`,ꞌ,č,ŋ,ň,y,w,ʎ,ṛ} ; ʀestrict the occurance of <ai>
 
-; Long vowels become short before a consonant cluster or <ꞌ>
-  ʀ -> ^ / _\` / _ꞌ
+ʀ -> ^ / _{\`,ꞌ} ; Long vowels are short before a cluster or <ꞌ>
 
-; <yi>, <ʎi> and <wu> are rejected.
-  yi ʎi wu yiʀ ʎiʀ wuʀ -> 0
+{y,ʎ}i(ʀ) wu(ʀ) -> 0 ; <yi>, <ʎi> and <wu> are rejected.
 
-; ʀomaniser:
-  \` -> ^
-  oʀ eʀ iʀ uʀ aʀ -> oo ee ii uu aa
-  r ṛ n̪ t̪ -> rr r nh th
-  ň ʎ č ŋ -> ny ly j ng`,
+\` -> ^ ; Remove coda separator
+
+*=1ʀ -> 11 ; Yield long vowels
+
+r ṛ n̪ t̪ ň ʎ č ŋ -> rr r nh th ny ly j ng ; ʀomaniser`,
 };
 
 export { examples };
