@@ -1,7 +1,7 @@
-import { vocabug_f } from '../../src/main';
+import { vocabug } from '../../src/main';
 
 onmessage = function (event) {
-    const log = vocabug_f({
+    const log = vocabug({
         file: event.data.file,
         num_of_words: event.data.num_of_words,
 

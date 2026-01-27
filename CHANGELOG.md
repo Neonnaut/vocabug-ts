@@ -36,7 +36,13 @@
 - Added Nesca - sound change applier
 
 ### Modified
-
 - Fixed https://github.com/Neonnaut/vocabug-ts/issues/1#issue-3821895482
 - When debug mode was on, there would be a newline at the end of the word list. Now that is not the case.
-- Chsnged this repository to "The Conlangers Suite"
+- Changed this repository to "The Conlangers Suite"
+
+## [1.0.4] - 2026-JAN-27
+
+### Modified
+- Finished writing docs
+- Finished renaming the package
+

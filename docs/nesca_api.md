@@ -1,4 +1,4 @@
-# API
+# Nesca API
 
 Install with `npm install the_conlangers_suite`, or `yarn add the_conlangers_suite` and import it with either:
 

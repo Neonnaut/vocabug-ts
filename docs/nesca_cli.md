@@ -5,13 +5,14 @@
 Install globally via npm or yarn:
 
 ```bash
-npm install -g vocabug
+npm install -g the_conlangers_suite
 # or
-yarn global add vocabug
+yarn global add the_conlangers_suite
 ```
 
+Then envoke Nesca CLI with:
 ```
-vocabug <path> [options]
+nesca <path> [options]
 ```
 
 `<path>` is the required path to the input text file

@@ -1,4 +1,4 @@
-import { vocabug_f } from "./main";
+import { vocabug } from "./main";
 import { nesca } from "./main";
-const vocabug = { vocabug_f, nesca };
-export default vocabug;
+const the_conlangers_suite = { vocabug, nesca };
+export default the_conlangers_suite;

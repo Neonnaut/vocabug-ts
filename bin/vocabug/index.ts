@@ -7,7 +7,7 @@ import { hideBin } from 'yargs/helpers';
 // Type-only import (safe in CommonJS with TypeScript)
 import type { Arguments } from 'yargs';
 
-import { vocabug_f } from '../../src/main';
+import { vocabug } from '../../src/main';
 import { VERSION } from '../../src/utils/version';
 
 
@@ -127,7 +127,7 @@ const file_text = fs.readFileSync(filePath, argv.encoding);
 try {
    console.log(`Generating words with Vocabug version ${VERSION}. This may take up to 30 seconds...`);
 
-   const run = vocabug_f({
+   const run = vocabug({
       file: file_text,
       num_of_words: argv.num_of_words,
       output_mode: argv.output_mode as Output_Modes,

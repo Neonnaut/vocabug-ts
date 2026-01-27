@@ -5,11 +5,12 @@
 Install globally via npm or yarn:
 
 ```bash
-npm install -g vocabug
+npm install -g the_conlangers_suite
 # or
-yarn global add vocabug
+yarn global add the_conlangers_suite
 ```
 
+Then envoke the Vocabug CLI with:
 ```
 vocabug <path> [options]
 ```

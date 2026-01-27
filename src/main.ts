@@ -20,7 +20,7 @@ import Word_Bank from "./word_bank";
 
 import type { App, Log } from "./utils/types";
 
-type Vocabug_f_Options = {
+type Vocabug_Options = {
    file: string;
    num_of_words?: number | string;
    output_mode?: Output_Mode;
@@ -38,7 +38,7 @@ type Nesca_Options = {
    output_divider?: string;
 };
 
-export function vocabug_f({
+export function vocabug({
    file,
    num_of_words = 100,
    output_mode = "word-list",
@@ -46,7 +46,7 @@ export function vocabug_f({
    force_word_limit = false,
    sort_words = true,
    output_divider = " ",
-}: Vocabug_f_Options): Log {
+}: Vocabug_Options): Log {
    const logger = new Logger();
    const app = "vocabug" as App;
 

@@ -5461,7 +5461,7 @@ var Canon_Graphemes_Resolver = class {
 var canon_graphemes_resolver_default = Canon_Graphemes_Resolver;
 
 // src/main.ts
-function vocabug_f({
+function vocabug({
   file,
   num_of_words = 100,
   output_mode = "word-list",
@@ -5582,7 +5582,7 @@ function vocabug_f({
 }
 
 // src/utils/version.ts
-var VERSION = "1.0.2";
+var VERSION = "1.0.4";
 
 // bin/vocabug/index.ts
 var encodings = [
@@ -5660,7 +5660,7 @@ if (!filePath) {
 var file_text = fs.readFileSync(filePath, argv.encoding);
 try {
   console.log(`Generating words with Vocabug version ${VERSION}. This may take up to 30 seconds...`);
-  const run = vocabug_f({
+  const run = vocabug({
     file: file_text,
     num_of_words: argv.num_of_words,
     output_mode: argv.output_mode,

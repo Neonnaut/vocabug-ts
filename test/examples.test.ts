@@ -1,6 +1,6 @@
 //import vocabug from '../dist/vocabug.es.js';
 
-import vocabug from '../src/index'
+import the_conlangers_suite from '../src/index'
 import { examples } from '../app/vocabug/examples'
 
 
@@ -11,7 +11,7 @@ describe('vocabug', () => {
 
     for (const [name, example] of Object.entries(examples)) {
 
-      const run = vocabug.vocabug_f({
+      const run = the_conlangers_suite.vocabug({
         file: example,
         num_of_words: 6
       });
