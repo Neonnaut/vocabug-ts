@@ -44,11 +44,11 @@ dts({
       unsafe: true,
       unsafe_symbols: true,
       toplevel: true,
-      top_retain: ['generate', 'vocabug']
+      top_retain: ['generate-words', 'vocabug']
     },
     mangle: {
       toplevel: true,
-      reserved: ['generate', 'vocabug']
+      reserved: ['generate-words', 'vocabug']
     },
     format: {
       wrap_func_args: false,

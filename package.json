@@ -22,16 +22,25 @@
     "vocabug"
   ],
   "scripts": {
-    "dev": "vite --config app/vite.config.ts",
+    "build": "node build.js",
+
     "lint": "eslint ./ --fix",
-    "prettier": "prettier --write 'src/**/*.{ts,js,json,md}'",
+    "format": "prettier --write 'src/**/*.{ts,js,json,md}'",
     "test": "vitest run",
-    "build:app": "vite build --config app/vite.config.js",
     "build:ts": "tsc && vite build",
     "build:win": "tsc.cmd",
-    "build:cli": "tsup bin/index.ts --format esm --no-dts minify --target node18 --out-dir bin",
-    "build": "node build.js",
-    "build:cm6": "cd codemirror && npx rollup src/editor.ts -f iife -o ../app/cm6.bundle.js -p @rollup/plugin-node-resolve -p @rollup/plugin-typescript --output.name cm6"
+    
+    "dev-vocabug": "vite --config app/vocabug/vite.config.ts",
+    "dev-nesca": "vite --config app/nesca/vite.config.ts",
+
+    "build:app-vocabug": "vite build --config app/vocabug/vite.config.js",
+    "build:app-nesca": "vite build --config app/nesca/vite.config.js",
+
+    "build:cli-vocabug": "tsup bin/vocabug/index.ts --format esm --no-dts minify --target node18 --out-dir bin/vocabug",
+    "build:cli-nesca": "tsup bin/nesca/index.ts --format esm --no-dts minify --target node18 --out-dir bin/nesca",
+    
+    "build:cm6-vocabug": "cd codemirror && npx rollup src/editor.ts -f iife -o ../app/vocabug/cm6.bundle.js -p @rollup/plugin-node-resolve -p @rollup/plugin-typescript --output.name cm6",
+    "build:cm6-nesca": "cd codemirror && npx rollup src/editor.ts -f iife -o ../app/nesca/cm6.bundle.js -p @rollup/plugin-node-resolve -p @rollup/plugin-typescript --output.name cm6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -70,7 +79,8 @@
     "README"
   ],
   "bin": {
-    "vocabug": "bin/index.js"
+    "vocabug": "bin/index.js",
+    "nesca": "bin/index.js"
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",

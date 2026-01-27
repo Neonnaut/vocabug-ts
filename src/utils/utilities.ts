@@ -1,4 +1,4 @@
-const cappa =
+export const cappa =
    "[A-Z" +
    // Latin acute
    "\u00C1\u0106\u00C9\u01F4\u00CD\u1E30\u0139\u1E3E\u0143\u00D3\u1E54\u0154\u015A\u00DA\u1E82\u00DD\u0179" +
@@ -11,24 +11,20 @@ const cappa =
    // Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω
    "\u0393\u0394\u0398\u039B\u039E\u03A0\u03A3\u03A6\u03A8\u03A9]";
 
-const get_last = <T = never>(arr: ArrayLike<T> | null | undefined) =>
+export const get_last = <T = never>(arr: ArrayLike<T> | null | undefined) =>
    // This thing fetches the last item of an array
    arr?.[arr.length - 1];
 
-const get_first = <T = never>(arr: ArrayLike<T> | null | undefined) =>
+export const get_first = <T = never>(arr: ArrayLike<T> | null | undefined) =>
    // This thing fetches the first item of an array
    arr?.[0];
 
-function capitalise(str: string): string {
-   return str[0].toUpperCase() + str.slice(1);
-}
-
-const make_percentage = (input: string): number | null => {
+export const make_percentage = (input: string): number | null => {
    const num = Number(input);
    return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
 };
 
-function swap_first_last_items(array: string[]): string[] {
+export function swap_first_last_items(array: string[]): string[] {
    if (array.length >= 2) {
       const first_item = array[0];
       const last_item_index = array.length - 1;
@@ -40,11 +36,11 @@ function swap_first_last_items(array: string[]): string[] {
    return array;
 }
 
-function reverse_items(array: string[]): string[] {
+export function reverse_items(array: string[]): string[] {
    return array.slice().reverse();
 }
 
-function final_sentence(items: string[]): string {
+export function final_sentence(items: string[]): string {
    // This function takes an array of strings and returns a string
    // with commas and 'and' before the last item.
    const len = items.length;
@@ -58,7 +54,7 @@ function final_sentence(items: string[]): string {
    return `${all_but_last} and ${last}`;
 }
 
-function recursive_expansion(
+export function recursive_expansion(
    input: string,
    mappings: Map<string, { content: string; line_num: number }>,
    enclose_in_brackets: boolean = false,
@@ -101,7 +97,10 @@ function recursive_expansion(
    return resolve_mapping(input);
 }
 
-function graphemosis(input: string, canon_graphemes: string[]): string[] {
+export function graphemosis(
+   input: string,
+   canon_graphemes: string[],
+): string[] {
    const tokens: string[] = [];
    let i = 0;
    while (i < input.length) {
@@ -121,16 +120,3 @@ function graphemosis(input: string, canon_graphemes: string[]): string[] {
    }
    return tokens;
 }
-
-export {
-   cappa,
-   get_last,
-   get_first,
-   capitalise,
-   make_percentage,
-   swap_first_last_items,
-   final_sentence,
-   recursive_expansion,
-   reverse_items,
-   graphemosis,
-};

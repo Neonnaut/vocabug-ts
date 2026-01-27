@@ -1,6 +1,8 @@
 const examples: { [key: string]: string } = {
   default: 
-`; A Category is a group of graphemes assigned to a key.
+`; Anything after a semicolon is a comment until the end of the line.
+
+; A Category is a group of graphemes assigned to a key.
 ; By default, graphemes in a category furthest to the right
 ; are picked more often than graphemes to the left.
 categories:

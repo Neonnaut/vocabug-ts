@@ -14,23 +14,25 @@ function log(msg) {
 function main() {
   const pkg = JSON.parse(readFileSync(resolve('./package.json'), 'utf-8'));
   const projectVersion = pkg.version;
-  const output = `// Auto-generated -- do not edit.\nexport const VOCABUG_VERSION = '${projectVersion}';\n`;
-  writeFileSync(resolve('./src/utils/vocabug-version.ts'), output);
+  const output = `// Auto-generated -- do not edit.\nexport const VERSION = '${projectVersion}';\n`;
+  writeFileSync(resolve('./src/utils/version.ts'), output);
 
-  log("creating codemirror bundle...")
-  run("npm run build:cm6")
-
-  log("Running EsLint...");
+  log("Running linter...");
   run("npm run lint");
 
-  log("Running Prettier...");
-  run("npm run prettier");
+  log("Running formatter...");
+  run("npm run format");
 
-  log("Running Vitest");
+  log("Running tests...");
   run("npm run test");
 
   log("Building app-folder scripts");
-  run("npm run build:app");
+  run("npm run build:app-vocabug");
+  run("npm run build:app-nesca");
+
+  log("creating codemirror bundle...")
+  run("npm run build:cm6-vocabug")
+  run("npm run build:cm6-nesca")
 
   log("Building main scripts");
   run("npm run build:ts");
@@ -38,8 +40,9 @@ function main() {
   log("Making modules/ for index.d.ts");
   run("npm run build:win")
 
-  log("Building CLI script");
-  run("npm run build:cli");
+  log("Building CLI scripts");
+  run("npm run build:cli-vocabug");
+  run("npm run build:cli-nesca");
   
   log("✅ Done.");
 }

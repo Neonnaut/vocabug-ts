@@ -17,7 +17,7 @@ import { stream } from './language';
 // Panel
 import { toolbar } from './toolbar';
 
-function createEditorState(initialContents:string, myTheme:string) {
+function createEditorState(initialContents:string, myTheme:string, app:string) {
     const extensions = [
         lineNumbers(),
         highlightActiveLineGutter(),
@@ -35,10 +35,10 @@ function createEditorState(initialContents:string, myTheme:string) {
             ...defaultKeymap,
             ...historyKeymap,
         ]),
-        new LanguageSupport(stream),
+        new LanguageSupport(stream(app)),
         themeConfig.of(themeIdentifier(myTheme)),
         lineWrapConfig.of([]),
-        toolbar,
+        toolbar(app),
     ];
 
     return EditorState.create({

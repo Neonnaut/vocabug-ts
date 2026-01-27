@@ -1,11 +1,13 @@
 import Word from "./word";
 import Logger from "./logger";
 import collator from "./collator";
-import { capitalise, final_sentence } from "./utils/utilities";
+import { final_sentence } from "./utils/utilities";
 import type { Output_Mode } from "./utils/types";
+import Lettercase_Mapper from "./transforma/lettercase_mapper";
 
 class Text_Builder {
    private logger: Logger;
+   private lettercase_mapper: Lettercase_Mapper;
    private build_start: number;
 
    private num_of_words: number;
@@ -13,7 +15,7 @@ class Text_Builder {
    private remove_duplicates: boolean;
    private force_word_limit: boolean;
    private sort_words: boolean;
-   private word_divider: string;
+   private output_divider: string;
    private alphabet: string[];
    private invisible: string[];
 
@@ -27,18 +29,25 @@ class Text_Builder {
 
    constructor(
       logger: Logger,
+      lettercase_mapper: Lettercase_Mapper,
       build_start: number,
 
       num_of_words: number,
-      output_mode: Output_Mode,
+      //input_words: string,
+      //input_divider: string,
+
       remove_duplicates: boolean,
       force_word_limit: boolean,
+
+      output_mode: Output_Mode,
+      output_divider: string,
+
       sort_words: boolean,
-      word_divider: string,
       alphabet: string[],
       invisible: string[],
    ) {
       this.logger = logger;
+      this.lettercase_mapper = lettercase_mapper;
       this.build_start = build_start;
 
       this.num_of_words = num_of_words;
@@ -46,7 +55,7 @@ class Text_Builder {
       this.remove_duplicates = remove_duplicates;
       this.force_word_limit = force_word_limit;
       this.sort_words = sort_words;
-      this.word_divider = word_divider;
+      this.output_divider = output_divider;
       this.alphabet = alphabet;
       this.invisible = invisible;
 
@@ -164,13 +173,16 @@ class Text_Builder {
          return this.paragraphify(this.words);
       }
 
-      return this.words.join(this.word_divider);
+      return this.words.join(this.output_divider);
    }
 
    paragraphify(words: string[]): string {
       if (words.length === 0) return "";
       if (words.length === 1)
-         return capitalise(words[0]) + this.random_end_punctuation();
+         return (
+            this.lettercase_mapper.capitalise(words[0]) +
+            this.random_end_punctuation()
+         );
 
       const result: string[] = [];
 
@@ -179,7 +191,7 @@ class Text_Builder {
          let word = words[i];
 
          if (should_capitalise) {
-            word = capitalise(word);
+            word = this.lettercase_mapper.capitalise(word);
             should_capitalise = false;
          }
 
@@ -219,7 +231,7 @@ class Text_Builder {
       const info: string =
          `Num of words: ` +
          this.num_of_words +
-         `\nMode: ` +
+         `\nOutput mode: ` +
          this.output_mode +
          `\nRemove duplicates: ` +
          this.remove_duplicates +
@@ -227,8 +239,8 @@ class Text_Builder {
          this.force_word_limit +
          `\nSort words: ` +
          this.sort_words +
-         `\nWord divider: "` +
-         this.word_divider +
+         `\nOutput divider: "` +
+         this.output_divider +
          `"` +
          `\nAlphabet: ` +
          this.alphabet.join(", ") +

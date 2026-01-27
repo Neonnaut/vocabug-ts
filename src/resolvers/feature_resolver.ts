@@ -4,7 +4,7 @@ import Logger from "../logger";
 import { recursive_expansion } from "../utils/utilities";
 import type { Output_Mode } from "../utils/types";
 
-class Resolver {
+class Feature_Resolver {
    private logger: Logger;
    private escape_mapper: Escape_Mapper;
    private output_mode: Output_Mode;
@@ -132,4 +132,4 @@ class Resolver {
    }
 }
 
-export default Resolver;
+export default Feature_Resolver;

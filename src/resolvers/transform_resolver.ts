@@ -14,8 +14,29 @@ class Transform_Resolver {
 
    public nesca_grammar_stream: Nesca_Grammar_Stream;
    public categories: Map<string, string[]>;
-   public transform_pending: Transform_Pending[];
-   public transforms: Transform[] = [];
+
+   //public transform_pending: Transform_Pending[];
+   //public transforms: Transform[] = [];
+
+   public stages_pending: {
+      transforms_pending: Transform_Pending[];
+      name: string;
+   }[];
+   public stages: {
+      transforms: Transform[];
+      name: string;
+   }[];
+
+   public substages_pending: {
+      transforms_pending: Transform_Pending[];
+      name: string;
+   }[];
+   public substages: {
+      transforms: Transform[];
+      name: string;
+   }[];
+
+   ////////////////////////////////////
 
    public syllable_boundaries: string[];
 
@@ -28,7 +49,16 @@ class Transform_Resolver {
       output_mode: Output_Mode,
       nesca_grmmar_stream: Nesca_Grammar_Stream,
       categories: Map<string, string[]>,
-      transform_pending: Transform_Pending[],
+
+      stages_pending: {
+         transforms_pending: Transform_Pending[];
+         name: string;
+      }[],
+      substages_pending: {
+         transforms_pending: Transform_Pending[];
+         name: string;
+      }[],
+
       features: Map<string, { graphemes: string[] }>,
       syllable_boundaries: string[],
    ) {
@@ -37,33 +67,53 @@ class Transform_Resolver {
 
       this.nesca_grammar_stream = nesca_grmmar_stream;
       this.categories = categories;
-      this.transform_pending = transform_pending;
+
+      // this.transform_pending = transform_pending;
+      this.stages_pending = stages_pending;
+      this.substages_pending = substages_pending;
+
+      this.stages = [];
+      this.substages = [];
+
       this.features = features;
       this.syllable_boundaries =
          syllable_boundaries.length === 0 ? ["."] : syllable_boundaries;
       this.line_num = 0;
 
-      this.resolve_transforms();
+      this.resolve_stages();
       if (this.output_mode === "debug") {
          this.show_debug();
       }
    }
 
-   resolve_transforms() {
-      // Resolve brackets, put categories in transforms, make a milkshake, etc.
+   resolve_stages() {
+      for (const stage_pending of this.stages_pending) {
+         this.stages.push({
+            transforms: this.resolve_transforms(
+               stage_pending.transforms_pending,
+            ),
+            name: stage_pending.name,
+         });
+      }
+   }
 
-      for (let i = 0; i < this.transform_pending.length; i++) {
-         this.line_num = this.transform_pending[i].line_num;
+   resolve_transforms(transform_pending: Transform_Pending[]): Transform[] {
+      // Resolve brackets, put categories in transforms, make a milkshake, etc.]
 
-         if (this.transform_pending[i].t_type === "cluster-field") {
-            this.transforms.push({
-               t_type: this.transform_pending[i].t_type,
+      const output_transforms: Transform[] = [];
+
+      for (let i = 0; i < transform_pending.length; i++) {
+         this.line_num = transform_pending[i].line_num;
+
+         if (transform_pending[i].t_type === "cluster-field") {
+            output_transforms.push({
+               t_type: transform_pending[i].t_type,
                target: this.get_cluser_field_graphemes(
-                  this.transform_pending[i].target,
+                  transform_pending[i].target,
                   "TARGET",
                ),
                result: this.get_cluser_field_graphemes(
-                  this.transform_pending[i].result,
+                  transform_pending[i].result,
                   "RESULT",
                ),
                conditions: [],
@@ -72,10 +122,10 @@ class Transform_Resolver {
                line_num: this.line_num,
             });
             continue;
-         } else if (this.transform_pending[i].t_type !== "rule") {
+         } else if (transform_pending[i].t_type !== "rule") {
             // Routine type
-            this.transforms.push({
-               t_type: this.transform_pending[i].t_type,
+            output_transforms.push({
+               t_type: transform_pending[i].t_type,
                target: [],
                result: [],
                conditions: [],
@@ -86,7 +136,7 @@ class Transform_Resolver {
             continue;
          }
 
-         const target = this.transform_pending[i].target; // string
+         const target = transform_pending[i].target; // string
 
          // Replace category keys with category graphemes, must be item, or alone
          const target_with_cat = this.categories_into_transform(target);
@@ -96,7 +146,7 @@ class Transform_Resolver {
          const target_altors: string[][] =
             this.resolve_alt_opt(target_with_fea);
 
-         const result = this.transform_pending[i].result; // string
+         const result = transform_pending[i].result; // string
          // Replace category keys with category graphemes, must be item, or alone
          const result_with_cat = this.categories_into_transform(result);
          // Replace feature matrix keys with feature matrix graphemes
@@ -139,14 +189,14 @@ class Transform_Resolver {
             );
          }
 
-         const chance = this.transform_pending[i].chance;
+         const chance = transform_pending[i].chance;
 
          const new_conditions: { before: Token[]; after: Token[] }[] = [];
          const new_exceptions: { before: Token[]; after: Token[] }[] = [];
 
-         for (let j = 0; j < this.transform_pending[i].conditions.length; j++) {
+         for (let j = 0; j < transform_pending[i].conditions.length; j++) {
             // CONDITIONS
-            let my_condition = this.transform_pending[i].conditions[j];
+            let my_condition = transform_pending[i].conditions[j];
             my_condition = this.categories_into_transform(my_condition);
             my_condition = this.features_into_transform(my_condition);
             // Validate brackets
@@ -185,9 +235,9 @@ class Transform_Resolver {
                });
             }
          }
-         for (let j = 0; j < this.transform_pending[i].exceptions.length; j++) {
+         for (let j = 0; j < transform_pending[i].exceptions.length; j++) {
             // EXCEPTIONS
-            let my_exception = this.transform_pending[i].exceptions[j];
+            let my_exception = transform_pending[i].exceptions[j];
             my_exception = this.categories_into_transform(my_exception);
             my_exception = this.features_into_transform(my_exception);
             // Validate brackets
@@ -227,8 +277,8 @@ class Transform_Resolver {
             }
          }
 
-         this.transforms.push({
-            t_type: this.transform_pending[i].t_type,
+         output_transforms.push({
+            t_type: transform_pending[i].t_type,
             target: tokenised_target_array,
             result: tokenised_result_array,
             conditions: new_conditions,
@@ -237,7 +287,7 @@ class Transform_Resolver {
             line_num: this.line_num,
          });
       }
-      return this.transforms;
+      return output_transforms;
    }
 
    environment_helper(input: string): [string, string] {
@@ -867,44 +917,57 @@ class Transform_Resolver {
    }
 
    show_debug(): void {
-      const transforms = [];
-      for (let i = 0; i < this.transforms.length; i++) {
-         const my_transform = this.transforms[i];
+      const format_stages: {
+         transforms: string[];
+         name: string;
+      }[] = [];
+      for (const stage of this.stages) {
+         const format_transforms: string[] = [];
 
-         if (
-            my_transform.t_type != "rule" &&
-            my_transform.t_type != "cluster-field"
-         ) {
-            transforms.push(
-               `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num + 1}`,
+         const my_transforms = stage.transforms;
+
+         for (let i = 0; i < my_transforms.length; i++) {
+            const my_transform = my_transforms[i];
+
+            if (
+               my_transform.t_type != "rule" &&
+               my_transform.t_type != "cluster-field"
+            ) {
+               format_transforms.push(
+                  `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num + 1}`,
+               );
+               continue;
+            }
+
+            const my_target = [];
+            for (let j = 0; j < my_transform.target.length; j++) {
+               my_target.push(this.format_tokens(my_transform.target[j]));
+            }
+            const my_result = [];
+            for (let j = 0; j < my_transform.result.length; j++) {
+               my_result.push(this.format_tokens(my_transform.result[j]));
+            }
+
+            const chance = my_transform.chance
+               ? ` CHANCE ${my_transform.chance}`
+               : "";
+            let exceptions = "";
+            for (let j = 0; j < my_transform.exceptions.length; j++) {
+               exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
+            }
+            let conditions = "";
+            for (let j = 0; j < my_transform.conditions.length; j++) {
+               conditions += ` / ${this.format_tokens(my_transform.conditions[j].before)}_${this.format_tokens(my_transform.conditions[j].after)}`;
+            }
+
+            format_transforms.push(
+               `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num + 1}`,
             );
-            continue;
          }
-
-         const my_target = [];
-         for (let j = 0; j < my_transform.target.length; j++) {
-            my_target.push(this.format_tokens(my_transform.target[j]));
-         }
-         const my_result = [];
-         for (let j = 0; j < my_transform.result.length; j++) {
-            my_result.push(this.format_tokens(my_transform.result[j]));
-         }
-
-         const chance = my_transform.chance
-            ? ` CHANCE ${my_transform.chance}`
-            : "";
-         let exceptions = "";
-         for (let j = 0; j < my_transform.exceptions.length; j++) {
-            exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
-         }
-         let conditions = "";
-         for (let j = 0; j < my_transform.conditions.length; j++) {
-            conditions += ` / ${this.format_tokens(my_transform.conditions[j].before)}_${this.format_tokens(my_transform.conditions[j].after)}`;
-         }
-
-         transforms.push(
-            `  ${my_target.join(", ")} → ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num + 1}`,
-         );
+         format_stages.push({
+            transforms: format_transforms,
+            name: stage.name,
+         });
       }
 
       const features = [];
@@ -934,9 +997,13 @@ class Transform_Resolver {
          associatemes +
          `\nFeatures {\n` +
          features.join("\n") +
-         `\n}` +
-         `\nTransforms {\n` +
-         transforms.join("\n") +
+         `\n}\n` +
+         format_stages
+            .map(
+               (stage) =>
+                  `stage "${stage.name}" {\n  ` + stage.transforms.join("\n  "),
+            )
+            .join("\n") +
          `\n}`;
       this.logger.diagnostic(info);
    }

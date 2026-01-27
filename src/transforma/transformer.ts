@@ -10,8 +10,10 @@ import type {
    Output_Mode,
    Transform,
    Associateme_Mapper,
+   Routine,
 } from "../utils/types";
 import Reference_Mapper from "./reference_mapper";
+import Lettercase_Mapper from "./lettercase_mapper";
 
 import { xsampa_to_ipa, ipa_to_xsampa } from "./xsampa";
 import { latin_to_hangul, hangul_to_latin } from "./hangul";
@@ -35,9 +37,14 @@ type Replacement = {
 class Transformer {
    public logger: Logger;
 
-   public transforms: Transform[];
+   public stages: { transforms: Transform[]; name: string }[] = [];
+   public substages: { transforms: Transform[]; name: string }[] = [];
+
+   //public transforms: Transform[];
 
    public graphemes: string[];
+
+   public lettercase_mapper: Lettercase_Mapper;
 
    private syllable_boundaries: string[];
 
@@ -47,22 +54,31 @@ class Transformer {
 
    constructor(
       logger: Logger,
+
       graphemes: string[],
+      lettercase_mapper: Lettercase_Mapper,
       syllable_boundaries: string[],
-      transforms: Transform[],
+      //transforms: Transform[],
+      stages: { transforms: Transform[]; name: string }[],
+      substages: { transforms: Transform[]; name: string }[],
+
       output_mode: Output_Mode,
       associateme_mapper: Associateme_Mapper,
    ) {
       this.logger = logger;
       this.graphemes = graphemes;
+      this.lettercase_mapper = lettercase_mapper;
       this.syllable_boundaries = syllable_boundaries;
-      this.transforms = transforms;
       this.associateme_mapper = associateme_mapper;
       this.debug = output_mode === "debug";
+
+      //this.transforms = transforms;
+      this.stages = stages;
+      this.substages = substages;
    }
 
    run_routine(
-      routine: string,
+      routine: Routine,
       word: Word,
       word_stream: string[],
       line_num: number,
@@ -78,18 +94,16 @@ class Transformer {
             modified_word = full_word.normalize("NFC");
             break;
          case "capitalise":
-            modified_word =
-               full_word.charAt(0).toUpperCase() + full_word.slice(1);
+            modified_word = this.lettercase_mapper.capitalise(full_word);
             break;
          case "decapitalise":
-            modified_word =
-               full_word.charAt(0).toLowerCase() + full_word.slice(1);
+            modified_word = this.lettercase_mapper.decapitalise(full_word);
             break;
          case "to-uppercase":
-            modified_word = full_word.toUpperCase();
+            modified_word = this.lettercase_mapper.to_uppercase(full_word);
             break;
          case "to-lowercase":
-            modified_word = full_word.toLowerCase();
+            modified_word = this.lettercase_mapper.to_lowercase(full_word);
             break;
          case "reverse":
             modified_word = reverse_items(word_stream).join("");
@@ -1013,18 +1027,18 @@ class Transformer {
       return word_stream;
    }
 
-   do_transforms(word: Word): Word {
+   do_transforms(word: Word, transforms: Transform[]): Word {
       if (word.get_last_form() == "") {
          word.rejected = true;
          return word;
       }
-      if (this.transforms.length == 0) {
+      if (transforms.length == 0) {
          return word;
       } // No transforms
 
       let tokens = graphemosis(word.get_last_form(), this.graphemes);
 
-      for (const t of this.transforms) {
+      for (const t of transforms) {
          if (word.rejected) {
             break;
          }
@@ -1034,25 +1048,33 @@ class Transformer {
          ) {
             continue;
          }
+
+         // Here I need to check if the transform is a substage, match the right
+         // substage by name, and go through each transform in the substage
+
          tokens = this.apply_transform(word, tokens, t);
-         if (tokens.length == 0) {
+         word.current_form = tokens.join("");
+         if (tokens.length === 0) {
             word.rejected = true;
             if (this.debug) {
-               word.record_transformation(`<reject-null-word>`, `∅`);
+               word.record_banner("REJECT-NULL-WORD");
             }
          }
       }
 
       if (!word.rejected) {
-         if (this.debug) {
-            if (word.transformations.length > 1) {
-               word.record_transformation(null, `${tokens.join("")}`);
-            }
-         } else {
-            word.record_transformation(null, `${tokens.join("")}`);
-         }
+         word.record_output();
       }
+      return word;
+   }
 
+   do_stages(word: Word) {
+      for (const stage of this.stages) {
+         if (stage.name) {
+            word.record_banner(`STAGE: ${stage.name}`);
+         }
+         word = this.do_transforms(word, stage.transforms);
+      }
       return word;
    }
 

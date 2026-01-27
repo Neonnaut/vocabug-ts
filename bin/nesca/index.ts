@@ -7,17 +7,16 @@ import { hideBin } from 'yargs/helpers';
 // Type-only import (safe in CommonJS with TypeScript)
 import type { Arguments } from 'yargs';
 
-import { generate } from '../src/core';
-import { VOCABUG_VERSION } from '../src/utils/vocabug-version';
+import { nesca } from '../../src/main';
+import { VERSION } from '../../src/utils/version';
 
 
 type CLI_Args = Arguments<{
-  num_of_words: number;
   output_mode: string;
-  remove_duplicates: boolean;
-  force_word_limit: boolean;
   sort_words: boolean;
-  word_divider: string;
+  input_words: string;
+  input_divider: string;
+  output_divider: string;
   encoding: BufferEncoding;
 }> & {
   _: string[]; // positional args
@@ -44,29 +43,11 @@ const argv = yargs(hideBin(process.argv))
   .alias({ help: '?', version: 'v' })
   // custom options
 
-  .option('num_of_words', {
-    alias: 'n',
-    describe: 'Number of words to generate',
-    type: 'number',
-    default: 100,
-  })
   .option('output_mode', {
     alias: 'm',
     describe: 'Output mode',
-    choices: ['word-list', 'debug', 'paragraph'] as const,
+    choices: ['word-list', 'debug', 'old-to-new'] as const,
     default: 'word-list'
-  })
-  .option('remove_duplicates', {
-    alias: 'd',
-    describe: 'Remove duplicate words',
-    type: 'boolean',
-    default: true
-  })
-  .option('force_word_limit', {
-    alias: 'l',
-    describe: 'Force word limit',
-    type: 'boolean',
-    default: false
   })
   .option('sort_words', {
     alias: 's',
@@ -74,8 +55,20 @@ const argv = yargs(hideBin(process.argv))
     type: 'boolean',
     default: true
   })
-  .option('word_divider', {
-    alias: 'w',
+  .option('input_words', {
+    alias: 'iw',
+    describe: 'Input words to transform',
+    type: 'string',
+    default: ''
+  })
+  .option('input_divider', {
+    alias: 'id',
+    describe: 'Divider between words',
+    type: 'string',
+    default: ' '
+  })
+  .option('output_divider', {
+    alias: 'od',
     describe: 'Divider between words',
     type: 'string',
     default: ' '
@@ -125,17 +118,16 @@ if (!filePath) {
 const file_text = fs.readFileSync(filePath, argv.encoding);
 
 try {
-  console.log(`Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...`);
+  console.log(`Transforming words with Nesca version ${VERSION}...`);
 
   const run = 
-      generate({
-      file: file_text,
-      num_of_words: argv.num_of_words,
-      mode: argv.output_mode  as Output_Modes,
-      remove_duplicates: argv.remove_duplicates,
-      force_word_limit: argv.force_word_limit,
-      sort_words: argv.sort_words,
-      word_divider: argv.word_divider
+      nesca({
+        file: file_text,
+        input_words: argv.input_words,
+        output_mode: argv.output_mode  as Output_Modes,
+        input_divider: argv.input_divider,
+        output_divider: argv.output_divider,
+        sort_words: argv.sort_words
     } )
 
   for (const warning of run.warnings) {
@@ -147,9 +139,9 @@ try {
   for (const info of run.infos) {
     console.info(info);
   }
-  if (run.text.length === 0) {
+  if (run.payload.length === 0) {
     console.log(
-      run.text
+      run.payload
     );
   }
 } catch {

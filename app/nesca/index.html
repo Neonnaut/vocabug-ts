@@ -4,10 +4,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8">
   <!-- Website information -->
-  <title>Vocabug</title>
-  <meta name="description" content="A tool to generate words.">
-  <meta name="keywords" content="conlangs, word generator, vocabulary generator">
-  <meta name=”robots” content="index, follow">
+  <title>Nesca</title>
+  <meta name="description" content="A tool to apply sound changes.">
+  <meta name="keywords" content="conlangs">
   <meta name="author" content="Neonnaut">
   <!-- Scripts and stylings -->
   <link href="style.css" rel="stylesheet" type="text/css" media="all">
@@ -17,13 +16,11 @@
   <!-- Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
   <!-- Icons -->
-
 </head>
 <body>
   <nav id="myNav">
     <ol class="breadcrumbs">
       <li>
-
       </li>
       <li style="float: right;">
         <button id="main_menu"><i class="fa fa-bars"></i> Menu</button>
@@ -34,77 +31,82 @@
   <div id="content">
     <section id="top">
 
-      <div>
-        <img src="img/vocabug_logo.svg" alt="Logo of letter V with bug antennae" style="float: left;">
-        
-        <h1 style="margin: 15px 0 10px 0; padding-top: 10px;">Vocabug</h1>
 
+      <div>
+        <img src="img/nesca.svg" alt="Logo of a spaceman" style="float: left;">
+        <h1 style="margin: 15px 0 10px 0; padding-top: 10px;">Nesca</h1>
         <div style="padding-left: 5px;">
-          <b>Version 1.0.2</b><br>
-          <a href="./vocabug_docs.html">Read the documentation here</a>
+          <b>Version <a class="VERSION">1.0.3</a></b><br>
+          <a href="./nesca_docs.html">Read the documentation here</a>
         </div>
       </div>
 
-      <br>
-      <p>Vocabug randomly generates vocabulary from a given definition of graphemes and word patterns. It can be used to generate words for a fictional language, original nicknames or passwords, or just for fun.</p>
-
       <!-- Da-na-na-naaah! -->
       <div id="editor"></div>
+      <script src="./index.ts" type="module"></script>
 
-      <br>
-
-        <script src="./index.ts" type="module"></script>
-  
-        <textarea data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" rows="6" id='voc-output-words-field' spellcheck='false' placeholder="Generated words will be shown here..."></textarea>
-        <input type="submit" class="styled-button generate-words" class="generate-words" value="Generate">        
-        <input type="submit" class="styled-button" id="help-button" value="Help">
-
-        <button class="styled-button" id="output-words-copy"><i class="fa fa-copy"></i></button>
-
-        <button class="styled-button" id="output-words-download"><i class="fa fa-download"></i></button>
-        
-        <div id='prog-output-message' style="border: 2px solid #000;"><p class="grey-message">Information may be shown here...</p></div>
-    
-        <fieldset style="float: left;" id="config">
-          <legend>Config</legend>
-          <div>
-            <div style="float:left; display: inline; margin: 4px 10px 2px 0;">
-              <label for="my_mode">Mode:</label>
-              <select id="my_mode" aria-label="Generation mode" style="margin-bottom: 2px;">
-                <option value="word-list" selected>Word-list</option>
-                <option value="debug">Debug</option>
-                <option value="paragraph">Paragraph</option>
-              </select> <br>
-
-                        <label for="num-of-words">Nº Words:</label>
-          <input type="number" style="width:52px; margin-bottom:2px;" min="1" max="9999" placeholder="100" autocomplete="off" id="num-of-words"><br>
-  
-
-          <label for="word-divider">Divider:</label>
-          <input type="text" autocomplete="off" id="word-divider" style="width: 70px; ">
-
-
-
-            </div>
-            <div style="float: left; display: inline; margin: 4px 10px 2px 0;">
-              <input type="checkbox" id="remove-duplicates" checked>
-              <label for="remove-duplicates">No duplicates</label><br>
-  
-              <input type="checkbox" id="force-words">
-              <label for="force-words">Force word limit</label><br>
-  
-              <input type="checkbox" id="sort-words" checked>
-              <label for="sort-words">Sort words</label><br>
-            </div>
+      <div id="nesca-container">
+        <div class="nesca-pane">
+          <h5 style="user-select: none;">Input</h5>
+          <textarea id="nesca-word-input" spellcheck="false" autocomplete="off" placeholder="Enter input words here" style="min-width: 180px;" rows="10"></textarea>
+          <div style="user-select: none;">
+            
+            
+            <input class="styled-button action-btn" type="submit" value="Apply">
+            
+            <input class="styled-button" type="submit" id='nesca-help' value="Help">
+            <button class="styled-button" type="submit" id='nesca-import-input'><i class="fa fa-file-import"></i></button>
           </div>
+
+        </div>
+
+        <div id="nesca-divider"></div>
+
+        <div class="nesca-pane">
+          <h5 style="user-select: none;">Output</h5>
+          <textarea id="nesca-word-output" spellcheck="false" autocomplete="off" placeholder="Changed words will appear here" style="min-width: 100px;" rows="10"></textarea>
+          
+          <div style="user-select: none;">
+                      <button class="styled-button" type="submit" id='nesca-copy'><i class="fa fa-copy"></i></button>
+          
+
+          <button class="styled-button" type="submit" id='nesca-output-words-download'><i class="fa fa-download"></i></button>
+
+
+          </div>
+
+
+
+        </div>
+      </div>
+
+      
+        <div id='prog-output-message' style="border: 2px solid #000;"><p class="grey-message">Information may be shown here...</p></div>
   
-          <div style="clear: left;"></div>
+
+        <fieldset id="config" style="display: inline-block;">
+          <legend>Config</legend>
+
+          <label for="my_mode">Mode:</label>
+          <select id="my_mode" aria-label="Output mode" style="margin-bottom: 2px;">
+            <option value="word-list" selected>Word-list</option>
+            <option value="debug">Debug</option>
+            <option value="old-to-new">Old-to-new</option>
+            <option value="paragraph">Paragraph</option>
+          </select> <br>
+
+          <label for="nesca-input-divider">Input divider:</label>
+          <input type="text" autocomplete="off" id="nesca-input-divider" style="width: 70px; margin-bottom: 2px;"><br>
+
+          <label for="nesca-output-divider">Output divider:</label>
+          <input type="text" autocomplete="off" id="nesca-output-divider" style="width: 70px; margin-bottom: 5px;"><br>
+
+          <input type="checkbox" id="sort-words">
+          <label for="sort-words">Sort words</label><br>
         
-        </fieldset>
-        <div style="clear: left;"></div>
+        </fieldset><br>
 
-
-        <fieldset style="float: left;">
+        <fieldset style="display: inline-block;">
             <legend>Editor options</legend>
             <div style="float: left; display: inline; margin: 4px 10px 2px 0;">
               <input type="checkbox" id="editor-wrap-lines">
@@ -119,39 +121,31 @@
 
             <details class="dropdown-group" id="colour-switch-field">
               <summary class="dropdown-btn">Themes</summary>
-              <a class="dropdown-itm-btn" id="light-mode" value="Light" name="changeThemeButton">Light</a>
-              <a class="dropdown-itm-btn" id="warm-mode" value="Warm" name="changeThemeButton">Warm</a>
-              <a class="dropdown-itm-btn" id="dark-mode" value="Dark" name="changeThemeButton">Dark</a>
+              <button class="dropdown-itm-btn" id="light-mode" value="Light" name="changeThemeButton">Light</button>
+              <button class="dropdown-itm-btn" id="warm-mode" value="Warm" name="changeThemeButton">Warm</button>
+              <button class="dropdown-itm-btn" id="dark-mode" value="Dark" name="changeThemeButton">Dark</button>
               <br>
-              <a class="dropdown-itm-btn" id="system-mode" value="System*" name="changeThemeButton">System</a>
+              <button class="dropdown-itm-btn" id="system-mode" value="System*" name="changeThemeButton">System</button>
             </details>
 
-        </fieldset>
-        <br style="clear: left;">
+        </fieldset><br>
   
-        <fieldset id="file-save-load" style="float: left;">
+        <fieldset id="file-save-load" style="display: inline-block;">
           <legend>File save / load</legend>
   
           <label for="file-name">File name:</label>
-          <input type="text" autocomplete="off" id="file-name" placeholder="vocabug" style="width:102px"><br>
+          <input type="text" autocomplete="off" id="file-name" placeholder="nesca" style="width:102px"><br>
           <input type="submit" class="styled-button" id="load-file" value="Load file">
           <input type="submit" class="styled-button" id="save-file" value="Save file">
           <br>
 
           <details class="dropdown-group">
             <summary class="dropdown-btn">Examples</summary>
-            <a class="dropdown-itm-btn voc-example" value="default">Default</a>
-            <a class="dropdown-itm-btn voc-example" value="japanese">Japanese-like</a><br>
-            <a class="dropdown-itm-btn voc-example" value="tonal">Tonal</a>
-            <a class="dropdown-itm-btn voc-example" value="australian">Australian-like</a>
+            <button class="dropdown-itm-btn nesca-example" value="default">Basic</button>
           </details>
 
         </fieldset>
-        <br style="clear: left;">
-
-      </section>
-      
-
+    </section>
 
     <section id="select-keyboard-section" style="display: none;">
       <h2>Keyboard</h2>

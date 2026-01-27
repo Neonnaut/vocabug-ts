@@ -3,12 +3,14 @@ class Logger {
    public warnings: string[];
    public infos: string[];
    public diagnostics: string[];
+   public payload: string;
 
    constructor() {
       this.errors = [];
       this.warnings = [];
       this.infos = [];
       this.diagnostics = [];
+      this.payload = "";
    }
 
    Uncaught_Error = class Uncaught_Error extends Error {
@@ -78,6 +80,19 @@ class Logger {
    }
    diagnostic(diagnostic: string): void {
       this.diagnostics.push(diagnostic);
+   }
+   set_payload(payload: string): void {
+      this.payload = payload;
+   }
+
+   create_log() {
+      return {
+         payload: this.payload,
+         errors: this.errors,
+         warnings: this.warnings,
+         infos: this.infos,
+         diagnostics: this.diagnostics,
+      };
    }
 }
 

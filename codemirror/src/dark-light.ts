@@ -62,7 +62,7 @@ export const xcodeDarkStyle: CreateThemeOptions["styles"] = [
   { tag: t.comment, color: "#b6ababff" },
 
   // Escape char / CREAM ON BLACK
-  { tag: t.escape, color: "#f0f0f0", backgroundColor:"#5f4418ff" }, 
+  { tag: t.escape, color: "#eeeeff", fontStyle: "italic" }, 
 
   // Directive / RED / words: alphabet: etc.
   { tag: [t.meta, t.name], color: "#ff7a7a" },
@@ -258,7 +258,7 @@ export const xcodeWarmStyle: CreateThemeOptions["styles"] = [
   { tag: t.comment, color: "#7e7474ff"},
 
   // Escape char / CREAM ON BLACK
-  { tag: t.escape, color: "#000000", backgroundColor:"#e8d9cc"}, 
+  { tag: t.escape, color: "#000000", fontStyle: "italic" }, 
 
   // Directive / RED / words: alphabet: etc.
   { tag: [t.meta, t.name], color: "#a11c08ff" },

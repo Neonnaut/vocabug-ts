@@ -1,9 +1,44 @@
+export type App = "vocabug" | "nesca";
+
+export type Log = {
+   payload: string;
+   errors: string[];
+   warnings: string[];
+   infos: string[];
+   diagnostics: string[];
+};
+
 export type Association = {
    entry_id: number;
    base_id: number;
    variant_id: number;
    is_target: boolean;
 };
+
+export type Word_Step =
+   | {
+        type: "transformation";
+        action: string;
+        form: string;
+        line_num: number;
+     }
+   | {
+        type: "banner";
+        action: string;
+     }
+   | {
+        type: "word-creation";
+        action: string;
+        form: string;
+     }
+   | {
+        type: "nesca-input";
+        form: string;
+     }
+   | {
+        type: "output";
+        form: string;
+     };
 
 export type Token =
    | {
@@ -131,6 +166,16 @@ export type Transform_Pending = {
    line_num: number;
 };
 
+export type Stage = {
+   name: string;
+   transforms: Transform[];
+};
+
+export type Sub_Stage = {
+   name: string;
+   transforms: Transform[];
+};
+
 export type Token_Stream_Mode = "TARGET" | "RESULT" | "BEFORE" | "AFTER";
 
 export type Output_Mode = "word-list" | "debug" | "paragraph" | "old-to-new";
@@ -148,7 +193,21 @@ export type Directive =
    | "features"
    | "feature-field"
    | "stage"
+   | "letter-case-field"
    | "none";
+
+export const directive_check = [
+   "categories",
+   "words",
+   "units",
+   "alphabet",
+   "invisible",
+   "graphemes",
+   "syllable-boundaries",
+   "features",
+   "feature-field",
+   "stage",
+];
 
 export type Routine =
    | "decompose"

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// bin/index.ts
+// bin/vocabug/index.ts
 import fs from "fs";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
@@ -15,9 +15,6 @@ var get_first = (arr) => (
   // This thing fetches the first item of an array
   arr?.[0]
 );
-function capitalise(str) {
-  return str[0].toUpperCase() + str.slice(1);
-}
 var make_percentage = (input) => {
   const num = Number(input);
   return Number.isInteger(num) && num >= 1 && num <= 100 ? num : null;
@@ -95,18 +92,75 @@ function graphemosis(input, canon_graphemes) {
   return tokens;
 }
 
+// src/utils/types.ts
+var directive_check = [
+  "categories",
+  "words",
+  "units",
+  "alphabet",
+  "invisible",
+  "graphemes",
+  "syllable-boundaries",
+  "features",
+  "feature-field",
+  "stage"
+];
+var SYNTAX_CHARS = [
+  "<",
+  ">",
+  "@",
+  "\u21D2",
+  "\u2192",
+  "->",
+  ">>",
+  "_",
+  "{",
+  "}",
+  "[",
+  "]",
+  "(",
+  ")",
+  "0",
+  "/",
+  "!",
+  "#",
+  "$",
+  "+",
+  "?",
+  ":",
+  "*",
+  "&",
+  "%",
+  "|",
+  "~",
+  "=",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9"
+];
+var SYNTAX_CHARS_AND_CARET = [...SYNTAX_CHARS, "^"];
+
 // src/parser.ts
 var Parser = class {
   logger;
   escape_mapper;
-  supra_builder;
+  lettercase_mapper;
   num_of_words;
   output_mode;
   remove_duplicates;
   force_word_limit;
   sort_words;
-  word_divider;
+  input_divider;
+  output_divider;
   directive = "none";
+  disable_directive = false;
+  directive_name;
   category_distribution;
   category_pending;
   units;
@@ -114,17 +168,21 @@ var Parser = class {
   wordshape_distribution;
   wordshape_pending;
   feature_pending;
-  transform_pending;
+  // public transform_pending: Transform_Pending[];
+  stages_pending = [];
+  substages_pending = [];
   graphemes;
   syllable_boundaries;
   graphemes_pending = "";
   alphabet;
   invisible;
   file_line_num = 0;
-  constructor(logger, escape_mapper, supra_builder, num_of_words_string, output_mode, sort_words, remove_duplicates, force_word_limit, word_divider) {
+  app;
+  constructor(logger, app, escape_mapper, lettercase_mapper2, num_of_words_string, output_mode, sort_words, remove_duplicates, force_word_limit, input_divider, output_divider) {
     this.logger = logger;
+    this.app = app;
     this.escape_mapper = escape_mapper;
-    this.supra_builder = supra_builder;
+    this.lettercase_mapper = lettercase_mapper2;
     if (num_of_words_string === "") {
       num_of_words_string = "100";
     }
@@ -151,8 +209,17 @@ var Parser = class {
     this.sort_words = sort_words;
     this.remove_duplicates = remove_duplicates;
     this.force_word_limit = force_word_limit;
-    this.word_divider = word_divider === "" ? " " : word_divider;
-    this.word_divider = this.word_divider.replace(
+    this.input_divider = input_divider === "" ? "\\n" : input_divider;
+    this.input_divider = this.input_divider.replace(
+      new RegExp("\\\\n", "g"),
+      "\n"
+    );
+    if (app === "vocabug") {
+      this.output_divider = output_divider === "" ? " " : output_divider;
+    } else {
+      this.output_divider = output_divider === "" ? "\n" : output_divider;
+    }
+    this.output_divider = this.output_divider.replace(
       new RegExp("\\\\n", "g"),
       "\n"
     );
@@ -160,12 +227,12 @@ var Parser = class {
       this.sort_words = false;
       this.remove_duplicates = false;
       this.force_word_limit = false;
-      this.word_divider = " ";
+      this.output_divider = " ";
     } else if (this.output_mode === "debug") {
       this.sort_words = false;
       this.remove_duplicates = false;
       this.force_word_limit = false;
-      this.word_divider = "\n";
+      this.output_divider = "\n\n";
     }
     this.category_distribution = "gusein-zade";
     this.category_pending = /* @__PURE__ */ new Map();
@@ -173,13 +240,29 @@ var Parser = class {
     this.units = /* @__PURE__ */ new Map();
     this.wordshape_distribution = "zipfian";
     this.wordshape_pending = { content: "", line_num: 0 };
-    this.transform_pending = [];
+    this.stages_pending = [];
+    this.substages_pending = [];
     this.feature_pending = /* @__PURE__ */ new Map();
     this.alphabet = [];
     this.invisible = [];
     this.graphemes_pending = "";
     this.graphemes = [];
     this.syllable_boundaries = [];
+    this.disable_directive = false;
+    this.directive_name = "";
+  }
+  get_line(file_array) {
+    let line = file_array[this.file_line_num];
+    line = this.escape_mapper.escape_backslash_pairs(line);
+    line = line.replace(/;.*/u, "").trim();
+    line = this.escape_mapper.escape_named_escape(line);
+    if (line.includes("&[")) {
+      this.logger.validation_error(
+        `Invalid named escape`,
+        this.file_line_num
+      );
+    }
+    return line;
   }
   parse_file(file) {
     const file_array = file.split("\n");
@@ -188,17 +271,9 @@ var Parser = class {
     let my_subdirective = "none";
     let my_header = [];
     let my_clusterfield_transform = [];
+    let my_wrapped_rule = "";
     for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-      let line = file_array[this.file_line_num];
-      line = this.escape_mapper.escape_backslash_pairs(line);
-      line = line.replace(/;.*/u, "").trim();
-      line = this.escape_mapper.escape_named_escape(line);
-      if (line.includes("&[")) {
-        this.logger.validation_error(
-          `Invalid named escape`,
-          this.file_line_num
-        );
-      }
+      let line = this.get_line(file_array);
       if (line === "") {
         continue;
       }
@@ -221,6 +296,18 @@ var Parser = class {
         }
         my_directive = temp_directive;
         my_decorator = "none";
+        if (this.disable_directive === true) {
+          this.disable_directive = false;
+        } else if (this.disable_directive === "p") {
+          this.disable_directive = true;
+        }
+        if (my_directive === "stage") {
+          const stage = { transforms_pending: [], name: "" };
+          this.stages_pending.push(stage);
+        }
+        continue;
+      }
+      if (this.disable_directive) {
         continue;
       }
       if (my_directive === "none") {
@@ -243,6 +330,12 @@ var Parser = class {
         });
       }
       if (my_directive === "words") {
+        if (this.app !== "vocabug") {
+          this.logger.validation_error(
+            `Words directive is only valid in Vocabug`,
+            this.file_line_num
+          );
+        }
         if (!this.valid_words_brackets(line)) {
           this.logger.validation_error(
             `Wordshapes had missmatched brackets`,
@@ -254,6 +347,12 @@ var Parser = class {
         continue;
       }
       if (my_directive === "units") {
+        if (this.app !== "vocabug") {
+          this.logger.validation_error(
+            `Units directive is only valid in Vocabug`,
+            this.file_line_num
+          );
+        }
         const [key, field, valid] = this.get_cat_seg_fea(line, "unit");
         if (!valid) {
           this.logger.validation_error(
@@ -313,6 +412,21 @@ var Parser = class {
           this.parse_featurefield(line, my_header);
         }
       }
+      if (my_directive === "letter-case-field") {
+        if (my_header.length === 0) {
+          const top_row = line.split(/[\s]+/).filter(Boolean);
+          if (top_row.length < 2) {
+            this.logger.validation_error(
+              `letter-case-field header too short`,
+              this.file_line_num
+            );
+          }
+          my_header = top_row;
+          continue;
+        } else {
+          this.parse_lettercasefield(line, my_header);
+        }
+      }
       if (my_directive === "alphabet") {
         const alphabet = line.split(/[,\s]+/).filter(Boolean);
         for (let i = 0; i < alphabet.length; i++) {
@@ -341,7 +455,9 @@ var Parser = class {
       if (my_directive === "stage") {
         if (my_subdirective === "clusterfield") {
           if (line.startsWith(">")) {
-            this.transform_pending.push(...my_clusterfield_transform);
+            for (const transform of my_clusterfield_transform) {
+              this.push_transform_to_stage(transform);
+            }
             my_subdirective = "none";
             my_header = [];
             my_clusterfield_transform = [];
@@ -354,6 +470,12 @@ var Parser = class {
           );
           continue;
         } else if (line.startsWith("< ")) {
+          if (my_wrapped_rule.length != 0) {
+            this.logger.validation_error(
+              `Wrapped rule was not completed before starting cluster-field`,
+              this.file_line_num
+            );
+          }
           my_clusterfield_transform.push({
             t_type: "cluster-field",
             target: "",
@@ -375,8 +497,14 @@ var Parser = class {
           my_header = top_row;
           continue;
         } else if (line.startsWith("<routine")) {
+          if (my_wrapped_rule.length != 0) {
+            this.logger.validation_error(
+              `Wrapped rule was not completed before starting routine`,
+              this.file_line_num
+            );
+          }
           const my_routine = this.parse_routine(line);
-          this.transform_pending.push({
+          this.push_transform_to_stage({
             t_type: my_routine,
             target: "\\",
             result: "\\",
@@ -387,8 +515,15 @@ var Parser = class {
           });
           continue;
         } else {
+          const continuationRe = /(->|=>|>>|⇒|→|\/|!)$/;
+          if (continuationRe.test(line)) {
+            my_wrapped_rule += " " + line;
+            continue;
+          }
+          line = my_wrapped_rule + " " + line;
+          my_wrapped_rule = "";
           const [target, result, conditions, exceptions] = this.get_transform(line);
-          this.transform_pending.push({
+          this.push_transform_to_stage({
             t_type: "rule",
             target,
             result,
@@ -407,6 +542,14 @@ var Parser = class {
         this.file_line_num
       );
     }
+  }
+  push_transform_to_stage(transform) {
+    let stage = get_last(this.stages_pending);
+    if (!stage) {
+      stage = { transforms_pending: [], name: "default" };
+      this.stages_pending.push(stage);
+    }
+    stage.transforms_pending.push(transform);
   }
   get_cat_seg_fea(input, mode) {
     const divider = "=";
@@ -471,42 +614,61 @@ var Parser = class {
     line = this.escape_mapper.restore_preserve_escaped_chars(line);
     const dotCount = (line.match(/\./g) || []).length;
     const eqCount = (line.match(/=/g) || []).length;
-    if (dotCount !== 1 || eqCount !== 1) {
+    if (dotCount !== 1) {
       this.logger.validation_error(
-        `Invalid decorator format`,
+        `Invalid decorator format1`,
         this.file_line_num
       );
     }
     const [my_directive, my_thing] = line.split(/\.(.+)/).filter(Boolean);
-    let [my_property, my_value] = my_thing.split("=");
-    my_property = my_property.trim();
-    my_value = my_value.trim();
-    if (my_directive === "words") {
-      if (my_property === "distribution") {
-        this.wordshape_distribution = this.parse_distribution(my_value);
-        new_decorator = "words";
-      } else if (my_property === "optionals-weight") {
-        if (!my_value.endsWith("%")) {
-          this.logger.validation_error(
-            `Invalid optionals-weight '${my_value}' -- expected a percentage value ending with '%'`,
-            this.file_line_num
-          );
+    if (eqCount === 1) {
+      let [my_property, my_value] = my_thing.split("=");
+      my_property = my_property.trim();
+      my_value = my_value.trim();
+      if (my_directive === "words") {
+        if (my_property === "distribution") {
+          this.wordshape_distribution = this.parse_distribution(my_value);
+          new_decorator = "words";
+        } else if (my_property === "optionals-weight") {
+          if (!my_value.endsWith("%")) {
+            this.logger.validation_error(
+              `Invalid optionals-weight '${my_value}' -- expected a percentage value ending with '%'`,
+              this.file_line_num
+            );
+          }
+          my_value = my_value.slice(0, -1).trim();
+          const optionals_weight = make_percentage(my_value);
+          if (optionals_weight == null) {
+            this.logger.validation_error(
+              `Invalid optionals-weight '${my_value}' -- expected a number between 1 and 100`,
+              this.file_line_num
+            );
+          }
+          this.optionals_weight = optionals_weight;
+          new_decorator = "words";
         }
-        my_value = my_value.slice(0, -1).trim();
-        const optionals_weight = make_percentage(my_value);
-        if (optionals_weight == null) {
-          this.logger.validation_error(
-            `Invalid optionals-weight '${my_value}' -- expected a number between 1 and 100`,
-            this.file_line_num
-          );
+      } else if (my_directive === "categories") {
+        if (my_property === "distribution") {
+          this.category_distribution = this.parse_distribution(my_value);
+          new_decorator = "categories";
         }
-        this.optionals_weight = optionals_weight;
-        new_decorator = "words";
       }
-    } else if (my_directive === "categories") {
-      if (my_property === "distribution") {
-        this.wordshape_distribution = this.parse_distribution(my_value);
-        new_decorator = "categories";
+    } else {
+      if (my_thing === "disabled") {
+        if (directive_check.includes(my_directive)) {
+          new_decorator = my_directive;
+          this.disable_directive = "p";
+        } else {
+          this.logger.validation_error(
+            `Invalid directive name on decorator ${my_directive}`,
+            this.file_line_num
+          );
+        }
+      } else {
+        this.logger.validation_error(
+          `Invalid decorator format2`,
+          this.file_line_num
+        );
       }
     }
     if (new_decorator === "none") {
@@ -541,6 +703,8 @@ var Parser = class {
       temp_directive = "feature-field";
     } else if (line === "stage:") {
       temp_directive = "stage";
+    } else if (line === "letter-case-field:") {
+      temp_directive = "letter-case-field";
     }
     if (temp_directive === "none") {
       return "none";
@@ -800,6 +964,26 @@ var Parser = class {
       });
     }
   }
+  parse_lettercasefield(line, top_row) {
+    const my_row = line.split(/[\s]+/).filter(Boolean);
+    const my_key = my_row.shift();
+    if (my_key !== "uppercase") {
+      this.logger.validation_error(
+        `Letter-case-field first column must be 'uppercase'`,
+        this.file_line_num
+      );
+    }
+    if (my_row.length !== top_row.length || my_key === void 0) {
+      this.logger.validation_error(
+        `Feature-field row length mismatch with header length -- expected row length of ${top_row.length} but got lenght of ${my_row.length}`,
+        this.file_line_num
+      );
+    }
+    const my_map = new Map(
+      top_row.map((k, i) => [k, my_row[i]])
+    );
+    this.lettercase_mapper.create_map(my_map);
+  }
   valid_transform_brackets(str) {
     const stack = [];
     const bracket_pairs = {
@@ -824,58 +1008,88 @@ var parser_default = Parser;
 // src/word.ts
 var Word = class _Word {
   static output_mode = "word-list";
-  transformations;
-  forms;
+  current_form;
   rejected;
-  line_nums;
-  constructor(first_form, second_form) {
-    this.transformations = [first_form];
-    this.forms = [second_form];
+  num_of_transformations;
+  steps;
+  constructor(action, form) {
     this.rejected = false;
-    this.line_nums = [""];
+    this.current_form = form;
+    this.num_of_transformations = 0;
+    this.steps = [];
+    if (action === null) {
+      this.steps.push({
+        type: "nesca-input",
+        form
+      });
+    } else {
+      this.steps.push({
+        type: "word-creation",
+        action,
+        form
+      });
+    }
   }
   get_last_form() {
-    const output = get_last(this.forms);
-    if (output == void 0) {
-      return "undefined";
-    }
-    return output;
+    return this.current_form;
   }
   get_word() {
-    let output = "";
+    const output = [];
     if (_Word.output_mode == "debug") {
-      for (let i = 0; i < this.forms.length; i++) {
-        if (i == 0) {
-          output += `${this.transformations[i]} \u27A4 \u27E8${this.forms[i]}\u27E9
-`;
-        } else if (!this.transformations[i]) {
-          output += `\u27E8${this.forms[i]}\u27E9
-`;
-        } else {
-          output += `${this.transformations[i]} \u27A4 \u27E8${this.forms[i]}\u27E9 @ ln${this.line_nums[i]}
-`;
+      for (let i = 0; i < this.steps.length; i++) {
+        const step = this.steps[i];
+        if (step.type === "nesca-input") {
+          output.push(`\u27E8${step.form}\u27E9`);
+        } else if (step.type === "word-creation") {
+          output.push(`${step.action} \u27A4 \u27E8${step.form}\u27E9`);
+        } else if (step.type === "transformation") {
+          output.push(
+            `${step.action} \u27A4 \u27E8${step.form}\u27E9 @ ln:${step.line_num}`
+          );
+        } else if (step.type === "banner") {
+          output.push(`${step.action}`);
+        } else if (step.type === "output") {
+          if (this.num_of_transformations != 0) {
+            output.push(`\u27E8${step.form}\u27E9`);
+          }
         }
       }
-      return output;
+      return output.join("\n");
     }
     if (_Word.output_mode == "old-to-new") {
-      output = `${this.forms[0]} => ${get_last(this.forms)}`;
-      return output;
+      const first_step = this.steps[0];
+      let first_form = "";
+      if (first_form) {
+        if (first_step.type === "nesca-input" || first_step.type === "word-creation") {
+          first_form = first_step.form;
+        }
+      }
+      output.push(`${first_form} => ${this.current_form}`);
+      return output.join("");
     }
-    output = get_last(this.forms);
-    if (output == void 0) {
-      return "undefined";
-    }
-    return output;
+    output.push(`${this.current_form}`);
+    return output.join("");
   }
-  record_transformation(rule, form, line_num = null) {
-    this.transformations.push(rule);
-    this.forms.push(form);
-    let my_line_num = "";
-    if (line_num != null) {
-      my_line_num = `:${line_num + 1}`;
-    }
-    this.line_nums.push(my_line_num);
+  record_transformation(transformation, form, line_num) {
+    this.steps.push({
+      type: "transformation",
+      action: transformation,
+      form,
+      line_num: line_num + 1
+    });
+    this.num_of_transformations++;
+  }
+  record_banner(action) {
+    this.steps.push({
+      type: "banner",
+      action
+    });
+  }
+  record_output() {
+    this.steps.push({
+      type: "output",
+      form: this.get_last_form()
+    });
   }
 };
 var word_default = Word;
@@ -2114,18 +2328,23 @@ var carryover_associator_default = Carryover_Associator;
 // src/transforma/transformer.ts
 var Transformer = class {
   logger;
-  transforms;
+  stages = [];
+  substages = [];
+  //public transforms: Transform[];
   graphemes;
+  lettercase_mapper;
   syllable_boundaries;
   debug = false;
   associateme_mapper;
-  constructor(logger, graphemes, syllable_boundaries, transforms, output_mode, associateme_mapper) {
+  constructor(logger, graphemes, lettercase_mapper2, syllable_boundaries, stages, substages, output_mode, associateme_mapper) {
     this.logger = logger;
     this.graphemes = graphemes;
+    this.lettercase_mapper = lettercase_mapper2;
     this.syllable_boundaries = syllable_boundaries;
-    this.transforms = transforms;
     this.associateme_mapper = associateme_mapper;
     this.debug = output_mode === "debug";
+    this.stages = stages;
+    this.substages = substages;
   }
   run_routine(routine, word, word_stream, line_num) {
     const full_word = word_stream.join("");
@@ -2138,16 +2357,16 @@ var Transformer = class {
         modified_word = full_word.normalize("NFC");
         break;
       case "capitalise":
-        modified_word = full_word.charAt(0).toUpperCase() + full_word.slice(1);
+        modified_word = this.lettercase_mapper.capitalise(full_word);
         break;
       case "decapitalise":
-        modified_word = full_word.charAt(0).toLowerCase() + full_word.slice(1);
+        modified_word = this.lettercase_mapper.decapitalise(full_word);
         break;
       case "to-uppercase":
-        modified_word = full_word.toUpperCase();
+        modified_word = this.lettercase_mapper.to_uppercase(full_word);
         break;
       case "to-lowercase":
-        modified_word = full_word.toLowerCase();
+        modified_word = this.lettercase_mapper.to_lowercase(full_word);
         break;
       case "reverse":
         modified_word = reverse_items(word_stream).join("");
@@ -2802,16 +3021,16 @@ var Transformer = class {
     );
     return word_stream;
   }
-  do_transforms(word) {
+  do_transforms(word, transforms) {
     if (word.get_last_form() == "") {
       word.rejected = true;
       return word;
     }
-    if (this.transforms.length == 0) {
+    if (transforms.length == 0) {
       return word;
     }
     let tokens = graphemosis(word.get_last_form(), this.graphemes);
-    for (const t of this.transforms) {
+    for (const t of transforms) {
       if (word.rejected) {
         break;
       }
@@ -2819,21 +3038,25 @@ var Transformer = class {
         continue;
       }
       tokens = this.apply_transform(word, tokens, t);
-      if (tokens.length == 0) {
+      word.current_form = tokens.join("");
+      if (tokens.length === 0) {
         word.rejected = true;
         if (this.debug) {
-          word.record_transformation(`<reject-null-word>`, `\u2205`);
+          word.record_banner("REJECT-NULL-WORD");
         }
       }
     }
     if (!word.rejected) {
-      if (this.debug) {
-        if (word.transformations.length > 1) {
-          word.record_transformation(null, `${tokens.join("")}`);
-        }
-      } else {
-        word.record_transformation(null, `${tokens.join("")}`);
+      word.record_output();
+    }
+    return word;
+  }
+  do_stages(word) {
+    for (const stage of this.stages) {
+      if (stage.name) {
+        word.record_banner(`STAGE: ${stage.name}`);
       }
+      word = this.do_transforms(word, stage.transforms);
     }
     return word;
   }
@@ -2947,13 +3170,14 @@ var collator_default = collator;
 // src/text_builder.ts
 var Text_Builder = class {
   logger;
+  lettercase_mapper;
   build_start;
   num_of_words;
   output_mode;
   remove_duplicates;
   force_word_limit;
   sort_words;
-  word_divider;
+  output_divider;
   alphabet;
   invisible;
   terminated;
@@ -2962,15 +3186,16 @@ var Text_Builder = class {
   num_of_rejects;
   num_of_duds;
   upper_gen_limit;
-  constructor(logger, build_start, num_of_words, output_mode, remove_duplicates, force_word_limit, sort_words, word_divider, alphabet, invisible) {
+  constructor(logger, lettercase_mapper2, build_start, num_of_words, remove_duplicates, force_word_limit, output_mode, output_divider, sort_words, alphabet, invisible) {
     this.logger = logger;
+    this.lettercase_mapper = lettercase_mapper2;
     this.build_start = build_start;
     this.num_of_words = num_of_words;
     this.output_mode = output_mode;
     this.remove_duplicates = remove_duplicates;
     this.force_word_limit = force_word_limit;
     this.sort_words = sort_words;
-    this.word_divider = word_divider;
+    this.output_divider = output_divider;
     this.alphabet = alphabet;
     this.invisible = invisible;
     this.terminated = false;
@@ -3068,18 +3293,18 @@ var Text_Builder = class {
     if (this.output_mode === "paragraph") {
       return this.paragraphify(this.words);
     }
-    return this.words.join(this.word_divider);
+    return this.words.join(this.output_divider);
   }
   paragraphify(words) {
     if (words.length === 0) return "";
     if (words.length === 1)
-      return capitalise(words[0]) + this.random_end_punctuation();
+      return this.lettercase_mapper.capitalise(words[0]) + this.random_end_punctuation();
     const result = [];
     let should_capitalise = true;
     for (let i = 0; i < words.length; i++) {
       let word = words[i];
       if (should_capitalise) {
-        word = capitalise(word);
+        word = this.lettercase_mapper.capitalise(word);
         should_capitalise = false;
       }
       if (i === words.length - 1) {
@@ -3108,11 +3333,11 @@ var Text_Builder = class {
   }
   show_debug() {
     const info = `Num of words: ` + this.num_of_words + `
-Mode: ` + this.output_mode + `
+Output mode: ` + this.output_mode + `
 Remove duplicates: ` + this.remove_duplicates + `
 Force word limit: ` + this.force_word_limit + `
 Sort words: ` + this.sort_words + `
-Word divider: "` + this.word_divider + `"
+Output divider: "` + this.output_divider + `"
 Alphabet: ` + this.alphabet.join(", ") + `
 Invisible: ` + this.invisible.join(", ");
     this.logger.diagnostic(info);
@@ -3126,11 +3351,13 @@ var Logger = class {
   warnings;
   infos;
   diagnostics;
+  payload;
   constructor() {
     this.errors = [];
     this.warnings = [];
     this.infos = [];
     this.diagnostics = [];
+    this.payload = "";
   }
   Uncaught_Error = class Uncaught_Error extends Error {
     constructor(original) {
@@ -3191,50 +3418,20 @@ var Logger = class {
   diagnostic(diagnostic) {
     this.diagnostics.push(diagnostic);
   }
+  set_payload(payload) {
+    this.payload = payload;
+  }
+  create_log() {
+    return {
+      payload: this.payload,
+      errors: this.errors,
+      warnings: this.warnings,
+      infos: this.infos,
+      diagnostics: this.diagnostics
+    };
+  }
 };
 var logger_default = Logger;
-
-// src/utils/types.ts
-var SYNTAX_CHARS = [
-  "<",
-  ">",
-  "@",
-  "\u21D2",
-  "\u2192",
-  "->",
-  ">>",
-  "_",
-  "{",
-  "}",
-  "[",
-  "]",
-  "(",
-  ")",
-  "0",
-  "/",
-  "!",
-  "#",
-  "$",
-  "+",
-  "?",
-  ":",
-  "*",
-  "&",
-  "%",
-  "|",
-  "~",
-  "=",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9"
-];
-var SYNTAX_CHARS_AND_CARET = [...SYNTAX_CHARS, "^"];
 
 // src/escape_mapper.ts
 var escapeMap = {
@@ -3363,6 +3560,68 @@ var Escape_Mapper = class {
 };
 var escape_mapper_default = Escape_Mapper;
 
+// src/transforma/lettercase_mapper.ts
+var lettercase_mapper = class {
+  map;
+  reverse_map;
+  constructor() {
+    this.map = /* @__PURE__ */ new Map();
+    this.reverse_map = /* @__PURE__ */ new Map();
+  }
+  create_map(new_map) {
+    const entries = Array.from(new_map.entries());
+    const sorted = entries.sort(
+      ([a], [b]) => b.length - a.length
+    );
+    this.map = new Map(sorted);
+    const reversed = sorted.slice().sort(([, vA], [, vB]) => vB.length - vA.length).map(([k, v]) => [v, k]);
+    this.reverse_map = new Map(reversed);
+  }
+  tokenise(word) {
+    const tokens = [];
+    let i = 0;
+    while (i < word.length) {
+      let matched = false;
+      for (const [key] of this.map) {
+        if (key && word.startsWith(key, i)) {
+          tokens.push(key);
+          i += key.length;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        tokens.push(word[i]);
+        i++;
+      }
+    }
+    return tokens;
+  }
+  capitalise(word) {
+    if (!word) return word;
+    const tokens = this.tokenise(word);
+    const first = tokens[0] ?? "";
+    const cap = this.map.get(first) ?? (first ? first[0].toUpperCase() + first.slice(1) : "");
+    return cap + tokens.slice(1).join("");
+  }
+  decapitalise(word) {
+    if (!word) return word;
+    const tokens = this.tokenise(word);
+    const first = tokens[0] ?? "";
+    const cap = this.reverse_map.get(first) ?? (first ? first[0].toUpperCase() + first.slice(1) : "");
+    return cap + tokens.slice(1).join("");
+  }
+  to_uppercase(word) {
+    if (!word) return word;
+    return this.tokenise(word).map((tok) => this.map.get(tok) ?? tok.toUpperCase()).join("");
+  }
+  to_lowercase(word) {
+    if (!word) return word;
+    return this.tokenise(word).map((tok) => this.reverse_map.get(tok) ?? tok.toLowerCase()).join("");
+  }
+};
+var lettercase_mapper_default = lettercase_mapper;
+
 // src/generata/supra_builder.ts
 var Supra_Builder = class {
   logger;
@@ -3440,37 +3699,56 @@ var Transform_Resolver = class {
   output_mode;
   nesca_grammar_stream;
   categories;
-  transform_pending;
-  transforms = [];
+  //public transform_pending: Transform_Pending[];
+  //public transforms: Transform[] = [];
+  stages_pending;
+  stages;
+  substages_pending;
+  substages;
+  ////////////////////////////////////
   syllable_boundaries;
   features = /* @__PURE__ */ new Map();
   line_num;
-  constructor(logger, output_mode, nesca_grmmar_stream, categories, transform_pending, features, syllable_boundaries) {
+  constructor(logger, output_mode, nesca_grmmar_stream, categories, stages_pending, substages_pending, features, syllable_boundaries) {
     this.logger = logger;
     this.output_mode = output_mode;
     this.nesca_grammar_stream = nesca_grmmar_stream;
     this.categories = categories;
-    this.transform_pending = transform_pending;
+    this.stages_pending = stages_pending;
+    this.substages_pending = substages_pending;
+    this.stages = [];
+    this.substages = [];
     this.features = features;
     this.syllable_boundaries = syllable_boundaries.length === 0 ? ["."] : syllable_boundaries;
     this.line_num = 0;
-    this.resolve_transforms();
+    this.resolve_stages();
     if (this.output_mode === "debug") {
       this.show_debug();
     }
   }
-  resolve_transforms() {
-    for (let i = 0; i < this.transform_pending.length; i++) {
-      this.line_num = this.transform_pending[i].line_num;
-      if (this.transform_pending[i].t_type === "cluster-field") {
-        this.transforms.push({
-          t_type: this.transform_pending[i].t_type,
+  resolve_stages() {
+    for (const stage_pending of this.stages_pending) {
+      this.stages.push({
+        transforms: this.resolve_transforms(
+          stage_pending.transforms_pending
+        ),
+        name: stage_pending.name
+      });
+    }
+  }
+  resolve_transforms(transform_pending) {
+    const output_transforms = [];
+    for (let i = 0; i < transform_pending.length; i++) {
+      this.line_num = transform_pending[i].line_num;
+      if (transform_pending[i].t_type === "cluster-field") {
+        output_transforms.push({
+          t_type: transform_pending[i].t_type,
           target: this.get_cluser_field_graphemes(
-            this.transform_pending[i].target,
+            transform_pending[i].target,
             "TARGET"
           ),
           result: this.get_cluser_field_graphemes(
-            this.transform_pending[i].result,
+            transform_pending[i].result,
             "RESULT"
           ),
           conditions: [],
@@ -3479,9 +3757,9 @@ var Transform_Resolver = class {
           line_num: this.line_num
         });
         continue;
-      } else if (this.transform_pending[i].t_type !== "rule") {
-        this.transforms.push({
-          t_type: this.transform_pending[i].t_type,
+      } else if (transform_pending[i].t_type !== "rule") {
+        output_transforms.push({
+          t_type: transform_pending[i].t_type,
           target: [],
           result: [],
           conditions: [],
@@ -3491,11 +3769,11 @@ var Transform_Resolver = class {
         });
         continue;
       }
-      const target = this.transform_pending[i].target;
+      const target = transform_pending[i].target;
       const target_with_cat = this.categories_into_transform(target);
       const target_with_fea = this.features_into_transform(target_with_cat);
       const target_altors = this.resolve_alt_opt(target_with_fea);
-      const result = this.transform_pending[i].result;
+      const result = transform_pending[i].result;
       const result_with_cat = this.categories_into_transform(result);
       const result_with_fea = this.features_into_transform(result_with_cat);
       const result_altors = this.resolve_alt_opt(result_with_fea);
@@ -3525,11 +3803,11 @@ var Transform_Resolver = class {
           )
         );
       }
-      const chance = this.transform_pending[i].chance;
+      const chance = transform_pending[i].chance;
       const new_conditions = [];
       const new_exceptions = [];
-      for (let j = 0; j < this.transform_pending[i].conditions.length; j++) {
-        let my_condition = this.transform_pending[i].conditions[j];
+      for (let j = 0; j < transform_pending[i].conditions.length; j++) {
+        let my_condition = transform_pending[i].conditions[j];
         my_condition = this.categories_into_transform(my_condition);
         my_condition = this.features_into_transform(my_condition);
         if (!this.valid_transform_brackets(my_condition)) {
@@ -3565,8 +3843,8 @@ var Transform_Resolver = class {
           });
         }
       }
-      for (let j = 0; j < this.transform_pending[i].exceptions.length; j++) {
-        let my_exception = this.transform_pending[i].exceptions[j];
+      for (let j = 0; j < transform_pending[i].exceptions.length; j++) {
+        let my_exception = transform_pending[i].exceptions[j];
         my_exception = this.categories_into_transform(my_exception);
         my_exception = this.features_into_transform(my_exception);
         if (!this.valid_transform_brackets(my_exception)) {
@@ -3602,8 +3880,8 @@ var Transform_Resolver = class {
           });
         }
       }
-      this.transforms.push({
-        t_type: this.transform_pending[i].t_type,
+      output_transforms.push({
+        t_type: transform_pending[i].t_type,
         target: tokenised_target_array,
         result: tokenised_result_array,
         conditions: new_conditions,
@@ -3612,7 +3890,7 @@ var Transform_Resolver = class {
         line_num: this.line_num
       });
     }
-    return this.transforms;
+    return output_transforms;
   }
   environment_helper(input) {
     const [left = "", right = ""] = input.split("_", 2);
@@ -4059,35 +4337,43 @@ var Transform_Resolver = class {
     return tokenised_array;
   }
   show_debug() {
-    const transforms = [];
-    for (let i = 0; i < this.transforms.length; i++) {
-      const my_transform = this.transforms[i];
-      if (my_transform.t_type != "rule" && my_transform.t_type != "cluster-field") {
-        transforms.push(
-          `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num + 1}`
+    const format_stages = [];
+    for (const stage of this.stages) {
+      const format_transforms = [];
+      const my_transforms = stage.transforms;
+      for (let i = 0; i < my_transforms.length; i++) {
+        const my_transform = my_transforms[i];
+        if (my_transform.t_type != "rule" && my_transform.t_type != "cluster-field") {
+          format_transforms.push(
+            `  <routine = ${my_transform.t_type}> @ ln:${my_transform.line_num + 1}`
+          );
+          continue;
+        }
+        const my_target = [];
+        for (let j = 0; j < my_transform.target.length; j++) {
+          my_target.push(this.format_tokens(my_transform.target[j]));
+        }
+        const my_result = [];
+        for (let j = 0; j < my_transform.result.length; j++) {
+          my_result.push(this.format_tokens(my_transform.result[j]));
+        }
+        const chance = my_transform.chance ? ` CHANCE ${my_transform.chance}` : "";
+        let exceptions = "";
+        for (let j = 0; j < my_transform.exceptions.length; j++) {
+          exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
+        }
+        let conditions = "";
+        for (let j = 0; j < my_transform.conditions.length; j++) {
+          conditions += ` / ${this.format_tokens(my_transform.conditions[j].before)}_${this.format_tokens(my_transform.conditions[j].after)}`;
+        }
+        format_transforms.push(
+          `  ${my_target.join(", ")} \u2192 ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num + 1}`
         );
-        continue;
       }
-      const my_target = [];
-      for (let j = 0; j < my_transform.target.length; j++) {
-        my_target.push(this.format_tokens(my_transform.target[j]));
-      }
-      const my_result = [];
-      for (let j = 0; j < my_transform.result.length; j++) {
-        my_result.push(this.format_tokens(my_transform.result[j]));
-      }
-      const chance = my_transform.chance ? ` CHANCE ${my_transform.chance}` : "";
-      let exceptions = "";
-      for (let j = 0; j < my_transform.exceptions.length; j++) {
-        exceptions += ` ! ${this.format_tokens(my_transform.exceptions[j].before)}_${this.format_tokens(my_transform.exceptions[j].after)}`;
-      }
-      let conditions = "";
-      for (let j = 0; j < my_transform.conditions.length; j++) {
-        conditions += ` / ${this.format_tokens(my_transform.conditions[j].before)}_${this.format_tokens(my_transform.conditions[j].after)}`;
-      }
-      transforms.push(
-        `  ${my_target.join(", ")} \u2192 ${my_result.join(", ")}${conditions}${exceptions}${chance} @ ln:${my_transform.line_num + 1}`
-      );
+      format_stages.push({
+        transforms: format_transforms,
+        name: stage.name
+      });
     }
     const features = [];
     for (const [key, value] of this.features) {
@@ -4109,8 +4395,10 @@ Associatemes:
 Features {
 ` + features.join("\n") + `
 }
-Transforms {
-` + transforms.join("\n") + `
+` + format_stages.map(
+      (stage) => `stage "${stage.name}" {
+  ` + stage.transforms.join("\n  ")
+    ).join("\n") + `
 }`;
     this.logger.diagnostic(info);
   }
@@ -5000,7 +5288,7 @@ Wordshapes {
 var generation_resolver_default = Generation_Resolver;
 
 // src/resolvers/feature_resolver.ts
-var Resolver = class {
+var Feature_Resolver = class {
   logger;
   escape_mapper;
   output_mode;
@@ -5098,7 +5386,7 @@ var Resolver = class {
     this.logger.diagnostic(info);
   }
 };
-var feature_resolver_default = Resolver;
+var feature_resolver_default = Feature_Resolver;
 
 // src/resolvers/canon_graphemes_resolver.ts
 var Canon_Graphemes_Resolver = class {
@@ -5172,35 +5460,35 @@ var Canon_Graphemes_Resolver = class {
 };
 var canon_graphemes_resolver_default = Canon_Graphemes_Resolver;
 
-// src/utils/vocabug-version.ts
-var VOCABUG_VERSION = "1.0.2";
-
-// src/core.ts
-function generate({
+// src/main.ts
+function vocabug_f({
   file,
   num_of_words = 100,
-  mode = "word-list",
+  output_mode = "word-list",
   remove_duplicates = true,
   force_word_limit = false,
   sort_words = true,
-  word_divider = " "
+  output_divider = " "
 }) {
   const logger = new logger_default();
-  let text = "";
+  const app = "vocabug";
   try {
     const build_start = Date.now();
     const escape_mapper = new escape_mapper_default();
     const supra_builder = new supra_builder_default(logger);
+    const lettercase_mapper2 = new lettercase_mapper_default();
     const p = new parser_default(
       logger,
+      app,
       escape_mapper,
-      supra_builder,
+      lettercase_mapper2,
       num_of_words,
-      mode,
+      output_mode,
       sort_words,
       remove_duplicates,
       force_word_limit,
-      word_divider
+      " ",
+      output_divider
     );
     p.parse_file(file);
     const category_resolver = new category_resolver_default(
@@ -5242,7 +5530,8 @@ function generate({
       p.output_mode,
       nesca_grammar_stream,
       category_resolver.trans_categories,
-      p.transform_pending,
+      p.stages_pending,
+      p.substages_pending,
       feature_resolver.features,
       p.syllable_boundaries
     );
@@ -5258,44 +5547,44 @@ function generate({
     const transformer = new transformer_default(
       logger,
       canon_graphemes_resolver.graphemes,
+      p.lettercase_mapper,
       transform_resolver.syllable_boundaries,
-      transform_resolver.transforms,
+      transform_resolver.stages,
+      transform_resolver.substages,
       p.output_mode,
       canon_graphemes_resolver.associateme_mapper
     );
     const text_builder = new text_builder_default(
       logger,
+      p.lettercase_mapper,
       build_start,
       p.num_of_words,
-      p.output_mode,
       p.remove_duplicates,
       p.force_word_limit,
+      p.output_mode,
+      p.output_divider,
       p.sort_words,
-      p.word_divider,
       p.alphabet,
       p.invisible
     );
     while (!text_builder.terminated) {
       let word = word_builder.make_word();
-      word = transformer.do_transforms(word);
+      word = transformer.do_stages(word);
       text_builder.add_word(word);
     }
-    text = text_builder.make_text();
+    logger.set_payload(text_builder.make_text());
   } catch (e) {
     if (!(e instanceof logger.Validation_Error)) {
       logger.uncaught_error(e);
     }
   }
-  return {
-    text,
-    errors: logger.errors,
-    warnings: logger.warnings,
-    infos: logger.infos,
-    diagnostics: logger.diagnostics
-  };
+  return logger.create_log();
 }
 
-// bin/index.ts
+// src/utils/version.ts
+var VERSION = "1.0.2";
+
+// bin/vocabug/index.ts
 var encodings = [
   "ascii",
   "binary",
@@ -5317,7 +5606,7 @@ var argv = yargs(hideBin(process.argv)).usage("Usage: $0 <path> [options]").alia
   choices: ["word-list", "debug", "paragraph"],
   default: "word-list"
 }).option("remove_duplicates", {
-  alias: "d",
+  alias: "r",
   describe: "Remove duplicate words",
   type: "boolean",
   default: true
@@ -5331,8 +5620,8 @@ var argv = yargs(hideBin(process.argv)).usage("Usage: $0 <path> [options]").alia
   describe: "Sort generated words",
   type: "boolean",
   default: true
-}).option("word_divider", {
-  alias: "w",
+}).option("output_divider", {
+  alias: "od",
   describe: "Divider between words",
   type: "string",
   default: " "
@@ -5370,15 +5659,15 @@ if (!filePath) {
 }
 var file_text = fs.readFileSync(filePath, argv.encoding);
 try {
-  console.log(`Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...`);
-  const run = generate({
+  console.log(`Generating words with Vocabug version ${VERSION}. This may take up to 30 seconds...`);
+  const run = vocabug_f({
     file: file_text,
     num_of_words: argv.num_of_words,
-    mode: argv.output_mode,
+    output_mode: argv.output_mode,
     remove_duplicates: argv.remove_duplicates,
     force_word_limit: argv.force_word_limit,
     sort_words: argv.sort_words,
-    word_divider: argv.word_divider
+    output_divider: argv.output_divider
   });
   for (const warning of run.warnings) {
     console.warn(warning);
@@ -5389,9 +5678,9 @@ try {
   for (const info of run.infos) {
     console.info(info);
   }
-  if (run.text.length === 0) {
+  if (run.payload.length === 0) {
     console.log(
-      run.text
+      run.payload
     );
   }
 } catch {

@@ -26,3 +26,17 @@
 - conditions and exceptions parsing improvement
 - updated docs to reflect this
 - updated examples to reflect this
+
+## [1.0.3] - 2026-JAN-27
+
+### Added
+- Disable any directive
+- Rule line wrapping
+- Letter-case field
+- Added Nesca - sound change applier
+
+### Modified
+
+- Fixed https://github.com/Neonnaut/vocabug-ts/issues/1#issue-3821895482
+- When debug mode was on, there would be a newline at the end of the word list. Now that is not the case.
+- Chsnged this repository to "The Conlangers Suite"

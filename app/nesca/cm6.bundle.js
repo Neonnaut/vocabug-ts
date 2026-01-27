@@ -20489,7 +20489,7 @@ var cm6 = (function (exports) {
         // Comment / GREEN / #
         { tag: tags.comment, color: "#b6ababff" },
         // Escape char / CREAM ON BLACK
-        { tag: tags.escape, color: "#f0f0f0", backgroundColor: "#5f4418ff" },
+        { tag: tags.escape, color: "#eeeeff", fontStyle: "italic" },
         // Directive / RED / words: alphabet: etc.
         { tag: [tags.meta, tags.name], color: "#ff7a7a" },
         // LIGHT BLUE / commas, equals sign, colon
@@ -20646,7 +20646,7 @@ var cm6 = (function (exports) {
         // Comment / GREEN / #
         { tag: tags.comment, color: "#7e7474ff" },
         // Escape char / CREAM ON BLACK
-        { tag: tags.escape, color: "#000000", backgroundColor: "#e8d9cc" },
+        { tag: tags.escape, color: "#000000", fontStyle: "italic" },
         // Directive / RED / words: alphabet: etc.
         { tag: [tags.meta, tags.name], color: "#a11c08ff" },
         // LIGHT BLUE / commas, equals sign, colon
@@ -20704,9 +20704,14 @@ var cm6 = (function (exports) {
         { token: "escape", regex: escapeRegex },
         { token: "link", regex: /,/ }
     ];
-    var decoratorRules = [
+    var decoratorRulesVocabug = [
         { token: "link", regex: /\.|=/ },
-        { token: "meta", regex: /words|categories|distribution|optionals-weight/ },
+        { token: "meta", regex: /categories|words|units|alphabet|invisible|graphemes|syllable-boundaries|features|feature-field|stage|distribution|optionals-weight|disabled/ },
+        { token: "attributeName", regex: /flat|zipfian|gusein-zade|shallow|\d{1,2}%/ }
+    ];
+    var decoratorRulesNesca = [
+        { token: "link", regex: /\.|=/ },
+        { token: "meta", regex: /categories|alphabet|invisible|graphemes|syllable-boundaries|features|feature-field|stage|distribution|optionals-weight|disabled/ },
         { token: "attributeName", regex: /flat|zipfian|gusein-zade|shallow|\d{1,2}%/ }
     ];
     var graphemesRules = [
@@ -20715,6 +20720,10 @@ var cm6 = (function (exports) {
         { token: "regexp", regex: /\<{|\}|\{/ },
     ];
     var categoryRules = [
+        { token: "escape", regex: escapeRegex },
+        { token: "link", regex: /,|=/ },
+    ];
+    var categoryRulesVocabug = [
         { token: "escape", regex: escapeRegex },
         { token: "link", regex: /,|=/ },
         { token: "operator", regex: /\^/ },
@@ -20751,194 +20760,172 @@ var cm6 = (function (exports) {
         { token: "attributeName", regex: /\+/ },
         { token: "processingInstruction", regex: /-/ }
     ];
-    var parser = {
-        name: "dsl",
-        startState: function (i) {
-            return {
-                directive: 'none',
-                sub_directive: 'none',
-                feature_matrix: false,
-                transform: false,
-                doIndent: false,
-                catList: [],
-                unitList: [],
-                featureList: [],
-                we_on_newline: true,
-                header_for_feature_field: 0,
-                insideUnit: false
-            };
-        },
-        token: function (stream, state) {
-            // Comments
-            if (stream.match(/\s*;.*$/)) {
-                return "comment";
-            }
-            // If directive change
-            if (stream.sol()) {
-                state.we_on_newline = true;
-                state.insideUnit = false;
-                state.feature_matrix = false;
-                if (state.directive === 'decorator') {
-                    state.directive = 'none';
+    function parser(app) {
+        return {
+            startState: function (i) {
+                return {
+                    directive: 'none',
+                    sub_directive: 'none',
+                    feature_matrix: false,
+                    transform: false,
+                    doIndent: false,
+                    catList: [],
+                    unitList: [],
+                    featureList: [],
+                    we_on_newline: true,
+                    header_for_feature_field: 0,
+                    insideUnit: false
+                };
+            },
+            token: function (stream, state) {
+                // Comments
+                if (stream.match(/\s*;.*$/)) {
+                    return "comment";
                 }
-                stream.match(/\s*/);
-                // Decorators
-                if (stream.match(/@/)) {
-                    state.directive = 'decorator';
+                // If directive change
+                if (stream.sol()) {
+                    state.we_on_newline = true;
+                    state.insideUnit = false;
+                    state.feature_matrix = false;
+                    if (state.directive === 'decorator') {
+                        state.directive = 'none';
+                    }
+                    stream.match(/\s*/);
+                    // Decorators
+                    if (stream.match(/@/)) {
+                        state.directive = 'decorator';
+                        return "link";
+                    }
+                    // Categories
+                    if (stream.match(/(categories)(?=:\s*(?:;|$))/)) {
+                        state.directive = 'categories';
+                        state.doIndent = true;
+                        return "meta";
+                    }
+                    if (app === "vocabug") {
+                        // Words
+                        if (stream.match(/(words)(?=:\s*(?:;|$))/)) {
+                            state.directive = 'words';
+                            state.doIndent = true;
+                            return "meta";
+                        }
+                        // Units
+                        if (stream.match(/(units)(?=:\s*(?:;|$))/)) {
+                            state.directive = 'units';
+                            state.doIndent = true;
+                            return "meta";
+                        }
+                    }
+                    // Alphabet, Invisible
+                    if (stream.match(/(alphabet|invisible|syllable-boundaries)(?=:\s*(?:;|$))/)) {
+                        state.directive = 'list';
+                        state.doIndent = true;
+                        return "meta";
+                    }
+                    // Graphemes
+                    if (stream.match(/(graphemes)(?=:\s*(?:;|$))/)) {
+                        state.directive = 'graphemes';
+                        state.doIndent = true;
+                        return "meta";
+                    }
+                    // LETTER-CASE FIELD
+                    if (stream.match(/(letter-case-field)(?=:\s*(?:;|$))/)) {
+                        state.directive = "letter-case-field";
+                        state.doIndent = true;
+                        return "meta";
+                    }
+                    // Features
+                    if (stream.match(/(features)(?=:\s*(?:;|$))/)) {
+                        state.directive = 'features';
+                        state.doIndent = true;
+                        return "meta";
+                    }
+                    // Feature-field
+                    if (stream.match(/(feature-field)(?=:\s*(?:;|$))/)) {
+                        state.directive = "feature-field-header";
+                        state.doIndent = true;
+                        state.header_for_feature_field = 0;
+                        return "meta";
+                    }
+                    // Stage
+                    if (stream.match(/(stage)(?=:\s*(?:;|$))/)) {
+                        state.directive = 'stage';
+                        state.doIndent = true;
+                        return "meta";
+                    }
+                }
+                // Okay, return ':' as directive opener
+                if (state.doIndent) {
+                    stream.match(/:/);
+                    state.doIndent = false;
                     return "link";
                 }
-                // Categories
-                if (stream.match(/(categories)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'categories';
-                    state.doIndent = true;
-                    return "meta";
+                if (state.directive == 'none') {
+                    // Check for nothing
+                    if (stream.sol()) ;
                 }
-                // Words
-                if (stream.match(/(words)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'words';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Units
-                if (stream.match(/(units)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'units';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Alphabet, Invisible
-                if (stream.match(/(alphabet|invisible|syllable-boundaries)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'list';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Graphemes
-                if (stream.match(/(graphemes)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'graphemes';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Features
-                if (stream.match(/(features)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'features';
-                    state.doIndent = true;
-                    return "meta";
-                }
-                // Feature-field
-                if (stream.match(/(feature-field)(?=:\s*(?:;|$))/)) {
-                    state.directive = "feature-field-header";
-                    state.doIndent = true;
-                    state.header_for_feature_field = 0;
-                    return "meta";
-                }
-                // Stage
-                if (stream.match(/(stage)(?=:\s*(?:;|$))/)) {
-                    state.directive = 'stage';
-                    state.doIndent = true;
-                    return "meta";
-                }
-            }
-            // Okay, return ':' as directive opener
-            if (state.doIndent) {
-                stream.match(/:/);
-                state.doIndent = false;
-                return "link";
-            }
-            if (state.directive == 'none') {
-                // Check for nothing
-                if (stream.sol()) ;
-            }
-            // DECORATOR
-            if (state.directive == 'decorator') {
-                for (var _i = 0, decoratorRules_1 = decoratorRules; _i < decoratorRules_1.length; _i++) {
-                    var rule = decoratorRules_1[_i];
-                    if (stream.match(rule.regex)) {
-                        return rule.token;
-                    }
-                }
-            }
-            // CATEGORIES
-            if (state.directive == 'categories') {
-                if (state.we_on_newline) {
-                    stream.match(/\s*/);
-                    // A new Category
-                    var catRegex = new RegExp("(".concat(cappa, ")(?=\\s*=)"), "u");
-                    var match = stream.match(catRegex);
-                    if (match) {
-                        state.catList.push(match[1]);
-                        state.we_on_newline = false;
-                        return "tagName";
-                    }
-                }
-                else {
-                    for (var _a = 0, categoryRules_1 = categoryRules; _a < categoryRules_1.length; _a++) {
-                        var rule = categoryRules_1[_a];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
+                // DECORATOR
+                if (state.directive == 'decorator') {
+                    if (app === "vocabug") {
+                        for (var _i = 0, decoratorRulesVocabug_1 = decoratorRulesVocabug; _i < decoratorRulesVocabug_1.length; _i++) {
+                            var rule = decoratorRulesVocabug_1[_i];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
                         }
                     }
-                    for (var _b = 0, _c = state.catList; _b < _c.length; _b++) {
-                        var cato = _c[_b];
-                        if (stream.match(cato)) {
+                    else {
+                        for (var _a = 0, decoratorRulesNesca_1 = decoratorRulesNesca; _a < decoratorRulesNesca_1.length; _a++) {
+                            var rule = decoratorRulesNesca_1[_a];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                    }
+                }
+                // CATEGORIES
+                if (state.directive == 'categories') {
+                    if (state.we_on_newline) {
+                        stream.match(/\s*/);
+                        // A new Category
+                        var catRegex = new RegExp("(".concat(cappa, ")(?=\\s*=)"), "u");
+                        var match = stream.match(catRegex);
+                        if (match) {
+                            state.catList.push(match[1]);
+                            state.we_on_newline = false;
                             return "tagName";
                         }
                     }
-                }
-            }
-            // WORDS
-            if (state.directive == 'words') {
-                if (state.insideUnit) {
-                    for (var _d = 0, _e = state.unitList; _d < _e.length; _d++) {
-                        var unito = _e[_d];
-                        var regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");
-                        if (stream.match(regex)) {
-                            state.insideUnit = false;
-                            return "tagName";
+                    else {
+                        if (app === "vocabug") {
+                            for (var _b = 0, categoryRulesVocabug_1 = categoryRulesVocabug; _b < categoryRulesVocabug_1.length; _b++) {
+                                var rule = categoryRulesVocabug_1[_b];
+                                if (stream.match(rule.regex)) {
+                                    return rule.token;
+                                }
+                            }
+                        }
+                        else {
+                            for (var _c = 0, categoryRules_1 = categoryRules; _c < categoryRules_1.length; _c++) {
+                                var rule = categoryRules_1[_c];
+                                if (stream.match(rule.regex)) {
+                                    return rule.token;
+                                }
+                            }
+                        }
+                        for (var _d = 0, _e = state.catList; _d < _e.length; _d++) {
+                            var cato = _e[_d];
+                            if (stream.match(cato)) {
+                                return "tagName";
+                            }
                         }
                     }
                 }
-                else if (stream.match(/</)) {
-                    state.insideUnit = true;
-                    return "regexp";
-                }
-                else {
-                    // Categories
-                    for (var _f = 0, _g = state.catList; _f < _g.length; _f++) {
-                        var cato = _g[_f];
-                        if (stream.match(cato)) {
-                            state.insideUnit = false;
-                            return "tagName";
-                        }
-                    }
-                    for (var _h = 0, wordRules_1 = wordRules; _h < wordRules_1.length; _h++) {
-                        var rule = wordRules_1[_h];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
-                        }
-                    }
-                }
-            }
-            // UNITS
-            if (state.directive == 'units') {
-                if (state.we_on_newline) {
-                    stream.match(/\s*/);
-                    // A new UNIT!!
-                    var match = stream.match(/([A-Za-z+$\-]+)(?=\s*=)/);
-                    if (match) {
-                        state.unitList.push(match[1]);
-                        state.we_on_newline = false;
-                        return "tagName";
-                    }
-                }
-                else {
-                    for (var _j = 0, wordRules_2 = wordRules; _j < wordRules_2.length; _j++) {
-                        var rule = wordRules_2[_j];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
-                        }
-                    }
+                // WORDS
+                if (state.directive == 'words') {
                     if (state.insideUnit) {
-                        for (var _k = 0, _l = state.unitList; _k < _l.length; _k++) {
-                            var unito = _l[_k];
+                        for (var _f = 0, _g = state.unitList; _f < _g.length; _f++) {
+                            var unito = _g[_f];
                             var regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");
                             if (stream.match(regex)) {
                                 state.insideUnit = false;
@@ -20951,210 +20938,279 @@ var cm6 = (function (exports) {
                         return "regexp";
                     }
                     else {
-                        for (var _m = 0, _o = state.catList; _m < _o.length; _m++) {
-                            var cato = _o[_m];
+                        // Categories
+                        for (var _h = 0, _j = state.catList; _h < _j.length; _h++) {
+                            var cato = _j[_h];
+                            if (stream.match(cato)) {
+                                state.insideUnit = false;
+                                return "tagName";
+                            }
+                        }
+                        for (var _k = 0, wordRules_1 = wordRules; _k < wordRules_1.length; _k++) {
+                            var rule = wordRules_1[_k];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                    }
+                }
+                // UNITS
+                if (state.directive == 'units') {
+                    if (state.we_on_newline) {
+                        stream.match(/\s*/);
+                        // A new UNIT!!
+                        var match = stream.match(/([A-Za-z+$\-]+)(?=\s*=)/);
+                        if (match) {
+                            state.unitList.push(match[1]);
+                            state.we_on_newline = false;
+                            return "tagName";
+                        }
+                    }
+                    else {
+                        for (var _l = 0, wordRules_2 = wordRules; _l < wordRules_2.length; _l++) {
+                            var rule = wordRules_2[_l];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                        if (state.insideUnit) {
+                            for (var _m = 0, _o = state.unitList; _m < _o.length; _m++) {
+                                var unito = _o[_m];
+                                var regex = new RegExp(unito.replace(/[-+$/]/g, '\\$&') + "(?=>)");
+                                if (stream.match(regex)) {
+                                    state.insideUnit = false;
+                                    return "tagName";
+                                }
+                            }
+                        }
+                        else if (stream.match(/</)) {
+                            state.insideUnit = true;
+                            return "regexp";
+                        }
+                        else {
+                            for (var _p = 0, _q = state.catList; _p < _q.length; _p++) {
+                                var cato = _q[_p];
+                                if (stream.match(cato)) {
+                                    return "tagName";
+                                }
+                            }
+                        }
+                    }
+                }
+                // LISTS
+                if (state.directive == 'list') {
+                    for (var _r = 0, listRules_1 = listRules; _r < listRules_1.length; _r++) {
+                        var rule = listRules_1[_r];
+                        if (stream.match(rule.regex)) {
+                            return rule.token;
+                        }
+                    }
+                }
+                // GRAPHEMES
+                if (state.directive == 'graphemes') {
+                    for (var _s = 0, graphemesRules_1 = graphemesRules; _s < graphemesRules_1.length; _s++) {
+                        var rule = graphemesRules_1[_s];
+                        if (stream.match(rule.regex)) {
+                            return rule.token;
+                        }
+                    }
+                }
+                // LETTER-CASE FIELD
+                if (state.directive == 'letter-case-field') {
+                    if (state.we_on_newline) {
+                        var Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/);
+                        if (Fmatch) {
+                            state.featureList.push('+' + Fmatch[0]);
+                            state.featureList.push('-' + Fmatch[0]);
+                            return 'tagName';
+                        }
+                    }
+                    state.we_on_newline = false;
+                    for (var _t = 0, featureFieldRules_1 = featureFieldRules; _t < featureFieldRules_1.length; _t++) {
+                        var rule = featureFieldRules_1[_t];
+                        if (stream.match(rule.regex)) {
+                            return rule.token;
+                        }
+                    }
+                }
+                // FEATURES
+                if (state.directive == 'features') {
+                    if (state.we_on_newline) {
+                        stream.match(/\s*/);
+                        // A new Feature
+                        var Fmatch = stream.match(/[-+>][a-zA-Z+-]+(?=\s*=)/);
+                        if (Fmatch) {
+                            if (Fmatch[0][0] === '>') {
+                                state.featureList.push('+' + Fmatch[0].slice(1));
+                                state.featureList.push('-' + Fmatch[0].slice(1));
+                            }
+                            else {
+                                state.featureList.push(Fmatch[0]);
+                            }
+                            state.directive = 'features';
+                            state.we_on_newline = false;
+                            return "tagName";
+                        }
+                    }
+                    else {
+                        for (var _u = 0, featureRules_1 = featureRules; _u < featureRules_1.length; _u++) {
+                            var rule = featureRules_1[_u];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                        for (var _v = 0, _w = state.featureList; _v < _w.length; _v++) {
+                            var featuro = _w[_v];
+                            if (stream.match(featuro, false)) {
+                                var start = stream.pos;
+                                var end = start + featuro.length;
+                                var nextChar = stream.string.charAt(end);
+                                if (nextChar === ' ' || nextChar === ',' || nextChar === '') {
+                                    stream.match(featuro); // consume it
+                                    return "tagName";
+                                }
+                            }
+                        }
+                    }
+                }
+                if (state.directive == 'feature-field-header') {
+                    if (state.header_for_feature_field >= 1) {
+                        console.log("f-f");
+                        state.directive = "feature-field";
+                        // DO NOT return here: let the rest of the tokenizer
+                        // see this token with the new directive
+                    }
+                    else {
+                        if (state.we_on_newline) {
+                            state.header_for_feature_field += 1;
+                        }
+                        state.we_on_newline = false;
+                        return "variableName";
+                    }
+                }
+                // FEATURES-FIELD
+                if (state.directive == 'feature-field') {
+                    if (state.we_on_newline) {
+                        var Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/);
+                        if (Fmatch) {
+                            state.featureList.push('+' + Fmatch[0]);
+                            state.featureList.push('-' + Fmatch[0]);
+                            return 'tagName';
+                        }
+                    }
+                    state.we_on_newline = false;
+                    for (var _x = 0, featureFieldRules_2 = featureFieldRules; _x < featureFieldRules_2.length; _x++) {
+                        var rule = featureFieldRules_2[_x];
+                        if (stream.match(rule.regex)) {
+                            return rule.token;
+                        }
+                    }
+                }
+                // STAGE
+                if (state.directive == 'stage') {
+                    stream.match(/\s*/);
+                    if (state.we_on_newline) {
+                        if (state.sub_directive === 'routine') {
+                            state.sub_directive = 'none';
+                        }
+                        // Clusterfield
+                        if (stream.match(/< /)) {
+                            state.sub_directive = 'cluster-block';
+                            state.we_on_newline = false;
+                            return "meta";
+                        }
+                        // End of clusterfield
+                        if (state.sub_directive == 'cluster-block') {
+                            if (stream.match(/>(?=\s*($|;))/)) {
+                                state.sub_directive = 'none';
+                                return "meta";
+                            }
+                        }
+                        // Routine
+                        if (stream.match(/<routine/)) {
+                            state.sub_directive = 'routine';
+                            state.we_on_newline = false;
+                            return "meta";
+                        }
+                    }
+                    // ROUTINE
+                    if (state.sub_directive == 'routine') {
+                        for (var _y = 0, routineRules_1 = routineRules; _y < routineRules_1.length; _y++) {
+                            var rule = routineRules_1[_y];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                    }
+                    // CLUSTER-FIELD
+                    else if (state.sub_directive == 'cluster-block') {
+                        for (var _z = 0, clusterRules_1 = clusterRules; _z < clusterRules_1.length; _z++) {
+                            var rule = clusterRules_1[_z];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                    }
+                    // Inside Feature matrix
+                    else if (state.feature_matrix) {
+                        for (var _0 = 0, _1 = state.featureList; _0 < _1.length; _0++) {
+                            var featuro = _1[_0];
+                            if (stream.match(featuro, false)) {
+                                var start = stream.pos;
+                                var end = start + featuro.length;
+                                var nextChar = stream.string.charAt(end);
+                                if (nextChar === ' ' || nextChar === ',' || nextChar === ']') {
+                                    stream.match(featuro); // consume it
+                                    return "tagName";
+                                }
+                            }
+                        }
+                        if (stream.match(/,/)) {
+                            return "link";
+                        }
+                        if (stream.match(/]/)) {
+                            state.feature_matrix = false;
+                            return "regexp";
+                        }
+                    }
+                    else { // Syntax etc.
+                        // Generic tokens
+                        for (var _2 = 0, transformRules_1 = transformRules; _2 < transformRules_1.length; _2++) {
+                            var rule = transformRules_1[_2];
+                            if (stream.match(rule.regex)) {
+                                return rule.token;
+                            }
+                        }
+                        // Feature matrix
+                        if (stream.match(/\[/)) {
+                            state.feature_matrix = true;
+                            return "regexp";
+                        }
+                        // Categories into transforms
+                        for (var _3 = 0, _4 = state.catList; _3 < _4.length; _3++) {
+                            var cato = _4[_3];
                             if (stream.match(cato)) {
                                 return "tagName";
                             }
                         }
                     }
                 }
+                // IT'S JUST WISHFUL THINKING
+                stream.next();
+                return null;
             }
-            // LISTS
-            if (state.directive == 'list') {
-                for (var _p = 0, listRules_1 = listRules; _p < listRules_1.length; _p++) {
-                    var rule = listRules_1[_p];
-                    if (stream.match(rule.regex)) {
-                        return rule.token;
-                    }
-                }
-            }
-            // GRAPHEMES
-            if (state.directive == 'graphemes') {
-                for (var _q = 0, graphemesRules_1 = graphemesRules; _q < graphemesRules_1.length; _q++) {
-                    var rule = graphemesRules_1[_q];
-                    if (stream.match(rule.regex)) {
-                        return rule.token;
-                    }
-                }
-            }
-            // FEATURES
-            if (state.directive == 'features') {
-                if (state.we_on_newline) {
-                    stream.match(/\s*/);
-                    // A new Feature
-                    var Fmatch = stream.match(/[-+>][a-zA-Z+-]+(?=\s*=)/);
-                    if (Fmatch) {
-                        if (Fmatch[0][0] === '>') {
-                            state.featureList.push('+' + Fmatch[0].slice(1));
-                            state.featureList.push('-' + Fmatch[0].slice(1));
-                        }
-                        else {
-                            state.featureList.push(Fmatch[0]);
-                        }
-                        state.directive = 'features';
-                        state.we_on_newline = false;
-                        return "tagName";
-                    }
-                }
-                else {
-                    for (var _r = 0, featureRules_1 = featureRules; _r < featureRules_1.length; _r++) {
-                        var rule = featureRules_1[_r];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
-                        }
-                    }
-                    for (var _s = 0, _t = state.featureList; _s < _t.length; _s++) {
-                        var featuro = _t[_s];
-                        if (stream.match(featuro, false)) {
-                            var start = stream.pos;
-                            var end = start + featuro.length;
-                            var nextChar = stream.string.charAt(end);
-                            if (nextChar === ' ' || nextChar === ',' || nextChar === '') {
-                                stream.match(featuro); // consume it
-                                return "tagName";
-                            }
-                        }
-                    }
-                }
-            }
-            if (state.directive == 'feature-field-header') {
-                if (state.header_for_feature_field >= 1) {
-                    console.log("f-f");
-                    state.directive = "feature-field";
-                    // DO NOT return here: let the rest of the tokenizer
-                    // see this token with the new directive
-                }
-                else {
-                    if (state.we_on_newline) {
-                        state.header_for_feature_field += 1;
-                    }
-                    state.we_on_newline = false;
-                    return "variableName";
-                }
-            }
-            // FEATURES-FIELD
-            if (state.directive == 'feature-field') {
-                if (state.we_on_newline) {
-                    var Fmatch = stream.match(/[a-zA-Z+-.]+(?=(\s+|,))/);
-                    if (Fmatch) {
-                        state.featureList.push('+' + Fmatch[0]);
-                        state.featureList.push('-' + Fmatch[0]);
-                        return 'tagName';
-                    }
-                }
-                state.we_on_newline = false;
-                for (var _u = 0, featureFieldRules_1 = featureFieldRules; _u < featureFieldRules_1.length; _u++) {
-                    var rule = featureFieldRules_1[_u];
-                    if (stream.match(rule.regex)) {
-                        return rule.token;
-                    }
-                }
-            }
-            // STAGE
-            if (state.directive == 'stage') {
-                if (state.we_on_newline) {
-                    if (state.sub_directive === 'routine') {
-                        state.sub_directive = 'none';
-                    }
-                    stream.match(/\s*/);
-                    // Clusterfield
-                    if (stream.match(/< /)) {
-                        state.sub_directive = 'cluster-block';
-                        state.we_on_newline = false;
-                        return "meta";
-                    }
-                    // End of clusterfield
-                    if (state.sub_directive == 'cluster-block') {
-                        if (stream.match(/>(?=\s*($|;))/)) {
-                            state.sub_directive = 'none';
-                            return "meta";
-                        }
-                    }
-                    // Routine
-                    if (stream.match(/<routine/)) {
-                        state.sub_directive = 'routine';
-                        state.we_on_newline = false;
-                        return "meta";
-                    }
-                }
-                // ROUTINE
-                if (state.sub_directive == 'routine') {
-                    for (var _v = 0, routineRules_1 = routineRules; _v < routineRules_1.length; _v++) {
-                        var rule = routineRules_1[_v];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
-                        }
-                    }
-                }
-                // CLUSTER-FIELD
-                else if (state.sub_directive == 'cluster-block') {
-                    for (var _w = 0, clusterRules_1 = clusterRules; _w < clusterRules_1.length; _w++) {
-                        var rule = clusterRules_1[_w];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
-                        }
-                    }
-                }
-                // Inside Feature matrix
-                else if (state.feature_matrix) {
-                    for (var _x = 0, _y = state.featureList; _x < _y.length; _x++) {
-                        var featuro = _y[_x];
-                        if (stream.match(featuro, false)) {
-                            var start = stream.pos;
-                            var end = start + featuro.length;
-                            var nextChar = stream.string.charAt(end);
-                            if (nextChar === ' ' || nextChar === ',' || nextChar === ']') {
-                                stream.match(featuro); // consume it
-                                return "tagName";
-                            }
-                        }
-                    }
-                    if (stream.match(/,/)) {
-                        return "link";
-                    }
-                    if (stream.match(/]/)) {
-                        state.feature_matrix = false;
-                        return "regexp";
-                    }
-                }
-                else { // Syntax etc.
-                    // Generic tokens
-                    for (var _z = 0, transformRules_1 = transformRules; _z < transformRules_1.length; _z++) {
-                        var rule = transformRules_1[_z];
-                        if (stream.match(rule.regex)) {
-                            return rule.token;
-                        }
-                    }
-                    // Feature matrix
-                    if (stream.match(/\[/)) {
-                        state.feature_matrix = true;
-                        return "regexp";
-                    }
-                    // Categories into transforms
-                    for (var _0 = 0, _1 = state.catList; _0 < _1.length; _0++) {
-                        var cato = _1[_0];
-                        if (stream.match(cato)) {
-                            return "tagName";
-                        }
-                    }
-                }
-            }
-            // IT'S JUST WISHFUL THINKING
-            stream.next();
-            return null;
-        }
-    };
-    var stream = StreamLanguage.define(parser);
+        };
+    }
+    function stream(app) {
+        return StreamLanguage.define(parser(app));
+    }
 
-    function toolbar_func(view) {
+    function toolbar_func(app) {
         var dom = document.createElement("div");
         dom.className = "cm-toolbar";
         var generate_btn = document.createElement("button");
-        generate_btn.textContent = "Generate";
-        generate_btn.classList.add("generate-words", "green-btn");
-        generate_btn.onclick = function () {
-        };
+        generate_btn.textContent = app === "vocabug" ? "Generate" : "Apply";
+        generate_btn.classList.add("action-btn", "green-btn");
         dom.appendChild(generate_btn);
         var clear_btn = document.createElement("button");
         clear_btn.innerHTML = "<i class='fa fa-trash-can'></i>";
@@ -21162,26 +21218,21 @@ var cm6 = (function (exports) {
         dom.appendChild(clear_btn);
         var config_btn = document.createElement("button");
         config_btn.innerHTML = "<i class='fa fa-gear'></i>";
-        config_btn.onclick = function () {
-            window.location.href = '#config';
-        };
+        config_btn.onclick = function () { return window.location.href = '#config'; };
         dom.appendChild(config_btn);
         var open_btn = document.createElement("button");
         open_btn.innerHTML = "<i class='fa fa-folder'></i>";
-        open_btn.onclick = function () {
-            window.location.href = '#file-save-load';
-        };
+        open_btn.onclick = function () { return window.location.href = '#file-save-load'; };
         dom.appendChild(open_btn);
-        return {
-            dom: dom,
-            top: false
-        };
+        return { dom: dom, top: false };
     }
-    var toolbar = showPanel.of(toolbar_func);
+    function toolbar(app) {
+        return showPanel.of(function () { return toolbar_func(app); });
+    }
 
     var themeConfig = new Compartment();
     var lineWrapConfig = new Compartment();
-    function createEditorState(initialContents, myTheme) {
+    function createEditorState(initialContents, myTheme, app) {
         var extensions = [
             lineNumbers(),
             highlightActiveLineGutter(),
@@ -21196,10 +21247,10 @@ var cm6 = (function (exports) {
             keymap.of(__spreadArray(__spreadArray(__spreadArray([
                 indentWithTab
             ], closeBracketsKeymap, true), defaultKeymap, true), historyKeymap, true)),
-            new LanguageSupport(stream),
+            new LanguageSupport(stream(app)),
             themeConfig.of(themeIdentifier(myTheme)),
             lineWrapConfig.of([]),
-            toolbar,
+            toolbar(app),
         ];
         return EditorState.create({
             doc: initialContents,

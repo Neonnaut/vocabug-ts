@@ -10,17 +10,24 @@ generated words would have meta information that they were in a pos or word clas
 
 Tranforms could then have a condition that targets that word with a word class
 
+```
 @words.class = nouns
+words:
+  Example
 
+@words.class = verbs
+words:
+  Example2
+```
 >
 
-## 2. Long form category keys
+## Long form category keys
 
 Somehow, you could use arbitrary lengths for category keys, like `nasal = m, n`.
 
-## 9. Chance for individual optionals
+## Chance for individual optionals
 
-## 10. Promises
+## Promises
 
 This would ensure that if a the optional `y` appears, The only graphemes that would be in the pool for `V` would be `a,o,a`, avoiding a `yi` syllable inside generation.
 

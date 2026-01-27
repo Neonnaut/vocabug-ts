@@ -1,12 +1,15 @@
 import type Escape_Mapper from "./escape_mapper";
+import type lettercase_mapper from "./transforma/lettercase_mapper";
 import Logger from "./logger";
-import Supra_Builder from "./generata/supra_builder";
 
-import { make_percentage, cappa } from "./utils/utilities";
-import type {
+import type { App } from "./utils/types";
+
+import { make_percentage, cappa, get_last } from "./utils/utilities";
+import {
    Output_Mode,
    Distribution,
    Directive,
+   directive_check,
    Routine,
    Transform_Pending,
 } from "./utils/types";
@@ -14,16 +17,21 @@ import type {
 class Parser {
    private logger: Logger;
    private escape_mapper: Escape_Mapper;
-   public supra_builder: Supra_Builder;
+   public lettercase_mapper: lettercase_mapper;
 
    public num_of_words: number;
    public output_mode: Output_Mode;
    public remove_duplicates: boolean;
    public force_word_limit: boolean;
    public sort_words: boolean;
-   public word_divider: string;
+   public input_divider: string;
+   public output_divider: string;
 
    public directive: Directive = "none";
+
+   public disable_directive: "p" | boolean = false;
+
+   public directive_name: string;
 
    public category_distribution: Distribution;
    public category_pending: Map<string, { content: string; line_num: number }>;
@@ -35,7 +43,16 @@ class Parser {
 
    public feature_pending: Map<string, { content: string; line_num: number }>;
 
-   public transform_pending: Transform_Pending[];
+   // public transform_pending: Transform_Pending[];
+
+   public stages_pending: {
+      transforms_pending: Transform_Pending[];
+      name: string;
+   }[] = [];
+   public substages_pending: {
+      transforms_pending: Transform_Pending[];
+      name: string;
+   }[] = [];
 
    public graphemes: string[];
 
@@ -48,21 +65,27 @@ class Parser {
 
    private file_line_num = 0;
 
+   private app: App;
+
    constructor(
       logger: Logger,
+      app: App,
       escape_mapper: Escape_Mapper,
-      supra_builder: Supra_Builder,
+      lettercase_mapper: lettercase_mapper,
 
-      num_of_words_string: number | string,
+      num_of_words_string: number | string, // gen
+
       output_mode: Output_Mode,
       sort_words: boolean,
-      remove_duplicates: boolean,
-      force_word_limit: boolean,
-      word_divider: string,
+      remove_duplicates: boolean, // gen
+      force_word_limit: boolean, // gen
+      input_divider: string,
+      output_divider: string,
    ) {
       this.logger = logger;
+      this.app = app;
       this.escape_mapper = escape_mapper;
-      this.supra_builder = supra_builder;
+      this.lettercase_mapper = lettercase_mapper;
 
       if (num_of_words_string === "") {
          num_of_words_string = "100";
@@ -92,8 +115,19 @@ class Parser {
       this.sort_words = sort_words;
       this.remove_duplicates = remove_duplicates;
       this.force_word_limit = force_word_limit;
-      this.word_divider = word_divider === "" ? " " : word_divider;
-      this.word_divider = this.word_divider.replace(
+
+      this.input_divider = input_divider === "" ? "\\n" : input_divider;
+      this.input_divider = this.input_divider.replace(
+         new RegExp("\\\\n", "g"),
+         "\n",
+      );
+
+      if (app === "vocabug") {
+         this.output_divider = output_divider === "" ? " " : output_divider;
+      } else {
+         this.output_divider = output_divider === "" ? "\n" : output_divider;
+      }
+      this.output_divider = this.output_divider.replace(
          new RegExp("\\\\n", "g"),
          "\n",
       );
@@ -102,12 +136,12 @@ class Parser {
          this.sort_words = false;
          this.remove_duplicates = false;
          this.force_word_limit = false;
-         this.word_divider = " ";
+         this.output_divider = " ";
       } else if (this.output_mode === "debug") {
          this.sort_words = false;
          this.remove_duplicates = false;
          this.force_word_limit = false;
-         this.word_divider = "\n";
+         this.output_divider = "\n\n";
       }
 
       this.category_distribution = "gusein-zade";
@@ -117,7 +151,9 @@ class Parser {
       this.wordshape_distribution = "zipfian";
       this.wordshape_pending = { content: "", line_num: 0 };
 
-      this.transform_pending = [];
+      this.stages_pending = [];
+      this.substages_pending = [];
+
       this.feature_pending = new Map();
 
       this.alphabet = [];
@@ -126,6 +162,24 @@ class Parser {
       this.graphemes_pending = "";
       this.graphemes = [];
       this.syllable_boundaries = [];
+
+      this.disable_directive = false;
+      this.directive_name = "";
+   }
+
+   private get_line(file_array: string[]) {
+      let line = file_array[this.file_line_num];
+
+      line = this.escape_mapper.escape_backslash_pairs(line);
+      line = line.replace(/;.*/u, "").trim(); // Remove comment!!
+      line = this.escape_mapper.escape_named_escape(line);
+      if (line.includes("&[")) {
+         this.logger.validation_error(
+            `Invalid named escape`,
+            this.file_line_num,
+         );
+      }
+      return line;
    }
 
    parse_file(file: string) {
@@ -137,18 +191,10 @@ class Parser {
       let my_header: string[] = [];
       let my_clusterfield_transform: Transform_Pending[] = [];
 
-      for (; this.file_line_num < file_array.length; ++this.file_line_num) {
-         let line = file_array[this.file_line_num];
+      let my_wrapped_rule = "";
 
-         line = this.escape_mapper.escape_backslash_pairs(line);
-         line = line.replace(/;.*/u, "").trim(); // Remove comment!!
-         line = this.escape_mapper.escape_named_escape(line);
-         if (line.includes("&[")) {
-            this.logger.validation_error(
-               `Invalid named escape`,
-               this.file_line_num,
-            );
-         }
+      for (; this.file_line_num < file_array.length; ++this.file_line_num) {
+         let line = this.get_line(file_array);
          if (line === "") {
             continue; // Blank line !!
          }
@@ -177,7 +223,20 @@ class Parser {
             }
             my_directive = temp_directive;
             my_decorator = "none";
+            if (this.disable_directive === true) {
+               this.disable_directive = false;
+            } else if (this.disable_directive === "p") {
+               this.disable_directive = true;
+            }
+            if (my_directive === "stage") {
+               const stage = { transforms_pending: [], name: "" };
+               this.stages_pending.push(stage);
+            }
             continue; // It's a directive change
+         }
+
+         if (this.disable_directive) {
+            continue;
          }
 
          // NO DIRECTIVE
@@ -205,6 +264,12 @@ class Parser {
 
          // WORDS
          if (my_directive === "words") {
+            if (this.app !== "vocabug") {
+               this.logger.validation_error(
+                  `Words directive is only valid in Vocabug`,
+                  this.file_line_num,
+               );
+            }
             if (!this.valid_words_brackets(line)) {
                this.logger.validation_error(
                   `Wordshapes had missmatched brackets`,
@@ -218,6 +283,12 @@ class Parser {
 
          // UNITS
          if (my_directive === "units") {
+            if (this.app !== "vocabug") {
+               this.logger.validation_error(
+                  `Units directive is only valid in Vocabug`,
+                  this.file_line_num,
+               );
+            }
             const [key, field, valid] = this.get_cat_seg_fea(line, "unit");
             if (!valid) {
                this.logger.validation_error(
@@ -282,6 +353,23 @@ class Parser {
             }
          }
 
+         // LETTER-CASE-FIELD
+         if (my_directive === "letter-case-field") {
+            if (my_header.length === 0) {
+               const top_row = line.split(/[\s]+/).filter(Boolean);
+               if (top_row.length < 2) {
+                  this.logger.validation_error(
+                     `letter-case-field header too short`,
+                     this.file_line_num,
+                  );
+               }
+               my_header = top_row;
+               continue;
+            } else {
+               this.parse_lettercasefield(line, my_header);
+            }
+         }
+
          // ALPHABET
          if (my_directive === "alphabet") {
             const alphabet = line.split(/[,\s]+/).filter(Boolean);
@@ -326,9 +414,14 @@ class Parser {
 
          // STAGE
          if (my_directive === "stage") {
+            // I need to push each transform to the last stage in stages_pending
+
             if (my_subdirective === "clusterfield") {
                if (line.startsWith(">")) {
-                  this.transform_pending.push(...my_clusterfield_transform);
+                  for (const transform of my_clusterfield_transform) {
+                     this.push_transform_to_stage(transform);
+                  }
+
                   my_subdirective = "none";
                   my_header = [];
                   my_clusterfield_transform = [];
@@ -343,6 +436,13 @@ class Parser {
                );
                continue;
             } else if (line.startsWith("< ")) {
+               if (my_wrapped_rule.length != 0) {
+                  this.logger.validation_error(
+                     `Wrapped rule was not completed before starting cluster-field`,
+                     this.file_line_num,
+                  );
+               }
+
                my_clusterfield_transform.push({
                   t_type: "cluster-field",
                   target: "",
@@ -364,9 +464,16 @@ class Parser {
                my_header = top_row;
                continue;
             } else if (line.startsWith("<routine")) {
+               if (my_wrapped_rule.length != 0) {
+                  this.logger.validation_error(
+                     `Wrapped rule was not completed before starting routine`,
+                     this.file_line_num,
+                  );
+               }
+
                // Routine
                const my_routine = this.parse_routine(line);
-               this.transform_pending.push({
+               this.push_transform_to_stage({
                   t_type: my_routine,
                   target: "\\",
                   result: "\\",
@@ -378,10 +485,20 @@ class Parser {
                continue;
             } else {
                // Else it's a normal transform rule
+
+               const continuationRe = /(->|=>|>>|⇒|→|\/|!)$/;
+               // If the line ends with a continuation operator, keep reading
+               if (continuationRe.test(line)) {
+                  my_wrapped_rule += " " + line;
+                  continue;
+               }
+               line = my_wrapped_rule + " " + line;
+               my_wrapped_rule = "";
+
                const [target, result, conditions, exceptions] =
                   this.get_transform(line);
 
-               this.transform_pending.push({
+               this.push_transform_to_stage({
                   t_type: "rule",
                   target: target,
                   result: result,
@@ -401,6 +518,17 @@ class Parser {
             this.file_line_num,
          );
       }
+   }
+
+   push_transform_to_stage(transform: Transform_Pending) {
+      // Get last stage and push the transform into it.
+      // if no stage exists, create one called "default"
+      let stage = get_last(this.stages_pending);
+      if (!stage) {
+         stage = { transforms_pending: [], name: "default" };
+         this.stages_pending.push(stage);
+      }
+      stage.transforms_pending.push(transform);
    }
 
    get_cat_seg_fea(
@@ -480,7 +608,7 @@ class Parser {
    }
 
    private parse_decorator(line: string, old_decorator: string): string {
-      let new_decorator: "none" | "words" | "categories" = "none";
+      let new_decorator: string = "none";
       line = line.substring(1); // remove '@' sign
       line = this.escape_mapper.restore_preserve_escaped_chars(line);
 
@@ -488,47 +616,67 @@ class Parser {
       const dotCount = (line.match(/\./g) || []).length;
       const eqCount = (line.match(/=/g) || []).length;
 
-      if (dotCount !== 1 || eqCount !== 1) {
+      if (dotCount !== 1) {
          this.logger.validation_error(
-            `Invalid decorator format`,
+            `Invalid decorator format1`,
             this.file_line_num,
          );
       }
-
       // Split at the first "."
       const [my_directive, my_thing] = line.split(/\.(.+)/).filter(Boolean);
 
-      // Split the remainder at "="
-      let [my_property, my_value] = my_thing.split("=");
-      my_property = my_property.trim();
-      my_value = my_value.trim();
+      if (eqCount === 1) {
+         // It's a property and value
+         // Split the remainder at "="
+         let [my_property, my_value] = my_thing.split("=");
+         my_property = my_property.trim();
+         my_value = my_value.trim();
 
-      if (my_directive === "words") {
-         if (my_property === "distribution") {
-            this.wordshape_distribution = this.parse_distribution(my_value);
-            new_decorator = "words";
-         } else if (my_property === "optionals-weight") {
-            if (!my_value.endsWith("%")) {
-               this.logger.validation_error(
-                  `Invalid optionals-weight '${my_value}' -- expected a percentage value ending with '%'`,
-                  this.file_line_num,
-               );
+         if (my_directive === "words") {
+            if (my_property === "distribution") {
+               this.wordshape_distribution = this.parse_distribution(my_value);
+               new_decorator = "words";
+            } else if (my_property === "optionals-weight") {
+               if (!my_value.endsWith("%")) {
+                  this.logger.validation_error(
+                     `Invalid optionals-weight '${my_value}' -- expected a percentage value ending with '%'`,
+                     this.file_line_num,
+                  );
+               }
+               my_value = my_value.slice(0, -1).trim(); // Remove '%' sign
+               const optionals_weight = make_percentage(my_value);
+               if (optionals_weight == null) {
+                  this.logger.validation_error(
+                     `Invalid optionals-weight '${my_value}' -- expected a number between 1 and 100`,
+                     this.file_line_num,
+                  );
+               }
+               this.optionals_weight = optionals_weight;
+               new_decorator = "words";
             }
-            my_value = my_value.slice(0, -1).trim(); // Remove '%' sign
-            const optionals_weight = make_percentage(my_value);
-            if (optionals_weight == null) {
-               this.logger.validation_error(
-                  `Invalid optionals-weight '${my_value}' -- expected a number between 1 and 100`,
-                  this.file_line_num,
-               );
+         } else if (my_directive === "categories") {
+            if (my_property === "distribution") {
+               this.category_distribution = this.parse_distribution(my_value);
+               new_decorator = "categories";
             }
-            this.optionals_weight = optionals_weight;
-            new_decorator = "words";
          }
-      } else if (my_directive === "categories") {
-         if (my_property === "distribution") {
-            this.wordshape_distribution = this.parse_distribution(my_value);
-            new_decorator = "categories";
+      } else {
+         // It's a boolean flag
+         if (my_thing === "disabled") {
+            if (directive_check.includes(my_directive)) {
+               new_decorator = my_directive;
+               this.disable_directive = "p";
+            } else {
+               this.logger.validation_error(
+                  `Invalid directive name on decorator ${my_directive}`,
+                  this.file_line_num,
+               );
+            }
+         } else {
+            this.logger.validation_error(
+               `Invalid decorator format2`,
+               this.file_line_num,
+            );
          }
       }
 
@@ -567,6 +715,8 @@ class Parser {
          temp_directive = "feature-field";
       } else if (line === "stage:") {
          temp_directive = "stage";
+      } else if (line === "letter-case-field:") {
+         temp_directive = "letter-case-field";
       }
       if (temp_directive === "none") {
          return "none"; // Not a directive change
@@ -891,6 +1041,28 @@ class Parser {
             line_num: this.file_line_num,
          });
       }
+   }
+
+   private parse_lettercasefield(line: string, top_row: string[]) {
+      const my_row = line.split(/[\s]+/).filter(Boolean);
+      const my_key = my_row.shift();
+      if (my_key !== "uppercase") {
+         this.logger.validation_error(
+            `Letter-case-field first column must be 'uppercase'`,
+            this.file_line_num,
+         );
+      }
+      if (my_row.length !== top_row.length || my_key === undefined) {
+         this.logger.validation_error(
+            `Feature-field row length mismatch with header length -- expected row length of ${top_row.length} but got lenght of ${my_row.length}`,
+            this.file_line_num,
+         );
+      }
+
+      const my_map = new Map<string, string>(
+         top_row.map((k, i): [string, string] => [k, my_row[i]]),
+      );
+      this.lettercase_mapper.create_map(my_map);
    }
 
    private valid_transform_brackets(str: string): boolean {

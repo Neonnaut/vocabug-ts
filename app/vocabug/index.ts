@@ -4,7 +4,7 @@ const cm6 = (window as any).cm6; // This was global. Stops TS from complaining
 
 const w = new Worker('./worker.js', { type: 'module' });
 
-import { VOCABUG_VERSION } from '../src/utils/vocabug-version';
+import { VERSION } from '../../src/utils/version';
 
 function create_file_editor() {
     // Work out content and theme of file editor
@@ -31,7 +31,7 @@ function create_file_editor() {
 
     // Create file editor
     return cm6.createEditorView(
-        cm6.createEditorState(content, theme),
+        cm6.createEditorState(content, theme, "vocabug"),
         document.getElementById("editor")
     );
 }
@@ -42,13 +42,13 @@ window.addEventListener("load", () => {
     if (localStorage.hasOwnProperty('vocabug')) {
         try {
             const got_LocalStorage = JSON.parse(localStorage.getItem('vocabug') || '[]') as [string, string, string, string, string];
-            let filename = got_LocalStorage[1];
+            const filename = got_LocalStorage[1];
             set_filename(filename);
 
-            let numwords = got_LocalStorage[2];
+            const numwords = got_LocalStorage[2];
             (document.getElementById('num-of-words') as HTMLInputElement).value = numwords;
 
-            let mode = got_LocalStorage[3];
+            const mode = got_LocalStorage[3];
             const my_mode = document.getElementById('my_mode') as HTMLSelectElement | null;
             if (!my_mode) {throw new Error}
             for (const option of Array.from(my_mode.options)) {
@@ -57,7 +57,7 @@ window.addEventListener("load", () => {
                 }
             }
             
-            let worddivider = got_LocalStorage[4] || " ";
+            const worddivider = got_LocalStorage[4] || " ";
             (document.getElementById('word-divider') as HTMLInputElement).value = worddivider;
 
             mode_buttons();
@@ -136,7 +136,7 @@ window.addEventListener("load", () => {
     // Watch for dark / light change in system settings for system theme people
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
         if (!localStorage.hasOwnProperty('colourScheme')) {
-            let scheme = event.matches ? "dark" : "light";
+            const scheme = event.matches ? "dark" : "light";
             if (scheme == "dark") {
                 cm6.changeEditorTheme(editor, "dark");
                 document.getElementById("colour-target")?.classList.remove("light-mode");
@@ -148,26 +148,26 @@ window.addEventListener("load", () => {
     });
     
     // Generate button(s)
-    document.querySelectorAll(".generate-words")?.forEach(btn => {
+    document.querySelectorAll(".action-btn")?.forEach(btn => {
         btn.addEventListener("click", function () {
-            const generate_buttons = Array.from(document.querySelectorAll(".generate-words")) as HTMLButtonElement[];
+            const generate_buttons = Array.from(document.querySelectorAll(".action-btn")) as HTMLButtonElement[];
             const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
 
             // Disable all generate buttons
             generate_buttons.forEach(b => b.disabled = true);
 
-            const output_message_html = `<p class='grey-message'>Generating words with Vocabug version ${VOCABUG_VERSION}. This may take up to 30 seconds...</p>`;
+            const output_message_html = `<p class='grey-message'>Generating words with Vocabug version ${VERSION}. This may take up to 30 seconds...</p>`;
             output_message.innerHTML = output_message_html;
 
             try {
                 w.postMessage({
                     file: editor.state.doc.toString(),
                     num_of_words: (document.getElementById('num-of-words') as HTMLInputElement)?.value || "",
-                    mode: (document.getElementById("my_mode") as HTMLSelectElement)?.value || "",
+                    output_mode: (document.getElementById("my_mode") as HTMLSelectElement)?.value || "",
                     remove_duplicates: (document.getElementById('remove-duplicates') as HTMLInputElement)?.checked || false,
                     force_word_limit: (document.getElementById('force-words') as HTMLInputElement)?.checked || false,
                     sort_words: (document.getElementById('sort-words') as HTMLInputElement)?.checked || false,
-                    word_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
+                    output_divider: (document.getElementById('word-divider') as HTMLInputElement)?.value || ""
                 });
 
                 w.onerror = function (e: ErrorEvent) {
@@ -195,13 +195,13 @@ window.addEventListener("load", () => {
         const output_message = document.getElementById('prog-output-message') as HTMLDivElement;
         const filename_input = document.getElementById('file-name') as HTMLInputElement;
         const num_of_words_input = document.getElementById('num-of-words') as HTMLInputElement;
-        const word_divider_input = document.getElementById('word-divider') as HTMLInputElement;
+        const output_divider_input = document.getElementById('word-divider') as HTMLInputElement;
         const mode_input = document.getElementById('my_mode') as HTMLSelectElement;
 
-        const generate_buttons = Array.from(document.querySelectorAll(".generate-words")) as HTMLButtonElement[];
+        const generate_buttons = Array.from(document.querySelectorAll(".action-btn")) as HTMLButtonElement[];
 
         if (output_words_field) {
-            output_words_field.value = e.data.words;
+            output_words_field.value = e.data.payload;
             output_words_field.focus();
         }
 
@@ -228,7 +228,7 @@ window.addEventListener("load", () => {
         }
         if (e.data.diagnostic_messages.length != 0) {
             for (const message of e.data.diagnostic_messages) {
-                console.debug(message);
+                console.info(message);
             }
         }
 
@@ -241,7 +241,7 @@ window.addEventListener("load", () => {
             filename,
             num_of_words_input?.value,
             mode_input?.value,
-            word_divider_input?.value
+            output_divider_input?.value
         ]));
 
         // Re-enable all generate buttons
@@ -454,7 +454,7 @@ function mode_buttons() {
     const selectElement = document.getElementById("my_mode") as HTMLSelectElement;
     const sort_words = document.getElementById("sort-words") as HTMLInputElement;
     const remove_duplicates = document.getElementById("remove-duplicates") as HTMLInputElement;
-    const word_divider = document.getElementById("word-divider") as HTMLInputElement;
+    const output_divider = document.getElementById("word-divider") as HTMLInputElement;
     const force_words = document.getElementById("force-words") as HTMLInputElement;
 
     const selectedValue = selectElement.value;
@@ -462,13 +462,13 @@ function mode_buttons() {
         case "word-list":
             if (sort_words) sort_words.disabled = false;
             if (remove_duplicates) remove_duplicates.disabled = false;
-            if (word_divider) word_divider.disabled = false;
+            if (output_divider) output_divider.disabled = false;
             if (force_words) force_words.disabled = false;
             break;
         default:
             if (sort_words) sort_words.disabled = true;
             if (remove_duplicates) remove_duplicates.disabled = true;
-            if (word_divider) word_divider.disabled = true;
+            if (output_divider) output_divider.disabled = true;
             if (force_words) force_words.disabled = true;
             break;
     }
@@ -478,7 +478,7 @@ function mode_buttons() {
 
 
 function colourSchemeButtons(clickedElement: HTMLElement): void {
-    const selection: NodeListOf<HTMLAnchorElement> = document.querySelectorAll("#colour-switch-field a");
+    const selection: NodeListOf<HTMLAnchorElement> = document.querySelectorAll("#colour-switch-field button");
     selection.forEach(el => el.classList.remove('checked'));
     clickedElement.classList.add("checked");
 }
