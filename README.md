@@ -55,17 +55,17 @@ Documentation lives online at [neonnaut.neocities.org/nesca_docs](neonnaut.neoci
 
 To build use `npm run build`. For live testing use `npm run dev-vocabug` or `npm run dev-nesca`.
 
-[1]: https://img.shields.io/npm/v/vocabug
-[2]: https://www.npmjs.com/package/vocabug "npm package"
-[3]: https://img.shields.io/npm/l/vocabug
-[4]: https://github.com/Neonnaut/vocabug-ts/blob/master/LICENSE "license text"
-[5]: https://img.shields.io/github/issues-raw/Neonnaut/vocabug-ts
-[6]: https://github.com/Neonnaut/vocabug-ts/issues "issues page"
-[7]: https://img.shields.io/github/commit-activity/m/Neonnaut/vocabug-ts
-[8]: https://github.com/Neonnaut/vocabug-ts/commits "commit log"
+[1]: https://img.shields.io/npm/v/the_conlangers_suite
+[2]: https://www.npmjs.com/package/the_conlangers_suite "npm package"
+[3]: https://img.shields.io/npm/l/the_conlangers_suite
+[4]: https://github.com/Neonnaut/the-conlangers-suite/blob/master/LICENSE "license text"
+[5]: https://img.shields.io/github/issues-raw/Neonnaut/the-conlangers-suite
+[6]: https://github.com/Neonnaut/the-conlangers-suite/issues "issues page"
+[7]: https://img.shields.io/github/commit-activity/m/Neonnaut/the-conlangers-suite
+[8]: https://github.com/Neonnaut/the-conlangers-suite/commits "commit log"
 
-[badge-link]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml
-[Tests]: https://github.com/Neonnaut/vocabug-ts/actions/workflows/ci.yml/badge.svg
+[badge-link]: https://github.com/Neonnaut/the-conlangers-suite/actions/workflows/ci.yml
+[Tests]: https://github.com/Neonnaut/the-conlangers-suite/actions/workflows/ci.yml/badge.svg
 
 
 
